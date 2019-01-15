@@ -13,24 +13,24 @@ class LogEvent(QCustomEvent):
         QCustomEvent.__init__(self, QEvent.User)
 
         self.record = record
-        
+
 
 def processLogMessages():
     i = 0
     while i < 10:
         if len(_logHandler.buffer) <= i:
             break
-        
+
         record = _logHandler.buffer[i]
-        
+
         for viewer in _logHandler.registeredViewers:
-            #viewer.appendLogRecord(record)
+            # viewer.appendLogRecord(record)
             qApp.postEvent(viewer, LogEvent(record))
-            
+
         i += 1
-        
+
     del _logHandler.buffer[0:i]
-    
+
 
 def GUILogHandler():
     global _logHandler
@@ -54,60 +54,38 @@ class LogRecord:
         self.time = record.created
         self.message = record.getMessage()
 
-
     def getName(self):
         return self.name
-        
 
     def getLevel(self):
         return self.levelno
 
-
     def getLevelName(self):
         return self.levelname
 
-
     def getDate(self):
-        return time.strftime('%Y-%m-%d', time.localtime(self.time))
+        return time.strftime("%Y-%m-%d", time.localtime(self.time))
 
-    
     def getTime(self):
-        return time.strftime('%H:%M:%S', time.localtime(self.time))
+        return time.strftime("%H:%M:%S", time.localtime(self.time))
 
-    
     def getMessage(self):
         return self.message
-    
+
 
 class __GUILogHandler(logging.Handler):
     def __init__(self):
         logging.Handler.__init__(self)
-        
+
         self.buffer = []
 
         self.registeredViewers = weakref.WeakKeyDictionary()
-        
 
     def register(self, viewer):
-        self.registeredViewers[viewer] = ''
+        self.registeredViewers[viewer] = ""
 
         for rec in self.buffer:
             viewer.appendLogRecord(rec)
-                    
-    
+
     def emit(self, record):
         self.buffer.append(LogRecord(record))
-
-
-
-
-
-
-
-
-
-
-
-
-
-

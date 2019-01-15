@@ -32,13 +32,14 @@ class LogEvent(QEvent):
     """
     Descript. :
     """
+
     def __init__(self, record):
         """
         Descript. :
         """
         QEvent.__init__(self, QEvent.User)
         self.record = record
-        
+
 
 def processLogMessages():
     """
@@ -48,16 +49,16 @@ def processLogMessages():
     while i < 10:
         if len(_logHandler.buffer) <= i:
             break
-        
+
         record = _logHandler.buffer[i]
-        
+
         for viewer in _logHandler.registeredViewers:
             QApplication.postEvent(viewer, LogEvent(record))
-            
+
         i += 1
-        
+
     del _logHandler.buffer[0:i]
-    
+
 
 def do_process_log_messages(sleep_time):
     """
@@ -65,7 +66,7 @@ def do_process_log_messages(sleep_time):
     """
     while True:
         processLogMessages()
-        time.sleep(sleep_time)  
+        time.sleep(sleep_time)
 
 
 def GUILogHandler():
@@ -78,10 +79,10 @@ def GUILogHandler():
     if _logHandler is None:
         _logHandler = __GUILogHandler()
 
-        _timer =  gevent.spawn(do_process_log_messages, 0.2) 
-        #_timer = QtCore.QTimer()
-        #QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
-        #_timer.start(10)
+        _timer = gevent.spawn(do_process_log_messages, 0.2)
+        # _timer = QtCore.QTimer()
+        # QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
+        # _timer.start(10)
 
     return _logHandler
 
@@ -123,20 +124,20 @@ class LogRecord:
         """
         Descript. :
         """
-        return time.strftime('%Y-%m-%d', time.localtime(self.time))
-    
+        return time.strftime("%Y-%m-%d", time.localtime(self.time))
+
     def getTime(self):
         """
         Descript. :
         """
-        return time.strftime('%H:%M:%S', time.localtime(self.time))
-    
+        return time.strftime("%H:%M:%S", time.localtime(self.time))
+
     def getMessage(self):
         """
         Descript. :
         """
         return self.message
-    
+
 
 class __GUILogHandler(logging.Handler):
     """
@@ -148,19 +149,19 @@ class __GUILogHandler(logging.Handler):
         Descript. :
         """
         logging.Handler.__init__(self)
-        
+
         self.buffer = []
 
         self.registeredViewers = weakref.WeakKeyDictionary()
-        
+
     def register(self, viewer):
         """
         Descript. :
         """
-        self.registeredViewers[viewer] = ''
+        self.registeredViewers[viewer] = ""
         for rec in self.buffer:
             viewer.append_log_record(rec)
-    
+
     def emit(self, record):
         """
         Descript. :

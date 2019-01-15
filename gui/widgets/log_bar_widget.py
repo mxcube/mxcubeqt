@@ -30,7 +30,6 @@ __license__ = "LGPLv3+"
 
 
 class LogBarWidget(QtImport.QWidget):
-
     def __init__(self, parent=None, name="log_bar_widget", fl=0):
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
 
@@ -63,4 +62,4 @@ class LogBarWidget(QtImport.QWidget):
         self.text_edit.setPalette(palette)
 
     def set_fixed_height(self, height):
-        self.text_edit.setFixedHeight(height)            
+        self.text_edit.setFixedHeight(height)

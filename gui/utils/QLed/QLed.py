@@ -1,10 +1,10 @@
-
 from QtImport import *
 
 from qled_resources import *
 
+
 class QLed(QWidget):
-    def __init__(self,*args):
+    def __init__(self, *args):
 
         QWidget.__init__(self, *args)
         self.value = False
@@ -17,7 +17,7 @@ class QLed(QWidget):
 
         self.shape = "circle"
 
-        self.shapes = ["circle", "square" , "triang", "round"]
+        self.shapes = ["circle", "square", "triang", "round"]
         self.colors = ["red", "green", "yellow", "grey", "orange", "purple", "blue"]
         self.renderer = QSvgRenderer()
         self.setOff()
@@ -34,22 +34,22 @@ class QLed(QWidget):
         self.message = msg
         self._update()
 
-    def paintEvent(self,ev):
-        painter = QPainter(self)  
+    def paintEvent(self, ev):
+        painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing, True)
 
-        self.filename = ":/resources/%s_%s.svg" % (self.shape, self.color) 
-        
+        self.filename = ":/resources/%s_%s.svg" % (self.shape, self.color)
+
         self.renderer.load(self.filename)
         self.renderer.render(painter)
 
-    def setOnColor(self,color):
+    def setOnColor(self, color):
         self.on_color = color
 
-    def setOffColor(self,color):
+    def setOffColor(self, color):
         self.off_color = color
 
-    def setShape(self,shape):
+    def setShape(self, shape):
         self.shape = shape
 
     def setOn(self):
@@ -58,7 +58,7 @@ class QLed(QWidget):
     def setOff(self):
         self.setState(False)
 
-    def setState(self,value):
+    def setState(self, value):
         self.value = value
         if self.value:
             self.color = self.on_color
@@ -68,11 +68,11 @@ class QLed(QWidget):
             self.message = "Off"
         self._update()
 
-    def toggle(self,value):
+    def toggle(self, value):
         self.value != value
         self._update()
 
-    def setShape(self, shape ):
+    def setShape(self, shape):
         self.shape = shape
         self._update()
 
@@ -87,22 +87,22 @@ class QLed(QWidget):
 
     def _update(self):
         if self.username:
-           _msg = self.username
+            _msg = self.username
         else:
-           _msg = ""
+            _msg = ""
 
         if self.message:
-           _msg += ". " + self.message
+            _msg += ". " + self.message
         self.setToolTip(_msg)
-   
+
         self.repaint()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app = QApplication([])
     win = QMainWindow()
     wid = QLed()
     wid.setOn()
-    win.setCentralWidget(wid) 
+    win.setCentralWidget(wid)
     win.show()
     app.exec_()
-

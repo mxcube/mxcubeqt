@@ -34,7 +34,7 @@ __category__ = "General"
 
 class Qt4_BeamstopDistanceBrick(BlissWidget):
     """
-    Descript. : 
+    Descript. :
     """
 
     def __init__(self, *args):
@@ -51,8 +51,8 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         self.beamstop_limits = [0, 200]
 
         # Properties ----------------------------------------------------------
-        self.addProperty('mnemonic', 'string', '')
-        self.addProperty('formatString', 'formatString', '###.##')
+        self.addProperty("mnemonic", "string", "")
+        self.addProperty("formatString", "formatString", "###.##")
 
         # Graphic elements ----------------------------------------------------
         self.group_box = QGroupBox("Beamstop distance", self)
@@ -83,39 +83,36 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         self.new_value_ledit.returnPressed.connect(self.current_value_changed)
         self.new_value_ledit.textChanged.connect(self.input_field_changed)
 
-        # Other --------------------------------------------------------------- 
-        Qt4_widget_colors.set_widget_color(self.new_value_ledit,
-                                           Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                           QPalette.Base)
-        self.new_value_validator = QDoubleValidator(\
-             0, 100, 2, self.new_value_ledit)
+        # Other ---------------------------------------------------------------
+        Qt4_widget_colors.set_widget_color(
+            self.new_value_ledit, Qt4_widget_colors.LINE_EDIT_ACTIVE, QPalette.Base
+        )
+        self.new_value_validator = QDoubleValidator(0, 100, 2, self.new_value_ledit)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         """
-        if property_name == 'mnemonic':
+        if property_name == "mnemonic":
             if self.beamstop_hwobj is not None:
-                self.disconnect(self.beamstop_hwobj,
-                                'deviceReady',
-                                self.connected)
-                self.disconnect(self.beamstop_hwobj,
-                                'deviceNotReady',
-                                self.disconnected)
-                self.disconnect(self.beamstop_hwobj,
-                                'beamstopDistanceChanged',
-                                self.beamstop_distance_changed)
+                self.disconnect(self.beamstop_hwobj, "deviceReady", self.connected)
+                self.disconnect(
+                    self.beamstop_hwobj, "deviceNotReady", self.disconnected
+                )
+                self.disconnect(
+                    self.beamstop_hwobj,
+                    "beamstopDistanceChanged",
+                    self.beamstop_distance_changed,
+                )
             self.beamstop_hwobj = self.getHardwareObject(new_value)
             if self.beamstop_hwobj is not None:
-                self.connect(self.beamstop_hwobj,
-                             'deviceReady',
-                             self.connected)
-                self.connect(self.beamstop_hwobj,
-                             'deviceNotReady',
-                             self.disconnected)
-                self.connect(self.beamstop_hwobj,
-                             'beamstopDistanceChanged',
-                             self.beamstop_distance_changed)
+                self.connect(self.beamstop_hwobj, "deviceReady", self.connected)
+                self.connect(self.beamstop_hwobj, "deviceNotReady", self.disconnected)
+                self.connect(
+                    self.beamstop_hwobj,
+                    "beamstopDistanceChanged",
+                    self.beamstop_distance_changed,
+                )
                 if self.beamstop_hwobj.isReady():
                     self.connected()
                     self.beamstop_hwobj.update_values()
@@ -145,13 +142,13 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         Descript. :
         """
         if input_field_text == "":
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
-                                               Qt4_widget_colors.LINE_EDIT_ACTIVE,
-                                               QPalette.Base)
+            Qt4_widget_colors.set_widget_color(
+                self.new_value_ledit, Qt4_widget_colors.LINE_EDIT_ACTIVE, QPalette.Base
+            )
         else:
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit,
-                                               Qt4_widget_colors.LINE_EDIT_CHANGED,
-                                               QPalette.Base)
+            Qt4_widget_colors.set_widget_color(
+                self.new_value_ledit, Qt4_widget_colors.LINE_EDIT_CHANGED, QPalette.Base
+            )
 
     def beamstop_distance_changed(self, value):
         """
@@ -162,8 +159,8 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
         if value < 0:
             self.beamstop_distance_ledit.setText("")
         else:
-            value_str = self['formatString'] % value
-            self.beamstop_distance_ledit.setText('%s mm' % value_str) 
+            value_str = self["formatString"] % value
+            self.beamstop_distance_ledit.setText("%s mm" % value_str)
 
     def current_value_changed(self):
         """
@@ -178,4 +175,4 @@ class Qt4_BeamstopDistanceBrick(BlissWidget):
             if val < self.beamstop_limits[0] or val > self.beamstop_limits[1]:
                 return
         self.beamstop_hwobj.set_distance(val)
-        self.new_value_ledit.setText('')
+        self.new_value_ledit.setText("")

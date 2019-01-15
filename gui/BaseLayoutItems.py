@@ -30,7 +30,6 @@ __license__ = "LGPLv3+"
 
 
 class _CfgItem:
-
     def __init__(self, name, item_type=""):
         self.name = name
         self.type = item_type
@@ -38,11 +37,25 @@ class _CfgItem:
         self.connections = []
 
         self.properties = PropertyBag.PropertyBag()
-        self.properties.add_property("alignment", "combo", ("none",
-                                     "top center", "top left", "top right",
-                                     "bottom center", "bottom left",
-                                     "bottom right", "center", "hcenter",
-                                     "vcenter", "left", "right"), "none")
+        self.properties.add_property(
+            "alignment",
+            "combo",
+            (
+                "none",
+                "top center",
+                "top left",
+                "top right",
+                "bottom center",
+                "bottom left",
+                "bottom right",
+                "center",
+                "hcenter",
+                "vcenter",
+                "left",
+                "right",
+            ),
+            "none",
+        )
         self.signals = {}
         self.slots = {}
 
@@ -54,8 +67,9 @@ class _CfgItem:
             if hasattr(item_property, "getName"):
                 prop_name = item_property.getName()
                 if prop_name in self.properties.properties:
-                    self.properties.get_property(prop_name).setValue(\
-                         item_property.getUserValue())
+                    self.properties.get_property(prop_name).setValue(
+                        item_property.getUserValue()
+                    )
                 elif item_property.hidden or prop_name.startswith("closable_"):
                     self.properties[prop_name] = item_property
                 elif item_property.hidden or prop_name.startswith("newdialog_"):
@@ -66,12 +80,14 @@ class _CfgItem:
                 else:
                     arg1 = item_property["value"]
                 arg2 = item_property["defaultValue"]
-                self.properties.add_property(property_name=item_property["name"],
-                                             property_type=item_property["type"],
-                                             arg1=arg1,
-                                             arg2=arg2,
-                                             comment=item_property["comment"],
-                                             hidden=item_property["hidden"])
+                self.properties.add_property(
+                    property_name=item_property["name"],
+                    property_type=item_property["type"],
+                    arg1=arg1,
+                    arg2=arg2,
+                    comment=item_property["comment"],
+                    hidden=item_property["hidden"],
+                )
 
     def __getitem__(self, item):
         try:
@@ -88,29 +104,31 @@ class _CfgItem:
     def rename(self, new_name):
         self.name = new_name
 
-class ContainerCfg(_CfgItem):
 
+class ContainerCfg(_CfgItem):
     def __init__(self, *args):
         _CfgItem.__init__(self, *args)
- 
+
         self.properties.add_property("label", "string", "")
         self.properties.add_property("icon", "string", "")
         self.properties.add_property("spacing", "integer", DEFAULT_SPACING)
         self.properties.add_property("margin", "integer", DEFAULT_MARGIN)
         self.properties.add_property("color", "color", None)
-        self.properties.add_property("hsizepolicy", "combo",
-                                    ("fixed", "expanding", "default"),
-                                    "default")
-        self.properties.add_property("vsizepolicy", "combo",
-                                    ("fixed", "expanding", "default"),
-                                    "default")
-        self.properties.add_property("frameshape", "combo",
-                                    ("Box", "Panel", "StyledPanel", "HLine",
-                                     "VLine", "default"),
-                                    "default")
-        self.properties.add_property("shadowstyle", "combo",
-                                    ("plain", "raised", "sunken", "default"),
-                                    "default")
+        self.properties.add_property(
+            "hsizepolicy", "combo", ("fixed", "expanding", "default"), "default"
+        )
+        self.properties.add_property(
+            "vsizepolicy", "combo", ("fixed", "expanding", "default"), "default"
+        )
+        self.properties.add_property(
+            "frameshape",
+            "combo",
+            ("Box", "Panel", "StyledPanel", "HLine", "VLine", "default"),
+            "default",
+        )
+        self.properties.add_property(
+            "shadowstyle", "combo", ("plain", "raised", "sunken", "default"), "default"
+        )
         self.properties.add_property("fixedwidth", "integer", -1)
         self.properties.add_property("fixedheight", "integer", -1)
 
@@ -118,8 +136,7 @@ class ContainerCfg(_CfgItem):
         self.children.append(item)
         return ""
 
-    def child_property_changed(self, child_name, property_name,
-                             old_value, new_value):
+    def child_property_changed(self, child_name, property_name, old_value, new_value):
         pass
 
     def update_slots(self):
@@ -130,7 +147,6 @@ class ContainerCfg(_CfgItem):
 
 
 class WindowCfg(ContainerCfg):
-
     def __init__(self, *args):
         _CfgItem.__init__(self, *args)
 
@@ -144,18 +160,15 @@ class WindowCfg(ContainerCfg):
         self.properties.add_property("expertPwd", "string", "tonic")
         self.properties.add_property("fontSize", "integer", 12)
 
-        self.signals.update({"isShown": (),
-                             "isHidden": (),
-                             "enableExpertMode": (),
-                             "quit":()})
-        self.slots.update({"show": (),
-                           "hide": (),
-                           "setCaption": (),
-                           "exitExpertMode": ()})
+        self.signals.update(
+            {"isShown": (), "isHidden": (), "enableExpertMode": (), "quit": ()}
+        )
+        self.slots.update(
+            {"show": (), "hide": (), "setCaption": (), "exitExpertMode": ()}
+        )
 
- 
+
 class TabCfg(ContainerCfg):
-
     def __init__(self, *args):
         ContainerCfg.__init__(self, *args)
 
@@ -168,7 +181,7 @@ class TabCfg(ContainerCfg):
         except AttributeError:
             r = repr(self.__dict__)
         else:
-            delattr(self, 'widget')
+            delattr(self, "widget")
             r = repr(self.__dict__)
             self.widget = widget
         return r
@@ -179,11 +192,10 @@ class TabCfg(ContainerCfg):
         else:
             return "Tabs can only have container children."
 
-    def child_property_changed(self, child_name, property_name,
-                             old_value, new_value):
+    def child_property_changed(self, child_name, property_name, old_value, new_value):
         if property_name == "label":
             self.update_slots()
- 
+
     def remove_child(self, child_index):
         ContainerCfg.remove_child(self, child_index)
         self.update_slots()
@@ -213,12 +225,16 @@ class TabCfg(ContainerCfg):
             if "label" in child["properties"].properties:
                 child_lbl = child["properties"]["label"]
                 child_lbl = child_lbl.replace(" ", "_")
-                self.properties.add_property("closable_%s" % child_lbl,
-                     "boolean", closable_props.get("closable_%s" % child_lbl,
-                     False))
-                self.properties.add_property("newdialog_%s" % child_lbl,
-                     "boolean", closable_props.get("newdialog_%s" % child_lbl,
-                     False))
+                self.properties.add_property(
+                    "closable_%s" % child_lbl,
+                    "boolean",
+                    closable_props.get("closable_%s" % child_lbl, False),
+                )
+                self.properties.add_property(
+                    "newdialog_%s" % child_lbl,
+                    "boolean",
+                    closable_props.get("newdialog_%s" % child_lbl, False),
+                )
                 slot_name = "showPage_%s" % child_lbl
                 self.slots[slot_name.replace(" ", "_")] = ()
                 slot_name = "hidePage_%s" % child_lbl
@@ -245,23 +261,20 @@ class TabCfg(ContainerCfg):
 
 
 class SplitterCfg(ContainerCfg):
-
     def __init__(self, *args):
         ContainerCfg.__init__(self, *args)
 
-        self.properties.add_property("sizes", "string", "[]",
-                                    hidden=True)
-        for key in [QtImport.Qt.Key_F9,
-                    QtImport.Qt.Key_F10,
-                    QtImport.Qt.Key_F11,
-                    QtImport.Qt.Key_F12]:
-            self.properties.add_property("sizes_%d" % key,
-                                        "string",
-                                        "[]",
-                                        hidden=True)
+        self.properties.add_property("sizes", "string", "[]", hidden=True)
+        for key in [
+            QtImport.Qt.Key_F9,
+            QtImport.Qt.Key_F10,
+            QtImport.Qt.Key_F11,
+            QtImport.Qt.Key_F12,
+        ]:
+            self.properties.add_property("sizes_%d" % key, "string", "[]", hidden=True)
+
 
 class GroupBoxCfg(ContainerCfg):
-
     def __init__(self, *args):
         ContainerCfg.__init__(self, *args)
 
@@ -270,16 +283,14 @@ class GroupBoxCfg(ContainerCfg):
 
 
 class SpacerCfg(_CfgItem):
-
     def __init__(self, *args):
         _CfgItem.__init__(self, *args)
 
         self.properties.add_property("fixed_size", "boolean", False)
         self.properties.add_property("size", "integer", 100)
- 
+
 
 class LabelCfg(_CfgItem):
-
     def __init__(self, *args):
 
         _CfgItem.__init__(self, *args)
@@ -289,7 +300,6 @@ class LabelCfg(_CfgItem):
 
 
 class IconCfg(_CfgItem):
-
     def __init__(self, *args):
         _CfgItem.__init__(self, *args)
 
@@ -297,7 +307,6 @@ class IconCfg(_CfgItem):
 
 
 class BrickCfg(_CfgItem):
-
     def __init__(self, name, brick_type, brick=None):
 
         _CfgItem.__init__(self, name, brick_type)
@@ -314,7 +323,7 @@ class BrickCfg(_CfgItem):
         # bricks have their own thing for properties
         if brick is not None:
             self.set_properties(brick.property_bag)
- 
+
     def set_properties(self, properties):
         self.brick.set_persistent_property_bag(properties)
         self.properties = self.brick.property_bag

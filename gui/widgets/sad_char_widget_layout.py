@@ -23,7 +23,7 @@ class SADWidgetLayout(QWidget):
     Descript. :
     """
 
-    def __init__(self, parent = None, name = None, flags = 0):
+    def __init__(self, parent=None, name=None, flags=0):
         """
         Descript. :
         """
@@ -41,9 +41,11 @@ class SADWidgetLayout(QWidget):
         self.optimised_sad_cbx = QCheckBox("Optimised SAD", self)
         self.automatic_resolution_radio = QRadioButton(self)
         _optimal_sad_widget = QWidget(self)
-        self.optimal_sad_radio = QRadioButton("Optimal SAD for given resolution:", _optimal_sad_widget)
+        self.optimal_sad_radio = QRadioButton(
+            "Optimal SAD for given resolution:", _optimal_sad_widget
+        )
         self.sad_bgroup = QButtonGroup(self)
-        self.sad_bgroup.addButton(self.automatic_resolution_radio) 
+        self.sad_bgroup.addButton(self.automatic_resolution_radio)
         self.sad_bgroup.addButton(self.optimal_sad_radio)
         self.sad_resolution_ledit = QLineEdit(_optimal_sad_widget)
         self.sad_resolution_ledit.setMinimumSize(50, 0)
@@ -64,7 +66,11 @@ class SADWidgetLayout(QWidget):
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        self.automatic_resolution_radio.setText(self.trUtf8("\x52\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x20\x73\x65\x6c\x65\x63\x74\x65\x64\x20\x61\x75\x74\x6f\x6d\x61\x74\x69\x63\x61\x6c\x6c\x79\x2c\x20\x72\x6f\x74\x61\x74\x69\x6f\x6e\x20\x69\x6e\x74\x65\x72\x76\x61\x6c\x3a\x20\x33\x36\x30\xc2\xb0"))
+        self.automatic_resolution_radio.setText(
+            self.trUtf8(
+                "\x52\x65\x73\x6f\x6c\x75\x74\x69\x6f\x6e\x20\x73\x65\x6c\x65\x63\x74\x65\x64\x20\x61\x75\x74\x6f\x6d\x61\x74\x69\x63\x61\x6c\x6c\x79\x2c\x20\x72\x6f\x74\x61\x74\x69\x6f\x6e\x20\x69\x6e\x74\x65\x72\x76\x61\x6c\x3a\x20\x33\x36\x30\xc2\xb0"
+            )
+        )
 
-    def trUtf8(self,s,c = None):
-        return QApplication.translate("SADWidgetLayout",s,c,QApplication.UnicodeUTF8)
+    def trUtf8(self, s, c=None):
+        return QApplication.translate("SADWidgetLayout", s, c, QApplication.UnicodeUTF8)

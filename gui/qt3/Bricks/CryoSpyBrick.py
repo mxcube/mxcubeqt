@@ -41,37 +41,40 @@ __category__ = "Synoptic"
 __author__ = "Vicente Rey, Matias Guijarro, Jose Gabadinho"
 __version__ = 1.0
 
-CRYO_COLORS = { "OFF": widget_colors.GRAY,
-                "SATURATED": widget_colors.LIGHT_RED,
-                "READY": widget_colors.LIGHT_GREEN,
-                "WARNING": widget_colors.LIGHT_YELLOW,
-                "FROZEN": widget_colors.LIGHT_BLUE,
-                "UNKNOWN": None }
+CRYO_COLORS = {
+    "OFF": widget_colors.GRAY,
+    "SATURATED": widget_colors.LIGHT_RED,
+    "READY": widget_colors.LIGHT_GREEN,
+    "WARNING": widget_colors.LIGHT_YELLOW,
+    "FROZEN": widget_colors.LIGHT_BLUE,
+    "UNKNOWN": None,
+}
+
 
 class CryoSpyBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
-        
+
         self.addProperty("mnemonic", "string", "")
-        self.addProperty('formatString', 'formatString', '###.#')
-        self.addProperty('warningTemp', 'integer', 110)
+        self.addProperty("formatString", "formatString", "###.#")
+        self.addProperty("warningTemp", "integer", 110)
 
-        self.cryodev = None #Cryo Hardware Object
+        self.cryodev = None  # Cryo Hardware Object
 
-        self.containerBox=QVGroupBox("Cryo",self)
+        self.containerBox = QVGroupBox("Cryo", self)
         self.containerBox.setInsideMargin(4)
         self.containerBox.setInsideSpacing(0)
         self.containerBox.setAlignment(QLabel.AlignCenter)
 
-        self.temperature=QLabel(self.containerBox)
+        self.temperature = QLabel(self.containerBox)
         self.temperature.setAlignment(QLabel.AlignCenter)
         self.temperature.setPaletteForegroundColor(widget_colors.WHITE)
-        #self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
-        font=self.temperature.font()
+        # self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
+        font = self.temperature.font()
         font.setStyleHint(QFont.OldEnglish)
         self.temperature.setFont(font)
 
-        #self.level=QProgressBar(self.containerBox)
+        # self.level=QProgressBar(self.containerBox)
 
         # grid1=QWidget(self.containerBox)
         # QGridLayout(grid1, 3, 2, 2, 1)
@@ -102,125 +105,133 @@ class CryoSpyBrick(BlissWidget):
         QVBoxLayout(self)
         self.layout().addWidget(self.containerBox)
 
-    def fontChange(self,oldFont):
-        font=self.font()
-        size=font.pointSize()
-        font.setPointSize(int(1.5*size))
+    def fontChange(self, oldFont):
+        font = self.font()
+        size = font.pointSize()
+        font.setPointSize(int(1.5 * size))
         self.temperature.setFont(font)
 
-    def setTemperature(self, temp, temp_error=None, old={"warning":False}):
+    def setTemperature(self, temp, temp_error=None, old={"warning": False}):
         try:
             t = float(temp)
         except TypeError:
             self.temperature.setPaletteBackgroundColor(widget_colors.DARK_GRAY)
-            #self.temperature.setText("?%s" % chr(176))
+            # self.temperature.setText("?%s" % chr(176))
             self.temperature.setText("? K")
         else:
-            svalue = "%s K" % str(self['formatString'] % temp)
+            svalue = "%s K" % str(self["formatString"] % temp)
             self.temperature.setText(svalue)
 
             if temp > self["warningTemp"]:
-              self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
-              if not old["warning"]:
-                old["warning"]=True
-                QMessageBox.critical(self, "Warning: risk for sample", "Cryo temperature is too high - sample is in danger!\nPlease fix the problem with cryo cooler") 
+                self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_RED)
+                if not old["warning"]:
+                    old["warning"] = True
+                    QMessageBox.critical(
+                        self,
+                        "Warning: risk for sample",
+                        "Cryo temperature is too high - sample is in danger!\nPlease fix the problem with cryo cooler",
+                    )
             else:
-              old["warning"]=False 
-              self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
-              
+                old["warning"] = False
+                self.temperature.setPaletteBackgroundColor(widget_colors.LIGHT_BLUE)
 
     def setDrier(self, status):
-        if status is None or status=='':
-            status="UNKNOWN"
+        if status is None or status == "":
+            status = "UNKNOWN"
         try:
             color = CRYO_COLORS[status]
         except KeyError:
             color = CRYO_COLORS["UNKNOWN"]
         if color is None:
-            color=QWidget.paletteBackgroundColor(self)
+            color = QWidget.paletteBackgroundColor(self)
         self.dryState.setPaletteBackgroundColor(QColor(color))
         try:
-            status=status.lower()
-        except:
-            status="unknown"
+            status = status.lower()
+        except BaseException:
+            status = "unknown"
         self.dryState.setText(status)
-        
+
     def setIcing(self, status):
-        if status is None or status=='':
-            status="UNKNOWN"
+        if status is None or status == "":
+            status = "UNKNOWN"
         try:
             color = CRYO_COLORS[status]
         except KeyError:
             color = CRYO_COLORS["UNKNOWN"]
         if color is None:
-            color=QWidget.paletteBackgroundColor(self)
+            color = QWidget.paletteBackgroundColor(self)
         self.icingState.setPaletteBackgroundColor(QColor(color))
         try:
-            status=status.lower()
-        except:
-            status="unknown"
+            status = status.lower()
+        except BaseException:
+            status = "unknown"
         self.icingState.setText(status)
 
     def setSDrier(self, status):
-        if status is None or status=='':
-            status="UNKNOWN"
+        if status is None or status == "":
+            status = "UNKNOWN"
         try:
             color = CRYO_COLORS[status]
         except KeyError:
             color = CRYO_COLORS["UNKNOWN"]
         if color is None:
-            color=QWidget.paletteBackgroundColor(self)
+            color = QWidget.paletteBackgroundColor(self)
         self.superdryState.setPaletteBackgroundColor(QColor(color))
         try:
-            status=status.lower()
-        except:
-            status="unknown"
+            status = status.lower()
+        except BaseException:
+            status = "unknown"
         self.superdryState.setText(status)
 
-    def setLevel(self,level):
+    def setLevel(self, level):
         pass
-##         if level is None:
-##             self.level.reset()
-##         else:
-##             try:
-##                 level=int(level)
-##             except:
-##                 pass
-##             else:
-##                 self.level.setProgress(level)
+
+    # if level is None:
+    # self.level.reset()
+    # else:
+    # try:
+    # level=int(level)
+    # except:
+    # pass
+    # else:
+    # self.level.setProgress(level)
 
     def propertyChanged(self, property, oldValue, newValue):
-        if property == 'mnemonic':
+        if property == "mnemonic":
             if self.cryodev is not None:
                 self.disconnect(self.cryodev, PYSIGNAL("levelChanged"), self.setLevel)
-                self.disconnect(self.cryodev, PYSIGNAL("temperatureChanged"), self.setTemperature)
-                #self.disconnect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
-                #self.disconnect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
-                #self.disconnect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
-                
+                self.disconnect(
+                    self.cryodev, PYSIGNAL("temperatureChanged"), self.setTemperature
+                )
+                # self.disconnect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
+                # self.disconnect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
+                # self.disconnect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
+
             self.cryodev = self.getHardwareObject(newValue)
             if self.cryodev is not None:
                 self.containerBox.setEnabled(True)
                 self.connect(self.cryodev, PYSIGNAL("levelChanged"), self.setLevel)
-                self.connect(self.cryodev, PYSIGNAL("temperatureChanged"), self.setTemperature)
-                #self.connect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
-                #self.connect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
-                #self.connect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
+                self.connect(
+                    self.cryodev, PYSIGNAL("temperatureChanged"), self.setTemperature
+                )
+                # self.connect(self.cryodev, PYSIGNAL("cryoStatusChanged"), self.setIcing)
+                # self.connect(self.cryodev, PYSIGNAL("dryStatusChanged"), self.setDrier)
+                # self.connect(self.cryodev, PYSIGNAL("sdryStatusChanged"), self.setSDrier)
 
                 self.setLevel(self.cryodev.n2level)
                 self.setTemperature(self.cryodev.temp)
-                #self.setIcing(self.cryodev.cryo_status)
-                #self.setDrier(self.cryodev.dry_status)
-                #self.setSDrier(self.cryodev.sdry_status)
+                # self.setIcing(self.cryodev.cryo_status)
+                # self.setDrier(self.cryodev.dry_status)
+                # self.setSDrier(self.cryodev.sdry_status)
             else:
                 self.containerBox.setEnabled(False)
                 self.setTemperature(None)
-                #self.setDrier("UNKNOWN")
-                #self.setSDrier("UNKNOWN")
-                #self.setIcing("UNKNOWN")
+                # self.setDrier("UNKNOWN")
+                # self.setSDrier("UNKNOWN")
+                # self.setIcing("UNKNOWN")
                 self.setLevel(None)
         else:
-            BlissWidget.propertyChanged(self,property,oldValue,newValue)
+            BlissWidget.propertyChanged(self, property, oldValue, newValue)
 
     def run(self):
         if self.cryodev is None:

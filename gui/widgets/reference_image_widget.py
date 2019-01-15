@@ -28,7 +28,6 @@ __license__ = "LGPLv3+"
 
 
 class ReferenceImageWidget(QtImport.QWidget):
-
     def __init__(self, parent=None, name=None, fl=0):
 
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
@@ -45,9 +44,9 @@ class ReferenceImageWidget(QtImport.QWidget):
         self.tool_box = QtImport.QToolBox(self.group_box)
         self.page_widget = QtImport.QWidget(self.tool_box)
         self.path_widget = DataPathWidget(self.page_widget)
-        self.acq_widget = AcquisitionWidget(self.page_widget, 'horizontal')
+        self.acq_widget = AcquisitionWidget(self.page_widget, "horizontal")
         self.acq_widget.acq_widget_layout.shutterless_cbx.hide()
-        #self.acq_widget.acq_widget_layout.setFixedHeight(130)
+        # self.acq_widget.acq_widget_layout.setFixedHeight(130)
         self.tool_box.addItem(self.page_widget, "Acquisition parameters")
 
         # Layout --------------------------------------------------------------
@@ -56,8 +55,8 @@ class ReferenceImageWidget(QtImport.QWidget):
         _page_widget_layout.addWidget(self.acq_widget)
         _page_widget_layout.addStretch(0)
         _page_widget_layout.setSpacing(0)
-        _page_widget_layout.setContentsMargins(0, 0, 0, 0)  
-        
+        _page_widget_layout.setContentsMargins(0, 0, 0, 0)
+
         _group_box_vlayout = QtImport.QVBoxLayout(self.group_box)
         _group_box_vlayout.addWidget(self.tool_box)
         _group_box_vlayout.setSpacing(0)

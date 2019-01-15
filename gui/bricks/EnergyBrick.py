@@ -29,17 +29,16 @@ __category__ = "General"
 
 
 class EnergyBrick(BaseWidget):
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        # Properties ----------------------------------------------------------       
-        self.add_property('mnemonic', 'string', '')
-        self.add_property('defaultMode', 'combo', ('keV', 'Ang'), 'keV')
-        self.add_property('kevFormatString', 'formatString', '##.####')
-        self.add_property('angFormatString', 'formatString', '##.####')
-        self.add_property('displayStatus', 'boolean', False)
-        self.add_property('doBeamAlignment', 'boolean', False)
+        # Properties ----------------------------------------------------------
+        self.add_property("mnemonic", "string", "")
+        self.add_property("defaultMode", "combo", ("keV", "Ang"), "keV")
+        self.add_property("kevFormatString", "formatString", "##.####")
+        self.add_property("angFormatString", "formatString", "##.####")
+        self.add_property("displayStatus", "boolean", False)
+        self.add_property("doBeamAlignment", "boolean", False)
 
         # Signals ------------------------------------------------------------
 
@@ -70,16 +69,18 @@ class EnergyBrick(BaseWidget):
         self.new_value_widget = QtImport.QWidget(self)
         self.set_to_label = QtImport.QLabel("Set to: ", self)
         self.new_value_ledit = QtImport.QLineEdit(self.new_value_widget)
-        #self.new_value_ledit.setMaximumWidth(60)
+        # self.new_value_ledit.setMaximumWidth(60)
         self.units_combobox = QtImport.QComboBox(self.new_value_widget)
-        self.units_combobox.addItems(["keV", u"\u212B"]) 
-        self.stop_button = QtImport.QPushButton(self.new_value_widget)        
+        self.units_combobox.addItems(["keV", u"\u212B"])
+        self.stop_button = QtImport.QPushButton(self.new_value_widget)
         self.stop_button.setIcon(Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedWidth(25)
 
-        self.beam_align_cbox = QtImport.QCheckBox("Center beam after energy change", self)
- 
+        self.beam_align_cbox = QtImport.QCheckBox(
+            "Center beam after energy change", self
+        )
+
         # Layout --------------------------------------------------------------
         _new_value_widget_hlayout = QtImport.QHBoxLayout(self.new_value_widget)
         _new_value_widget_hlayout.addWidget(self.new_value_ledit)
@@ -90,17 +91,17 @@ class EnergyBrick(BaseWidget):
 
         _group_box_gridlayout = QtImport.QGridLayout(self.group_box)
         _group_box_gridlayout.addWidget(energy_label, 0, 0)
-        _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1) 
+        _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1)
         _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
         _group_box_gridlayout.addWidget(self.wavelength_ledit, 1, 1)
         _group_box_gridlayout.addWidget(self.status_label, 2, 0)
         _group_box_gridlayout.addWidget(self.status_ledit, 2, 1)
-        _group_box_gridlayout.addWidget(self.set_to_label, 3, 0) 
+        _group_box_gridlayout.addWidget(self.set_to_label, 3, 0)
         _group_box_gridlayout.addWidget(self.new_value_widget, 3, 1)
         _group_box_gridlayout.addWidget(self.beam_align_cbox, 4, 0, 1, 2)
-        
+
         _group_box_gridlayout.setSpacing(0)
-        _group_box_gridlayout.setContentsMargins(1, 1, 1, 1) 
+        _group_box_gridlayout.setContentsMargins(1, 1, 1, 1)
 
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
@@ -116,51 +117,56 @@ class EnergyBrick(BaseWidget):
         self.stop_button.clicked.connect(self.stop_clicked)
         self.beam_align_cbox.stateChanged.connect(self.do_beam_align_changed)
 
-        # Other --------------------------------------------------------------- 
-        #self.group_box.setCheckable(True)
-        #self.group_box.setChecked(True)
-        self.new_value_validator = QtImport.QDoubleValidator(\
-             0, 15, 4, self.new_value_ledit)
+        # Other ---------------------------------------------------------------
+        # self.group_box.setCheckable(True)
+        # self.group_box.setChecked(True)
+        self.new_value_validator = QtImport.QDoubleValidator(
+            0, 15, 4, self.new_value_ledit
+        )
         self.status_ledit.setEnabled(False)
 
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'mnemonic':
+        if property_name == "mnemonic":
             if self.energy_hwobj is not None:
-                self.disconnect(self.energy_hwobj, 'deviceReady', self.connected)
-                self.disconnect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
-                self.disconnect(self.energy_hwobj, 'energyChanged', self.energy_changed)
-                self.disconnect(self.energy_hwobj, 'stateChanged', self.state_changed)
-                self.disconnect(self.energy_hwobj, 'statusInfoChanged', self.status_info_changed)
+                self.disconnect(self.energy_hwobj, "deviceReady", self.connected)
+                self.disconnect(self.energy_hwobj, "deviceNotReady", self.disconnected)
+                self.disconnect(self.energy_hwobj, "energyChanged", self.energy_changed)
+                self.disconnect(self.energy_hwobj, "stateChanged", self.state_changed)
+                self.disconnect(
+                    self.energy_hwobj, "statusInfoChanged", self.status_info_changed
+                )
 
             self.energy_hwobj = self.get_hardware_object(new_value)
 
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
-                self.connect(self.energy_hwobj, 'deviceReady', self.connected)
-                self.connect(self.energy_hwobj, 'deviceNotReady', self.disconnected)
-                self.connect(self.energy_hwobj, 'energyChanged', self.energy_changed)
-                self.connect(self.energy_hwobj, 'stateChanged', self.state_changed)
-                self.connect(self.energy_hwobj, 'statusInfoChanged', self.status_info_changed)
+                self.connect(self.energy_hwobj, "deviceReady", self.connected)
+                self.connect(self.energy_hwobj, "deviceNotReady", self.disconnected)
+                self.connect(self.energy_hwobj, "energyChanged", self.energy_changed)
+                self.connect(self.energy_hwobj, "stateChanged", self.state_changed)
+                self.connect(
+                    self.energy_hwobj, "statusInfoChanged", self.status_info_changed
+                )
                 self.energy_hwobj.update_values()
-                self.energy_hwobj.set_do_beam_alignment(self['doBeamAlignment'])
+                self.energy_hwobj.set_do_beam_alignment(self["doBeamAlignment"])
                 if self.energy_hwobj.isReady():
                     self.connected()
                 else:
                     self.disconnected()
             else:
                 self.disconnected()
-        elif property_name == 'defaultMode':
+        elif property_name == "defaultMode":
             if new_value == "keV":
                 self.units_combobox.setCurrentIndex(0)
             else:
                 self.units_combobox.setCurrentIndex(1)
 
-        elif property_name == 'displayStatus':
+        elif property_name == "displayStatus":
             self.status_label.setVisible(new_value)
             self.status_ledit.setVisible(new_value)
-        elif property_name == 'doBeamAlignment':
+        elif property_name == "doBeamAlignment":
             self.beam_align_cbox.setEnabled(new_value)
             self.beam_align_cbox.setChecked(new_value)
         else:
@@ -170,19 +176,18 @@ class EnergyBrick(BaseWidget):
         self.setEnabled(True)
         tunable_energy = self.energy_hwobj.can_move_energy()
         if tunable_energy is None:
-            tunable_energy = False 
+            tunable_energy = False
         self.set_to_label.setEnabled(tunable_energy)
         self.new_value_ledit.setEnabled(tunable_energy)
         self.units_combobox.setEnabled(tunable_energy)
         if tunable_energy:
-             Colors.set_widget_color(\
-                self.new_value_ledit,
-                Colors.LINE_EDIT_ACTIVE,
-                QtImport.QPalette.Base)
-             #Colors.set_widget_color(\
-             #   self.units_combobox,
-             #   Colors.LIGHT_GREEN,
-             #   QtGui.QPalette.Button) 
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
+            )
+            # Colors.set_widget_color(\
+            #   self.units_combobox,
+            #   Colors.LIGHT_GREEN,
+            #   QtGui.QPalette.Button)
 
     def disconnected(self):
         self.setEnabled(False)
@@ -192,8 +197,8 @@ class EnergyBrick(BaseWidget):
             self.energy_hwobj.set_do_beam_alignment(self.beam_align_cbox.isChecked())
 
     def energy_changed(self, energy_value, wavelength_value):
-        energy_value_str = self['kevFormatString'] % energy_value
-        wavelength_value_str = self['angFormatString'] % wavelength_value
+        energy_value_str = self["kevFormatString"] % energy_value
+        wavelength_value_str = self["angFormatString"] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
@@ -207,31 +212,32 @@ class EnergyBrick(BaseWidget):
     def current_value_changed(self):
         input_field_text = self.new_value_ledit.text()
 
-        if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtImport.QValidator.Acceptable:
+        if (
+            self.new_value_validator.validate(input_field_text, 0)[0]
+            == QtImport.QValidator.Acceptable
+        ):
             if self.units_combobox.currentIndex() == 0:
                 BaseWidget.set_status_info("status", "Setting energy...", "running")
                 self.energy_hwobj.move_energy(float(input_field_text))
             else:
                 self.energy_hwobj.move_wavelength(float(input_field_text))
             self.new_value_ledit.setText("")
-            Colors.set_widget_color(\
-                 self.new_value_ledit,
-                 Colors.LINE_EDIT_ACTIVE,
-                 QtImport.QPalette.Base)
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
+            )
 
     def input_field_changed(self, input_field_text):
-        if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtImport.QValidator.Acceptable:
-            Colors.set_widget_color(\
-                self.new_value_ledit,
-                Colors.LINE_EDIT_CHANGED,
-                QtImport.QPalette.Base)
+        if (
+            self.new_value_validator.validate(input_field_text, 0)[0]
+            == QtImport.QValidator.Acceptable
+        ):
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+            )
         else:
-           Colors.set_widget_color(\
-                self.new_value_ledit,
-                Colors.LINE_EDIT_ERROR,
-                QtImport.QPalette.Base)
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
+            )
 
     def units_changed(self, unit):
         self.set_new_value_limits()
@@ -240,16 +246,17 @@ class EnergyBrick(BaseWidget):
         if self.units_combobox.currentIndex() == 0:
             value_limits = self.energy_hwobj.get_energy_limits()
             self.group_box.setTitle("Energy")
-            self.new_value_ledit.setToolTip(\
-                 "Energy limits %.4f : %.4f keV" % \
-                 (value_limits[0], value_limits[1]))
+            self.new_value_ledit.setToolTip(
+                "Energy limits %.4f : %.4f keV" % (value_limits[0], value_limits[1])
+            )
         else:
             value_limits = self.energy_hwobj.get_wavelength_limits()
             self.group_box.setTitle("Wavelength")
-            self.new_value_ledit.setToolTip(\
-                 "Wavelength limits %.4f : %.4f %s" % \
-                 (value_limits[0], value_limits[1], u"\u212B"))
-        self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)    
-   
+            self.new_value_ledit.setToolTip(
+                "Wavelength limits %.4f : %.4f %s"
+                % (value_limits[0], value_limits[1], u"\u212B")
+            )
+        self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)
+
     def stop_clicked(self):
         print("stoped clicked")

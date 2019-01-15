@@ -34,8 +34,10 @@ class ISPyBSampleInfoWidget(QWidget):
         QWidget.__init__(self, parent)
 
         self.ispyb_sample_widget = loadUi(
-              os.path.join(os.path.dirname(__file__),
-             "ui_files/Qt4_ispyb_widget_layout.ui"))
+            os.path.join(
+                os.path.dirname(__file__), "ui_files/Qt4_ispyb_widget_layout.ui"
+            )
+        )
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.ispyb_sample_widget)

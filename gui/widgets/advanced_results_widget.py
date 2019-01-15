@@ -34,7 +34,7 @@ __license__ = "LGPLv3+"
 class AdvancedResultsWidget(QtImport.QWidget):
     def __init__(self, parent=None, allow_adjust_size=True):
         QtImport.QWidget.__init__(self, parent)
-        self.setObjectName('advanced_results_widget')  
+        self.setObjectName("advanced_results_widget")
 
         # Hardware objects ----------------------------------------------------
 
@@ -59,28 +59,27 @@ class AdvancedResultsWidget(QtImport.QWidget):
         # Other ---------------------------------------------------------------
 
     def set_beamline_setup(self, bl_setup):
-        if hasattr(bl_setup, 'parallel_processing_hwobj'):
-            if bl_setup.parallel_processing_hwobj and \
-            not self._initialized:
+        if hasattr(bl_setup, "parallel_processing_hwobj"):
+            if bl_setup.parallel_processing_hwobj and not self._initialized:
                 bl_setup.parallel_processing_hwobj.connect(
-                         'processingStarted',
-                         self.processing_started)
+                    "processingStarted", self.processing_started
+                )
                 bl_setup.parallel_processing_hwobj.connect(
-                         'processingResultsUpdate', 
-                         self.update_processing_results)
+                    "processingResultsUpdate", self.update_processing_results
+                )
                 self._initialized = True
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
     def populate_widget(self, item, data_collection):
-        #if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
+        # if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
         #    data_collection = item.get_model().reference_image_collection
-        #else: 
+        # else:
         #    data_collection = item.get_model()
 
         executed = data_collection.is_executed()
         self.heat_map_widget.set_associated_data_collection(data_collection)
-     
-        if executed: 
+
+        if executed:
             processing_results = data_collection.get_parallel_processing_result()
             if processing_results is not None:
                 self.heat_map_widget.set_results(processing_results)

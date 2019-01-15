@@ -23,10 +23,10 @@ from QtImport import QPixmap, QIcon
 
 ROOT_DIR_PARTS = os.path.dirname(os.path.abspath(__file__)).split(os.sep)
 ROOT_DIR = os.path.join(*ROOT_DIR_PARTS[1:-2])
-ICONS_DIR = os.path.join("/", ROOT_DIR, 'gui/icons')
+ICONS_DIR = os.path.join("/", ROOT_DIR, "gui/icons")
 
 
-def load(icon_name): 
+def load(icon_name):
     """
     Try to load an icon from file and return the QPixmap object
     """
@@ -34,13 +34,14 @@ def load(icon_name):
 
     try:
         icon = QPixmap(filename)
-    except:
-        return QPixmap(os.path.join(ICONS_DIR, 'brick.png'))
+    except BaseException:
+        return QPixmap(os.path.join(ICONS_DIR, "brick.png"))
     else:
         if icon.isNull():
-            return QPixmap(os.path.join(ICONS_DIR, 'brick.png'))
+            return QPixmap(os.path.join(ICONS_DIR, "brick.png"))
         else:
             return icon
+
 
 def get_icon_path(icon_name):
     """
@@ -48,16 +49,18 @@ def get_icon_path(icon_name):
     """
     filename = os.path.join(ICONS_DIR, icon_name)
     if not os.path.exists(filename):
-        for ext in ['png', 'xpm', 'gif', 'bmp']:
-            f = '.'.join([filename, ext])
+        for ext in ["png", "xpm", "gif", "bmp"]:
+            f = ".".join([filename, ext])
             if os.path.exists(f):
                 filename = f
                 break
     if os.path.exists(filename):
         return filename
-        
+
+
 def load_icon(icon_name):
     return QIcon(load(icon_name))
+
 
 def load_pixmap(icon_name):
     return load(icon_name)

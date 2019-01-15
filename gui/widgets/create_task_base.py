@@ -26,7 +26,10 @@ import QtImport
 
 from gui.utils import queue_item
 
-from HardwareRepository.HardwareObjects import queue_model_objects, queue_model_enumerables
+from HardwareRepository.HardwareObjects import (
+    queue_model_objects,
+    queue_model_enumerables,
+)
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -47,39 +50,44 @@ class CreateTaskBase(QtImport.QWidget):
     be made, to make this class generic for widgets not using
     the objects PathTemplate and AcquisitionParameters.
     """
+
     acqParametersConflictSignal = QtImport.pyqtSignal(bool)
     pathTempleConflictSignal = QtImport.pyqtSignal(bool)
 
-    def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
-         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
-         self.setObjectName(name)
-        
-         self._tree_brick = None
-         self._task_node_name = task_node_name
+    def __init__(self, parent, name, fl, task_node_name="Unamed task-node"):
+        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        self.setObjectName(name)
 
-         # Centred positons that currently are selected in the parent
-         # widget, position_history_brick.
-         self._selected_positions = []
+        self._tree_brick = None
+        self._task_node_name = task_node_name
 
-         # Abstract attributes
-         self._acq_widget = None
-         self._data_path_widget = None
-         self._current_selected_items = []
-         self._path_template = None
-         self._session_hwobj = None
-         self._beamline_setup_hwobj = None
-         self._graphics_manager_hwobj = None
-         self._in_plate_mode = None
-         self._enable_compression = None
-        
+        # Centred positons that currently are selected in the parent
+        # widget, position_history_brick.
+        self._selected_positions = []
+
+        # Abstract attributes
+        self._acq_widget = None
+        self._data_path_widget = None
+        self._current_selected_items = []
+        self._path_template = None
+        self._session_hwobj = None
+        self._beamline_setup_hwobj = None
+        self._graphics_manager_hwobj = None
+        self._in_plate_mode = None
+        self._enable_compression = None
+
     def set_expert_mode(self, state):
         if self._acq_widget:
             self._acq_widget.acq_widget_layout.energy_label.setEnabled(state)
             self._acq_widget.acq_widget_layout.energy_ledit.setEnabled(state)
-            if self._acq_widget.acq_widget_layout.findChild(QtImport.QCheckBox, "mad_cbox"):
+            if self._acq_widget.acq_widget_layout.findChild(
+                QtImport.QCheckBox, "mad_cbox"
+            ):
                 self._acq_widget.acq_widget_layout.mad_cbox.setEnabled(state)
                 self._acq_widget.acq_widget_layout.energies_combo.setEnabled(state)
-            if self._acq_widget.acq_widget_layout.findChild(QtImport.QLabel, "first_image_label"):
+            if self._acq_widget.acq_widget_layout.findChild(
+                QtImport.QLabel, "first_image_label"
+            ):
                 self._acq_widget.acq_widget_layout.first_image_label.setEnabled(state)
                 self._acq_widget.acq_widget_layout.first_image_ledit.setEnabled(state)
 
@@ -121,18 +129,21 @@ class CreateTaskBase(QtImport.QWidget):
             # Initialize the path_template of the widget to default
             # values read from the beamline setup
             if self._data_path_widget:
-                self._data_path_widget._base_image_dir = \
+                self._data_path_widget._base_image_dir = (
                     self._session_hwobj.get_base_image_directory()
-                self._data_path_widget._base_process_dir = \
+                )
+                self._data_path_widget._base_process_dir = (
                     self._session_hwobj.get_base_process_directory()
+                )
 
                 (data_directory, proc_directory) = self.get_default_directory()
                 self._path_template = bl_setup.get_default_path_template()
                 self._path_template.directory = data_directory
                 self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = self.get_default_prefix()
-                self._path_template.run_number = bl_setup.queue_model_hwobj.\
-                    get_next_run_number(self._path_template)
+                self._path_template.run_number = bl_setup.queue_model_hwobj.get_next_run_number(
+                    self._path_template
+                )
                 self._path_template.compression = self._enable_compression
         else:
             self._path_template = queue_model_objects.PathTemplate()
@@ -145,35 +156,57 @@ class CreateTaskBase(QtImport.QWidget):
 
     def set_beamline_setup(self, bl_setup_hwobj):
         self._beamline_setup_hwobj = bl_setup_hwobj
-        self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
+        self._in_plate_mode = (
+            self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
+        )
 
         try:
             self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
 
-            bl_setup_hwobj.energy_hwobj.connect('energyChanged', self.set_energy)
-            bl_setup_hwobj.energy_hwobj.connect('energyLimitsChanged', self.set_energy_limits)
-            bl_setup_hwobj.transmission_hwobj.connect('valueChanged', self.set_transmission)
-            bl_setup_hwobj.transmission_hwobj.connect('limitsChanged', self.set_transmission_limits)
-            bl_setup_hwobj.resolution_hwobj.connect('positionChanged', self.set_resolution)
-            bl_setup_hwobj.resolution_hwobj.connect('limitsChanged', self.set_resolution_limits)
-            bl_setup_hwobj.omega_axis_hwobj.connect('positionChanged', self.set_osc_start)
-            bl_setup_hwobj.kappa_axis_hwobj.connect('positionChanged', self.set_kappa)
-            bl_setup_hwobj.kappa_phi_axis_hwobj.connect('positionChanged', self.set_kappa_phi)
-            bl_setup_hwobj.detector_hwobj.connect('detectorRoiModeChanged', self.set_detector_roi_mode)
-            bl_setup_hwobj.detector_hwobj.connect('expTimeLimitsChanged', self.set_detector_exp_time_limits)
-            bl_setup_hwobj.beam_info_hwobj.connect('beamInfoChanged', self.set_beam_info)
+            bl_setup_hwobj.energy_hwobj.connect("energyChanged", self.set_energy)
+            bl_setup_hwobj.energy_hwobj.connect(
+                "energyLimitsChanged", self.set_energy_limits
+            )
+            bl_setup_hwobj.transmission_hwobj.connect(
+                "valueChanged", self.set_transmission
+            )
+            bl_setup_hwobj.transmission_hwobj.connect(
+                "limitsChanged", self.set_transmission_limits
+            )
+            bl_setup_hwobj.resolution_hwobj.connect(
+                "positionChanged", self.set_resolution
+            )
+            bl_setup_hwobj.resolution_hwobj.connect(
+                "limitsChanged", self.set_resolution_limits
+            )
+            bl_setup_hwobj.omega_axis_hwobj.connect(
+                "positionChanged", self.set_osc_start
+            )
+            bl_setup_hwobj.kappa_axis_hwobj.connect("positionChanged", self.set_kappa)
+            bl_setup_hwobj.kappa_phi_axis_hwobj.connect(
+                "positionChanged", self.set_kappa_phi
+            )
+            bl_setup_hwobj.detector_hwobj.connect(
+                "detectorRoiModeChanged", self.set_detector_roi_mode
+            )
+            bl_setup_hwobj.detector_hwobj.connect(
+                "expTimeLimitsChanged", self.set_detector_exp_time_limits
+            )
+            bl_setup_hwobj.beam_info_hwobj.connect(
+                "beamInfoChanged", self.set_beam_info
+            )
 
             bl_setup_hwobj.resolution_hwobj.update_values()
             bl_setup_hwobj.detector_hwobj.update_values()
         except AttributeError as ex:
-            msg = 'Could not connect to one or more hardware objects' + str(ex)
+            msg = "Could not connect to one or more hardware objects" + str(ex)
             logging.getLogger("HWR").warning(msg)
-       
+
         self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
-        if self._graphics_manager_hwobj: 
-            self._graphics_manager_hwobj.connect('shapeCreated', self.shape_created)
-            self._graphics_manager_hwobj.connect('shapeChanged', self.shape_changed)
-            self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
+        if self._graphics_manager_hwobj:
+            self._graphics_manager_hwobj.connect("shapeCreated", self.shape_created)
+            self._graphics_manager_hwobj.connect("shapeChanged", self.shape_changed)
+            self._graphics_manager_hwobj.connect("shapeDeleted", self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
@@ -196,13 +229,14 @@ class CreateTaskBase(QtImport.QWidget):
         if self._tree_brick:
             self._tree_brick.acq_parameters_changed(conflict)
             self.acqParametersConflictSignal.emit(len(conflict) > 0)
- 
+
     def path_template_changed(self):
         self._data_path_widget.update_file_name()
         if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
-            path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                            check_for_path_collisions(self._path_template)
+            path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.check_for_path_collisions(
+                self._path_template
+            )
             self._data_path_widget.indicate_path_conflict(path_conflict)
             self._tree_brick.data_path_changed(path_conflict)
             self.pathTempleConflictSignal.emit(path_conflict)
@@ -213,7 +247,7 @@ class CreateTaskBase(QtImport.QWidget):
     @abc.abstractmethod
     def set_energies(self):
         pass
- 
+
     def get_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):
             return item
@@ -240,13 +274,14 @@ class CreateTaskBase(QtImport.QWidget):
 
     def _item_is_group_or_sample(self):
         result = False
-        
+
         if self._current_selected_items:
             item = self._current_selected_items[0]
-        
-            if isinstance(item, queue_item.SampleQueueItem) or \
-                isinstance(item, queue_item.DataCollectionGroupQueueItem):
-                    result = True
+
+            if isinstance(item, queue_item.SampleQueueItem) or isinstance(
+                item, queue_item.DataCollectionGroupQueueItem
+            ):
+                result = True
         return result
 
     def _item_is_dc(self):
@@ -255,28 +290,29 @@ class CreateTaskBase(QtImport.QWidget):
         if self._current_selected_items:
             item = self._current_selected_items[0]
 
-            if isinstance(item, queue_item.TaskQueueItem) and \
-            not isinstance(item, queue_item.DataCollectionGroupQueueItem):   
+            if isinstance(item, queue_item.TaskQueueItem) and not isinstance(
+                item, queue_item.DataCollectionGroupQueueItem
+            ):
                 result = True
         return result
 
-    def set_energy(self, energy, wavelength):         
+    def set_energy(self, energy, wavelength):
         if not self._item_is_dc() and energy:
             acq_widget = self.get_acquisition_widget()
-            
+
             if acq_widget:
                 acq_widget.previous_energy = energy
                 acq_widget.update_energy(energy, wavelength)
 
     def set_transmission(self, trans):
         acq_widget = self.get_acquisition_widget()
-        
+
         if not self._item_is_dc() and acq_widget:
             acq_widget.update_transmission(trans)
 
     def set_resolution(self, res):
         acq_widget = self.get_acquisition_widget()
-        
+
         if not self._item_is_dc() and acq_widget:
             acq_widget.update_resolution(res)
 
@@ -297,7 +333,7 @@ class CreateTaskBase(QtImport.QWidget):
 
         if not self._item_is_dc() and acq_widget:
             acq_widget.update_kappa_phi(kappa_phi)
-                                                      
+
     def set_run_number(self, run_number):
         data_path_widget = self.get_data_path_widget()
 
@@ -333,15 +369,15 @@ class CreateTaskBase(QtImport.QWidget):
     def set_beam_info(self, beam_info):
         pass
 
-    def get_default_prefix(self, sample_data_node = None, generic_name = False):
+    def get_default_prefix(self, sample_data_node=None, generic_name=False):
         prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
         return prefix
-        
-    def get_default_directory(self, tree_item = None, sub_dir = ''):
+
+    def get_default_directory(self, tree_item=None, sub_dir=""):
         group_name = self._session_hwobj.get_group_name()
 
         if group_name:
-            sub_dir = group_name + '/' + sub_dir
+            sub_dir = group_name + "/" + sub_dir
 
         if tree_item:
             item = self.get_sample_item(tree_item)
@@ -350,13 +386,11 @@ class CreateTaskBase(QtImport.QWidget):
             else:
                 if isinstance(tree_item, queue_item.SampleQueueItem):
                     if item.get_model().lims_id == -1:
-                        sub_dir += ''
-            
-        data_directory = self._session_hwobj.\
-                         get_image_directory(sub_dir)
+                        sub_dir += ""
 
-        proc_directory = self._session_hwobj.\
-                         get_process_directory(sub_dir)
+        data_directory = self._session_hwobj.get_image_directory(sub_dir)
+
+        proc_directory = self._session_hwobj.get_process_directory(sub_dir)
 
         return (data_directory, proc_directory)
 
@@ -366,13 +400,13 @@ class CreateTaskBase(QtImport.QWidget):
 
     def select_shape_with_cpos(self, cpos):
         self._graphics_manager_hwobj.select_shape_with_cpos(cpos)
-            
+
     def selection_changed(self, items):
         if items:
             if len(items) == 1:
                 self._current_selected_items = items
                 self.single_item_selection(items[0])
-            elif len(items) > 1:                
+            elif len(items) > 1:
                 sample_items = []
 
                 # Allow mutiple selections on sample items, only.
@@ -383,7 +417,7 @@ class CreateTaskBase(QtImport.QWidget):
                 if sample_items:
                     self._current_selected_items = sample_items
                     self.single_item_selection(items[0])
-                    #self.multiple_item_selection(sample_items)
+                    # self.multiple_item_selection(sample_items)
         else:
             self.setDisabled(True)
 
@@ -394,7 +428,6 @@ class CreateTaskBase(QtImport.QWidget):
         sample_item = self.get_sample_item(tree_item)
         if self._data_path_widget:
             self._data_path_widget.enable_macros = False
-        
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
@@ -405,14 +438,15 @@ class CreateTaskBase(QtImport.QWidget):
             # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
                 prefix = self.get_default_prefix(sample_data_model)
-                (data_directory, proc_directory) = self.get_default_directory(\
-                  tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
+                (data_directory, proc_directory) = self.get_default_directory(
+                    tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
+                )
 
-                #TODO create templates to customize this
-                #self._path_template.directory = data_directory
-                #self._path_template.process_directory = proc_directory
+                # TODO create templates to customize this
+                # self._path_template.directory = data_directory
+                # self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
-            elif self._session_hwobj.get_group_name() != '':
+            elif self._session_hwobj.get_group_name() != "":
                 base_dir = self._session_hwobj.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
@@ -427,27 +461,29 @@ class CreateTaskBase(QtImport.QWidget):
             # This works if each sample is clicked, but do not work
             # when a task is assigned to the whole puck.
             # Then all samples get the same dir
-            
-            #if sample_data_model.lims_id == -1 and \
+
+            # if sample_data_model.lims_id == -1 and \
             #   not None in (sample_data_model.location):
             #    (data_directory, proc_directory) = self.get_default_directory(tree_item)
             #    self._path_template.directory = data_directory
             #    self._path_template.process_directory = proc_directory
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                get_next_run_number(self._path_template)
+            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+                self._path_template
+            )
 
-            #Update energy transmission and resolution
+            # Update energy transmission and resolution
             if self._acq_widget:
                 self._update_etr()
                 self._acq_widget.use_kappa(True)
                 sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
-                self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                   self._path_template)
-                #self.get_acquisition_widget().use_osc_start(False)
+                self._acq_widget.update_data_model(
+                    self._acquisition_parameters, self._path_template
+                )
+                # self.get_acquisition_widget().use_osc_start(False)
 
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
@@ -457,27 +493,28 @@ class CreateTaskBase(QtImport.QWidget):
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self._path_template = deepcopy(self._path_template)
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
-            #(data_directory, proc_directory) = self.get_default_directory(tree_item)
-            #self._path_template.directory = data_directory
-            #self._path_template.process_directory = proc_directory
+            # (data_directory, proc_directory) = self.get_default_directory(tree_item)
+            # self._path_template.directory = data_directory
+            # self._path_template.process_directory = proc_directory
 
-            #Update energy transmission and resolution
+            # Update energy transmission and resolution
             if self._acq_widget:
                 self._update_etr()
                 self._acq_widget.use_kappa(True)
-                self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                   self._path_template)
+                self._acq_widget.update_data_model(
+                    self._acquisition_parameters, self._path_template
+                )
             if self._data_path_widget:
                 self._data_path_widget.update_data_model(self._path_template)
                 self._data_path_widget.enable_macros = True
-            self.setDisabled(False)          
+            self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
-        #if self._acq_widget:
+        # if self._acq_widget:
         #    self._acq_widget.set_enable_parameter_update(\
-        #         not isinstance(tree_item, queue_item.TaskQueueItem)) 
+        #         not isinstance(tree_item, queue_item.TaskQueueItem))
 
     def _update_etr(self):
         omega = self._beamline_setup_hwobj._get_omega_axis_position()
@@ -487,13 +524,15 @@ class CreateTaskBase(QtImport.QWidget):
         transmission = self._beamline_setup_hwobj._get_transmission()
         resolution = self._beamline_setup_hwobj._get_resolution()
 
-        set_omega = True   
+        set_omega = True
         if self._acq_widget:
-            if self._acq_widget.acq_widget_layout.findChild(QtImport.QCheckBox, "max_osc_range_cbx"):
+            if self._acq_widget.acq_widget_layout.findChild(
+                QtImport.QCheckBox, "max_osc_range_cbx"
+            ):
                 if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
                     set_omega = False
         if set_omega:
-            self._acquisition_parameters.osc_start = omega            
+            self._acquisition_parameters.osc_start = omega
         self._acquisition_parameters.kappa = kappa
         self._acquisition_parameters.kappa_phi = kappa_phi
         self._acquisition_parameters.energy = energy
@@ -515,7 +554,7 @@ class CreateTaskBase(QtImport.QWidget):
             # Sample with lims information, use values from lims
             # to set the data path.
             (data_directory, proc_directory) = self.get_default_directory(\
-                 sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
+                 sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
@@ -544,13 +583,13 @@ class CreateTaskBase(QtImport.QWidget):
     def centred_position_selection(self, position):
         """
         Descript. : Called by the owning widget (task_toolbox_widget) when
-                    one or several centred positions are selected. 
+                    one or several centred positions are selected.
                     Updates kappa/phi position from the centring point
                     Enables kappa/phi edit if not collection item and no
                     centring point is selected. In all other cases kappa/phi
                     edit is disabled.
                     Also updates centring point if a data collection item is
-                    selected and new centring point clicked 
+                    selected and new centring point clicked
         Args.     : centring points
         Return    "
         """
@@ -567,7 +606,9 @@ class CreateTaskBase(QtImport.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = self._graphics_manager_hwobj.get_scene_snapshot(position)
+                        snapshot = self._graphics_manager_hwobj.get_scene_snapshot(
+                            position
+                        )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:
@@ -584,54 +625,62 @@ class CreateTaskBase(QtImport.QWidget):
     # and add_task.
     def approve_creation(self):
         result = True
-        
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.\
-                        check_for_path_collisions(self._path_template)
+
+        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.check_for_path_collisions(
+            self._path_template
+        )
 
         if path_conflict:
-            logging.getLogger("GUI").\
-                error('The current path settings will overwrite data ' + \
-                      'from another task. Correct the problem before ' + \
-                      'adding to queue')
+            logging.getLogger("GUI").error(
+                "The current path settings will overwrite data "
+                + "from another task. Correct the problem before "
+                + "adding to queue"
+            )
             result = False
 
         if self._acq_widget is not None:
-            parameter_conflict =  self._acq_widget.check_parameter_conflict()
+            parameter_conflict = self._acq_widget.check_parameter_conflict()
             if len(parameter_conflict) > 0:
-                msg = "Entered value of " 
+                msg = "Entered value of "
                 for item in parameter_conflict:
                     msg = msg + "%s, " % item
                 msg = msg[:-2]
-                msg += " is out of range. Correct the input value(s) before " + \
-                       "adding item to the queue"
+                msg += (
+                    " is out of range. Correct the input value(s) before "
+                    + "adding item to the queue"
+                )
                 logging.getLogger("GUI").error(msg)
                 result = False
 
         return result
-            
+
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
 
-        dm = self._beamline_setup_hwobj.diffractometer_hwobj      
+        dm = self._beamline_setup_hwobj.diffractometer_hwobj
 
         sample_is_mounted = False
         if self._in_plate_mode:
             try:
-               sample_is_mounted = self._beamline_setup_hwobj.plate_manipulator_hwobj.\
-                  getLoadedSample().getCoords() == sample.location
-            except:
-               sample_is_mounted = False
-        else: 
-            try: 
-               sample_is_mounted = self._beamline_setup_hwobj.sample_changer_hwobj.\
-                  getLoadedSample().getCoords() == sample.location
+                sample_is_mounted = (
+                    self._beamline_setup_hwobj.plate_manipulator_hwobj.getLoadedSample().getCoords()
+                    == sample.location
+                )
+            except BaseException:
+                sample_is_mounted = False
+        else:
+            try:
+                sample_is_mounted = (
+                    self._beamline_setup_hwobj.sample_changer_hwobj.getLoadedSample().getCoords()
+                    == sample.location
+                )
 
             except AttributeError:
-               sample_is_mounted = False
+                sample_is_mounted = False
 
-        fully_automatic = (not dm.user_confirms_centring)
+        fully_automatic = not dm.user_confirms_centring
 
         free_pin_mode = sample.free_pin_mode
         temp_tasks = self._create_task(sample, shape)
@@ -639,51 +688,65 @@ class CreateTaskBase(QtImport.QWidget):
         if len(temp_tasks) == 0:
             return
 
-        if ((not free_pin_mode) and (not sample_is_mounted) or (not shape)):
+        if (not free_pin_mode) and (not sample_is_mounted) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
 
             # Check if the tasks requires centring, assumes that all
             # the "sub tasks" has the same centring requirements.
             if temp_tasks[0].requires_centring():
-                if self._tree_brick.dc_tree_widget.centring_method == \
-                   queue_model_enumerables.CENTRING_METHOD.MANUAL:
+                if (
+                    self._tree_brick.dc_tree_widget.centring_method
+                    == queue_model_enumerables.CENTRING_METHOD.MANUAL
+                ):
 
-                    #Manual 3 click centering
+                    # Manual 3 click centering
                     acq_par = None
                     kappa = None
                     kappa_phi = None
                     task_label = "Manual centring"
 
                     if isinstance(temp_tasks[0], queue_model_objects.DataCollection):
-                        acq_par = temp_tasks[0].acquisitions[0].\
-                          acquisition_parameters
-                    elif isinstance(temp_tasks[0], queue_model_objects.Characterisation):
-                        acq_par =  temp_tasks[0].reference_image_collection.\
-                           acquisitions[0].acquisition_parameters
+                        acq_par = temp_tasks[0].acquisitions[0].acquisition_parameters
+                    elif isinstance(
+                        temp_tasks[0], queue_model_objects.Characterisation
+                    ):
+                        acq_par = (
+                            temp_tasks[0]
+                            .reference_image_collection.acquisitions[0]
+                            .acquisition_parameters
+                        )
 
                     if acq_par:
                         kappa = acq_par.kappa
                         kappa_phi = acq_par.kappa_phi
                         if kappa is not None and kappa_phi is not None:
-                            task_label = "Manual centring (kappa=%0.1f,phi=%0.1f)" % \
-                              (kappa, kappa_phi)
+                            task_label = "Manual centring (kappa=%0.1f,phi=%0.1f)" % (
+                                kappa,
+                                kappa_phi,
+                            )
 
-                    sc = queue_model_objects.SampleCentring(task_label,
-                                                            kappa,
-                                                            kappa_phi)
-                elif self._tree_brick.dc_tree_widget.centring_method == \
-                   queue_model_enumerables.CENTRING_METHOD.LOOP:
+                    sc = queue_model_objects.SampleCentring(
+                        task_label, kappa, kappa_phi
+                    )
+                elif (
+                    self._tree_brick.dc_tree_widget.centring_method
+                    == queue_model_enumerables.CENTRING_METHOD.LOOP
+                ):
 
-                    #Optical automatic centering with user confirmation
+                    # Optical automatic centering with user confirmation
                     sc = queue_model_objects.OpticalCentring(user_confirms=True)
-                elif self._tree_brick.dc_tree_widget.centring_method == \
-                   queue_model_enumerables.CENTRING_METHOD.FULLY_AUTOMATIC:
+                elif (
+                    self._tree_brick.dc_tree_widget.centring_method
+                    == queue_model_enumerables.CENTRING_METHOD.FULLY_AUTOMATIC
+                ):
 
-                    #Optical automatic centering without user confirmation
+                    # Optical automatic centering without user confirmation
                     sc = queue_model_objects.OpticalCentring()
-                elif self._tree_brick.dc_tree_widget.centring_method == \
-                   queue_model_enumerables.CENTRING_METHOD.XRAY:
+                elif (
+                    self._tree_brick.dc_tree_widget.centring_method
+                    == queue_model_enumerables.CENTRING_METHOD.XRAY
+                ):
 
                     # Xray centering
                     # TODO add dg_group for XrayCentering
@@ -718,54 +781,68 @@ class CreateTaskBase(QtImport.QWidget):
 
         acq_path_template = deepcopy(path_template)
 
-        if '<sample_name>' in acq_path_template.directory:
-            name = sample.get_name().replace(':', '-')
-            acq_path_template.directory = acq_path_template.directory.\
-                                          replace('<sample_name>', name)
-            acq_path_template.process_directory = acq_path_template.process_directory.\
-                                                  replace('<sample_name>', name)
+        if "<sample_name>" in acq_path_template.directory:
+            name = sample.get_name().replace(":", "-")
+            acq_path_template.directory = acq_path_template.directory.replace(
+                "<sample_name>", name
+            )
+            acq_path_template.process_directory = acq_path_template.process_directory.replace(
+                "<sample_name>", name
+            )
 
-        if '<acronym>-<name>' in acq_path_template.base_prefix:
+        if "<acronym>-<name>" in acq_path_template.base_prefix:
             acq_path_template.base_prefix = self.get_default_prefix(sample)
-            acq_path_template.run_number = bl_setup.queue_model_hwobj.get_next_run_number(acq_path_template)
+            acq_path_template.run_number = bl_setup.queue_model_hwobj.get_next_run_number(
+                acq_path_template
+            )
 
-        if '<acronym>' in acq_path_template.directory:
+        if "<acronym>" in acq_path_template.directory:
             prefix = self.get_default_prefix(sample)
             acronym = prefix.split("-")[0]
-            acq_path_template.directory = acq_path_template.directory.\
-                                          replace('<acronym>', acronym)
-            acq_path_template.process_directory = acq_path_template.process_directory.\
-                                                  replace('<acronym>', acronym)
+            acq_path_template.directory = acq_path_template.directory.replace(
+                "<acronym>", acronym
+            )
+            acq_path_template.process_directory = acq_path_template.process_directory.replace(
+                "<acronym>", acronym
+            )
 
-        #TODO create a method get_user_name in Session hwobj
+        # TODO create a method get_user_name in Session hwobj
         user_name = ""
         if os.getenv("SUDO_USER"):
             user_name = os.getenv("SUDO_USER")
         else:
             user_name = os.getenv("USER")
- 
+
         # expand macro keywords in the directory path
-        acq_path_template.directory = acq_path_template.directory.\
-            replace('%c', str(sample.location[0]))
-        acq_path_template.directory = acq_path_template.directory.\
-            replace('%p', str(sample.location[1]))
-        acq_path_template.directory = acq_path_template.directory.\
-            replace('%s', str(sample.name))
-        acq_path_template.directory = acq_path_template.directory.\
-            replace('%u', user_name)
- 
+        acq_path_template.directory = acq_path_template.directory.replace(
+            "%c", str(sample.location[0])
+        )
+        acq_path_template.directory = acq_path_template.directory.replace(
+            "%p", str(sample.location[1])
+        )
+        acq_path_template.directory = acq_path_template.directory.replace(
+            "%s", str(sample.name)
+        )
+        acq_path_template.directory = acq_path_template.directory.replace(
+            "%u", user_name
+        )
+
         # expand macro keywords in the prefix
-        acq_path_template.base_prefix = acq_path_template.base_prefix.\
-            replace('%c', str(sample.location[0]))
-        acq_path_template.base_prefix = acq_path_template.base_prefix.\
-            replace('%p', str(sample.location[1]))
-        acq_path_template.base_prefix = acq_path_template.base_prefix.\
-            replace('%s', str(sample.name))
-        acq_path_template.base_prefix = acq_path_template.base_prefix.\
-            replace('%u', user_name)
+        acq_path_template.base_prefix = acq_path_template.base_prefix.replace(
+            "%c", str(sample.location[0])
+        )
+        acq_path_template.base_prefix = acq_path_template.base_prefix.replace(
+            "%p", str(sample.location[1])
+        )
+        acq_path_template.base_prefix = acq_path_template.base_prefix.replace(
+            "%s", str(sample.name)
+        )
+        acq_path_template.base_prefix = acq_path_template.base_prefix.replace(
+            "%u", user_name
+        )
         acq_path_template.base_prefix
 
-        #acq_path_template.suffix = bl_setup.suffix
+        # acq_path_template.suffix = bl_setup.suffix
 
         return acq_path_template
 
@@ -776,11 +853,11 @@ class CreateTaskBase(QtImport.QWidget):
         bl_setup = self._beamline_setup_hwobj
 
         acq = queue_model_objects.Acquisition()
-        acq.acquisition_parameters = \
-            deepcopy(parameters)
-        acq.acquisition_parameters.collect_agent = \
+        acq.acquisition_parameters = deepcopy(parameters)
+        acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
-        
+        )
+
         acq.path_template = self._create_path_template(sample, path_template)
 
         if self._in_plate_mode:
@@ -792,29 +869,27 @@ class CreateTaskBase(QtImport.QWidget):
         if grid is None:
             grid = self._graphics_manager_hwobj.create_auto_grid()
 
-        grid.set_snapshot(self._graphics_manager_hwobj.\
-                          get_scene_snapshot(grid))
+        grid.set_snapshot(self._graphics_manager_hwobj.get_scene_snapshot(grid))
 
         grid_properties = grid.get_properties()
 
         acq = self._create_acq(sample)
-        acq.acquisition_parameters.centred_position = \
-            grid.get_centred_position()
-        acq.acquisition_parameters.mesh_range = \
-            [grid_properties["dx_mm"],
-             grid_properties["dy_mm"]]
-        acq.acquisition_parameters.num_lines = \
-            grid_properties["num_lines"]
-        acq.acquisition_parameters.num_images = \
-            grid_properties["num_lines"] * \
-            grid_properties["num_images_per_line"]
+        acq.acquisition_parameters.centred_position = grid.get_centred_position()
+        acq.acquisition_parameters.mesh_range = [
+            grid_properties["dx_mm"],
+            grid_properties["dy_mm"],
+        ]
+        acq.acquisition_parameters.num_lines = grid_properties["num_lines"]
+        acq.acquisition_parameters.num_images = (
+            grid_properties["num_lines"] * grid_properties["num_images_per_line"]
+        )
         grid.set_osc_range(acq.acquisition_parameters.osc_range)
 
         processing_parameters = deepcopy(self._processing_parameters)
 
-        dc = queue_model_objects.DataCollection([acq],
-                                                sample.crystals[0],
-                                                processing_parameters)
+        dc = queue_model_objects.DataCollection(
+            [acq], sample.crystals[0], processing_parameters
+        )
 
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
@@ -845,18 +920,20 @@ class CreateTaskBase(QtImport.QWidget):
         if state:
             self._path_template.mad_prefix = str(name)
         else:
-            self._path_template.mad_prefix = ''
+            self._path_template.mad_prefix = ""
 
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-            get_next_run_number(self._path_template)
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+            self._path_template
+        )
 
         data_path_widget = self.get_data_path_widget()
         data_path_widget.set_run_number(run_number)
         data_path_widget.set_prefix(self._path_template.base_prefix)
 
         if self.isEnabled():
-            if isinstance(item, queue_item.TaskQueueItem) and \
-                   not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+            if isinstance(item, queue_item.TaskQueueItem) and not isinstance(
+                item, queue_item.DataCollectionGroupQueueItem
+            ):
                 model.set_name(self._path_template.get_prefix())
                 item.setText(0, model.get_name())
 
@@ -865,30 +942,34 @@ class CreateTaskBase(QtImport.QWidget):
             item = self._current_selected_items[0]
             model = item.get_model()
             if self.isEnabled():
-                if isinstance(item, queue_item.TaskQueueItem) and \
-                     not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                if isinstance(item, queue_item.TaskQueueItem) and not isinstance(
+                    item, queue_item.DataCollectionGroupQueueItem
+                ):
                     name = self._path_template.get_prefix()
                     model.set_name(name)
                     item.setText(0, model.get_display_name())
 
-
     def set_osc_total_range(self, num_images=None, mesh=False):
         """Updates osc totol range. Limits are changed if a plate is used.
-           - For simple oscillation osc_range is defined by osc_start and 
+           - For simple oscillation osc_range is defined by osc_start and
              osc_start top limit.
            - For mesh osc_range is defined by number of images per line
-             and osc in the middle of mesh  
+             and osc in the middle of mesh
         """
         if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
             set_max_range = False
 
             if num_images is None:
                 try:
-                    num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
-                except:
+                    num_images = int(
+                        self._acq_widget.acq_widget_layout.num_images_ledit.text()
+                    )
+                except BaseException:
                     num_images = 0
 
-            if self._acq_widget.acq_widget_layout.findChild(QtImport.QCheckBox, "max_osc_range_cbx"):
+            if self._acq_widget.acq_widget_layout.findChild(
+                QtImport.QCheckBox, "max_osc_range_cbx"
+            ):
                 if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
                     set_max_range = True
                 else:
@@ -897,30 +978,48 @@ class CreateTaskBase(QtImport.QWidget):
             exp_time = None
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
 
-            scan_limits = self._beamline_setup_hwobj.diffractometer_hwobj.get_scan_limits(num_images, exp_time)
+            scan_limits = self._beamline_setup_hwobj.diffractometer_hwobj.get_scan_limits(
+                num_images, exp_time
+            )
 
-            self._acq_widget.osc_total_range_validator.setTop(abs(scan_limits[1] - scan_limits[0]))
-            self._acq_widget.acq_widget_layout.osc_total_range_ledit.setToolTip(\
-                 "Oscillation range limits 0 : %0.5f\n4 digits precision." % \
-                 abs(scan_limits[1] - scan_limits[0]))
+            self._acq_widget.osc_total_range_validator.setTop(
+                abs(scan_limits[1] - scan_limits[0])
+            )
+            self._acq_widget.acq_widget_layout.osc_total_range_ledit.setToolTip(
+                "Oscillation range limits 0 : %0.5f\n4 digits precision."
+                % abs(scan_limits[1] - scan_limits[0])
+            )
 
-            self._acq_widget.osc_start_validator.setRange(scan_limits[0], scan_limits[1], 4)
+            self._acq_widget.osc_start_validator.setRange(
+                scan_limits[0], scan_limits[1], 4
+            )
             self._acq_widget.acq_widget_layout.osc_start_ledit.setToolTip(
-                "Oscillation start limits %0.2f : %0.2f\n" % \
-                (scan_limits[0], scan_limits[1]) +
-                "4 digits precision.")
+                "Oscillation start limits %0.2f : %0.2f\n"
+                % (scan_limits[0], scan_limits[1])
+                + "4 digits precision."
+            )
 
             if set_max_range:
                 if mesh:
-                    self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
-                       "%.4f" % ((scan_limits[0] + scan_limits[1])/2))
+                    self._acq_widget.acq_widget_layout.osc_start_ledit.setText(
+                        "%.4f" % ((scan_limits[0] + scan_limits[1]) / 2)
+                    )
                 else:
-                    self._acq_widget.acq_widget_layout.osc_start_ledit.setText(\
-                       "%.4f" % (scan_limits[0] + 0.01))
-                self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(\
-                     "%.4f" % abs(scan_limits[1] - scan_limits[0] - 0.01))
+                    self._acq_widget.acq_widget_layout.osc_start_ledit.setText(
+                        "%.4f" % (scan_limits[0] + 0.01)
+                    )
+                self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(
+                    "%.4f" % abs(scan_limits[1] - scan_limits[0] - 0.01)
+                )
                 if num_images:
-                     osc_range_per_frame = int(abs(scan_limits[1] - scan_limits[0] - 0.01) / \
-                          num_images * 1000) / 1000.
-                     self._acq_widget.acq_widget_layout.osc_range_ledit.setText(\
-                         "%.3f" % osc_range_per_frame)
+                    osc_range_per_frame = (
+                        int(
+                            abs(scan_limits[1] - scan_limits[0] - 0.01)
+                            / num_images
+                            * 1000
+                        )
+                        / 1000.0
+                    )
+                    self._acq_widget.acq_widget_layout.osc_range_ledit.setText(
+                        "%.3f" % osc_range_per_frame
+                    )

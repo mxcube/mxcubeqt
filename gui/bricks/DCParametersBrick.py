@@ -33,7 +33,6 @@ __category__ = "Task"
 
 
 class DCParametersBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -53,22 +52,24 @@ class DCParametersBrick(BaseWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.define_slot("populate_dc_parameter_widget",({}))
-       
-        # Graphic elements ---------------------------------------------------- 
+        self.define_slot("populate_dc_parameter_widget", ({}))
+
+        # Graphic elements ----------------------------------------------------
         self.tool_box = QtImport.QToolBox(self)
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
         self.results_static_view = QtImport.QTextBrowser(self.tool_box)
-        self.image_tracking_widget = ImageTrackingWidget(self.tool_box) 
+        self.image_tracking_widget = ImageTrackingWidget(self.tool_box)
         self.advance_results_widget = AdvancedResultsWidget(self.tool_box)
         self.snapshot_widget = SnapshotWidget(self)
 
         self.tool_box.addItem(self.parameters_widget, "Parameters")
         self.tool_box.addItem(self.image_tracking_widget, "Results - ADXV control")
         self.tool_box.addItem(self.results_static_view, "Results - Summary")
-        self.tool_box.addItem(self.advance_results_widget, "Results - Parallel processing")
+        self.tool_box.addItem(
+            self.advance_results_widget, "Results - Parallel processing"
+        )
 
-        # Layout -------------------------------------------------------------- 
+        # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QHBoxLayout(self)
         _main_vlayout.addWidget(self.tool_box)
         _main_vlayout.addWidget(self.snapshot_widget)
@@ -77,29 +78,33 @@ class DCParametersBrick(BaseWidget):
 
         # Qt signal/slot connections ------------------------------------------
 
-        # Other --------------------------------------------------------------- 
+        # Other ---------------------------------------------------------------
 
     def populate_dc_parameter_widget(self, item):
         """
         Descript. :
         """
-        self.parameters_widget._data_path_widget._base_image_dir = \
+        self.parameters_widget._data_path_widget._base_image_dir = (
             self.session_hwobj.get_base_image_directory()
-        self.parameters_widget._data_path_widget._base_process_dir = \
+        )
+        self.parameters_widget._data_path_widget._base_process_dir = (
             self.session_hwobj.get_base_process_directory()
+        )
 
         data_collection = item.get_model()
 
-        #if data_collection.is_helical():
+        # if data_collection.is_helical():
         #    self.advance_results_widget.show()
-        #else:
+        # else:
         #    self.advance_results_widget.hide()
-              
-        self.snapshot_widget.display_snapshot(data_collection.\
-             acquisitions[0].acquisition_parameters.\
-             centred_position.snapshot_image,
-             width=800) 
-        
+
+        self.snapshot_widget.display_snapshot(
+            data_collection.acquisitions[
+                0
+            ].acquisition_parameters.centred_position.snapshot_image,
+            width=800,
+        )
+
         if data_collection.is_collected():
             self.parameters_widget.setEnabled(False)
             self.results_static_view.reload()
@@ -112,35 +117,43 @@ class DCParametersBrick(BaseWidget):
         self.advance_results_widget.populate_widget(item, data_collection)
 
     def populate_results(self, data_collection):
-        if data_collection.html_report[-4:] == 'html':
-            if self.results_static_view.mimeSourceFactory().\
-                   data(data_collection.html_report) == None:
-                self.results_static_view.setText(\
-                     html_template.html_report(data_collection))
+        if data_collection.html_report[-4:] == "html":
+            if (
+                self.results_static_view.mimeSourceFactory().data(
+                    data_collection.html_report
+                )
+                is None
+            ):
+                self.results_static_view.setText(
+                    html_template.html_report(data_collection)
+                )
             else:
                 self.results_static_view.setSource(data_collection.html_report)
         else:
-            self.results_static_view.setText(\
-                 html_template.html_report(data_collection))
-        
+            self.results_static_view.setText(html_template.html_report(data_collection))
+
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'beamline_setup':            
+        if property_name == "beamline_setup":
             self.beamline_setup_hwobj = self.get_hardware_object(new_value)
             self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
             self.parameters_widget.set_beamline_setup(self.beamline_setup_hwobj)
             self.advance_results_widget.set_beamline_setup(self.beamline_setup_hwobj)
             if hasattr(self.beamline_setup_hwobj, "image_tracking_hwobj"):
-                self.image_tracking_widget.set_image_tracking_hwobj(\
-                     self.beamline_setup_hwobj.image_tracking_hwobj)
-        elif property_name == 'queue-model':            
-            self.parameters_widget.queue_model_hwobj = \
-                 self.get_hardware_object(new_value)
-        elif property_name == 'useImageTracking':
+                self.image_tracking_widget.set_image_tracking_hwobj(
+                    self.beamline_setup_hwobj.image_tracking_hwobj
+                )
+        elif property_name == "queue-model":
+            self.parameters_widget.queue_model_hwobj = self.get_hardware_object(
+                new_value
+            )
+        elif property_name == "useImageTracking":
             if new_value:
-                self.tool_box.removeItem(self.tool_box.indexOf(\
-                     self.results_static_view))
+                self.tool_box.removeItem(
+                    self.tool_box.indexOf(self.results_static_view)
+                )
                 self.results_static_view.hide()
             else:
-                self.tool_box.removeItem(self.tool_box.indexOf(\
-                     self.image_tracking_widget))
+                self.tool_box.removeItem(
+                    self.tool_box.indexOf(self.image_tracking_widget)
+                )
                 self.image_tracking_widget.hide()

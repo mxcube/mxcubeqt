@@ -31,7 +31,6 @@ __category__ = "General"
 
 
 class Qt4_ExporterClientBrick(BlissWidget):
-
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
@@ -40,7 +39,7 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
         # Internal variables --------------------------------------------------
 
-        # Properties ---------------------------------------------------------- 
+        # Properties ----------------------------------------------------------
         self.addProperty("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
@@ -57,7 +56,7 @@ class Qt4_ExporterClientBrick(BlissWidget):
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.info_address_ledit)
-        _info_widget_hlayout.addWidget(self.info_refresh_button) 
+        _info_widget_hlayout.addWidget(self.info_refresh_button)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.info_widget)
@@ -72,14 +71,16 @@ class Qt4_ExporterClientBrick(BlissWidget):
         self.method_table.setColumnCount(2)
         self.method_table.setHorizontalHeaderLabels(["Type", "Method (Parameters)"])
         self.property_table.setColumnCount(4)
-        self.property_table.setHorizontalHeaderLabels(["Type", "Property", "Access", "Value"])
+        self.property_table.setHorizontalHeaderLabels(
+            ["Type", "Property", "Access", "Value"]
+        )
         self.setFixedWidth(600)
 
     def set_expert_mode(self, expert):
         self.setEnabled(expert)
 
     def propertyChanged(self, property_name, old_value, new_value):
-        if property_name == 'mnemonic':
+        if property_name == "mnemonic":
             self.exporter_client_hwobj = self.getHardwareObject(new_value)
             if self.exporter_client_hwobj is not None:
                 self.init_tables()
@@ -87,8 +88,8 @@ class Qt4_ExporterClientBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def init_tables(self):
-        client_info = self.exporter_client_hwobj.get_client_info() 
-        self.info_address_ledit.setText("%s:%d" % (client_info[0], client_info[1]))      
+        client_info = self.exporter_client_hwobj.get_client_info()
+        self.info_address_ledit.setText("%s:%d" % (client_info[0], client_info[1]))
 
         method_list = self.exporter_client_hwobj.get_method_list()
         self.method_table.setRowCount(len(method_list))
@@ -117,8 +118,11 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
     def refresh_property_values(self):
         for row in range(self.property_table.rowCount()):
-            value = str(self.exporter_client_hwobj.read_property(\
-                 str(self.property_table.item(row, 1).text())))
+            value = str(
+                self.exporter_client_hwobj.read_property(
+                    str(self.property_table.item(row, 1).text())
+                )
+            )
             if len(value) > 100:
-                value = value[:100] + "..." 
+                value = value[:100] + "..."
             self.property_table.item(row, 3).setText(value)

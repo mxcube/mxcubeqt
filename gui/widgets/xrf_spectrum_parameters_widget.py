@@ -31,7 +31,7 @@ __license__ = "LGPLv3+"
 
 
 class XRFSpectrumParametersWidget(QtImport.QWidget):
-    def __init__(self, parent = None, name = "xrf_spectrum_parameters_widget"):
+    def __init__(self, parent=None, name="xrf_spectrum_parameters_widget"):
         QtImport.QWidget.__init__(self, parent)
 
         if name is not None:
@@ -48,20 +48,26 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         _top_widget = QtImport.QWidget(self)
         _parameters_widget = QtImport.QWidget(_top_widget)
         self.data_path_widget = DataPathWidget(_parameters_widget)
-        self.other_parameters_gbox = QtImport.QGroupBox("Other parameters", _parameters_widget) 
-        self.count_time_label = QtImport.QLabel("Count time:", 
-                                       self.other_parameters_gbox)
+        self.other_parameters_gbox = QtImport.QGroupBox(
+            "Other parameters", _parameters_widget
+        )
+        self.count_time_label = QtImport.QLabel(
+            "Count time:", self.other_parameters_gbox
+        )
         self.count_time_ledit = QtImport.QLineEdit(self.other_parameters_gbox)
         self.count_time_ledit.setFixedWidth(50)
-        self.adjust_transmission_cbox = QtImport.QCheckBox("Adjust transmission", \
-             self.other_parameters_gbox)
+        self.adjust_transmission_cbox = QtImport.QCheckBox(
+            "Adjust transmission", self.other_parameters_gbox
+        )
         self.adjust_transmission_cbox.hide()
         self.mca_spectrum_widget = McaSpectrumWidget(self)
         self.snapshot_widget = SnapshotWidget(self)
- 
+
         # Layout -------------------------------------------------------------
-        _other_parameters_gbox_hlayout = QtImport.QHBoxLayout(self.other_parameters_gbox)
-        _other_parameters_gbox_hlayout.addWidget(self.count_time_label)  
+        _other_parameters_gbox_hlayout = QtImport.QHBoxLayout(
+            self.other_parameters_gbox
+        )
+        _other_parameters_gbox_hlayout.addWidget(self.count_time_label)
         _other_parameters_gbox_hlayout.addWidget(self.count_time_ledit)
         _other_parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
         _other_parameters_gbox_hlayout.addStretch(0)
@@ -81,45 +87,46 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         _top_widget_layout.setSpacing(2)
         _top_widget_layout.addStretch(0)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.mca_spectrum_widget)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
-       
-        # SizePolicies -------------------------------------------------------
-        self.mca_spectrum_widget.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                                               QtImport.QSizePolicy.Expanding)
-        _top_widget.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                                  QtImport.QSizePolicy.Fixed)
 
-        # Qt signal/slot connections ------------------------------------------ 
-        self.data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self.data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self.count_time_ledit.textChanged.connect(\
-             self._count_time_ledit_change)
-        
+        # SizePolicies -------------------------------------------------------
+        self.mca_spectrum_widget.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
+        _top_widget.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed
+        )
+
+        # Qt signal/slot connections ------------------------------------------
+        self.data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
+            self._prefix_ledit_change
+        )
+        self.data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
+            self._run_number_ledit_change
+        )
+        self.count_time_ledit.textChanged.connect(self._count_time_ledit_change)
+
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
     def _prefix_ledit_change(self, new_value):
         self.xrf_spectrum_model.set_name(str(new_value))
-        self._tree_view_item.setText(\
-             0, self.xrf_spectrum_model.get_display_name())
+        self._tree_view_item.setText(0, self.xrf_spectrum_model.get_display_name())
 
     def _run_number_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.xrf_spectrum_model.set_number(int(new_value))
-            self._tree_view_item.setText(\
-                 0, self.xrf_spectrum_model.get_display_name())
+            self._tree_view_item.setText(0, self.xrf_spectrum_model.get_display_name())
 
     def _count_time_ledit_change(self, new_value):
         if str(new_value).isdigit():
             self.xrf_spectrum_model.set_count_time(float(new_value))
-        
+
     def tab_changed(self):
         if self._tree_view_item:
             self.populate_widget(self._tree_view_item)
@@ -130,20 +137,19 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         executed = self.xrf_spectrum_model.is_executed()
 
         self.data_path_widget.setEnabled(not executed)
-        self.other_parameters_gbox.setEnabled(not executed)    
-        #self.mca_spectrum_widget.setEnabled(executed)        
- 
+        self.other_parameters_gbox.setEnabled(not executed)
+        # self.mca_spectrum_widget.setEnabled(executed)
+
         if executed:
             result = self.xrf_spectrum_model.get_spectrum_result()
-            self.mca_spectrum_widget.set_data(result.mca_data, 
-                 result.mca_calib, result.mca_config) 
+            self.mca_spectrum_widget.set_data(
+                result.mca_data, result.mca_calib, result.mca_config
+            )
         else:
             self.mca_spectrum_widget.clear()
-        
-        self.data_path_widget.update_data_model(\
-             self.xrf_spectrum_model.path_template)  
-        self.count_time_ledit.setText(\
-             str(self.xrf_spectrum_model.count_time)) 
+
+        self.data_path_widget.update_data_model(self.xrf_spectrum_model.path_template)
+        self.count_time_ledit.setText(str(self.xrf_spectrum_model.count_time))
 
         image = self.xrf_spectrum_model.centred_position.snapshot_image
         self.snapshot_widget.display_snapshot(image, width=400)
@@ -151,8 +157,9 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
     def set_xrf_spectrum_hwobj(self, xrf_spectrum_hwobj):
         if self.xrf_spectrum_hwobj is None:
             self.xrf_spectrum_hwobj = xrf_spectrum_hwobj
-            self.xrf_spectrum_hwobj.connect("xrfSpectrumFinished",
-                                            self.spectrum_finished)
+            self.xrf_spectrum_hwobj.connect(
+                "xrfSpectrumFinished", self.spectrum_finished
+            )
 
     def spectrum_finished(self, mca_data, mca_calib, mca_config):
         self.mca_spectrum_widget.set_data(mca_data, mca_calib, mca_config)

@@ -1,51 +1,50 @@
-
-'''
-[Name] 
+"""
+[Name]
 
 [Description]
 
-This brick ..  
+This brick ..
 
 [Properties]
 ----------------------------------------------------------------------
 | name                | type     | description
 ----------------------------------------------------------------------
-|                     |          | 
-|                     |          | 
-|                     |          | 
+|                     |          |
+|                     |          |
+|                     |          |
 ----------------------------------------------------------------------
-'''
+"""
 
 from qt import *
 
 from BlissFramework import BaseComponents
 
-__category__ = 'GuiUtils'
+__category__ = "GuiUtils"
+
 
 class SpacerBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
         BaseComponents.BlissWidget.__init__(self, *args)
 
-        self.addProperty('direction', 'combo', ('horizontal', 'vertical'), 'horizontal')
-        self.addProperty('fixedSize', 'integer', 100)
-        self.addProperty('autoSize', 'boolean', False)
+        self.addProperty("direction", "combo", ("horizontal", "vertical"), "horizontal")
+        self.addProperty("fixedSize", "integer", 100)
+        self.addProperty("autoSize", "boolean", False)
 
         QHBoxLayout(self)
         self.layoutItem = QSpacerItem(100, 100, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.layout().addItem(self.layoutItem)
-       
+
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self._rowStretchFactor = 1000
         self._colStretchFactor = 1000
 
-
     def paintEvent(self, event):
         if not self.isRunning():
             p = QPainter(self)
             p.setPen(QPen(Qt.black, 3))
-            
-            if self['direction'] == 'horizontal':
+
+            if self["direction"] == "horizontal":
                 h = self.height() / 2
                 p.drawLine(0, h, self.width(), h)
                 p.drawLine(0, h, 5, h - 5)
@@ -60,19 +59,18 @@ class SpacerBrick(BaseComponents.BlissWidget):
                 p.drawLine(w, self.height(), w - 5, self.height() - 5)
                 p.drawLine(w, self.height(), w + 5, self.height() - 5)
 
-        
     def propertyChanged(self, propertyName, oldValue, newValue):
-        if propertyName == 'autoSize':
+        if propertyName == "autoSize":
             self.layout().removeItem(self.layoutItem)
 
-            if self['direction'] == 'horizontal':
-                x = self['fixedSize']
+            if self["direction"] == "horizontal":
+                x = self["fixedSize"]
                 y = 10
             else:
                 x = 10
-                y = self['fixedSize']
-                                     
-            if self['direction'] == 'horizontal':
+                y = self["fixedSize"]
+
+            if self["direction"] == "horizontal":
                 if newValue:
                     xs = QSizePolicy.Expanding
                 else:
@@ -89,14 +87,12 @@ class SpacerBrick(BaseComponents.BlissWidget):
             self.layout().addItem(self.layoutItem)
             self.setSizePolicy(xs, ys)
             self.updateGeometry()
-        elif propertyName == 'fixedSize':
+        elif propertyName == "fixedSize":
             if newValue < 10:
-                self.getProperty('fixedSize').setValue(10)
+                self.getProperty("fixedSize").setValue(10)
 
-            #force refresh
-            self['autoSize'] = self['autoSize']
-        elif propertyName == 'direction':
-            self['autoSize'] = self['autoSize']
+            # force refresh
+            self["autoSize"] = self["autoSize"]
+        elif propertyName == "direction":
+            self["autoSize"] = self["autoSize"]
             self.update()
-            
-

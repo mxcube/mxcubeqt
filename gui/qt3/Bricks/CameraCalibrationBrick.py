@@ -59,6 +59,8 @@ __category__ = "Camera"
 ##########                         BRICK                           ##########
 ##########                                                         ##########
 #############################################################################
+
+
 class CameraCalibrationBrick(BlissWidget):
     def __init__(self, parent, name):
         BlissWidget.__init__(self, parent, name)
@@ -67,8 +69,8 @@ class CameraCalibrationBrick(BlissWidget):
         variables
         """
         self.firstTime = True
-        self.YCalib  = None
-        self.ZCalib  = None
+        self.YCalib = None
+        self.ZCalib = None
         self.calibration = 0
         self.drawing = None
         self.y1 = 0
@@ -84,20 +86,20 @@ class CameraCalibrationBrick(BlissWidget):
         self.addProperty("vertical motor", "string", "")
         self.addProperty("horizontal motor", "string", "")
         self.hwZoom = None
-        self.hmot   = None
-        self.vmot   = None
+        self.hmot = None
+        self.vmot = None
 
         """
         signals
         """
-        self.defineSignal('getView',())
+        self.defineSignal('getView', ())
         self.defineSignal("ChangePixelCalibration", ())
 
         """
         slots
         """
-        self.defineSlot('getCalibration',())
-        self.defineSlot('useExpertMode',())
+        self.defineSlot('getCalibration', ())
+        self.defineSlot('useExpertMode', ())
 
         self.buildInterface()
 
@@ -117,7 +119,7 @@ class CameraCalibrationBrick(BlissWidget):
         vlayout1 = qt.QVBoxLayout(self.calibFrame)
         vlayout1.setMargin(10)
 
-        self.table = qttable.QTable(0,3, self.calibFrame)
+        self.table = qttable.QTable(0, 3, self.calibFrame)
         self.table.setFocusPolicy(qt.QWidget.NoFocus)
         self.table.setSelectionMode(qttable.QTable.NoSelection)
         self.table.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Minimum,
@@ -196,7 +198,7 @@ class CameraCalibrationBrick(BlissWidget):
         if prop == "vertical motor":
             self.vmot = self.getHardwareObject(newValue)
             mne = self.vmot.getMotorMnemonic()
-            self.relZLabel.setText("Delta on \"%s\" "%mne)
+            self.relZLabel.setText("Delta on \"%s\" " % mne)
             self.vmotUnit = self.vmot.getProperty("unit")
             if self.vmotUnit is None:
                 self.vmotUnit = 1e-3
@@ -204,9 +206,9 @@ class CameraCalibrationBrick(BlissWidget):
         if prop == "horizontal motor":
             self.hmot = self.getHardwareObject(newValue)
             mne = self.hmot.getMotorMnemonic()
-            self.relYLabel.setText("Delta on \"%s\" "%mne)
+            self.relYLabel.setText("Delta on \"%s\" " % mne)
             self.hmotUnit = self.hmot.getProperty("unit")
-            if self.hmotUnit is  None:
+            if self.hmotUnit is None:
                 self.hmotUnit = 1e-3
 
         if not self.firstTime:
@@ -241,7 +243,7 @@ class CameraCalibrationBrick(BlissWidget):
                                    self.setColor)
 
                 self.drawing.addDrawingMgr(self.drawingMgr)
-            except:
+            except BaseException:
                 print "No View"
 
         self.firstTime = False
@@ -308,7 +310,7 @@ class CameraCalibrationBrick(BlissWidget):
                 if resoy is not None:
                     self.table.setText(self.currIdx, 1, str(int(resoy * 1e9)))
                 else:
-                    self.table.setText(self.currIdx, 1,"Not Defined")
+                    self.table.setText(self.currIdx, 1, "Not Defined")
                 if resoz is not None:
                     self.table.setText(self.currIdx, 2, str(int(resoz * 1e9)))
                 else:
@@ -358,7 +360,6 @@ class CameraCalibrationBrick(BlissWidget):
             self.drawingMgr.stopDrawing()
             self.drawingMgr.hide()
 
-
     def pointSelected(self, drawingMgr):
         point = drawingMgr.point()
         if self.calibration == 1:
@@ -367,8 +368,8 @@ class CameraCalibrationBrick(BlissWidget):
 
             ymne = self.hmot.getMotorMnemonic()
             zmne = self.vmot.getMotorMnemonic()
-            self.deltaY  = float(str(self.relYText.text()))
-            self.deltaZ  = float(str(self.relZText.text()))
+            self.deltaY = float(str(self.relYText.text()))
+            self.deltaZ = float(str(self.relZText.text()))
 
             self.calibration = 2
             self.calibButton.setText("STOP")
@@ -425,7 +426,6 @@ class CameraCalibrationBrick(BlissWidget):
         calib["ycalib"] = self.YCalib
         calib["zcalib"] = self.ZCalib
 
-
     def useExpertMode(self, value):
         if value:
             # print "Someone ask to enable CameraCalibrationBrick."
@@ -433,4 +433,3 @@ class CameraCalibrationBrick(BlissWidget):
         else:
             # print "Someone ask to disable CameraCalibrationBrick."
             self.setEnabled(False)
-

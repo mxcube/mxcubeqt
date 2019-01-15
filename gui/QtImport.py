@@ -2,13 +2,13 @@
 
 Description
 --------------
- 
+
 This module import all symbols from PyQt in one single module
 space
 
 It also imports the *matplotlib* module and allow to check
 version compatibility between PyQt and matplotbil
-  
+
 This module, on importing,  assigns the variables:
 
    qt_imported = [True,False]
@@ -55,8 +55,8 @@ directly use this module to print out a report::
    Matplotlib:  PyQt4, version: 1.3.1
    Matplotlib is COMPATIBLE with PyQt
 
-  
-   
+
+
 
 Credits
 -------------
@@ -90,54 +90,56 @@ try:
     if len(version_parts) > 2:
         try:
             import re
+
             rel = version_parts[2]
-            m = re.search("(?P<release>\d+)", rel)
+            m = re.search(r"(?P<release>\d+)", rel)
             if m:
-                mpl_version_no[2] = int(m.group('release'))
-        except:
+                mpl_version_no[2] = int(m.group("release"))
+        except BaseException:
             pass
-except:
+except BaseException:
     pass
 
-if '--pyqt5' in sys.argv:
-    qt_variant = 'PyQt5'
-elif '--pyside' in sys.argv:
-    qt_variant = 'PySide'
-elif '--pyqt4' in sys.argv:
-    qt_variant = 'PyQt4'
-elif '--pyqt3' in sys.argv:
-    qt_variant = 'PyQt3'
+if "--pyqt5" in sys.argv:
+    qt_variant = "PyQt5"
+elif "--pyside" in sys.argv:
+    qt_variant = "PySide"
+elif "--pyqt4" in sys.argv:
+    qt_variant = "PyQt4"
+elif "--pyqt3" in sys.argv:
+    qt_variant = "PyQt3"
 
 #
-# PyQt5 
+# PyQt5
 #
-if (qt_variant == 'PyQt5') or (qt_variant is None and not qt_imported):
+if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
     try:
         from PyQt5.QtCore import *
         from PyQt5.QtGui import *
         from PyQt5.QtWidgets import *
         from PyQt5.QtPrintSupport import *
         from PyQt5.uic import *
+
         try:
             from PyQt5.QtSvg import *
-        except:
+        except BaseException:
             print("QtSvg is not imported. It maybe needs to be installed")
 
         getQApp = QCoreApplication.instance
 
         qt_imported = True
         qt_variant = "PyQt5"
-        qt_version_no = list(map(int,QT_VERSION_STR.split(".")))
+        qt_version_no = list(map(int, QT_VERSION_STR.split(".")))
         _ver = PYQT_VERSION_STR.split(".")
-        ver = _ver + ['0']*(3 - len(_ver))
-        pyqt_version_no = list(map(int,ver))[:3]
-    except:
+        ver = _ver + ["0"] * (3 - len(_ver))
+        pyqt_version_no = list(map(int, ver))[:3]
+    except BaseException:
         pass
 
 #
 # PyQt4
 #
-if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
+if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
     #
     # Maybe it is PyQt4 that you want
     #
@@ -162,32 +164,35 @@ if (qt_variant == 'PyQt4') or (qt_variant is None and not qt_imported):
         from PyQt4.QtCore import *
         from PyQt4.QtGui import *
         from PyQt4.uic import *
-        #from PyQt4.QtSvg import *
+
+        # from PyQt4.QtSvg import *
         from PyQt4.QtTest import *
-        
+
         def getQApp():
             return qApp
 
         qt_imported = True
         qt_variant = "PyQt4"
-        qt_version_no = list(map(int,QT_VERSION_STR.split(".")))
+        qt_version_no = list(map(int, QT_VERSION_STR.split(".")))
         _ver = PYQT_VERSION_STR.split(".")
-        ver = _ver + ['0']*(3 - len(_ver))
-        pyqt_version_no = list(map(int,ver))[:3]
-    except:
+        ver = _ver + ["0"] * (3 - len(_ver))
+        pyqt_version_no = list(map(int, ver))[:3]
+    except BaseException:
         pass
 
 #
 # PySide
 #
-if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
+if (qt_variant == "PySide") or (qt_variant is None and not qt_imported):
     #
     # Finally try PySide (not fully tested)
     #
     try:
-        from PySide import __version_info__ 
+        from PySide import __version_info__
+
         pyqt_version_no = __version_info__[:3]
         from PySide.QtCore import __version_info__
+
         qt_version_no = __version_info__[:3]
 
         from PySide.QtCore import *
@@ -200,6 +205,7 @@ if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
         qt_imported = True
         qt_variant = "PySide"
         getQApp = QCoreApplication.instance
+
         def loadUi(filename, parent=None):
             loader = QUiLoader()
             uifile = QFile(filename)
@@ -208,30 +214,31 @@ if (qt_variant == 'PySide') or (qt_variant is None and not qt_imported):
             uifile.close()
             return ui
 
-    except:
+    except BaseException:
         pass
 
 #
 #  Matplotlib backend assignment
 #
 if mpl_imported:
-    if qt_variant == 'PyQt5':
-        if mpl_version_no < [1,4,0]:
+    if qt_variant == "PyQt5":
+        if mpl_version_no < [1, 4, 0]:
             mpl_compat = False
         else:
             mpl_compat = True
             matplotlib.use("Qt5Agg")
 
-    elif qt_variant == 'PySide':
-        if mpl_version_no < [1,1,0]:
+    elif qt_variant == "PySide":
+        if mpl_version_no < [1, 1, 0]:
             mpl_compat = False
         else:
             mpl_compat = True
             matplotlib.use("Qt4Agg")
             from matplotlib import rcParams
+
             rcParams["backend.qt4"] = "PySide"
 
-    elif qt_variant == 'PyQt4':
+    elif qt_variant == "PyQt4":
         mpl_compat = True
         matplotlib.use("Qt4Agg")
 
@@ -257,20 +264,21 @@ if qt_imported and mpl_imported:
         print("  !!! Matplotlib is NOT COMPATIBLE with PyQt !!!")
 """
 
-if qt_variant in ('PyQt4', 'PyQt5', 'PySide'):
+if qt_variant in ("PyQt4", "PyQt5", "PySide"):
     # QHeaderView is not defined for Qt3, so the import broke without the 'if'
     class RotatedHeaderView(QHeaderView):
         def __init__(self, parent=None):
             super(RotatedHeaderView, self).__init__(Qt.Horizontal, parent)
             self.setMinimumSectionSize(22)
 
-        def paintSection(self, painter, rect, logicalIndex ):
+        def paintSection(self, painter, rect, logicalIndex):
             painter.save()
-            # translate the painter such that rotate will rotate around the correct point
-            painter.translate(rect.x()+rect.width(), rect.y())
+            # translate the painter such that rotate will rotate around the correct
+            # point
+            painter.translate(rect.x() + rect.width(), rect.y())
             painter.rotate(90)
             # and have parent code paint at this location
-            newrect = QRect(0,0,rect.height(),rect.width())
+            newrect = QRect(0, 0, rect.height(), rect.width())
             super(RotatedHeaderView, self).paintSection(painter, newrect, logicalIndex)
             painter.restore()
 
@@ -309,10 +317,15 @@ if qt_variant in ('PyQt4', 'PyQt5', 'PySide'):
             return self._max_value - self._min_value
 
         def value(self):
-            return float(super(QSlider, self).value()) / self._max_int * self._value_range + self._min_value
+            return (
+                float(super(QSlider, self).value()) / self._max_int * self._value_range
+                + self._min_value
+            )
 
         def setValue(self, value):
-            super(QSlider, self).setValue(int((value - self._min_value) / self._value_range * self._max_int))
+            super(QSlider, self).setValue(
+                int((value - self._min_value) / self._value_range * self._max_int)
+            )
 
         def setMinimum(self, value):
             if value > self._max_value:
@@ -334,5 +347,6 @@ if qt_variant in ('PyQt4', 'PyQt5', 'PySide'):
         def maximum(self):
             return self._max_value
 
+
 def load_ui_file(filename):
-    return loadUi(os.path.join(os.path.dirname(__file__), 'ui_files', filename))
+    return loadUi(os.path.join(os.path.dirname(__file__), "ui_files", filename))

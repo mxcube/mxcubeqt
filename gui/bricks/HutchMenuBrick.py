@@ -36,7 +36,7 @@ __category__ = "General"
 class HutchMenuBrick(BaseWidget):
     """
     HutchMenuBrick is used to perform sample centring
-    """ 
+    """
 
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
@@ -45,29 +45,30 @@ class HutchMenuBrick(BaseWidget):
         self.graphics_manager_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.inside_data_collection =  None
+        self.inside_data_collection = None
         self.directory = "/tmp"
-        self.prefix = "snapshot" 
+        self.prefix = "snapshot"
         self.file_index = 1
 
         # Properties ----------------------------------------------------------
-        self.add_property('graphicsManager', 'string', '')
-        self.add_property('enableAutoFocus', 'boolean', True)
-        self.add_property('enableRefreshCamera', 'boolean', False)
-        self.add_property('enableVisualAlign', 'boolean', True)
-        self.add_property('enableAutoCenter', 'boolean', True)
-        self.add_property('enableRealignBeam', 'boolean', False)
+        self.add_property("graphicsManager", "string", "")
+        self.add_property("enableAutoFocus", "boolean", True)
+        self.add_property("enableRefreshCamera", "boolean", False)
+        self.add_property("enableVisualAlign", "boolean", True)
+        self.add_property("enableAutoCenter", "boolean", True)
+        self.add_property("enableRealignBeam", "boolean", False)
 
         # Signals -------------------------------------------------------------
-        
+
         # Slots ---------------------------------------------------------------
-       
+
         # Graphic elements ----------------------------------------------------
         self.centre_button = DuoStateButton(self, "Centre")
         self.centre_button.set_icons("VCRPlay2", "Delete")
         self.accept_button = MonoStateButton(self, "Save", "ThumbUp")
-        self.standard_color = self.accept_button.palette().\
-             color(QtImport.QPalette.Window)
+        self.standard_color = self.accept_button.palette().color(
+            QtImport.QPalette.Window
+        )
         self.reject_button = MonoStateButton(self, "Reject", "ThumbDown")
         self.reject_button.hide()
         self.create_line_button = MonoStateButton(self, "Line", "Line")
@@ -82,7 +83,7 @@ class HutchMenuBrick(BaseWidget):
         self.auto_center_button.setText("Auto")
         self.realign_button = MonoStateButton(self, "Realign beam", "QuickRealign")
 
-        # Layout -------------------------------------------------------------- 
+        # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.centre_button)
         _main_vlayout.addWidget(self.accept_button)
@@ -117,49 +118,64 @@ class HutchMenuBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
         self.centre_button.setToolTip("3 click centring (Ctrl+1)")
-        self.accept_button.setToolTip("Accept 3 click centring or " \
-             "create a point\nbased on current position (Ctrl+2)")
+        self.accept_button.setToolTip(
+            "Accept 3 click centring or "
+            "create a point\nbased on current position (Ctrl+2)"
+        )
         self.reject_button.setToolTip("Reject centring")
-        self.create_line_button.setToolTip("Create helical line between \n" + \
-             "two points (Ctrl+L)")
+        self.create_line_button.setToolTip(
+            "Create helical line between \n" + "two points (Ctrl+L)"
+        )
         self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+G)")
         self.select_all_button.setToolTip("Select all centring points (Ctrl+A)")
         self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
-        #self.instanceSynchronize("")
+        # self.instanceSynchronize("")
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "graphicsManager":
-            if self.graphics_manager_hwobj:  
-                self.disconnect(self.graphics_manager_hwobj, 
-                                'centringStarted',
-                                self.centring_started)
-                self.disconnect(self.graphics_manager_hwobj,
-                                'centringFailed',
-                                self.centring_failed)
-                self.disconnect(self.graphics_manager_hwobj,
-                                'centringSuccessful',
-                                self.centring_successful)
-                self.disconnect(self.graphics_manager_hwobj, 
-                                'diffractometerPhaseChanged',
-                                self.diffractometer_phase_changed)
+            if self.graphics_manager_hwobj:
+                self.disconnect(
+                    self.graphics_manager_hwobj,
+                    "centringStarted",
+                    self.centring_started,
+                )
+                self.disconnect(
+                    self.graphics_manager_hwobj, "centringFailed", self.centring_failed
+                )
+                self.disconnect(
+                    self.graphics_manager_hwobj,
+                    "centringSuccessful",
+                    self.centring_successful,
+                )
+                self.disconnect(
+                    self.graphics_manager_hwobj,
+                    "diffractometerPhaseChanged",
+                    self.diffractometer_phase_changed,
+                )
 
             self.graphics_manager_hwobj = self.get_hardware_object(new_value)
 
             if self.graphics_manager_hwobj:
-                self.connect(self.graphics_manager_hwobj,
-                             'centringStarted',
-                             self.centring_started)
-                self.connect(self.graphics_manager_hwobj,
-                             'centringFailed',
-                             self.centring_failed)
-                self.connect(self.graphics_manager_hwobj,
-                             'centringSuccessful',
-                             self.centring_successful)
-                self.connect(self.graphics_manager_hwobj,
-                             'diffractometerPhaseChanged',
-                             self.diffractometer_phase_changed)
+                self.connect(
+                    self.graphics_manager_hwobj,
+                    "centringStarted",
+                    self.centring_started,
+                )
+                self.connect(
+                    self.graphics_manager_hwobj, "centringFailed", self.centring_failed
+                )
+                self.connect(
+                    self.graphics_manager_hwobj,
+                    "centringSuccessful",
+                    self.centring_successful,
+                )
+                self.connect(
+                    self.graphics_manager_hwobj,
+                    "diffractometerPhaseChanged",
+                    self.diffractometer_phase_changed,
+                )
         elif property_name == "enableAutoFocus":
-            self.auto_focus_button.setVisible(new_value) 
+            self.auto_focus_button.setVisible(new_value)
         elif property_name == "enableRefreshCamera":
             self.refresh_camera_button.setVisible(new_value)
         elif property_name == "enableVisualAlign":
@@ -173,26 +189,37 @@ class HutchMenuBrick(BaseWidget):
 
     def centre_button_clicked(self, state):
         if state:
-            self.graphics_manager_hwobj.start_centring(tree_click = True)
+            self.graphics_manager_hwobj.start_centring(tree_click=True)
         else:
-            self.graphics_manager_hwobj.cancel_centring(reject = False)
+            self.graphics_manager_hwobj.cancel_centring(reject=False)
             self.accept_button.setEnabled(True)
 
     def save_snapshot_clicked(self):
-        formats = ["*.%s" % unicode(format).lower() for format in \
-                   QtImport.QImageWriter.supportedImageFormats()]
+        formats = [
+            "*.%s" % unicode(format).lower()
+            for format in QtImport.QImageWriter.supportedImageFormats()
+        ]
 
-        current_file_name = "%s/%s_%d.%s" % (self.directory, self.prefix,
-            self.file_index, "png")
-        filename = str(QtImport.QFileDialog.getSaveFileName(\
-            self, "Choose a filename to save under",
-            current_file_name, "Image files (%s)" % " ".join(formats)))
+        current_file_name = "%s/%s_%d.%s" % (
+            self.directory,
+            self.prefix,
+            self.file_index,
+            "png",
+        )
+        filename = str(
+            QtImport.QFileDialog.getSaveFileName(
+                self,
+                "Choose a filename to save under",
+                current_file_name,
+                "Image files (%s)" % " ".join(formats),
+            )
+        )
 
         if len(filename):
             try:
                 self.graphics_manager_hwobj.save_scene_snapshot(filename)
-                self.file_index += 1        
-            except:
+                self.file_index += 1
+            except BaseException:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
 
     def refresh_camera_clicked(self):
@@ -209,17 +236,15 @@ class HutchMenuBrick(BaseWidget):
         """
         Clears all shapes (points, lines and meshes)
         """
-        self.graphics_manager_hwobj.clear_all() 
+        self.graphics_manager_hwobj.clear_all()
 
     def accept_clicked(self):
-        Colors.set_widget_color(self.accept_button, 
-                                           self.standard_color)
+        Colors.set_widget_color(self.accept_button, self.standard_color)
         self.reject_button.setEnabled(False)
         self.graphics_manager_hwobj.accept_centring()
 
     def reject_clicked(self):
-        Colors.set_widget_color(self.accept_button, 
-                                           self.standard_color)
+        Colors.set_widget_color(self.accept_button, self.standard_color)
         self.reject_button.setEnabled(False)
         self.centre_button.setEnabled(True)
         self.accept_button.setEnabled(True)
@@ -244,10 +269,8 @@ class HutchMenuBrick(BaseWidget):
         self.accept_button.setEnabled(True)
         self.reject_button.setEnabled(True)
         if self.inside_data_collection:
-            Colors.set_widget_color(self.accept_button, 
-                                               Colors.LIGHT_GREEN)
-            Colors.set_widget_color(self.reject_button, 
-                                               Colors.LIGHT_RED)
+            Colors.set_widget_color(self.accept_button, Colors.LIGHT_GREEN)
+            Colors.set_widget_color(self.reject_button, Colors.LIGHT_RED)
 
         self.setEnabled(True)
 
@@ -260,7 +283,7 @@ class HutchMenuBrick(BaseWidget):
             Colors.set_widget_color(self.reject_button, QtImport.Qt.red)
         else:
             self.reject_button.setEnabled(False)
-        #self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
+        # self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
     def create_line_clicked(self):
         self.graphics_manager_hwobj.create_line()
@@ -272,7 +295,7 @@ class HutchMenuBrick(BaseWidget):
         self.setEnabled(is_ready)
 
     def diffractometer_phase_changed(self, phase):
-        #TODO connect this to minidiff
+        # TODO connect this to minidiff
         status = phase != "BeamLocation"
         self.centre_button.setEnabled(status)
         self.accept_button.setEnabled(status)
@@ -292,20 +315,20 @@ class HutchMenuBrick(BaseWidget):
     def auto_center_clicked(self):
         self.graphics_manager_hwobj.start_auto_centring()
 
-class MonoStateButton(QtImport.QToolButton):
 
+class MonoStateButton(QtImport.QToolButton):
     def __init__(self, parent, caption=None, icon=None):
 
         QtImport.QToolButton.__init__(self, parent)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                           QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
         self.setToolButtonStyle(QtImport.Qt.ToolButtonTextUnderIcon)
         if caption:
             self.setText(caption)
             self.setWindowIconText(caption)
         if icon:
             self.setIcon(Icons.load_icon(icon))
-            
+
+
 class DuoStateButton(QtImport.QToolButton):
 
     commandExecuteSignal = QtImport.pyqtSignal(bool)
@@ -319,8 +342,7 @@ class DuoStateButton(QtImport.QToolButton):
         self.stop_icon = None
         self.standard_color = self.palette().color(QtImport.QPalette.Window)
         self.setText(caption)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                           QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
         self.clicked.connect(self.button_clicked)
 
     def set_icons(self, icon_run, icon_stop):
@@ -333,12 +355,11 @@ class DuoStateButton(QtImport.QToolButton):
 
     def button_clicked(self):
         self.commandExecuteSignal.emit(not self.executing)
-        #if not self.executing:
+        # if not self.executing:
         #    self.setEnabled(False)
 
     def command_started(self):
-        Colors.set_widget_color(self, Colors.LIGHT_YELLOW,
-            QtImport.QPalette.Button) 
+        Colors.set_widget_color(self, Colors.LIGHT_YELLOW, QtImport.QPalette.Button)
         if self.stop_icon is not None:
             self.setIcon(self.stop_icon)
         self.executing = True
@@ -349,8 +370,7 @@ class DuoStateButton(QtImport.QToolButton):
 
     def command_done(self):
         self.executing = False
-        Colors.set_widget_color(self, self.standard_color,
-            QtImport.QPalette.Button)
+        Colors.set_widget_color(self, self.standard_color, QtImport.QPalette.Button)
         if self.run_icon is not None:
             self.setIcon(self.run_icon)
         self.setEnabled(True)

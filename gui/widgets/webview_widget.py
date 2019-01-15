@@ -20,19 +20,18 @@
 import QtImport
 
 try:
-    if QtImport.qt_variant == 'PyQt5':
+    if QtImport.qt_variant == "PyQt5":
         from PyQt5.QtWebKit import QWebView
     else:
         from PyQt4.QtWebKit import QWebView
     QWEBVIEW_AVAILABLE = True
-except:
+except BaseException:
     QWEBVIEW_AVAILABLE = False
 
 from gui.utils import Icons
 
 
 class WebViewWidget(QtImport.QWidget):
-
     def __init__(self, parent):
 
         QtImport.QWidget.__init__(self, parent)
@@ -49,29 +48,30 @@ class WebViewWidget(QtImport.QWidget):
         self.home_button.setIcon(Icons.load_icon("Home2"))
         self.back_button.setIcon(Icons.load_icon("Left2"))
         self.forward_button.setIcon(Icons.load_icon("Right2"))
-         
+
         if QWEBVIEW_AVAILABLE:
             self.web_page_viewer = QWebView(self)
-            self.web_page_viewer.settings().setObjectCacheCapacities(0,0,0)
+            self.web_page_viewer.settings().setObjectCacheCapacities(0, 0, 0)
         else:
             self.web_page_viewer = QtImport.QTextBrowser(self)
 
         _navigation_bar_hlayout = QtImport.QHBoxLayout(self.navigation_bar)
         _navigation_bar_hlayout.addWidget(self.home_button)
-        _navigation_bar_hlayout.addWidget(self.back_button) 
+        _navigation_bar_hlayout.addWidget(self.back_button)
         _navigation_bar_hlayout.addWidget(self.forward_button)
-        _navigation_bar_hlayout.addWidget(self.url_ledit)  
+        _navigation_bar_hlayout.addWidget(self.url_ledit)
         _navigation_bar_hlayout.setSpacing(2)
         _navigation_bar_hlayout.setContentsMargins(2, 2, 2, 2)
 
         _main_vlayout = QtImport.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.navigation_bar) 
-        _main_vlayout.addWidget(self.web_page_viewer)  
+        _main_vlayout.addWidget(self.navigation_bar)
+        _main_vlayout.addWidget(self.web_page_viewer)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
-        
-        self.web_page_viewer.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                                           QtImport.QSizePolicy.Expanding)
+
+        self.web_page_viewer.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
         self.home_button.clicked.connect(self.go_to_home_page)
         self.back_button.clicked.connect(self.go_back)
@@ -82,7 +82,7 @@ class WebViewWidget(QtImport.QWidget):
             self.home_url = url
             self.navigation_bar.setEnabled(True)
             self.go_to_home_page()
-              
+
     def set_static_page(self, html_text):
         if QWEBVIEW_AVAILABLE:
             self.web_page_viewer.setHtml(html_text)
@@ -99,4 +99,4 @@ class WebViewWidget(QtImport.QWidget):
 
     def go_forward(self):
         if QWEBVIEW_AVAILABLE:
-            self.web_page_viewer.forward()  
+            self.web_page_viewer.forward()

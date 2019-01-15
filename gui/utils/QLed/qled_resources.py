@@ -1,4 +1,3 @@
-
 from QtImport import *
 
 if qt_variant == "PyQt4":
@@ -16,4 +15,3 @@ elif qt_variant == "PySide":
         from qled_resources_pyside_py3 import *
     else:
         from qled_resources_pyside import *
-

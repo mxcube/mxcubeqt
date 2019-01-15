@@ -128,12 +128,12 @@ class DataCollectTree(QtImport.QWidget):
 
         self.collect_button = QtImport.QPushButton(self.button_widget)
         self.collect_button.setText("Collect Queue")
-        #self.collect_button.setFixedWidth(125)
+        # self.collect_button.setFixedWidth(125)
         self.collect_button.setIcon(self.play_icon)
         self.collect_button.setDisabled(True)
         Colors.set_widget_color(self.collect_button,
-                                           Colors.LIGHT_GREEN,
-                                           QtImport.QPalette.Button)
+                                Colors.LIGHT_GREEN,
+                                QtImport.QPalette.Button)
 
         self.continue_button = QtImport.QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
@@ -164,7 +164,7 @@ class DataCollectTree(QtImport.QWidget):
         button_widget_grid_layout.setSpacing(1)
 
         main_layout = QtImport.QVBoxLayout(self)
-        #main_layout.addWidget(self.sample_tree_widget)
+        # main_layout.addWidget(self.sample_tree_widget)
         main_layout.addWidget(self.tree_splitter)
         main_layout.addWidget(self.history_enable_cbox)
         main_layout.addWidget(self.plate_navigator_cbox)
@@ -182,7 +182,7 @@ class DataCollectTree(QtImport.QWidget):
         self.delete_button.clicked.connect(self.delete_click)
         self.collect_button.clicked.connect(self.collect_stop_toggle)
         self.sample_tree_widget.itemSelectionChanged.\
-             connect(self.sample_tree_widget_selection)
+            connect(self.sample_tree_widget_selection)
         self.sample_tree_widget.contextMenuEvent = self.show_context_menu
         self.sample_tree_widget.itemDoubleClicked.connect(self.item_double_click)
         self.sample_tree_widget.itemClicked.connect(self.item_click)
@@ -191,36 +191,38 @@ class DataCollectTree(QtImport.QWidget):
         self.confirm_dialog.continueClickedSignal.connect(self.collect_items)
         self.continue_button.clicked.connect(self.continue_button_click)
 
-        #self.history_tree_widget.cellDoubleClicked.\
+        # self.history_tree_widget.cellDoubleClicked.\
         #     connect(self.history_table_double_click)
         self.history_enable_cbox.stateChanged.\
-             connect(self.history_tree_widget.setVisible)
+            connect(self.history_tree_widget.setVisible)
 
         self.plate_navigator_cbox.stateChanged.\
-             connect(self.use_plate_navigator)
+            connect(self.use_plate_navigator)
 
         # Other ---------------------------------------------------------------
-        #TODO number of columns should not be hard coded but come from processing methods
+        # TODO number of columns should not be hard coded but come from processing
+        # methods
         self.sample_tree_widget.setColumnCount(6)
         self.sample_tree_widget.setColumnWidth(0, 150)
         self.sample_tree_widget.setColumnWidth(1, 160)
-        for col in range (4):
+        for col in range(4):
             self.sample_tree_widget.setColumnWidth(2 + col, 15)
 
-        #self.sample_tree_widget.header().setDefaultSectionSize(180)
+        # self.sample_tree_widget.header().setDefaultSectionSize(180)
         self.sample_tree_widget.header().setDefaultSectionSize(400)
         self.sample_tree_widget.header().hide()
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
-        self.sample_tree_widget.setSelectionMode(QtImport.QAbstractItemView.ExtendedSelection)
+        self.sample_tree_widget.setSelectionMode(
+            QtImport.QAbstractItemView.ExtendedSelection)
         self.setAttribute(QtImport.Qt.WA_WState_Polished)
         self.sample_tree_widget.viewport().installEventFilter(self)
 
-        self.history_tree_widget.setEditTriggers(\
-             QtImport.QAbstractItemView.NoEditTriggers)
+        self.history_tree_widget.setEditTriggers(
+            QtImport.QAbstractItemView.NoEditTriggers)
         self.history_tree_widget.setColumnCount(5)
-        self.history_tree_widget.setHeaderLabels(\
-             ("Date/Time", "Sample", "Type", "Status", "Details"))
+        self.history_tree_widget.setHeaderLabels(
+            ("Date/Time", "Sample", "Type", "Status", "Details"))
         self.tree_splitter.setSizes([200, 20])
 
     def setFont(self, font):
@@ -263,7 +265,8 @@ class DataCollectTree(QtImport.QWidget):
             add_details = False
             self.item_menu.addAction("Rename", self.rename_treewidget_item)
             if item.has_star():
-                self.item_menu.addAction("Remove star", self.remove_star_treewidget_item)
+                self.item_menu.addAction(
+                    "Remove star", self.remove_star_treewidget_item)
             else:
                 self.item_menu.addAction(self.star_icon,
                                          "Add star",
@@ -302,12 +305,12 @@ class DataCollectTree(QtImport.QWidget):
                         else:
                             self.item_menu.addAction("Mount",
                                                      self.mount_sample)
-                            close_kappa_action = self.item_menu.addAction(\
-                                  "Close kappa after sample mount")
+                            close_kappa_action = self.item_menu.addAction(
+                                "Close kappa after sample mount")
                             close_kappa_action.toggled.connect(
-                                  self.close_kappa_toggled)
+                                self.close_kappa_toggled)
                             close_kappa_action.setCheckable(True)
-                            close_kappa_action.setChecked(self.close_kappa) 
+                            close_kappa_action.setChecked(self.close_kappa)
 
                 self.item_menu.addSeparator()
 
@@ -331,7 +334,7 @@ class DataCollectTree(QtImport.QWidget):
             if add_details:
                 self.item_menu.addAction("Details", self.show_details)
             if isinstance(item, queue_item.DataCollectionQueueItem):
-                open_in_ispyb_action = self.item_menu.addAction(\
+                open_in_ispyb_action = self.item_menu.addAction(
                     "View results in ISPyB", self.open_ispyb_link)
                 open_in_ispyb_action.setEnabled(item.get_model().id > 0)
             self.item_menu.popup(QtImport.QCursor.pos())
@@ -342,13 +345,13 @@ class DataCollectTree(QtImport.QWidget):
 
     def history_table_double_click(self, row, col):
         """Shows more details of a double clicked history view item"""
-        #elf.show_details([self.item_history_list[row]])
+        # elf.show_details([self.item_history_list[row]])
         pass
 
     def item_click(self):
         """Single item click verifies if there is a path conflict"""
         self.check_for_path_collisions()
-        #self.sample_tree_widget_selection()
+        # self.sample_tree_widget_selection()
         self.toggle_collect_button_enabled()
 
     def item_changed(self, item, column):
@@ -357,7 +360,7 @@ class DataCollectTree(QtImport.QWidget):
           Item check state is updated when checkbox is toggled
           (to avoid update when text is changed)
         """
-        #if item.checkState(0) != item.get_previous_check_state():
+        # if item.checkState(0) != item.get_previous_check_state():
         #   item.update_check_state()
 
         # IK. This type check should not be here,because all tree items are
@@ -416,7 +419,7 @@ class DataCollectTree(QtImport.QWidget):
                 self.tree_brick.show_dcg_tab(item)
             elif isinstance(item, queue_item.XrayCenteringQueueItem):
                 self.tree_brick.show_advanced_tab(item)
-        #elif len(items) == 0:
+        # elif len(items) == 0:
         #    self.tree_brick.show_sample_tab()
 
     def rename_treewidget_item(self):
@@ -457,7 +460,8 @@ class DataCollectTree(QtImport.QWidget):
                 item = items[0]
 
         if item:
-            self.sample_tree_widget.scrollToItem(item, QtImport.QAbstractItemView.PositionAtCenter)
+            self.sample_tree_widget.scrollToItem(
+                item, QtImport.QAbstractItemView.PositionAtCenter)
             self.sample_tree_widget.horizontalScrollBar().setValue(0)
 
     def mount_sample(self):
@@ -478,8 +482,9 @@ class DataCollectTree(QtImport.QWidget):
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
                     queue_entry.mount_sample(self.beamline_setup_hwobj,
-                        items[0], items[0].get_model(), self.centring_done,
-                        self.sample_centring_result)
+                                             items[0], items[0].get_model(
+                                             ), self.centring_done,
+                                             self.sample_centring_result)
                     if self.close_kappa:
                         self.beamline_setup_hwobj.diffractometer_hwobj.close_kappa()
                 except Exception as e:
@@ -493,7 +498,7 @@ class DataCollectTree(QtImport.QWidget):
                     self.enable_collect(True)
             else:
                 logging.getLogger("GUI").\
-                  info('Its not possible to mount samples in free pin mode')
+                    info('Its not possible to mount samples in free pin mode')
 
     def centring_done(self, success, centring_info):
         """Updates centring status"""
@@ -517,7 +522,7 @@ class DataCollectTree(QtImport.QWidget):
             items[0].setText(1, "Unloading sample...")
             self.beamline_setup_hwobj.shape_history_hwobj.clear_all()
             logging.getLogger("GUI").\
-                info("All centred positions associated with this " + \
+                info("All centred positions associated with this " +
                      "sample will be lost.")
 
             location = items[0].get_model().location
@@ -526,14 +531,14 @@ class DataCollectTree(QtImport.QWidget):
             sample_changer = None
             if self.sample_mount_method == 1:
                 try:
-                   sample_changer = self.beamline_setup_hwobj.sample_changer_hwobj
+                    sample_changer = self.beamline_setup_hwobj.sample_changer_hwobj
                 except AttributeError:
-                   sample_changer = None
+                    sample_changer = None
             elif self.sample_mount_method == 2:
                 try:
-                   sample_changer = self.beamline_setup_hwobj.plate_manipulator_hwobj
+                    sample_changer = self.beamline_setup_hwobj.plate_manipulator_hwobj
                 except AttributeError:
-                   sample_changer = None
+                    sample_changer = None
 
             if sample_changer:
                 robot_action_dict = {"actionType": "UNLOAD",
@@ -546,15 +551,15 @@ class DataCollectTree(QtImport.QWidget):
 
                 try:
                     if hasattr(sample_changer, '__TYPE__')\
-                    and sample_changer.__TYPE__ in ('CATS', 'Marvin', 'Mockup'):
-                       sample_changer.unload(wait=True)
+                            and sample_changer.__TYPE__ in ('CATS', 'Marvin', 'Mockup'):
+                        sample_changer.unload(wait=True)
                     else:
-                       sample_changer.unload(22, location, wait=False)
+                        sample_changer.unload(22, location, wait=False)
                 except Exception as e:
-                   items[0].setText(1, "Error in unloading")
-                   msg = "Error unloading sample, please check" +\
-                          " sample changer: " + str(e)
-                   logging.getLogger("GUI").error(msg)
+                    items[0].setText(1, "Error in unloading")
+                    msg = "Error unloading sample, please check" +\
+                        " sample changer: " + str(e)
+                    logging.getLogger("GUI").error(msg)
 
                 robot_action_dict["endTime"] = time.strftime("%Y-%m-%d %H:%M:%S")
                 if not sample_changer.hasLoadedSample():
@@ -562,7 +567,8 @@ class DataCollectTree(QtImport.QWidget):
                 else:
                     robot_action_dict['message'] = "Sample was not unloaded"
                     robot_action_dict['status'] = "ERROR"
-                self.beamline_setup_hwobj.lims_client_hwobj.store_robot_action(robot_action_dict)
+                self.beamline_setup_hwobj.lims_client_hwobj.store_robot_action(
+                    robot_action_dict)
 
             items[0].setText(1, "")
             items[0].setOn(False)
@@ -593,13 +599,14 @@ class DataCollectTree(QtImport.QWidget):
         self.toggle_collect_button_enabled()
 
     def toggle_collect_button_enabled(self):
-        enable_collect = (len(self.get_checked_items()) > 1 and \
+        enable_collect = (len(self.get_checked_items()) > 1 and
                           len(self.get_checked_samples()) and
                           self.enable_collect_condition) or \
-                         self.collecting
+            self.collecting
 
         self.collect_button.setEnabled(enable_collect)
-        self.enableCollectSignal.emit(self.enable_collect_condition and not self.collecting)
+        self.enableCollectSignal.emit(
+            self.enable_collect_condition and not self.collecting)
 
     def get_item_by_model(self, parent_node):
         """Returns tree item by its model
@@ -645,15 +652,15 @@ class DataCollectTree(QtImport.QWidget):
             view_item.setExpanded(True)
 
         self.queue_model_hwobj.view_created(view_item, task)
-        #self.sample_tree_widget_selection()
+        # self.sample_tree_widget_selection()
         self.toggle_collect_button_enabled()
 
         self.last_added_item = view_item
 
         if isinstance(view_item, queue_item.TaskQueueItem) and \
-            self.samples_initialized:
+                self.samples_initialized:
             self.tree_brick.auto_save_queue()
-        #self.sample_tree_widget.resizeColumnToContents(0)
+        # self.sample_tree_widget.resizeColumnToContents(0)
 
         if isinstance(task, queue_model_objects.DataCollection):
             view_item.init_tool_tip()
@@ -681,16 +688,16 @@ class DataCollectTree(QtImport.QWidget):
         """Returns a list with selected samples"""
         res_list = []
         for item in self.get_selected_items():
-            if isinstance(item,  queue_item.SampleQueueItem):
-               res_list.append(item)
+            if isinstance(item, queue_item.SampleQueueItem):
+                res_list.append(item)
         return res_list
 
     def get_selected_tasks(self):
         """Returns a list with tasks"""
         res_list = []
         for item in self.get_selected_items():
-            if isinstance(item,  queue_item.TaskQueueItem):
-               res_list.append(item)
+            if isinstance(item, queue_item.TaskQueueItem):
+                res_list.append(item)
         return res_list
 
     def get_selected_dcs(self):
@@ -698,8 +705,8 @@ class DataCollectTree(QtImport.QWidget):
         """
         res_list = []
         for item in self.get_selected_items():
-            if isinstance(item,  queue_item.DataCollectionQueueItem):
-               res_list.append(item)
+            if isinstance(item, queue_item.DataCollectionQueueItem):
+                res_list.append(item)
         return res_list
 
     def get_selected_task_nodes(self):
@@ -707,8 +714,8 @@ class DataCollectTree(QtImport.QWidget):
         """
         res_list = []
         for item in self.get_selected_items():
-            if isinstance(item,  queue_item.DataCollectionGroupQueueItem):
-               res_list.append(item)
+            if isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                res_list.append(item)
         return res_list
 
     def is_sample_selected(self):
@@ -726,17 +733,17 @@ class DataCollectTree(QtImport.QWidget):
         item = it.value()
 
         while item:
-           if isinstance(item, queue_item.SampleQueueItem):
-              if item.mounted_style:
-                  return item
-           it += 1
-           item = it.value()
+            if isinstance(item, queue_item.SampleQueueItem):
+                if item.mounted_style:
+                    return item
+            it += 1
+            item = it.value()
 
     def get_checked_samples(self):
         res_list = []
         for item in self.get_checked_items():
-            if isinstance(item,  queue_item.SampleQueueItem):
-               res_list.append(item)
+            if isinstance(item, queue_item.SampleQueueItem):
+                res_list.append(item)
         return res_list
 
     def filter_sample_list(self, option):
@@ -757,26 +764,26 @@ class DataCollectTree(QtImport.QWidget):
             loaded_sample_loc = None
 
             if self.beamline_setup_hwobj.diffractometer_hwobj.\
-                in_plate_mode():
+                    in_plate_mode():
                 try:
-                   loaded_sample = self.beamline_setup_hwobj.\
-                       plate_manipulator_hwobj.getLoadedSample()
-                   loaded_sample_loc = loaded_sample.getCoords()
-                except:
-                   pass
+                    loaded_sample = self.beamline_setup_hwobj.\
+                        plate_manipulator_hwobj.getLoadedSample()
+                    loaded_sample_loc = loaded_sample.getCoords()
+                except BaseException:
+                    pass
             else:
                 try:
-                   loaded_sample = self.beamline_setup_hwobj.\
-                       sample_changer_hwobj.getLoadedSample()
-                   loaded_sample_loc = loaded_sample.getCoords()
-                except:
-                   pass
+                    loaded_sample = self.beamline_setup_hwobj.\
+                        sample_changer_hwobj.getLoadedSample()
+                    loaded_sample_loc = loaded_sample.getCoords()
+                except BaseException:
+                    pass
             it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()
 
             while item:
                 if isinstance(item, queue_item.SampleQueueItem):
-                    #TODO fix this to actual plate sample!!!
+                    # TODO fix this to actual plate sample!!!
                     if item.get_model().location == loaded_sample_loc:
                         item.setSelected(True)
                         item.setHidden(False)
@@ -806,7 +813,7 @@ class DataCollectTree(QtImport.QWidget):
             else:
                 dm.user_confirms_centring = True
         except AttributeError:
-            #beamline_setup_hwobj not set when method called
+            # beamline_setup_hwobj not set when method called
             pass
 
     def continue_button_click(self):
@@ -821,19 +828,19 @@ class DataCollectTree(QtImport.QWidget):
         """Pause handlers"""
         if state:
             self.continue_button.setText('Continue')
-            QtImport.QToolTip.showText(self.continue_button.mapToGlobal(\
+            QtImport.QToolTip.showText(self.continue_button.mapToGlobal(
                 QtImport.QPoint(0, 10)),
-                "If necessary please center a new point.\n\n" + \
-                "Press 'Continue' to continue." )
+                "If necessary please center a new point.\n\n" +
+                "Press 'Continue' to continue.")
             Colors.set_widget_color(self.continue_button,
-                                               Colors.LIGHT_YELLOW,
-                                               QtImport.QPalette.Button)
+                                    Colors.LIGHT_YELLOW,
+                                    QtImport.QPalette.Button)
         else:
             self.continue_button.setText('Pause')
             Colors.set_widget_color(
-                              self.continue_button,
-                              Colors.BUTTON_ORIGINAL,
-                              QtImport.QPalette.Button)
+                self.continue_button,
+                Colors.BUTTON_ORIGINAL,
+                QtImport.QPalette.Button)
 
     def collect_stop_toggle(self):
         """Stops queue"""
@@ -850,7 +857,7 @@ class DataCollectTree(QtImport.QWidget):
 
             if self.queue_hwobj.is_disabled():
                 logging.getLogger("GUI").\
-                    error('Can not start collect, see the tasks marked' +\
+                    error('Can not start collect, see the tasks marked' +
                           ' in the tree and solve the prorblems.')
 
             else:
@@ -868,8 +875,8 @@ class DataCollectTree(QtImport.QWidget):
                     message = "No data collections selected, please select one" + \
                               " or more data collections"
 
-                    QtImport.QMessageBox.information(self,"Data collection",
-                                                  message, "OK")
+                    QtImport.QMessageBox.information(self, "Data collection",
+                                                     message, "OK")
 
     def enable_sample_changer_widget(self, state):
         """Enables sample changer widget"""
@@ -886,11 +893,11 @@ class DataCollectTree(QtImport.QWidget):
             elif self.beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
                 if self.beamline_setup_hwobj.plate_manipulator_hwobj is not None:
                     if not self.beamline_setup_hwobj.plate_manipulator_hwobj.hasLoadedSample():
-                       result = False
-                    #TODO remove :2 and check full location
+                        result = False
+                    # TODO remove :2 and check full location
                     elif item.get_model().location == self.beamline_setup_hwobj.\
-                             plate_manipulator_hwobj.getLoadedSample().getCoords():
-                       result = True
+                            plate_manipulator_hwobj.getLoadedSample().getCoords():
+                        result = True
             elif self.beamline_setup_hwobj.sample_changer_hwobj is not None:
                 if not self.beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
                     result = False
@@ -912,7 +919,7 @@ class DataCollectTree(QtImport.QWidget):
             # update the run-number text incase of re-collect
             #item.setText(0, item.get_model().get_name())
 
-            #Clear status
+            # Clear status
             item.setText(1, "")
             item.reset_style()
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
@@ -937,9 +944,9 @@ class DataCollectTree(QtImport.QWidget):
         self.collecting = True
         self.collect_button.setText(" Stop   ")
         Colors.set_widget_color(
-                          self.collect_button,
-                          Colors.LIGHT_RED,
-                          QtImport.QPalette.Button)
+            self.collect_button,
+            Colors.LIGHT_RED,
+            QtImport.QPalette.Button)
         self.collect_button.setIcon(self.stop_icon)
         self.continue_button.setEnabled(True)
         self.parent().set_condition_state("confirmation_window_accepted",
@@ -959,7 +966,7 @@ class DataCollectTree(QtImport.QWidget):
         self.queue_hwobj.stop()
         self.queue_stop_handler()
 
-    def queue_stop_handler(self, status = None):
+    def queue_stop_handler(self, status=None):
         """Stop handler"""
         self.beamline_setup_hwobj.shape_history_hwobj.set_cursor_busy(False)
         self.user_stopped = True
@@ -997,7 +1004,7 @@ class DataCollectTree(QtImport.QWidget):
             # sample_model = item_model.get_parent().get_parent()
 
             if isinstance(view_item, queue_item.DataCollectionQueueItem):
-                item_details = "%.1f%s " % (item_model.as_dict()["osc_range"] ,
+                item_details = "%.1f%s " % (item_model.as_dict()["osc_range"],
                                             u"\u00b0") + \
                                "%.5f sec, " % item_model.as_dict()["exp_time"] + \
                                "%d images, " % item_model.as_dict()["num_images"] + \
@@ -1016,7 +1023,8 @@ class DataCollectTree(QtImport.QWidget):
                                    item_details,
                                    view_item)
 
-    def add_history_entry(self, sample_name, date, time, entry_type, status, entry_details, view_item=None):
+    def add_history_entry(self, sample_name, date, time, entry_type,
+                          status, entry_details, view_item=None):
         # At the top level insert date
         date_item = None
         for item_index in range(self.history_tree_widget.topLevelItemCount()):
@@ -1075,14 +1083,14 @@ class DataCollectTree(QtImport.QWidget):
         self.collect_button.setIcon(self.play_icon)
         self.continue_button.setEnabled(False)
         Colors.set_widget_color(
-                          self.collect_button,
-                          Colors.LIGHT_GREEN,
-                          QtImport.QPalette.Button)
+            self.collect_button,
+            Colors.LIGHT_GREEN,
+            QtImport.QPalette.Button)
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
-        #self.parent().enable_hutch_menu(True)
-        #self.parent().enable_command_menu(True)
-        #self.parent().enable_task_toolbox(True)
+        # self.parent().enable_hutch_menu(True)
+        # self.parent().enable_command_menu(True)
+        # self.parent().enable_task_toolbox(True)
 
         self.sample_tree_widget.clearSelection()
         sample_item = self.get_mounted_sample_item()
@@ -1133,9 +1141,10 @@ class DataCollectTree(QtImport.QWidget):
                                   queue_item.SampleQueueItem,
                                   queue_item.DataCollectionGroupQueueItem):
                 new_node = self.queue_model_hwobj.copy_node(item.get_model())
-                new_node.set_snapshot(self.beamline_setup_hwobj.\
-                         shape_history_hwobj.get_scene_snapshot())
-                self.queue_model_hwobj.add_child(item.get_model().get_parent(), new_node)
+                new_node.set_snapshot(self.beamline_setup_hwobj.
+                                      shape_history_hwobj.get_scene_snapshot())
+                self.queue_model_hwobj.add_child(
+                    item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
 
     def delete_click(self, selected_items=None):
@@ -1166,7 +1175,7 @@ class DataCollectTree(QtImport.QWidget):
                     children.append(item.child(index))
 
         if children:
-            self.delete_click(selected_items = children)
+            self.delete_click(selected_items=children)
 
         self.check_for_path_collisions()
         self.set_first_element()
@@ -1203,20 +1212,20 @@ class DataCollectTree(QtImport.QWidget):
         else:
             first_child = item.treeWidget().topLevelItem(0)
 
-        if first_child is not item :
+        if first_child is not item:
             sibling = first_child.treeWidget().itemBelow(first_child)
             #sibling = first_child.nextSibling()
 
             while sibling:
-                if sibling is item :
+                if sibling is item:
                     return first_child
-                #elif sibling.nextSibling() is item:
+                # elif sibling.nextSibling() is item:
                 elif first_child.treeWidget().itemBelow(first_child) is item:
                     return sibling
                 else:
                     sibling = first_child.treeWidget().itemBelow(first_child)
                     #sibling = sibling.nextSibling()
-        else :
+        else:
             return None
 
     def up_click(self):
@@ -1283,7 +1292,7 @@ class DataCollectTree(QtImport.QWidget):
     def enqueue_samples(self, sample_list):
         """Adds items to the queue"""
         for sample in sample_list:
-            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.
                                              get_model_root(), sample)
             self.add_to_queue([sample], self.sample_tree_widget, False)
 
@@ -1295,14 +1304,14 @@ class DataCollectTree(QtImport.QWidget):
             sample = queue_model_objects.Sample()
             sample.set_name('manually-mounted')
         sample.free_pin_mode = True
-        print self.queue_model_hwobj.get_model_root(), sample 
+        print self.queue_model_hwobj.get_model_root(), sample
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
         self.set_sample_pin_icon()
 
     def populate_tree_widget(self, basket_list, sample_list, sample_changer_num):
         """Populates tree with samples from sample changer or plate"""
-        #Make this better
+        # Make this better
         if sample_changer_num == 1:
             mode_str = "ispyb"
         else:
@@ -1313,7 +1322,7 @@ class DataCollectTree(QtImport.QWidget):
         self.queue_model_hwobj.select_model(mode_str)
 
         for basket_index, basket in enumerate(basket_list):
-            self.queue_model_hwobj.add_child(self.queue_model_hwobj.\
+            self.queue_model_hwobj.add_child(self.queue_model_hwobj.
                                              get_model_root(), basket)
             basket.set_enabled(False)
             for sample in sample_list:
@@ -1332,20 +1341,20 @@ class DataCollectTree(QtImport.QWidget):
             if self.is_mounted_sample_item(item):
                 item.setSelected(True)
                 item.set_mounted_style(True)
-                #self.sample_tree_widget.scrollTo(self.sample_tree_widget.\
+                # self.sample_tree_widget.scrollTo(self.sample_tree_widget.\
                 #     indexFromItem(item))
             elif isinstance(item, queue_item.SampleQueueItem):
                 item.set_mounted_style(False)
 
             if isinstance(item, queue_item.SampleQueueItem):
                 if item.get_model().lims_location != (None, None):
-                    #if item.get_model().diffraction_plan is not None:
+                    # if item.get_model().diffraction_plan is not None:
                     #    item.setIcon(0, self.ispyb_diff_plan_icon)
                     if not self.is_mounted_sample_item(item):
                         item.setIcon(0, self.ispyb_icon)
                     item.setText(0, item.get_model().get_display_name())
             elif isinstance(item, queue_item.BasketQueueItem):
-                #pass
+                # pass
                 item.setText(0, item.get_model().get_display_name())
                 """
                 do_it = True
@@ -1356,7 +1365,7 @@ class DataCollectTree(QtImport.QWidget):
                         break
                     child_item = self.sample_tree_widget.itemBelow(child_item)
                 if do_it:
-                    item.setOn(False)        
+                    item.setOn(False)
                 """
 
             if item.has_star():
@@ -1387,17 +1396,17 @@ class DataCollectTree(QtImport.QWidget):
                 pt = item.get_model().get_path_template()
 
                 if pt:
-                     path_conflict = self.queue_model_hwobj.\
-                                check_for_path_collisions(pt)
+                    path_conflict = self.queue_model_hwobj.\
+                        check_for_path_collisions(pt)
 
-                     if path_conflict:
-                         conflict = True
-                         item.setIcon(0, self.caution_icon)
-                     else:
-                         if item.has_star():
-                             item.setIcon(0, self.star_icon)
-                         else:
-                             item.setIcon(0, QtImport.QIcon())
+                    if path_conflict:
+                        conflict = True
+                        item.setIcon(0, self.caution_icon)
+                    else:
+                        if item.has_star():
+                            item.setIcon(0, self.star_icon)
+                        else:
+                            item.setIcon(0, QtImport.QIcon())
 
             it += 1
             item = it.value()
@@ -1413,39 +1422,39 @@ class DataCollectTree(QtImport.QWidget):
 
     def hide_empty_baskets(self):
         """Hides empty baskets after the tree filtering"""
-        self.item_iterator = QtImport.QTreeWidgetItemIterator(\
-             self.sample_tree_widget)
+        self.item_iterator = QtImport.QTreeWidgetItemIterator(
+            self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
-              hide = True
+            hide = True
 
-              if type(item) in(queue_item.BasketQueueItem,
-                               queue_item.DataCollectionGroupQueueItem):
-                  for index in range(item.childCount()):
-                      if not item.child(index).isHidden():
-                          hide = False
-                          break
-                  if hide:
-                      item.set_hidden(hide)
+            if type(item) in(queue_item.BasketQueueItem,
+                             queue_item.DataCollectionGroupQueueItem):
+                for index in range(item.childCount()):
+                    if not item.child(index).isHidden():
+                        hide = False
+                        break
+                if hide:
+                    item.set_hidden(hide)
 
-              self.item_iterator += 1
-              item = self.item_iterator.value()
+            self.item_iterator += 1
+            item = self.item_iterator.value()
 
     def delete_empty_finished_items(self):
         """Deletes collected items"""
-        self.item_iterator = QtImport.QTreeWidgetItemIterator(\
-             self.sample_tree_widget)
+        self.item_iterator = QtImport.QTreeWidgetItemIterator(
+            self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
-              #if type(item) in(queue_item.BasketQueueItem,
-              #                 queue_item.DataCollectionGroupQueueItem):
-              #    for index in range(item.childCount()):
-              #        if not item.child(index).isHidden():
-              #            hide = False
-              #            break
-              #    item.setHidden(hide)
-              self.item_iterator += 1
-              item = self.item_iterator.value()
+            # if type(item) in(queue_item.BasketQueueItem,
+            #                 queue_item.DataCollectionGroupQueueItem):
+            #    for index in range(item.childCount()):
+            #        if not item.child(index).isHidden():
+            #            hide = False
+            #            break
+            #    item.setHidden(hide)
+            self.item_iterator += 1
+            item = self.item_iterator.value()
 
     def cut_item(self):
         """Cut selected item"""
@@ -1468,20 +1477,20 @@ class DataCollectTree(QtImport.QWidget):
             if new_node is None:
                 new_node = self.queue_model_hwobj.copy_node(self.item_copy[0])
             else:
-                #we have to update run number
+                # we have to update run number
                 new_node.acquisitions[0].path_template.run_number = \
-                    self.queue_model_hwobj.get_next_run_number(\
+                    self.queue_model_hwobj.get_next_run_number(
                     new_node.acquisitions[0].path_template)
 
-            new_node.set_snapshot(self.beamline_setup_hwobj.\
-                shape_history_hwobj.get_scene_snapshot())
+            new_node.set_snapshot(self.beamline_setup_hwobj.
+                                  shape_history_hwobj.get_scene_snapshot())
 
             if isinstance(item, queue_item.DataCollectionQueueItem):
                 parent_nodes = [item.get_model().get_parent()]
             elif isinstance(item, queue_item.DataCollectionGroupQueueItem):
                 parent_nodes = [item.get_model()]
             elif isinstance(item, queue_item.SampleQueueItem):
-                #If sample was selected then a new task group is created
+                # If sample was selected then a new task group is created
                 parent_nodes = [self.create_task_group(item.get_model())]
             elif isinstance(item, queue_item.BasketQueueItem):
                 for sample in item.get_model().get_sample_list():
@@ -1497,7 +1506,7 @@ class DataCollectTree(QtImport.QWidget):
     def save_item(self):
         """Saves a single item in a file"""
 
-        filename = str(QtImport.QFileDialog.getSaveFileName(\
+        filename = str(QtImport.QFileDialog.getSaveFileName(
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
@@ -1505,15 +1514,15 @@ class DataCollectTree(QtImport.QWidget):
 
         save_file = None
         try:
-           save_file = open(filename, 'w')
-           items_to_save = []
-           for item in self.get_selected_items():
-               items_to_save.append(item.get_model())
-           save_file.write(jsonpickle.encode(items_to_save))
-        except:
-           logging.getLogger().exception("Cannot save file %s", filename)
-           if save_file:
-               save_file.close()
+            save_file = open(filename, 'w')
+            items_to_save = []
+            for item in self.get_selected_items():
+                items_to_save.append(item.get_model())
+            save_file.write(jsonpickle.encode(items_to_save))
+        except BaseException:
+            logging.getLogger().exception("Cannot save file %s", filename)
+            if save_file:
+                save_file.close()
 
     def load_item(self):
         """Load item from a template saved in a file"""
@@ -1526,8 +1535,8 @@ class DataCollectTree(QtImport.QWidget):
         """Inserts item from a file"""
 
         filename = str(QtImport.QFileDialog.getOpenFileName(self,
-            "Open file", os.environ["HOME"],
-            "Item file (*.dat)", "Choose a itemfile to open"))
+                                                            "Open file", os.environ["HOME"],
+                                                            "Item file (*.dat)", "Choose a itemfile to open"))
         if len(filename) > 0:
             load_file = None
             try:
@@ -1537,8 +1546,8 @@ class DataCollectTree(QtImport.QWidget):
                     self.paste_item(item)
                     if apply_once:
                         break
-            except:
-                logging.getLogger().exception(\
+            except BaseException:
+                logging.getLogger().exception(
                     "Cannot insert an item from file %s", filename)
                 if load_file:
                     load_file.close()
@@ -1548,9 +1557,9 @@ class DataCollectTree(QtImport.QWidget):
         if selected_items:
             item_model = selected_items[0].get_model().id
             if item_model:
-                webbrowser.open("%s%d" % \
-                  (self.beamline_setup_hwobj.lims_client_hwobj.get_dc_display_link(),
-                   item_model))
+                webbrowser.open("%s%d" %
+                                (self.beamline_setup_hwobj.lims_client_hwobj.get_dc_display_link(),
+                                 item_model))
 
     def create_task_group(self, sample_item_model, group_name="Group"):
         """Creates empty task group"""
@@ -1583,7 +1592,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def save_queue_in_file(self):
         """Saves queue in the file"""
-        filename = str(QtImport.QFileDialog.getSaveFileName(\
+        filename = str(QtImport.QFileDialog.getSaveFileName(
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
@@ -1593,12 +1602,12 @@ class DataCollectTree(QtImport.QWidget):
     def load_queue_from_file(self):
         """Loads queue from file"""
         filename = str(QtImport.QFileDialog.getOpenFileName(self,
-            "Open file", os.environ["HOME"],
-            "Item file (*.dat)", "Choose queue file to open"))
+                                                            "Open file", os.environ["HOME"],
+                                                            "Item file (*.dat)", "Choose queue file to open"))
         if len(filename) > 0:
             self.sample_tree_widget.clear()
             loaded_model = self.queue_model_hwobj.load_queue(filename,
-               self.beamline_setup_hwobj.shape_history_hwobj.get_scene_snapshot())
+                                                             self.beamline_setup_hwobj.shape_history_hwobj.get_scene_snapshot())
             return loaded_model
 
     def save_history_queue(self):
@@ -1609,16 +1618,16 @@ class DataCollectTree(QtImport.QWidget):
                                 "queue_history.dat")
         save_file = None
         try:
-           save_file = open(filename, 'w')
-           #items_to_save = []
-           #for item in self.item_history_list:
-           #    items_to_save.append(item.get_model())
-           #save_file.write(jsonpickle.encode(items_to_save))
-           save_file.write(jsonpickle.encode(self.item_history_list))
-        except:
-           logging.getLogger().exception("Cannot save file %s", filename)
-           if save_file:
-               save_file.close()
+            save_file = open(filename, 'w')
+            #items_to_save = []
+            # for item in self.item_history_list:
+            #    items_to_save.append(item.get_model())
+            # save_file.write(jsonpickle.encode(items_to_save))
+            save_file.write(jsonpickle.encode(self.item_history_list))
+        except BaseException:
+            logging.getLogger().exception("Cannot save file %s", filename)
+            if save_file:
+                save_file.close()
 
     def load_history_queue_from_file(self):
         filename = os.path.join(self.tree_brick.user_file_directory,
@@ -1629,7 +1638,7 @@ class DataCollectTree(QtImport.QWidget):
             load_file = open(filename, 'r')
             for item in jsonpickle.decode(load_file.read()):
                 self.add_history_entry(*item)
-        except:
+        except BaseException:
             pass
         finally:
             if load_file:
@@ -1653,19 +1662,19 @@ class DataCollectTree(QtImport.QWidget):
 
     def shape_changed(self, shape, shape_type):
         """Updates tree item if its related shape has changed"""
-        self.item_iterator = QtImport.QTreeWidgetItemIterator(\
-             self.sample_tree_widget)
+        self.item_iterator = QtImport.QTreeWidgetItemIterator(
+            self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
-              item_model = item.get_model()
-              if shape_type == "Line" and \
-                 isinstance(item_model, queue_model_objects.DataCollection):
-                  if item_model.is_helical():
-                      (cp_start, cp_end) = item_model.get_centred_positions()
-                      item_model.set_centred_positions((cp_end, cp_start))
-                      item.update_display_name()
-              self.item_iterator += 1
-              item = self.item_iterator.value()
+            item_model = item.get_model()
+            if shape_type == "Line" and \
+               isinstance(item_model, queue_model_objects.DataCollection):
+                if item_model.is_helical():
+                    (cp_start, cp_end) = item_model.get_centred_positions()
+                    item_model.set_centred_positions((cp_end, cp_start))
+                    item.update_display_name()
+            self.item_iterator += 1
+            item = self.item_iterator.value()
 
     def sync_diffraction_plan(self):
         """Adds data collection items defined in ispyb diffraction plan"""
@@ -1683,16 +1692,17 @@ class DataCollectTree(QtImport.QWidget):
            At first experimentKind is checked and related data collection
            queue entry is created.
         """
-        #logging.getLogger("HWR").debug("Adding diffraction plan : %s",
+        # logging.getLogger("HWR").debug("Adding diffraction plan : %s",
         #                               str(sample_model.diffraction_plan))
         task_node = self.create_task_group(sample_model, "Diffraction plan")
-        prefix = self.beamline_setup_hwobj.session_hwobj.get_default_prefix(sample_model)
+        prefix = self.beamline_setup_hwobj.session_hwobj.get_default_prefix(
+            sample_model)
         snapshot = self.beamline_setup_hwobj.shape_history_hwobj.get_scene_snapshot()
 
         if sample_model.diffraction_plan.experimentKind in ("OSC", "Default"):
             acq = queue_model_objects.Acquisition()
 
-            #TODO create default_diffraction_plan_values
+            # TODO create default_diffraction_plan_values
             acq.acquisition_parameters = self.beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_acquisition_values")
             if hasattr(sample_model.diffraction_plan, "oscillationRange"):
@@ -1703,7 +1713,7 @@ class DataCollectTree(QtImport.QWidget):
             if hasattr(sample_model.diffraction_plan, "exposureTime"):
                 if sample_model.diffraction_plan.exposureTime > 0:
                     acq.acquisition_parameters.exp_time = \
-                      sample_model.diffraction_plan.exposureTime
+                        sample_model.diffraction_plan.exposureTime
 
             acq.acquisition_parameters.centred_position.snapshot_image = snapshot
             path_template = self.beamline_setup_hwobj.get_default_path_template()

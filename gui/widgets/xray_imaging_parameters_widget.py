@@ -32,11 +32,10 @@ __license__ = "LGPLv3+"
 
 
 class XrayImagingParametersWidget(QtImport.QWidget):
-
     def __init__(self, parent=None, name=None, fl=0, xray_imaging_params=None):
 
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
-        
+
         if name is not None:
             self.setObjectName(name)
 
@@ -45,18 +44,19 @@ class XrayImagingParametersWidget(QtImport.QWidget):
 
         # Internal variables --------------------------------------------------
 
-        # Properties ---------------------------------------------------------- 
+        # Properties ----------------------------------------------------------
 
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self._xray_imaging_parameters = xray_imaging_params 
+        self._xray_imaging_parameters = xray_imaging_params
         self._xray_imaging_mib = DataModelInputBinder(self._xray_imaging_parameters)
 
         self._parameters_widget = QtImport.load_ui_file(
-             "xray_imaging_parameters_widget_layout.ui")
+            "xray_imaging_parameters_widget_layout.ui"
+        )
         # Layout --------------------------------------------------------------
         __main_vlayout = QtImport.QVBoxLayout(self)
         __main_vlayout.addWidget(self._parameters_widget)
@@ -67,67 +67,62 @@ class XrayImagingParametersWidget(QtImport.QWidget):
 
         # Qt signal/slot connections ------------------------------------------
 
-        # Other --------------------------------------------------------------- 
-        self.detector_distance_validator = QtImport.QDoubleValidator(\
-             0, 99999, 1, self._parameters_widget.detector_distance_ledit)
+        # Other ---------------------------------------------------------------
+        self.detector_distance_validator = QtImport.QDoubleValidator(
+            0, 99999, 1, self._parameters_widget.detector_distance_ledit
+        )
 
     def set_beamline_setup(self, beamline_setup):
-        self._xray_imaging_mib.\
-             bind_value_update('camera_write_data',
-                               self._parameters_widget.store_data_cbox,
-                               bool,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "camera_write_data", self._parameters_widget.store_data_cbox, bool, None
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('ff_pre',
-                               self._parameters_widget.ff_pre_cbox,
-                               bool,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "ff_pre", self._parameters_widget.ff_pre_cbox, bool, None
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('ff_post',
-                               self._parameters_widget.ff_post_cbox,
-                               bool,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "ff_post", self._parameters_widget.ff_post_cbox, bool, None
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('ff_apply',
-                               self._parameters_widget.ff_apply_cbox,
-                               bool,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "ff_apply", self._parameters_widget.ff_apply_cbox, bool, None
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('ff_num_images',
-                               self._parameters_widget.ff_num_images_ledit,
-                               int,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "ff_num_images", self._parameters_widget.ff_num_images_ledit, int, None
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('sample_offset_a',
-                               self._parameters_widget.sample_offset_a_ledit,
-                               float,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "sample_offset_a",
+            self._parameters_widget.sample_offset_a_ledit,
+            float,
+            None,
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('sample_offset_b',
-                               self._parameters_widget.sample_offset_b_ledit,
-                               float,
-                               None)
- 
-        self._xray_imaging_mib.\
-             bind_value_update('sample_offset_c',
-                               self._parameters_widget.sample_offset_c_ledit,
-                               float,
-                               None)
+        self._xray_imaging_mib.bind_value_update(
+            "sample_offset_b",
+            self._parameters_widget.sample_offset_b_ledit,
+            float,
+            None,
+        )
 
-        self._xray_imaging_mib.\
-             bind_value_update('detector_distance',
-                               self._parameters_widget.detector_distance_ledit,
-                               float,
-                               self.detector_distance_validator)
+        self._xray_imaging_mib.bind_value_update(
+            "sample_offset_c",
+            self._parameters_widget.sample_offset_c_ledit,
+            float,
+            None,
+        )
+
+        self._xray_imaging_mib.bind_value_update(
+            "detector_distance",
+            self._parameters_widget.detector_distance_ledit,
+            float,
+            self.detector_distance_validator,
+        )
 
     def set_detector_distance(self, value):
-        self._parameters_widget.detector_distance_ledit.setText("%d" % value) 
+        self._parameters_widget.detector_distance_ledit.setText("%d" % value)
         self._xray_imaging_parameters.detector_distance = value
 
     def populate_widget(self, item):

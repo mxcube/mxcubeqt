@@ -18,40 +18,44 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import Colors
-from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import SampleChangerState, SampleChangerMode, SampleChanger
+from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import (
+    SampleChangerState,
+    SampleChangerMode,
+    SampleChanger,
+)
 
 
 __credits__ = ["MXCuBE colaboration"]
 __license__ = "LGPLv3+"
 
 
-SC_STATE_COLOR = { SampleChangerState.Fault: Colors.LIGHT_RED,
-                   SampleChangerState.Ready: Colors.LIGHT_GREEN,
-                   SampleChangerState.StandBy: Colors.LIGHT_GREEN,
-                   SampleChangerState.Moving: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Unloading: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Selecting: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Loading: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Scanning: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Resetting: Colors.LIGHT_YELLOW,
-                   SampleChangerState.ChangingMode: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Initializing: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Closing: Colors.LIGHT_YELLOW,
-                   SampleChangerState.Charging: Colors.LIGHT_GREEN,
-                   SampleChangerState.Alarm: Colors.LIGHT_RED,
-                   SampleChangerState.Disabled: Colors.LIGHT_RED,
-                   SampleChangerState.Unknown: Colors.LIGHT_GRAY}
+SC_STATE_COLOR = {
+    SampleChangerState.Fault: Colors.LIGHT_RED,
+    SampleChangerState.Ready: Colors.LIGHT_GREEN,
+    SampleChangerState.StandBy: Colors.LIGHT_GREEN,
+    SampleChangerState.Moving: Colors.LIGHT_YELLOW,
+    SampleChangerState.Unloading: Colors.LIGHT_YELLOW,
+    SampleChangerState.Selecting: Colors.LIGHT_YELLOW,
+    SampleChangerState.Loading: Colors.LIGHT_YELLOW,
+    SampleChangerState.Scanning: Colors.LIGHT_YELLOW,
+    SampleChangerState.Resetting: Colors.LIGHT_YELLOW,
+    SampleChangerState.ChangingMode: Colors.LIGHT_YELLOW,
+    SampleChangerState.Initializing: Colors.LIGHT_YELLOW,
+    SampleChangerState.Closing: Colors.LIGHT_YELLOW,
+    SampleChangerState.Charging: Colors.LIGHT_GREEN,
+    SampleChangerState.Alarm: Colors.LIGHT_RED,
+    SampleChangerState.Disabled: Colors.LIGHT_RED,
+    SampleChangerState.Unknown: Colors.LIGHT_GRAY,
+}
 
-SC_STATE_GENERAL = { SampleChangerState.Ready: True,
-                     SampleChangerState.Alarm: True }
+SC_STATE_GENERAL = {SampleChangerState.Ready: True, SampleChangerState.Alarm: True}
 
-SC_SAMPLE_COLOR = { "LOADED": Colors.LIGHT_GREEN,
-                    "UNLOADED": Colors.DARK_GRAY,
-                    "LOADING": Colors.LIGHT_YELLOW,
-                    "UNLOADING": Colors.LIGHT_YELLOW,
-                    "UNKNOWN": None }
+SC_SAMPLE_COLOR = {
+    "LOADED": Colors.LIGHT_GREEN,
+    "UNLOADED": Colors.DARK_GRAY,
+    "LOADING": Colors.LIGHT_YELLOW,
+    "UNLOADING": Colors.LIGHT_YELLOW,
+    "UNKNOWN": None,
+}
 
-SC_LOADED_COLOR = { -1: None,
-                     0: Colors.WHITE,
-                     1: Colors.GREEN}
-
+SC_LOADED_COLOR = {-1: None, 0: Colors.WHITE, 1: Colors.GREEN}

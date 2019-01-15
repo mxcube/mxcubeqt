@@ -25,7 +25,8 @@ class RadiationDamageWidgetLayout(QWidget):
     """
     Descript. :
     """
-    def __init__(self, parent = None, name = None, flags = 0):
+
+    def __init__(self, parent=None, name=None, flags=0):
         """
         Descript. :
         """
@@ -47,8 +48,8 @@ class RadiationDamageWidgetLayout(QWidget):
         self.burn_osc_start_ledit.setMinimumSize(50, 0)
         self.burn_osc_start_ledit.setMaximumSize(50, 32767)
 
-        _value_widget = QWidget(self) 
-        self.burn_osc_interval_label = QLabel(_value_widget) 
+        _value_widget = QWidget(self)
+        self.burn_osc_interval_label = QLabel(_value_widget)
         self.burn_osc_interval_ledit = QLineEdit(_value_widget)
         self.burn_osc_interval_ledit.setMinimumSize(50, 0)
         self.burn_osc_interval_ledit.setMaximumSize(50, 32767)
@@ -73,7 +74,7 @@ class RadiationDamageWidgetLayout(QWidget):
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.rad_damage_cbx)
         _main_vlayout.addWidget(_label_widget)
-        _main_vlayout.addWidget(_value_widget) 
+        _main_vlayout.addWidget(_value_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -92,10 +93,14 @@ class RadiationDamageWidgetLayout(QWidget):
         """
         self.setWindowTitle(self.__tr("RadiationDamageWidget"))
         self.rad_damage_cbx.setText(self.__tr("Determine radiation damage parameters"))
-        self.burn_osc_start_label.setText(self.__tr("Oscillation start for burn strategy:"))
-        self.burn_osc_interval_label.setText(self.__tr("Oscillation interval for burn:"))
+        self.burn_osc_start_label.setText(
+            self.__tr("Oscillation start for burn strategy:")
+        )
+        self.burn_osc_interval_label.setText(
+            self.__tr("Oscillation interval for burn:")
+        )
 
-    def __tr(self, s, c = None):
+    def __tr(self, s, c=None):
         """
         Descript. :
         """

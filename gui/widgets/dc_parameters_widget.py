@@ -32,12 +32,11 @@ __license__ = "LGPLv3+"
 
 
 class DCParametersWidget(QtImport.QWidget):
-
-    def __init__(self, parent = None, name = "parameter_widget"):
+    def __init__(self, parent=None, name="parameter_widget"):
 
         QtImport.QWidget.__init__(self, parent)
         if name is not None:
-            self.setObjectName(name) 
+            self.setObjectName(name)
 
         # Properties ----------------------------------------------------------
 
@@ -56,10 +55,9 @@ class DCParametersWidget(QtImport.QWidget):
         # Graphic elements ----------------------------------------------------
         _dc_parameters_widget = QtImport.QWidget(self)
         self._data_path_widget = DataPathWidget(_dc_parameters_widget)
-        self._acq_widget = AcquisitionWidget(_dc_parameters_widget, 
-                                            layout = 'horizontal')
+        self._acq_widget = AcquisitionWidget(_dc_parameters_widget, layout="horizontal")
         self._processing_widget = ProcessingWidget(_dc_parameters_widget)
-        
+
         # Layout --------------------------------------------------------------
         _dc_parameters_widget_layout = QtImport.QVBoxLayout(_dc_parameters_widget)
         _dc_parameters_widget_layout.addWidget(self._data_path_widget)
@@ -76,17 +74,16 @@ class DCParametersWidget(QtImport.QWidget):
         _main_hlayout.addStretch(0)
 
         # SizePolicies --------------------------------------------------------
-        
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.\
-             connect(self._prefix_ledit_change)
-        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.\
-             connect(self._run_number_ledit_change)
-        self._acq_widget.madEnergySelectedSignal.\
-             connect(self.mad_energy_selected)
-        self._acq_widget.acqParametersChangedSignal.\
-             connect(self.acq_parameters_changed)
+        self._data_path_widget.data_path_layout.prefix_ledit.textChanged.connect(
+            self._prefix_ledit_change
+        )
+        self._data_path_widget.data_path_layout.run_number_ledit.textChanged.connect(
+            self._run_number_ledit_change
+        )
+        self._acq_widget.madEnergySelectedSignal.connect(self.mad_energy_selected)
+        self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
 
         # Other ---------------------------------------------------------------
 
@@ -95,8 +92,7 @@ class DCParametersWidget(QtImport.QWidget):
         self._beamline_setup_hwobj = bl_setup
 
     def _prefix_ledit_change(self, new_value):
-        prefix = self._data_collection.acquisitions[0].\
-                 path_template.get_prefix()
+        prefix = self._data_collection.acquisitions[0].path_template.get_prefix()
         self._data_collection.set_name(prefix)
         self._tree_view_item.setText(0, self._data_collection.get_name())
 
@@ -107,36 +103,36 @@ class DCParametersWidget(QtImport.QWidget):
 
     def acq_parameters_changed(self):
         if self._tree_view_item is None:
-            #TODO fix this
-            return 
- 
-        #TODO  get tree view in another way
+            # TODO fix this
+            return
+
+        # TODO  get tree view in another way
         dc_tree_widget = self._tree_view_item.listView().parent().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
-        path_conflict = self.queue_model_hwobj.\
-                        check_for_path_collisions(path_template)
+        path_conflict = self.queue_model_hwobj.check_for_path_collisions(path_template)
 
     def __add_data_collection(self):
         return self.add_dc_cb(self._data_collection, self.collection_type)
-    
+
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
 
         if state:
             path_template.mad_prefix = str(name)
         else:
-            path_template.mad_prefix = ''
+            path_template.mad_prefix = ""
 
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-          get_next_run_number(path_template)
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+            path_template
+        )
 
         self._data_path_widget.set_run_number(run_number)
         self._data_path_widget.set_prefix(path_template.base_prefix)
         model = self._tree_view_item.get_model()
         model.set_name(path_template.get_prefix())
         self._tree_view_item.setText(0, model.get_name())
-        
+
     def tab_changed(self):
         if self._tree_view_item:
             self.populate_parameter_widget(self._tree_view_item)
@@ -150,28 +146,33 @@ class DCParametersWidget(QtImport.QWidget):
         data_collection = item.get_model()
         self._tree_view_item = item
         self._data_collection = data_collection
-        self._acquisition_mib = DataModelInputBinder(self._data_collection.\
-                                                         acquisitions[0].acquisition_parameters)
+        self._acquisition_mib = DataModelInputBinder(
+            self._data_collection.acquisitions[0].acquisition_parameters
+        )
 
         # The acq_widget sends a signal to the path_widget, and it relies
         # on that both models upto date, we need to refactor this part
         # so that both models are set before taking ceratin actions.
         # This workaround, works for the time beeing.
-        self._data_path_widget._data_model = data_collection.acquisitions[0].path_template
+        self._data_path_widget._data_model = data_collection.acquisitions[
+            0
+        ].path_template
 
         self._acq_widget.set_energies(data_collection.crystal.energy_scan_result)
-        self._acq_widget.update_data_model(data_collection.acquisitions[0].\
-                                          acquisition_parameters,
-                                          data_collection.acquisitions[0].\
-                                          path_template)
-        self._data_path_widget.update_data_model(data_collection.\
-                                           acquisitions[0].path_template)
-        self._processing_widget.update_data_model(data_collection.\
-                                                 processing_parameters)
+        self._acq_widget.update_data_model(
+            data_collection.acquisitions[0].acquisition_parameters,
+            data_collection.acquisitions[0].path_template,
+        )
+        self._data_path_widget.update_data_model(
+            data_collection.acquisitions[0].path_template
+        )
+        self._processing_widget.update_data_model(data_collection.processing_parameters)
 
         invalid = self._acquisition_mib.validate_all()
         if invalid:
-            msg = "This data collection has one or more incorrect parameters,"+\
-                " correct the fields marked in red to solve the problem."
+            msg = (
+                "This data collection has one or more incorrect parameters,"
+                + " correct the fields marked in red to solve the problem."
+            )
 
             logging.getLogger("GUI").warning(msg)

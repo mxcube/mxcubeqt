@@ -42,20 +42,20 @@ def disableStdErrRedirection():
     Descript. :
     """
     global _handler
-    
+
     _handler = None
 
     sys.stderr = sys.__stderr__
     sys.excepthook = sys.__excepthook__
-    
+
 
 def enableStdErrRedirection():
     """
-    Descript. : redirect stderr and installs excepthook 
+    Descript. : redirect stderr and installs excepthook
     """
     sys.stderr = Handler()
     sys.excepthook = Handler().excepthook
-      
+
 
 class __Handler:
     """
@@ -67,7 +67,7 @@ class __Handler:
         Descript. :
         """
         logging.getLogger().error(buffer)
-           
+
     def flush(self):
         """
         Descript. :
@@ -79,11 +79,10 @@ class __Handler:
         Descript. :
         """
         if type == KeyboardInterrupt:
-          getQApp().quit()
-          return
-        try: 
+            getQApp().quit()
+            return
+        try:
             exception = traceback.format_exception(type, value, tb)
-            logging.getLogger().error('Uncaught exception : ' + '\n'.join(exception))
-        except:  
+            logging.getLogger().error("Uncaught exception : " + "\n".join(exception))
+        except BaseException:
             pass
-                    

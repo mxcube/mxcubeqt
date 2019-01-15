@@ -27,22 +27,21 @@ __license__ = "LGPLv3+"
 
 
 class RadiationDamageModelWidgetLayout(QtImport.QWidget):
-
-    def __init__(self, parent = None, name = None, fl = 0):
+    def __init__(self, parent=None, name=None, fl=0):
 
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
 
         if not name:
             self.setObjectName("RadiationDamageModelWidgetLayout")
 
-        
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
         self.rad_damage_widget = QtImport.load_ui_file(
-             "radiation_damage_model_widget_layout.ui")
+            "radiation_damage_model_widget_layout.ui"
+        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
@@ -55,22 +54,28 @@ class RadiationDamageModelWidgetLayout(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
         self.languageChange()
-        self.setAttribute(QtImport.Qt.WA_WState_Polished) 
+        self.setAttribute(QtImport.Qt.WA_WState_Polished)
         Colors.set_widget_color(self, Colors.GROUP_BOX_GRAY)
 
     def languageChange(self):
         self.setWindowTitle(self.__tr("RadiationDamageModelWidget"))
-        self.rad_damage_widget.main_groupbox.setTitle(self.__tr("Radiation damage model"))
-        self.rad_damage_widget.beta_over_gray_label.\
-             setText(self.__trUtf8("\xce\xb2\xc3\x85\x3c\x73\x75\x70\x3e\x32\x3c\x2f\x73\x75\x70\x3e\x2f\x4d\x47\x79\x3a"))
-        self.rad_damage_widget.gamma_over_gray_label.\
-             setText(self.__trUtf8("\xce\xb3\x20\x31\x2f\x4d\x47\x79\x3a"))
-        self.rad_damage_widget.sensetivity_label.\
-             setText(self.__tr("Sensetivity:"))
+        self.rad_damage_widget.main_groupbox.setTitle(
+            self.__tr("Radiation damage model")
+        )
+        self.rad_damage_widget.beta_over_gray_label.setText(
+            self.__trUtf8(
+                "\xce\xb2\xc3\x85\x3c\x73\x75\x70\x3e\x32\x3c\x2f\x73\x75\x70\x3e\x2f\x4d\x47\x79\x3a"
+            )
+        )
+        self.rad_damage_widget.gamma_over_gray_label.setText(
+            self.__trUtf8("\xce\xb3\x20\x31\x2f\x4d\x47\x79\x3a")
+        )
+        self.rad_damage_widget.sensetivity_label.setText(self.__tr("Sensetivity:"))
 
-    def __tr(self, s, c = None):
+    def __tr(self, s, c=None):
         return QtImport.QApplication.translate("RadiationDamageModelWidgetLayout", s, c)
 
-    def __trUtf8(self, s, c = None):
-        return QtImport.QApplication.translate("RadiationDamageModelWidgetLayout",\
-                     s, c, QtImport.QApplication.UnicodeUTF8)
+    def __trUtf8(self, s, c=None):
+        return QtImport.QApplication.translate(
+            "RadiationDamageModelWidgetLayout", s, c, QtImport.QApplication.UnicodeUTF8
+        )

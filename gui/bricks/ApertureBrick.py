@@ -21,7 +21,7 @@
 [Name] ApertureBrick
 
 [Description]
-The ApertureBrick displays checkbox with available apertures. 
+The ApertureBrick displays checkbox with available apertures.
 Apertures are allowed according the bam focusing mode.
 
 [Properties]
@@ -31,17 +31,17 @@ Apertures are allowed according the bam focusing mode.
 | defAperture  | string | name of the BeamAperture Hardware Object
 -----------------------------------------------------------------------
 
-[Signals] - 
+[Signals] -
 
-[Slots] - 
+[Slots] -
 
-[Comments] - 
+[Comments] -
 
 [Hardware Objects]
 -----------------------------------------------------------------------
 | name            | signals         | functions
 -----------------------------------------------------------------------
-| aperture_hwobj  | apertureChanged | 
+| aperture_hwobj  | apertureChanged |
 -----------------------------------------------------------------------
 """
 
@@ -57,7 +57,6 @@ __category__ = "Beam definition"
 
 
 class ApertureBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -68,7 +67,7 @@ class ApertureBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property('mnemonic', 'string', '')
+        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -92,23 +91,22 @@ class ApertureBrick(BaseWidget):
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
-        #_main_vlayout.addSpacing(0)
+        # _main_vlayout.addSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # Qt signal/slot connections ------------------------------------------
-        self.aperture_diameter_combo.activated.\
-             connect(self.change_diameter)
-        self.aperture_position_combo.activated.\
-             connect(self.change_position)
-         
- 
+        self.aperture_diameter_combo.activated.connect(self.change_diameter)
+        self.aperture_position_combo.activated.connect(self.change_position)
+
         # SizePolicies --------------------------------------------------------
 
-        # Other --------------------------------------------------------------- 
-        Colors.set_widget_color(self.aperture_diameter_combo,
-             Colors.LIGHT_GREEN, QtImport.QPalette.Button)
-        Colors.set_widget_color(self.aperture_position_combo,
-             Colors.LIGHT_GREEN, QtImport.QPalette.Button)
+        # Other ---------------------------------------------------------------
+        Colors.set_widget_color(
+            self.aperture_diameter_combo, Colors.LIGHT_GREEN, QtImport.QPalette.Button
+        )
+        Colors.set_widget_color(
+            self.aperture_position_combo, Colors.LIGHT_GREEN, QtImport.QPalette.Button
+        )
 
         self.aperture_diameter_combo.setMinimumWidth(100)
         self.aperture_position_combo.setMinimumWidth(100)
@@ -116,40 +114,40 @@ class ApertureBrick(BaseWidget):
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.aperture_hwobj is not None:
-                self.disconnect(self.aperture_hwobj, 
-                                'diameterIndexChanged', 
-                                self.diameter_changed)
-                self.disconnect(self.aperture_hwobj,
-                                'positionChanged',
-                                self.position_changed)
+                self.disconnect(
+                    self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
+                )
+                self.disconnect(
+                    self.aperture_hwobj, "positionChanged", self.position_changed
+                )
 
             self.aperture_hwobj = self.get_hardware_object(new_value)
 
             if self.aperture_hwobj is not None:
                 self.init_aperture()
-                self.connect(self.aperture_hwobj, 
-                             'diameterIndexChanged', 
-                             self.diameter_changed)
-                self.connect(self.aperture_hwobj,
-                             'positionChanged',
-                             self.position_changed)
+                self.connect(
+                    self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
+                )
+                self.connect(
+                    self.aperture_hwobj, "positionChanged", self.position_changed
+                )
                 self.aperture_hwobj.update_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def change_diameter(self):
-        self.aperture_hwobj.set_diameter_index(\
-             self.aperture_diameter_combo.currentIndex())
+        self.aperture_hwobj.set_diameter_index(
+            self.aperture_diameter_combo.currentIndex()
+        )
 
     def change_position(self):
-        self.aperture_hwobj.set_position(\
-             self.aperture_position_combo.currentIndex())
+        self.aperture_hwobj.set_position(self.aperture_position_combo.currentIndex())
 
     def init_aperture(self):
         aperture_size_list = self.aperture_hwobj.get_diameter_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
-            self.aperture_diameter_combo.addItem("%d%s" %(aperture_size, unichr(956)))
+            self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))
 
         aperture_position_list = self.aperture_hwobj.get_position_list()
         self.aperture_position_combo.clear()
@@ -161,9 +159,9 @@ class ApertureBrick(BaseWidget):
         self.aperture_diameter_combo.blockSignals(False)
 
         self.aperture_position_combo.blockSignals(True)
-        self.aperture_position_combo.setCurrentIndex(-1) 
+        self.aperture_position_combo.setCurrentIndex(-1)
         self.aperture_position_combo.blockSignals(False)
-        
+
     def diameter_changed(self, diameter_index, diameter_size):
         self.aperture_diameter_combo.blockSignals(True)
         if diameter_index is None:
@@ -177,10 +175,11 @@ class ApertureBrick(BaseWidget):
     def position_changed(self, position):
         self.aperture_position_combo.blockSignals(True)
         if position is None:
-            #self.aperture_position_combo.setEnabled(False)
+            # self.aperture_position_combo.setEnabled(False)
             self.aperture_position_combo.setCurrentIndex(-1)
         else:
-            #self.aperture_position_combo.setEnabled(True)
-            self.aperture_position_combo.setCurrentIndex(\
-                 self.aperture_position_combo.findText(position))
+            # self.aperture_position_combo.setEnabled(True)
+            self.aperture_position_combo.setCurrentIndex(
+                self.aperture_position_combo.findText(position)
+            )
         self.aperture_position_combo.blockSignals(False)

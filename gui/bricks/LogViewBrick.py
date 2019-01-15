@@ -66,7 +66,8 @@ is sent to the recipients specified in the emailAddresses property.
 import os
 import sys
 import logging
-#import email.Utils
+
+# import email.Utils
 from datetime import datetime
 import smtplib
 
@@ -78,29 +79,27 @@ from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]
 __license__ = "LGPLv3+"
-__category__ = 'Log'
+__category__ = "Log"
 
 
 class CustomTreeWidget(QtImport.QTreeWidget):
-
     def __init__(self, parent, tab_label):
         QtImport.QTreeWidget.__init__(self, parent)
 
-        self.setSizePolicy(QtImport.QSizePolicy.Minimum,
-                           QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(QtImport.QSizePolicy.Minimum, QtImport.QSizePolicy.Expanding)
         self.tab_label = tab_label
         self.unread_messages = 0
         self.max_log_lines = None
- 
+
         self.setColumnCount(4)
         self.setRootIsDecorated(False)
         self.setHeaderLabels(["Level", "Date", "Time", "Message"])
 
         self.contextMenuEvent = self.show_context_menu
         self.clipboard = QtImport.QApplication.clipboard()
- 
+
     def add_log_line(self, record):
-        msg = record.getMessage().replace('\n', ' ').strip()
+        msg = record.getMessage().replace("\n", " ").strip()
         info_str_list = []
 
         info_str_list.append(record.getLevelName())
@@ -112,10 +111,10 @@ class CustomTreeWidget(QtImport.QTreeWidget):
         if self.topLevelItemCount() % 10 == 0:
             for col in range(4):
                 new_item.setBackground(col, QtImport.QBrush(Colors.LIGHT_2_GRAY))
-              
+
         if self.max_log_lines and self.max_log_lines > 0:
             if self.topLevelItemCount() > self.max_log_lines:
-                self.takeTopLevelItem(0) 
+                self.takeTopLevelItem(0)
         self.scrollToBottom()
 
     def set_max_log_lines(self, max_log_lines):
@@ -133,19 +132,22 @@ class CustomTreeWidget(QtImport.QTreeWidget):
         text = ""
         for item_index in range(self.topLevelItemCount()):
             for col in range(4):
-                text += "%s%s" %(self.topLevelItem(item_index).text(col), chr(9))
-            text += "\n"  
+                text += "%s%s" % (self.topLevelItem(item_index).text(col), chr(9))
+            text += "\n"
         self.clipboard.setText(text, mode=self.clipboard.Clipboard)
 
     def save_log(self):
         self.copy_log()
-        filename = str(QtImport.QFileDialog.getSaveFileName(\
-            self, "Choose a filename to save under", "/tmp"))
+        filename = str(
+            QtImport.QFileDialog.getSaveFileName(
+                self, "Choose a filename to save under", "/tmp"
+            )
+        )
         if len(filename) > 0:
             log_file = open(filename, "w")
             log_file.write(self.clipboard.text())
             log_file.close()
-        
+
 
 class Submitfeedback(QtImport.QWidget):
     """Widget to submit a feedback email
@@ -162,9 +164,11 @@ class Submitfeedback(QtImport.QWidget):
         self.email_addresses = email_addresses
         self.from_email_address = None
 
-        msg = ["Feel free to report any comment about this software;",
-               " an email will be sent to the people concerned.",
-               "Do not forget to put your name or email address if you require an answer."]
+        msg = [
+            "Feel free to report any comment about this software;",
+            " an email will be sent to the people concerned.",
+            "Do not forget to put your name or email address if you require an answer.",
+        ]
         # Properties ----------------------------------------------------------
 
         # Signals ------------------------------------------------------------
@@ -173,7 +177,7 @@ class Submitfeedback(QtImport.QWidget):
 
         # Graphic elements ----------------------------------------------------
         __label = QtImport.QLabel("<b>%s</b>" % "\n".join(msg), self)
-        __msg_label = QtImport.QLabel('Message:', self)
+        __msg_label = QtImport.QLabel("Message:", self)
 
         self.submit_button = QtImport.QToolButton(self)
         self.message_textedit = QtImport.QTextEdit(self)
@@ -194,17 +198,18 @@ class Submitfeedback(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
         self.message_textedit.setToolTip("Write here your comments or feedback")
-        self.submit_button.setText('Submit')
+        self.submit_button.setText("Submit")
 
-        #if hasattr(self.submit_button, "setUsesTextLabel"):  
+        # if hasattr(self.submit_button, "setUsesTextLabel"):
         #    self.submit_button.setUsesTextLabel(True)
-        #elif hasattr(self.submit_button, "setToolButtonStyle"):
+        # elif hasattr(self.submit_button, "setToolButtonStyle"):
         #    self.submit_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         self.submit_button.setToolButtonStyle(True)
-        self.submit_button.setIcon(Icons.load_icon('Envelope'))
-        self.submit_button.setToolTip("Click here to send your feedback " + \
-                                      "to the authors of this software")
+        self.submit_button.setIcon(Icons.load_icon("Envelope"))
+        self.submit_button.setToolTip(
+            "Click here to send your feedback " + "to the authors of this software"
+        )
 
     def clear(self):
         """Clears log"""
@@ -213,29 +218,32 @@ class Submitfeedback(QtImport.QWidget):
     def submit_message(self):
         """Submits email"""
         msg_date = str(datetime.now())
- 
+
         if self.from_email_address:
             from_addr = self.from_email_address
         else:
             try:
-                user = os.environ['SMIS_BEAMLINE_NAME']
-                from_addr = user.replace(' ', '-')
+                user = os.environ["SMIS_BEAMLINE_NAME"]
+                from_addr = user.replace(" ", "-")
             except (KeyError, TypeError, ValueError, AttributeError):
-                from_addr = 'some-beamline'
+                from_addr = "some-beamline"
             from_addr += "@mxcube.com"
 
         try:
-            smtp = smtplib.SMTP('smtp', smtplib.SMTP_PORT)
-            to_addrs = self.email_addresses.replace(' ', ',')
+            smtp = smtplib.SMTP("smtp", smtplib.SMTP_PORT)
+            to_addrs = self.email_addresses.replace(" ", ",")
             subj = "[BEAMLINE FEEDBACK] %s" % os.getlogin()
-            email_msg = "From: %s\r\n" % from_addr + \
-                        "To: %s\r\n" % from_addr + \
-                        "Subject: %s\r\n" % subj + \
-                        "Date: %s\r\n\r\n" % msg_date + \
-                        str(self.message_textedit.toPlainText())
-            logging.getLogger("HWR").debug("Sending feedback from " + \
-                                           "%s to %s" % (from_addr, to_addrs))
-            error_dict = smtp.sendmail(from_addr, to_addrs.split(','), email_msg)
+            email_msg = (
+                "From: %s\r\n" % from_addr
+                + "To: %s\r\n" % from_addr
+                + "Subject: %s\r\n" % subj
+                + "Date: %s\r\n\r\n" % msg_date
+                + str(self.message_textedit.toPlainText())
+            )
+            logging.getLogger("HWR").debug(
+                "Sending feedback from " + "%s to %s" % (from_addr, to_addrs)
+            )
+            error_dict = smtp.sendmail(from_addr, to_addrs.split(","), email_msg)
         except smtplib.SMTPException as e:
             logging.getLogger().error("Could not send mail: %s" % str(e))
             smtp.quit()
@@ -244,8 +252,9 @@ class Submitfeedback(QtImport.QWidget):
             if len(error_dict):
                 logging.getLogger().error(str(error_dict))
 
-            QtImport.QMessageBox.information(self, "Thank you!",
-                "Your comments have been submitted.", QMessageBox.Ok)
+            QtImport.QMessageBox.information(
+                self, "Thank you!", "Your comments have been submitted.", QMessageBox.Ok
+            )
             self.message_textedit.clear()
 
 
@@ -255,12 +264,14 @@ class LogViewBrick(BaseWidget):
        The debug messages might me switched off (in either modes).
     """
 
-    TOOLTIPS = {"info": "Displays the progress of the requested operations",
-                "feedback":"Submits a feedback email about this software",
-                "details":"Detailed messages, including warnings and errors",
-                "debug":"Debug messages; please disregard them"}
+    TOOLTIPS = {
+        "info": "Displays the progress of the requested operations",
+        "feedback": "Submits a feedback email about this software",
+        "details": "Detailed messages, including warnings and errors",
+        "debug": "Debug messages; please disregard them",
+    }
 
-    incUnreadMessagesSignal = QtImport.pyqtSignal(int,bool)
+    incUnreadMessagesSignal = QtImport.pyqtSignal(int, bool)
     resetUnreadMessagesSignal = QtImport.pyqtSignal(bool)
 
     def __init__(self, *args):
@@ -269,51 +280,46 @@ class LogViewBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        
+
         # Properties ----------------------------------------------------------
-        self.add_property('level', 'combo', ('NOT SET', 'INFO', 'WARNING', 'ERROR'), 'NOT SET')
-        self.add_property('showDebug', 'boolean', True)
-        self.add_property('appearance', 'combo', ('list', 'tabs'), 'tabs')
-        self.add_property('enableFeedback', 'boolean', True)
-        self.add_property('emailAddresses', 'string', '')
-        self.add_property('fromEmailAddress', 'string', '')
-        self.add_property('maxLogLines', 'integer', -1)
-        self.add_property('autoSwitchTabs', 'boolean', False)
-        self.add_property('myTabLabel', 'string', '')
+        self.add_property(
+            "level", "combo", ("NOT SET", "INFO", "WARNING", "ERROR"), "NOT SET"
+        )
+        self.add_property("showDebug", "boolean", True)
+        self.add_property("appearance", "combo", ("list", "tabs"), "tabs")
+        self.add_property("enableFeedback", "boolean", True)
+        self.add_property("emailAddresses", "string", "")
+        self.add_property("fromEmailAddress", "string", "")
+        self.add_property("maxLogLines", "integer", -1)
+        self.add_property("autoSwitchTabs", "boolean", False)
+        self.add_property("myTabLabel", "string", "")
 
         # Signals -------------------------------------------------------------
-        self.define_signal('incUnreadMessagesSignal', ())
-        self.define_signal('resetUnreadMessagesSignal', ())
+        self.define_signal("incUnreadMessagesSignal", ())
+        self.define_signal("resetUnreadMessagesSignal", ())
 
         # Slots ---------------------------------------------------------------
-        self.define_slot('clearLog', ())
-        self.define_slot('tabSelected', ())
+        self.define_slot("clearLog", ())
+        self.define_slot("tabSelected", ())
 
         # Graphic elements ----------------------------------------------------
         self.tab_widget = QtImport.QTabWidget(self)
 
-        self.details_log = CustomTreeWidget(self.tab_widget,
-                                            "Errors and warnings")
-        self.info_log = CustomTreeWidget(self.tab_widget,
-                                         "Information") 
-        self.debug_log = CustomTreeWidget(self.tab_widget,
-                                          "Debug")
-        self.feedback_log = Submitfeedback(self.tab_widget, 
-                                           self['emailAddresses'],
-                                           "Submit feedback")
+        self.details_log = CustomTreeWidget(self.tab_widget, "Errors and warnings")
+        self.info_log = CustomTreeWidget(self.tab_widget, "Information")
+        self.debug_log = CustomTreeWidget(self.tab_widget, "Debug")
+        self.feedback_log = Submitfeedback(
+            self.tab_widget, self["emailAddresses"], "Submit feedback"
+        )
 
-        self.tab_widget.addTab(self.details_log,
-                               Icons.load_icon("Caution"),
-                               "Errors and warnings")
-        self.tab_widget.addTab(self.info_log,
-                               Icons.load_icon("Inform"),
-                               "Information")
-        self.tab_widget.addTab(self.debug_log,
-                               Icons.load_icon("Hammer"),
-                               "Debug")
-        self.tab_widget.addTab(self.feedback_log,
-                               Icons.load_icon("Envelope"),
-                               "Submit feedback")
+        self.tab_widget.addTab(
+            self.details_log, Icons.load_icon("Caution"), "Errors and warnings"
+        )
+        self.tab_widget.addTab(self.info_log, Icons.load_icon("Inform"), "Information")
+        self.tab_widget.addTab(self.debug_log, Icons.load_icon("Hammer"), "Debug")
+        self.tab_widget.addTab(
+            self.feedback_log, Icons.load_icon("Envelope"), "Submit feedback"
+        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
@@ -322,23 +328,23 @@ class LogViewBrick(BaseWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtImport.QSizePolicy.Minimum,
-                           QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(QtImport.QSizePolicy.Minimum, QtImport.QSizePolicy.Expanding)
 
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.tab_levels = {logging.NOTSET: self.info_log,
-                           logging.DEBUG: self.info_log,
-                           logging.INFO: self.info_log,
-                           logging.WARNING: self.info_log,
-                           logging.ERROR: self.info_log,
-                           logging.CRITICAL: self.info_log}
+        self.tab_levels = {
+            logging.NOTSET: self.info_log,
+            logging.DEBUG: self.info_log,
+            logging.INFO: self.info_log,
+            logging.WARNING: self.info_log,
+            logging.ERROR: self.info_log,
+            logging.CRITICAL: self.info_log,
+        }
 
-        self.filter_level = logging.NOTSET 
+        self.filter_level = logging.NOTSET
         # Register to GUI log handler
         GUILogHandler.GUILogHandler().register(self)
-
 
     def run(self):
         # Register to GUI log handler
@@ -355,13 +361,13 @@ class LogViewBrick(BaseWidget):
 
     def tabSelected(self, tab_name):
         if self["appearance"] == "list":
-            if tab_name == self['myTabLabel']:
+            if tab_name == self["myTabLabel"]:
                 self.resetUnreadMessagesSignal.emit(True)
 
     def append_log_record(self, record):
         rec_level = record.getLevel()
 
-        if rec_level == logging.DEBUG and not self['showDebug']:
+        if rec_level == logging.DEBUG and not self["showDebug"]:
             return
         else:
             if rec_level < self.filter_level:
@@ -382,69 +388,73 @@ class LogViewBrick(BaseWidget):
         elif self["appearance"] == "list":
             self.incUnreadMessagesSignal.emit(1, True)
 
-
     def resetUnreadMessages(self, tab_index):
         selected_tab = self.tab_widget.widget(tab_index)
         selected_tab.unread_messages = 0
         self.tab_widget.setTabText(tab_index, selected_tab.tab_label)
 
-                          
     def customEvent(self, event):
         if self.is_running():
             self.append_log_record(event.record)
 
     def blockSignals(self, block):
         pass
-        
+
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'level':
+        if property_name == "level":
             self.filter_level = logging.NOTSET
 
-            if new_value == 'INFO':
+            if new_value == "INFO":
                 self.filter_level = logging.INFO
-            elif new_value == 'WARNING':
+            elif new_value == "WARNING":
                 self.filter_level = logging.WARNING
-            elif new_value == 'ERROR':
+            elif new_value == "ERROR":
                 self.filter_level = logging.ERROR
 
-        elif property_name == 'showDebug':
-            if self['appearance'] == "tabs":
+        elif property_name == "showDebug":
+            if self["appearance"] == "tabs":
                 if not new_value:
                     self.tab_widget.removeTab(self.tab_widget.indexOf(self.debug_log))
-        
-        elif property_name == 'emailAddresses':
+
+        elif property_name == "emailAddresses":
             self.feedback_log.email_addresses = new_value
-        elif property_name == 'fromEmailAddress':
+        elif property_name == "fromEmailAddress":
             self.feedback_log.from_email_address = new_value
 
-        elif property_name == 'enableFeedback':
-            if self['appearance'] == "tabs":
+        elif property_name == "enableFeedback":
+            if self["appearance"] == "tabs":
                 if not new_value:
-                    self.tab_widget.removeTab(self.tab_widget.indexOf(self.feedback_log))
+                    self.tab_widget.removeTab(
+                        self.tab_widget.indexOf(self.feedback_log)
+                    )
 
-        elif property_name == 'appearance':
+        elif property_name == "appearance":
             if new_value == "list":
-                self.tab_levels = {logging.NOTSET: self.info_log, 
-                                   logging.DEBUG: self.info_log, 
-                                   logging.INFO: self.info_log, 
-                                   logging.WARNING: self.info_log,
-                                   logging.ERROR: self.info_log,
-                                   logging.CRITICAL: self.info_log}
+                self.tab_levels = {
+                    logging.NOTSET: self.info_log,
+                    logging.DEBUG: self.info_log,
+                    logging.INFO: self.info_log,
+                    logging.WARNING: self.info_log,
+                    logging.ERROR: self.info_log,
+                    logging.CRITICAL: self.info_log,
+                }
 
                 self.tab_widget.removeTab(self.tab_widget.indexOf(self.details_log))
                 self.tab_widget.removeTab(self.tab_widget.indexOf(self.debug_log))
 
             elif new_value == "tabs":
-                self.tab_levels = {logging.NOTSET: self.details_log, 
-                                   logging.DEBUG: self.debug_log,
-                                   logging.INFO: self.info_log,
-                                   logging.WARNING: self.details_log,
-                                   logging.ERROR: self.details_log,
-                                   logging.CRITICAL: self.details_log}
-                
-        elif property_name == 'maxLogLines':
+                self.tab_levels = {
+                    logging.NOTSET: self.details_log,
+                    logging.DEBUG: self.debug_log,
+                    logging.INFO: self.info_log,
+                    logging.WARNING: self.details_log,
+                    logging.ERROR: self.details_log,
+                    logging.CRITICAL: self.details_log,
+                }
+
+        elif property_name == "maxLogLines":
             self.details_log.set_max_log_lines(new_value)
             self.info_log.set_max_log_lines(new_value)
             self.debug_log.set_max_log_lines(new_value)
         else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)        
+            BaseWidget.property_changed(self, property_name, old_value, new_value)

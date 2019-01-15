@@ -30,41 +30,42 @@ __category__ = "General"
 
 class DoorInterlockBrick(BaseWidget):
 
-    STATES = {'unknown': Colors.LIGHT_GRAY,
-              'disabled': Colors.LIGHT_GRAY,
-              'error': Colors.LIGHT_RED,
-              'unlocked': Colors.LIGHT_GRAY, 
-              'locked_active': Colors.LIGHT_GREEN,
-              'locked_inactive': Colors.LIGHT_GRAY}
+    STATES = {
+        "unknown": Colors.LIGHT_GRAY,
+        "disabled": Colors.LIGHT_GRAY,
+        "error": Colors.LIGHT_RED,
+        "unlocked": Colors.LIGHT_GRAY,
+        "locked_active": Colors.LIGHT_GREEN,
+        "locked_inactive": Colors.LIGHT_GRAY,
+    }
 
     def __init__(self, *args):
-        BaseWidget.__init__(self,*args)
+        BaseWidget.__init__(self, *args)
 
-        # Properties ---------------------------------------------------------- 
-        self.add_property('mnemonic','string','')
+        # Properties ----------------------------------------------------------
+        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Hardware objects ----------------------------------------------------
-        self.door_interlock_hwobj=None
+        self.door_interlock_hwobj = None
 
         # Internal values -----------------------------------------------------
-        
+
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QtImport.QGroupBox("Door interlock", self)
         self.main_groupbox.setAlignment(QtImport.Qt.AlignCenter)
-        self.state_label = QtImport.QLabel('<b>unknown</b>', self.main_groupbox)
-        Colors.set_widget_color(self.state_label,
-                                       self.STATES['unknown']) 
+        self.state_label = QtImport.QLabel("<b>unknown</b>", self.main_groupbox)
+        Colors.set_widget_color(self.state_label, self.STATES["unknown"])
         self.state_label.setAlignment(QtImport.Qt.AlignCenter)
         self.state_label.setFixedHeight(24)
-        self.unlock_door_button = QtImport.QPushButton(\
-             Icons.load_icon("EnterHutch"),
-             "Unlock", self.main_groupbox)
+        self.unlock_door_button = QtImport.QPushButton(
+            Icons.load_icon("EnterHutch"), "Unlock", self.main_groupbox
+        )
 
-        # Layout -------------------------------------------------------------- 
+        # Layout --------------------------------------------------------------
         _main_gbox_vlayout = QtImport.QVBoxLayout(self.main_groupbox)
         _main_gbox_vlayout.addWidget(self.state_label)
         _main_gbox_vlayout.addWidget(self.unlock_door_button)
@@ -89,35 +90,38 @@ class DoorInterlockBrick(BaseWidget):
         self.unlock_door_button.setEnabled(False)
         self.door_interlock_hwobj.unlock_door_interlock()
 
-    def updateLabel(self,label):
+    def updateLabel(self, label):
         self.main_groupbox.setTitle(label)
 
     def state_changed(self, state, state_label=None):
         try:
             color = self.STATES[state]
         except KeyError:
-            state = 'unknown'
+            state = "unknown"
             color = self.STATES[state]
-        Colors.set_widget_color(self.state_label,
-                                           color)
+        Colors.set_widget_color(self.state_label, color)
         if state_label is not None:
-            self.state_label.setText('<b>%s</b>' % state_label)
+            self.state_label.setText("<b>%s</b>" % state_label)
         else:
-            self.state_label.setText('<b>%s</b>' % state)
+            self.state_label.setText("<b>%s</b>" % state)
 
-        self.unlock_door_button.setEnabled(state=='locked_active')
+        self.unlock_door_button.setEnabled(state == "locked_active")
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name=='mnemonic':
+        if property_name == "mnemonic":
             if self.door_interlock_hwobj is not None:
-                self.disconnect(self.door_interlock_hwobj,
-                                'doorInterlockStateChanged',
-                                self.state_changed)
+                self.disconnect(
+                    self.door_interlock_hwobj,
+                    "doorInterlockStateChanged",
+                    self.state_changed,
+                )
             self.door_interlock_hwobj = self.get_hardware_object(new_value)
             if self.door_interlock_hwobj is not None:
-                self.connect(self.door_interlock_hwobj,
-                             'doorInterlockStateChanged',
-                             self.state_changed)
+                self.connect(
+                    self.door_interlock_hwobj,
+                    "doorInterlockStateChanged",
+                    self.state_changed,
+                )
                 self.door_interlock_hwobj.update_values()
         else:
-            BaseWidget.property_changed(self,property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)

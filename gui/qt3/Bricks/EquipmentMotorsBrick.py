@@ -8,7 +8,7 @@ The EquipmentMotors brick displays the motors found in an Equipment.
 [Properties]
 
 -----------------------------------------
-|  name         |  type  | description 
+|  name         |  type  | description
 -----------------------------------------
 |  mnemonic     | string | Equipment Hardware Object
 |  title        | string | title to be shown on top of the brick
@@ -49,6 +49,7 @@ from qt import *
 
 __category__ = ''
 
+
 class EquipmentMotorsBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
         BaseComponents.BlissWidget.__init__(self, *args)
@@ -60,7 +61,7 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
         self.addProperty('mnemonic', 'string')
         self.addProperty('title', 'string', str(self.name()))
         self.addProperty('formatString', 'formatString', '+##.####')
-        
+
         #
         # create GUI elements
         #
@@ -73,18 +74,17 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.frame.setFrameStyle(QFrame.NoFrame)
         self.lblTitle.setText('<nobr><h3>%s</h3></nobr>' % str(self.name()))
-            
+
         #
         # layout
         #
         QHBoxLayout(self.frame, 5, 5)
-         
+
         QVBoxLayout(self, 5, 0)
         self.layout().addWidget(self.lblTitle, 0, Qt.AlignTop | Qt.AlignLeft)
         self.layout().addWidget(self.frame, 1, Qt.AlignTop | Qt.AlignLeft)
 
-        
-    def updateGUI(self):  
+    def updateGUI(self):
         self.hardwareObject = self.getHardwareObject(self['mnemonic'])
 
         for motor in self.motors:
@@ -96,34 +96,37 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
 
         self.panels = {}
         self.motors = []
-         
+
         if self.hardwareObject:
             if self.hardwareObject.hasObject('motors'):
                 ho = self.hardwareObject['motors']
             else:
                 print self.hardwareObject.userName(), 'is not an Equipment : no <motors> section.'
                 return
-                
+
             for panelName in ho.objectsNames():
                 newPanel = QWidget(self.frame)
-                newPanel.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+                newPanel.setSizePolicy(
+                    QSizePolicy.MinimumExpanding,
+                    QSizePolicy.MinimumExpanding)
                 QVBoxLayout(newPanel, 0, 0)
                 lbl = QLabel('<b>%s</b>' % panelName, newPanel)
                 lbl.setAlignment(Qt.AlignCenter)
                 self.panels[panelName] = newPanel
                 self.frame.layout().addWidget(newPanel, 0, Qt.AlignTop)
-                
+
                 container = QGrid(4, Qt.Vertical, newPanel)
                 container.setMargin(0)
                 container.setSpacing(5)
 
                 newPanel.layout().addWidget(lbl)
                 newPanel.layout().addWidget(container)
-                                
+
                 for motor in ho[panelName].getDevices():
                     newMotorWidget = MotorBrick.MotorBrick(container, motor.name())
                     newMotorWidget['mnemonic'] = str(motor.name())
-                    newMotorWidget['formatString'] = self.getProperty('formatString').getUserValue()
+                    newMotorWidget['formatString'] = self.getProperty(
+                        'formatString').getUserValue()
                     newMotorWidget['appearance'] = 'normal'
                     newMotorWidget['allowConfigure'] = True
                     self.motors.append(newMotorWidget)
@@ -137,7 +140,9 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
                 # object has no sections defined
                 #
                 newPanel = QWidget(self.frame)
-                newPanel.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+                newPanel.setSizePolicy(
+                    QSizePolicy.MinimumExpanding,
+                    QSizePolicy.MinimumExpanding)
                 QVBoxLayout(newPanel, 5, 5)
                 self.panels[' '] = newPanel
                 self.frame.layout().addWidget(newPanel, 0, Qt.AlignTop)
@@ -147,11 +152,12 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
                 container.setSpacing(5)
 
                 newPanel.layout().addWidget(container)
-                
+
                 for motor in ho.getDevices():
                     newMotorWidget = MotorBrick.MotorBrick(container, motor.name())
                     newMotorWidget.setMnemonic(motor.name())
-                    newMotorWidget.getProperty('formatString').setValue(self.getProperty('formatString').getUserValue())
+                    newMotorWidget.getProperty('formatString').setValue(
+                        self.getProperty('formatString').getUserValue())
                     newMotorWidget.getProperty('appearance').setValue('normal')
                     newMotorWidget.getProperty('allowConfigure').setValue(True)
                     newMotorWidget.readProperties()
@@ -160,13 +166,10 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
                         newMotorWidget.run()
 
                 newPanel.show()
-                
 
     def setMnemonic(self, mne):
         self['mnemonic'] = str(mne)
 
-
-    
     def propertyChanged(self, propertyName, oldValue, newValue):
         if propertyName == 'title':
             title = '<nobr><h3>%s</h3></nobr>' % newValue
@@ -178,27 +181,13 @@ class EquipmentMotorsBrick(BaseComponents.BlissWidget):
                 self.lblTitle.show()
         elif propertyName == 'showBorder':
             if newValue:
-                 self.frame.setMidLineWidth(0)
-                 self.frame.setLineWidth(1)
-                 self.frame.setFrameStyle(QFrame.GroupBoxPanel | QFrame.Sunken)
+                self.frame.setMidLineWidth(0)
+                self.frame.setLineWidth(1)
+                self.frame.setFrameStyle(QFrame.GroupBoxPanel | QFrame.Sunken)
             else:
-                 self.frame.setFrameStyle(QFrame.NoFrame)
+                self.frame.setFrameStyle(QFrame.NoFrame)
         elif propertyName == 'formatString':
             for motor in self.motors:
                 motor['formatString'] = newValue
         elif propertyName == 'mnemonic':
             self.updateGUI()
-
-
-
-
-
-
-
-
-
-
-
-
-
-

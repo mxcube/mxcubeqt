@@ -34,32 +34,33 @@ class Qt4_ChatBrick(BlissWidget):
     """
     Descript. :
     """
-    PRIORITY_COLORS = ('darkblue', 'black', 'red')
-    MY_COLOR = 'darkgrey'
 
-    incoming_unread_messages = pyqtSignal(int,bool)
+    PRIORITY_COLORS = ("darkblue", "black", "red")
+    MY_COLOR = "darkgrey"
+
+    incoming_unread_messages = pyqtSignal(int, bool)
     reset_unread_messages = pyqtSignal(bool)
 
     def __init__(self, *args):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         BlissWidget.__init__(self, *args)
 
-        # Properties ---------------------------------------------------------- 
-        self.addProperty('mnemonic', 'string', '')
-        self.addProperty('icons', 'string', '')
-        self.addProperty('myTabLabel', 'string', '')
+        # Properties ----------------------------------------------------------
+        self.addProperty("mnemonic", "string", "")
+        self.addProperty("icons", "string", "")
+        self.addProperty("myTabLabel", "string", "")
 
         # Signals ------------------------------------------------------------
-        self.defineSignal('incoming_unread_messages',())
-        self.defineSignal('reset_unread_message',())
+        self.defineSignal("incoming_unread_messages", ())
+        self.defineSignal("reset_unread_message", ())
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot('tabSelected',())
-        self.defineSlot('sessionSelected',())
+        self.defineSlot("tabSelected", ())
+        self.defineSlot("sessionSelected", ())
 
         # Hardware objects ----------------------------------------------------
         self.instance_server_hwobj = None
@@ -97,14 +98,14 @@ class Qt4_ChatBrick(BlissWidget):
         self.message_ledit.returnPressed.connect(self.send_current_message)
         self.message_ledit.textChanged.connect(self.message_changed)
 
-        #self.setFixedHeight(120)
-        #self.setFixedWidth(790)
+        # self.setFixedHeight(120)
+        # self.setFixedWidth(790)
 
     def run(self):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         self.set_role(self.role)
 
@@ -112,41 +113,44 @@ class Qt4_ChatBrick(BlissWidget):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         session_id = args[0]
         is_inhouse = args[-1]
         self.conversation_textedit.clear()
         if is_inhouse:
-          self.session_id = None
+            self.session_id = None
         else:
-          self.session_id = session_id
-          self.load_chat_history()
+            self.session_id = session_id
+            self.load_chat_history()
 
     def load_chat_history(self):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         if self.instance_server_hwobj is not None:
-            chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (self.session_id, self.instance_server_hwobj.isClient() and "client" or "server")
+            chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (
+                self.session_id,
+                self.instance_server_hwobj.isClient() and "client" or "server",
+            )
         else:
             return
         try:
             chat_history = open(chat_history_filename, "r")
-        except:
+        except BaseException:
             return
 
         if self.isEnabled():
             for msg in chat_history.readlines():
-              self.conversation_textedit.append(msg)
+                self.conversation_textedit.append(msg)
 
-    def instance_role_changed(self,role):
+    def instance_role_changed(self, role):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         self.set_role(role)
 
@@ -154,249 +158,290 @@ class Qt4_ChatBrick(BlissWidget):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         self.role = role
         if role != BlissWidget.INSTANCE_ROLE_UNKNOWN and not self.isEnabled():
             self.setEnabled(True)
             self.load_chat_history()
 
-    def message_changed(self,text):
+    def message_changed(self, text):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        self.send_button.setEnabled(len(str(text))>0)
+        self.send_button.setEnabled(len(str(text)) > 0)
 
-    def message_arrived(self,priority,user_id,message):
+    def message_arrived(self, priority, user_id, message):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        color=Qt4_ChatBrick.PRIORITY_COLORS[priority]
-        msg_prefix=""
-        msg_suffix=""
-        if priority==InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL:
+        color = Qt4_ChatBrick.PRIORITY_COLORS[priority]
+        msg_prefix = ""
+        msg_suffix = ""
+        if priority == InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL:
             if user_id is None:
-                header=""
+                header = ""
             else:
-                header=" %s:" % self.instance_server_hwobj.idPrettyPrint(user_id)
-                if user_id[0]==self.nickname:
-                    color=Qt4_ChatBrick.MY_COLOR
+                header = " %s:" % self.instance_server_hwobj.idPrettyPrint(user_id)
+                if user_id[0] == self.nickname:
+                    color = Qt4_ChatBrick.MY_COLOR
         else:
-            header=""
-            msg_prefix="<i>"
-            msg_suffix="</i>"
+            header = ""
+            msg_prefix = "<i>"
+            msg_suffix = "</i>"
 
         now = time.strftime("%T")
-        new_line = "<font color=%s><b>(%s)%s</b> %s%s%s</font>" % (color, now,header,msg_prefix,message,msg_suffix)
+        new_line = "<font color=%s><b>(%s)%s</b> %s%s%s</font>" % (
+            color,
+            now,
+            header,
+            msg_prefix,
+            message,
+            msg_suffix,
+        )
         self.conversation_textedit.append(new_line)
-       
-        if self.session_id is not None and self.instance_server_hwobj is not None: 
-          chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (self.session_id, self.instance_server_hwobj.isClient() and "client" or "server")
-          try:
-            if time.time() - os.stat(chat_history_filename).st_mtime > 24*3600:
-              os.unlink(chat_history_filename)
-          except OSError:
-            pass  
-          chat_history_file = open(chat_history_filename, "a")
-          chat_history_file.write(new_line)
-          chat_history_file.write("\n")
-          chat_history_file.close()
 
-        #self.emit(QtCore.SIGNAL("incUnreadMessages"),1, True)
-        self.incoming_unread_messages.emit(1,True)
+        if self.session_id is not None and self.instance_server_hwobj is not None:
+            chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (
+                self.session_id,
+                self.instance_server_hwobj.isClient() and "client" or "server",
+            )
+            try:
+                if time.time() - os.stat(chat_history_filename).st_mtime > 24 * 3600:
+                    os.unlink(chat_history_filename)
+            except OSError:
+                pass
+            chat_history_file = open(chat_history_filename, "a")
+            chat_history_file.write(new_line)
+            chat_history_file.write("\n")
+            chat_history_file.close()
 
-    def new_client(self,client_id):
+        # self.emit(QtCore.SIGNAL("incUnreadMessages"),1, True)
+        self.incoming_unread_messages.emit(1, True)
+
+    def new_client(self, client_id):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        msg="%s has joined the conversation." % self.instance_server_hwobj.idPrettyPrint(client_id)
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
+        msg = (
+            "%s has joined the conversation."
+            % self.instance_server_hwobj.idPrettyPrint(client_id)
+        )
+        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
-    def wants_control(self,client_id):
+    def wants_control(self, client_id):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        msg="%s wants to have control!" % self.instance_server_hwobj.idPrettyPrint(client_id)
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_HIGH,None,msg)
+        msg = "%s wants to have control!" % self.instance_server_hwobj.idPrettyPrint(
+            client_id
+        )
+        self.message_arrived(
+            InstanceServer.ChatInstanceMessage.PRIORITY_HIGH, None, msg
+        )
 
-    def server_initialized(self,started,server_id=None):
+    def server_initialized(self, started, server_id=None):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         if started:
-            #sg="I'm moderating the chat as %s." % server_id[0]
-            #self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
-            self.nickname=server_id[0]
+            # sg="I'm moderating the chat as %s." % server_id[0]
+            # self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
+            self.nickname = server_id[0]
 
-    def client_closed(self,client_id):
+    def client_closed(self, client_id):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        msg="%s has left the conversation..." % self.instance_server_hwobj.idPrettyPrint(client_id)
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
+        msg = (
+            "%s has left the conversation..."
+            % self.instance_server_hwobj.idPrettyPrint(client_id)
+        )
+        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
-    def client_initialized(self,connected,server_id=None,my_nickname=None,quiet=False):
+    def client_initialized(
+        self, connected, server_id=None, my_nickname=None, quiet=False
+    ):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         if connected:
-            server_print=self.instance_server_hwobj.idPrettyPrint(server_id)
-            msg="I've joined the conversation as %s (moderator is %s)." % (my_nickname,server_print)
-            self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
-            self.nickname=my_nickname
+            server_print = self.instance_server_hwobj.idPrettyPrint(server_id)
+            msg = "I've joined the conversation as %s (moderator is %s)." % (
+                my_nickname,
+                server_print,
+            )
+            self.message_arrived(
+                InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg
+            )
+            self.nickname = my_nickname
 
-    def client_changed(self,old_client_id,new_client_id):
+    def client_changed(self, old_client_id, new_client_id):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        #print "CHAT CLIENT CHANGED",old_client_id,new_client_id
-        if old_client_id[0]==self.nickname:
-            self.nickname=new_client_id[0]
+        # print "CHAT CLIENT CHANGED",old_client_id,new_client_id
+        if old_client_id[0] == self.nickname:
+            self.nickname = new_client_id[0]
         else:
-            old_client_print=self.instance_server_hwobj.idPrettyPrint(old_client_id)
-            new_client_print=self.instance_server_hwobj.idPrettyPrint(new_client_id)
-            msg="%s has changed to %s." % (old_client_print,new_client_print)
-            self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
+            old_client_print = self.instance_server_hwobj.idPrettyPrint(old_client_id)
+            new_client_print = self.instance_server_hwobj.idPrettyPrint(new_client_id)
+            msg = "%s has changed to %s." % (old_client_print, new_client_print)
+            self.message_arrived(
+                InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg
+            )
 
     def send_current_message(self):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        txt=str(self.message_ledit.text())
+        txt = str(self.message_ledit.text())
         if len(txt):
-            self.instance_server_hwobj.sendChatMessage(InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL,txt)
+            self.instance_server_hwobj.sendChatMessage(
+                InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL, txt
+            )
             self.message_ledit.setText("")
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        if property_name == 'mnemonic':
+        if property_name == "mnemonic":
             if self.instance_server_hwobj is not None:
-                self.disconnect(self.instance_server_hwobj,
-                                'chatMessageReceived',
-                                self.message_arrived)
-                self.disconnect(self.instance_server_hwobj,
-                                'newClient',
-                                self.new_client)
-                self.disconnect(self.instance_server_hwobj,
-                                'serverInitialized',
-                                self.server_initialized)
-                self.disconnect(self.instance_server_hwobj,
-                                'clientInitialized',
-                                self.client_initialized)
-                self.disconnect(self.instance_server_hwobj,
-                                'serverClosed',
-                                self.client_closed)
-                self.disconnect(self.instance_server_hwobj,
-                                'wantsControl',
-                                self.wants_control)
-                self.disconnect(self.instance_server_hwobj,
-                                'haveControl',
-                                self.have_control)
-                self.disconnect(self.instance_server_hwobj,
-                                'passControl',
-                                self.pass_control)
-                self.disconnect(self.instance_server_hwobj,
-                                'clientClosed',
-                                self.client_closed)
-                self.disconnect(self.instance_server_hwobj,
-                                'clientChanged',
-                                self.client_changed)
+                self.disconnect(
+                    self.instance_server_hwobj,
+                    "chatMessageReceived",
+                    self.message_arrived,
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "newClient", self.new_client
+                )
+                self.disconnect(
+                    self.instance_server_hwobj,
+                    "serverInitialized",
+                    self.server_initialized,
+                )
+                self.disconnect(
+                    self.instance_server_hwobj,
+                    "clientInitialized",
+                    self.client_initialized,
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "serverClosed", self.client_closed
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "wantsControl", self.wants_control
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "haveControl", self.have_control
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "passControl", self.pass_control
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "clientClosed", self.client_closed
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "clientChanged", self.client_changed
+                )
 
             self.instance_server_hwobj = self.getHardwareObject(new_value)
             if self.instance_server_hwobj is not None:
-                self.connect(self.instance_server_hwobj,
-                             'chatMessageReceived',
-                             self.message_arrived)
-                self.connect(self.instance_server_hwobj,
-                             'newClient',
-                             self.new_client)
-                self.connect(self.instance_server_hwobj,
-                             'serverInitialized',
-                             self.server_initialized)
-                self.connect(self.instance_server_hwobj,
-                             'clientInitialized',
-                             self.client_initialized)
-                self.connect(self.instance_server_hwobj,
-                             'serverClosed',
-                             self.client_closed)
-                self.connect(self.instance_server_hwobj,
-                             'wantsControl',
-                             self.wants_control)
-                self.connect(self.instance_server_hwobj,
-                             'haveControl',
-                             self.have_control)
-                self.connect(self.instance_server_hwobj,
-                             'passControl',
-                             self.pass_control)
-                self.connect(self.instance_server_hwobj,
-                             'clientClosed',
-                             self.client_closed)
-                self.connect(self.instance_server_hwobj,
-                             'clientChanged',
-                             self.client_changed)
+                self.connect(
+                    self.instance_server_hwobj,
+                    "chatMessageReceived",
+                    self.message_arrived,
+                )
+                self.connect(self.instance_server_hwobj, "newClient", self.new_client)
+                self.connect(
+                    self.instance_server_hwobj,
+                    "serverInitialized",
+                    self.server_initialized,
+                )
+                self.connect(
+                    self.instance_server_hwobj,
+                    "clientInitialized",
+                    self.client_initialized,
+                )
+                self.connect(
+                    self.instance_server_hwobj, "serverClosed", self.client_closed
+                )
+                self.connect(
+                    self.instance_server_hwobj, "wantsControl", self.wants_control
+                )
+                self.connect(
+                    self.instance_server_hwobj, "haveControl", self.have_control
+                )
+                self.connect(
+                    self.instance_server_hwobj, "passControl", self.pass_control
+                )
+                self.connect(
+                    self.instance_server_hwobj, "clientClosed", self.client_closed
+                )
+                self.connect(
+                    self.instance_server_hwobj, "clientChanged", self.client_changed
+                )
 
-        elif property_name == 'icons':
+        elif property_name == "icons":
             icons_list = new_value.split()
             try:
                 self.send_button.setIcon(Qt4_Icons.load_icon(icons_list[0]))
             except IndexError:
                 pass
         else:
-            BlissWidget.propertyChanged(self,property_name, old_value, new_value)        
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
-    def have_control(self,have_control,gui_only=False):
+    def have_control(self, have_control, gui_only=False):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
         if not gui_only:
             if have_control:
-                p=InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
-                msg="I've gained control!"
+                p = InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
+                msg = "I've gained control!"
             else:
-                p=InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
-                msg="I've lost control..."
-            self.message_arrived(p,None,msg)
+                p = InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
+                msg = "I've lost control..."
+            self.message_arrived(p, None, msg)
 
-    def pass_control(self,has_control_id):
+    def pass_control(self, has_control_id):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        has_control_print=self.instance_server_hwobj.idPrettyPrint(has_control_id)
-        msg="%s has control." % has_control_print
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
+        has_control_print = self.instance_server_hwobj.idPrettyPrint(has_control_id)
+        msg = "%s has control." % has_control_print
+        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
-    def tabSelected(self,tab_name):
+    def tabSelected(self, tab_name):
         """
         Descript. :
         Args.     :
-        Return    : 
+        Return    :
         """
-        if tab_name==self['myTabLabel']:
-            #self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
+        if tab_name == self["myTabLabel"]:
+            # self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
             self.reset_unread_messages.emit(True)

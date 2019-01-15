@@ -25,13 +25,13 @@ class SnapshotWidget(QWidget):
     """
     """
 
-    def __init__(self, parent, realtime_plot = False):
+    def __init__(self, parent, realtime_plot=False):
         """
         """
         QWidget.__init__(self, parent)
-       
-        self.snapshot_gbox = QGroupBox('Snapshot', self)
-        self.animation_gbox = QGroupBox('Animation', self)
+
+        self.snapshot_gbox = QGroupBox("Snapshot", self)
+        self.animation_gbox = QGroupBox("Animation", self)
         self.snapshot_label = QLabel(self.snapshot_gbox)
         self.animation_label = QLabel(self.animation_gbox)
 
@@ -56,10 +56,9 @@ class SnapshotWidget(QWidget):
     def display_snapshot(self, image, width=None):
         if width is not None:
             ration = image.height() / float(image.width())
-            image = image.scaled(width, 
-                                 width * ration, 
-                                 Qt.KeepAspectRatio,
-                                 Qt.SmoothTransformation)
+            image = image.scaled(
+                width, width * ration, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
 
         self.snapshot_label.setPixmap(QPixmap(image))
         self.setFixedWidth(width)

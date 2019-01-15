@@ -31,7 +31,6 @@ __category__ = "General"
 
 
 class ProgressBarBrick(BaseWidget):
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -41,16 +40,16 @@ class ProgressBarBrick(BaseWidget):
         self.use_dialog = False
 
         # Properties ----------------------------------------------------------
-        self.add_property('mnemonicList', 'string', '')
+        self.add_property("mnemonicList", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.progress_type_label = QtImport.QLabel('', self)
+        self.progress_type_label = QtImport.QLabel("", self)
         self.progress_bar = QtImport.QProgressBar(self)
-        #$self.progress_bar.setCenterIndicator(True)
+        # $self.progress_bar.setCenterIndicator(True)
         self.progress_bar.setMinimum(0)
 
         main_layout = QtImport.QVBoxLayout(self)
@@ -61,35 +60,35 @@ class ProgressBarBrick(BaseWidget):
         self.setEnabled(False)
 
     def stop_progress(self, *args):
-        #if self.use_dialog:
+        # if self.use_dialog:
         #    BaseWidget.close_progress_dialog()
-        #else:
+        # else:
         self.progress_bar.reset()
         self.progress_type_label.setText("")
         self.setEnabled(False)
-        #BaseWidget.set_status_info("status", "")
+        # BaseWidget.set_status_info("status", "")
         #    BaseWidget.stop_progress_bar()
 
     def step_progress(self, step, msg=None):
-        #f self.use_dialog:
+        # f self.use_dialog:
         #   BaseWidget.set_progress_dialog_step(step)
-        #lse:
+        # lse:
         self.progress_bar.setValue(step)
         self.setEnabled(True)
         #   BaseWidget.set_progress_bar_step(step)
 
     def init_progress(self, progress_type, number_of_steps, use_dialog=False):
-        #elf.use_dialog = use_dialog
+        # elf.use_dialog = use_dialog
 
-        #f self.use_dialog:
+        # f self.use_dialog:
         #   BaseWidget.open_progress_dialog(progress_type, number_of_steps)
-        #lse:
+        # lse:
         self.setEnabled(True)
         self.progress_bar.reset()
         self.progress_type_label.setText(progress_type)
         self.progress_bar.setMaximum(number_of_steps)
-        #lissWidget.set_status_info("status", progress_type)
-        #lissWidget.init_progress_bar(progress_type, number_of_steps)
+        # lissWidget.set_status_info("status", progress_type)
+        # lissWidget.init_progress_bar(progress_type, number_of_steps)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonicList":
@@ -99,14 +98,14 @@ class ProgressBarBrick(BaseWidget):
                 hwobj = self.get_hardware_object(hwobj_role)
                 if hwobj is not None:
                     self.hwobj_list.append(hwobj)
-                    self.connect(self.hwobj_list[-1],
-                                 'progressInit',
-                                 self.init_progress)
-                    self.connect(self.hwobj_list[-1],
-                                 'progressStep',
-                                 self.step_progress)
-                    self.connect(self.hwobj_list[-1],
-                                 'progressStop',
-                                 self.stop_progress)
+                    self.connect(
+                        self.hwobj_list[-1], "progressInit", self.init_progress
+                    )
+                    self.connect(
+                        self.hwobj_list[-1], "progressStep", self.step_progress
+                    )
+                    self.connect(
+                        self.hwobj_list[-1], "progressStop", self.stop_progress
+                    )
         else:
-            BaseWidget.property_changed(self,property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)

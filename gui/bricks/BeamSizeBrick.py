@@ -21,7 +21,7 @@
 [Name] BeamSizeBrick
 
 [Description]
-The Beam size brick displays beam horizontal and vertical sizes. 
+The Beam size brick displays beam horizontal and vertical sizes.
 Sizes are estimated by related HO
 
 [Properties]
@@ -32,17 +32,17 @@ Sizes are estimated by related HO
 | formatString | string | format string for size display (defaults to #.###)
 -----------------------------------------------------------------------
 
-[Signals] - 
+[Signals] -
 
-[Slots] - 
+[Slots] -
 
-[Comments] - 
+[Comments] -
 
 [Hardware Objects]
 -----------------------------------------------------------------------
 | name		| signals         | functions
 -----------------------------------------------------------------------
-| BeamSize      | beamSizeChanged | 
+| BeamSize      | beamSizeChanged |
 -----------------------------------------------------------------------
 """
 
@@ -57,7 +57,6 @@ __category__ = "Beam definition"
 
 
 class BeamSizeBrick(BaseWidget):
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -67,15 +66,15 @@ class BeamSizeBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property('mnemonic', 'string', '')
-        self.add_property('formatString', 'formatString', '#.#')
+        self.add_property("mnemonic", "string", "")
+        self.add_property("formatString", "formatString", "#.#")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QtImport.QGroupBox('Beam size', self)
+        self.main_gbox = QtImport.QGroupBox("Beam size", self)
         hor_label = QtImport.QLabel("Horizontal:", self.main_gbox)
         self.hor_size_ledit = QtImport.QLineEdit(self.main_gbox)
         self.hor_size_ledit.setMaximumWidth(120)
@@ -115,19 +114,19 @@ class BeamSizeBrick(BaseWidget):
         # Other ---------------------------------------------------------------
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'mnemonic':
+        if property_name == "mnemonic":
             if self.beam_info_hwobj is not None:
-                self.disconnect(self.beam_info_hwobj,
-                                'beamInfoChanged', 
-                                self.beam_info_changed)
+                self.disconnect(
+                    self.beam_info_hwobj, "beamInfoChanged", self.beam_info_changed
+                )
             self.beam_info_hwobj = self.get_hardware_object(new_value)
             if self.beam_info_hwobj is not None:
-                self.connect(self.beam_info_hwobj,
-                             'beamInfoChanged', 
-                             self.beam_info_changed)
+                self.connect(
+                    self.beam_info_hwobj, "beamInfoChanged", self.beam_info_changed
+                )
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
-    
+
     def beam_info_changed(self, beam_info):
         """
         beam size is in mm. It is displayed in microns
@@ -138,11 +137,11 @@ class BeamSizeBrick(BaseWidget):
         if hor_size is None:
             self.hor_size_ledit.setText("")
         else:
-            size_str = self['formatString'] % (hor_size * 1000)
-            self.hor_size_ledit.setText('%s %sm' % (size_str, unichr(956)))
+            size_str = self["formatString"] % (hor_size * 1000)
+            self.hor_size_ledit.setText("%s %sm" % (size_str, unichr(956)))
         if ver_size is None:
             self.ver_size_ledit.setText("")
         else:
-            #ver_size *= 1000
-            size_str = self['formatString'] % (ver_size * 1000)
-            self.ver_size_ledit.setText('%s %sm' % (size_str, unichr(956)))
+            # ver_size *= 1000
+            size_str = self["formatString"] % (ver_size * 1000)
+            self.ver_size_ledit.setText("%s %sm" % (size_str, unichr(956)))

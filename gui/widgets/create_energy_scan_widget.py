@@ -28,7 +28,10 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE, COLLECTION_ORIGIN
+from HardwareRepository.HardwareObjects.queue_model_enumerables import (
+    EXPERIMENT_TYPE,
+    COLLECTION_ORIGIN,
+)
 from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
 
 
@@ -37,10 +40,9 @@ __license__ = "LGPLv3+"
 
 
 class CreateEnergyScanWidget(CreateTaskBase):
+    def __init__(self, parent=None, name=None, fl=0):
 
-    def __init__(self, parent=None,name=None, fl=0):
- 
-        CreateTaskBase.__init__(self, parent, name, fl, 'Energy scan')
+        CreateTaskBase.__init__(self, parent, name, fl, "Energy scan")
 
         if not name:
             self.setObjectName("create_energy_scan_widget")
@@ -52,12 +54,14 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         # Graphic elements ----------------------------------------------------
         self._periodic_table_widget = PeriodicTableWidget(self)
-        self._data_path_widget = DataPathWidget(self, 
-             data_model = self._path_template, layout = 'vertical')
+        self._data_path_widget = DataPathWidget(
+            self, data_model=self._path_template, layout="vertical"
+        )
 
-        _parameters_gbox = QtImport.QGroupBox('Parameters', self)
-        self._adjust_transmission_cbox = QtImport.QCheckBox(\
-             "Adjust transmission", _parameters_gbox)
+        _parameters_gbox = QtImport.QGroupBox("Parameters", self)
+        self._adjust_transmission_cbox = QtImport.QCheckBox(
+            "Adjust transmission", _parameters_gbox
+        )
         self._adjust_transmission_cbox.setChecked(False)
         self._adjust_transmission_cbox.setEnabled(True)
         self._max_transmission_label = QtImport.QLabel("Maximum transmission:")
@@ -68,7 +72,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QtImport.QGridLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(self._adjust_transmission_cbox, 0, 0)
-        _parameters_gbox_hlayout.addWidget(self._max_transmission_label, 1, 0) 
+        _parameters_gbox_hlayout.addWidget(self._max_transmission_label, 1, 0)
         _parameters_gbox_hlayout.addWidget(self._max_transmission_ledit, 1, 1)
         _parameters_gbox_hlayout.setColumnStretch(2, 1)
         _parameters_gbox_hlayout.setSpacing(2)
@@ -84,14 +88,17 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        #self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
+        # self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
         #     self.acq_parameters_changed)
-        self._data_path_widget.pathTemplateChangedSignal.connect(\
-             self.path_template_changed)
-        self._adjust_transmission_cbox.stateChanged.connect(\
-             self.adjust_transmission_state_changed)
-        self._max_transmission_ledit.textEdited.connect(\
-             self.max_transmission_value_changed)
+        self._data_path_widget.pathTemplateChangedSignal.connect(
+            self.path_template_changed
+        )
+        self._adjust_transmission_cbox.stateChanged.connect(
+            self.adjust_transmission_state_changed
+        )
+        self._max_transmission_ledit.textEdited.connect(
+            self.max_transmission_value_changed
+        )
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
@@ -107,28 +114,30 @@ class CreateEnergyScanWidget(CreateTaskBase):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
 
         try:
-            self._periodic_table_widget.set_elements(\
-                self._beamline_setup_hwobj.energyscan_hwobj.getElements())
+            self._periodic_table_widget.set_elements(
+                self._beamline_setup_hwobj.energyscan_hwobj.getElements()
+            )
 
-            max_transmission_value = self._beamline_setup_hwobj.\
-                 energyscan_hwobj.get_max_transmission_value()
+            max_transmission_value = (
+                self._beamline_setup_hwobj.energyscan_hwobj.get_max_transmission_value()
+            )
 
-            self._adjust_transmission_cbox.setEnabled(True) 
+            self._adjust_transmission_cbox.setEnabled(True)
             self._adjust_transmission_cbox.setChecked(True)
             self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(True)
-  
+
             if max_transmission_value:
                 self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
-        except:
+        except BaseException:
             pass
 
     def init_models(self):
-       
+
         CreateTaskBase.init_models(self)
         self.enery_scan = queue_model_objects.EnergyScan()
         self._path_template.start_num = 1
         self._path_template.num_files = 1
-        self._path_template.suffix = 'raw'
+        self._path_template.suffix = "raw"
         self._path_template.compression = False
 
     def single_item_selection(self, tree_item):
@@ -145,16 +154,21 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 self._path_template = escan_model.get_path_template()
 
             self._data_path_widget.update_data_model(self._path_template)
-        elif not(isinstance(tree_item, queue_item.SampleQueueItem) or \
-                     isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
+        elif not (
+            isinstance(tree_item, queue_item.SampleQueueItem)
+            or isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)
+        ):
             self.setDisabled(True)
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
-        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()
+        selected_element, selected_edge = (
+            self._periodic_table_widget.get_selected_element_edge()
+        )
         if not selected_element:
-            logging.getLogger("GUI").\
-                warning("No element selected, please select an element.")
+            logging.getLogger("GUI").warning(
+                "No element selected, please select an element."
+            )
 
         return base_result and selected_element
 
@@ -162,7 +176,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
         data_collections = []
-        selected_element, selected_edge = self._periodic_table_widget.get_selected_element_edge()   
+        selected_element, selected_edge = (
+            self._periodic_table_widget.get_selected_element_edge()
+        )
 
         if selected_element:
             if not shape:
@@ -172,17 +188,14 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = self._graphics_manager_hwobj.\
-                           get_scene_snapshot(shape)
+                    snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot
 
             path_template = self._create_path_template(sample, self._path_template)
 
-            energy_scan = queue_model_objects.EnergyScan(sample,
-                                                         path_template,
-                                                         cpos)
+            energy_scan = queue_model_objects.EnergyScan(sample, path_template, cpos)
             energy_scan.set_name(path_template.get_prefix())
             energy_scan.set_number(path_template.run_number)
             energy_scan.element_symbol = selected_element
@@ -191,8 +204,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
             data_collections.append(energy_scan)
             self._path_template.run_number += 1
         else:
-            logging.getLogger("GUI").\
-                info("No element selected, please select an element.")
+            logging.getLogger("GUI").info(
+                "No element selected, please select an element."
+            )
 
         return data_collections
 
@@ -206,10 +220,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
     def adjust_transmission_state_changed(self, state):
         self._max_transmission_ledit.setEnabled(state)
         self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(state)
-   
+
     def max_transmission_value_changed(self, value):
         try:
             max_transmission = float(value)
-            self._beamline_setup_hwobj.energyscan_hwobj.set_max_transmission(max_transmission)
-        except:
+            self._beamline_setup_hwobj.energyscan_hwobj.set_max_transmission(
+                max_transmission
+            )
+        except BaseException:
             pass

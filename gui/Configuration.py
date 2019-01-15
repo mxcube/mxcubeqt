@@ -42,10 +42,10 @@ def load_module(brick_name):
     try:
         fp, path_name, description = imp.find_module(brick_name)
         mod = imp.load_module(brick_name, fp, path_name, description)
-    except:
+    except BaseException:
         if fp:
             fp.close()
-        logging.getLogger().exception('Cannot import module %s', brick_name)
+        logging.getLogger().exception("Cannot import module %s", brick_name)
         return None
     else:
         return mod
@@ -57,43 +57,48 @@ def load_brick(brick_type, brick_name):
 
     if module is not None:
         try:
-            #classObj = getattr(module, brick_type)
+            # classObj = getattr(module, brick_type)
             class_obj = getattr(module, brick_type)
         except AttributeError:
-            logging.getLogger().error(\
-                  "Cannot load brick %s : " % brick_name + \
-                  "cannot found class %s in module" % brick_type)
+            logging.getLogger().error(
+                "Cannot load brick %s : " % brick_name
+                + "cannot found class %s in module" % brick_type
+            )
             return NullBrick(None, brick_name)
         else:
             try:
                 new_instance = class_obj(None, brick_name)
-            except:
-                logging.getLogger().exception(\
-                   "Cannot load brick %s : initialization failed", brick_name)
+            except BaseException:
+                logging.getLogger().exception(
+                    "Cannot load brick %s : initialization failed", brick_name
+                )
                 return NullBrick(None, brick_name)
             else:
                 new_instance._BaseWidget__stop()
                 return new_instance
     else:
-        logging.getLogger().error("Cannot load brick %s : " % brick_name + \
-                                  "module could not be loaded.")
+        logging.getLogger().error(
+            "Cannot load brick %s : " % brick_name + "module could not be loaded."
+        )
         return NullBrick(None, brick_name)
 
 
 class Configuration:
     """Configuration of a BaseWidget"""
-    classes = {"hbox": BaseLayoutItems.ContainerCfg,
-               "vbox": BaseLayoutItems.ContainerCfg,
-               "vgroupbox": BaseLayoutItems.GroupBoxCfg,
-               "hgroupbox": BaseLayoutItems.GroupBoxCfg,
-               "hspacer": BaseLayoutItems.SpacerCfg,
-               "vspacer": BaseLayoutItems.SpacerCfg,
-               "label": BaseLayoutItems.LabelCfg,
-               "icon": BaseLayoutItems.IconCfg,
-               "tab": BaseLayoutItems.TabCfg,
-               "hsplitter": BaseLayoutItems.SplitterCfg,
-               "vsplitter": BaseLayoutItems.SplitterCfg}
 
+    classes = {
+        "hbox": BaseLayoutItems.ContainerCfg,
+        "vbox": BaseLayoutItems.ContainerCfg,
+        "vgroupbox": BaseLayoutItems.GroupBoxCfg,
+        "hgroupbox": BaseLayoutItems.GroupBoxCfg,
+        "hspacer": BaseLayoutItems.SpacerCfg,
+        "vspacer": BaseLayoutItems.SpacerCfg,
+        "label": BaseLayoutItems.LabelCfg,
+        "icon": BaseLayoutItems.IconCfg,
+        "tab": BaseLayoutItems.TabCfg,
+        "hsplitter": BaseLayoutItems.SplitterCfg,
+        "vsplitter": BaseLayoutItems.SplitterCfg,
+    }
 
     def __init__(self, config=None, load_from_dict=None):
         """__init__ method"""
@@ -167,8 +172,9 @@ class Configuration:
             else:
                 return error
         else:
-            logging.getLogger().error(\
-                "Item of this type (%s) does not exist.", item_type)
+            logging.getLogger().error(
+                "Item of this type (%s) does not exist.", item_type
+            )
 
     def add_brick(self, brick_type, parent):
         """Adds brick to the gui
@@ -185,9 +191,7 @@ class Configuration:
             brick_name = "%s%d" % (brick_type, i)
 
         brick = load_brick(brick_type, brick_name)
-        error = parent.addChild(BaseLayoutItems.BrickCfg(brick_name,
-                                                             brick_type,
-                                                             brick))
+        error = parent.addChild(BaseLayoutItems.BrickCfg(brick_name, brick_type, brick))
 
         if len(error) == 0:
             self.bricks[brick_name] = parent["children"][-1]
@@ -205,8 +209,9 @@ class Configuration:
             if item["name"] == item_name:
                 return (parent, iter_index)
             else:
-                parent_item, item_index = self.find_parent(\
-                    item_name, nodeset=item["children"], parent=item)
+                parent_item, item_index = self.find_parent(
+                    item_name, nodeset=item["children"], parent=item
+                )
                 if parent_item is not None:
                     return (parent_item, item_index)
             iter_index += 1
@@ -216,7 +221,9 @@ class Configuration:
     def find_all_children(self, parent_item):
         """Returns a list of all children
         """
-        return parent_item["children"] + sum([self.find_all_children(child) for child in parent_item["children"]], [])
+        return parent_item["children"] + sum(
+            [self.find_all_children(child) for child in parent_item["children"]], []
+        )
 
     def find_item(self, item_name, nodeset=None):
         """
@@ -302,10 +309,11 @@ class Configuration:
                     connections = item.connections
                 for connection in connections:
                     if connection[recv] == old_item_name:
-                        logging.getLogger().debug(\
-                           "Receiver item %s in "  % old_item_name + \
-                           "%s has been changed to " % item.name + \
-                           "%s" % new_item_name)
+                        logging.getLogger().debug(
+                            "Receiver item %s in " % old_item_name
+                            + "%s has been changed to " % item.name
+                            + "%s" % new_item_name
+                        )
                         connection[recv] = new_item_name
 
             self.has_changed = True
@@ -387,10 +395,12 @@ class Configuration:
         if source_item_name == target_item_name:
             return False
 
-        source_parent_cfg, source_item_pos = \
-            self.find_parent(source_item_name, self.windows_list)
-        target_parent_cfg, target_item_pos = \
-            self.find_parent(target_item_name, self.windows_list)
+        source_parent_cfg, source_item_pos = self.find_parent(
+            source_item_name, self.windows_list
+        )
+        target_parent_cfg, target_item_pos = self.find_parent(
+            target_item_name, self.windows_list
+        )
 
         if source_parent_cfg is None:
             # cannot drag an entire window
@@ -416,8 +426,7 @@ class Configuration:
         if self.is_container(target_item_cfg):
             target_item_cfg["children"].insert(0, source_item_cfg)
         else:
-            target_parent_cfg["children"].insert(target_item_pos,
-                                                 source_item_cfg)
+            target_parent_cfg["children"].insert(target_item_pos, source_item_cfg)
 
         self.has_changed = True
 
@@ -431,11 +440,13 @@ class Configuration:
         """Prints window list"""
         wl = []
         for window_cfg in self.windows_list:
-            window_cfg_dict = {"type": "window",
-                               "name": window_cfg["name"],
-                               "properties": [],
-                               "signals": window_cfg.signals,
-                               "connections": window_cfg.connections}
+            window_cfg_dict = {
+                "type": "window",
+                "name": window_cfg["name"],
+                "properties": [],
+                "signals": window_cfg.signals,
+                "connections": window_cfg.connections,
+            }
             for prop in window_cfg.properties:
                 window_cfg_dict["properties"].append(prop.__getstate__())
 
@@ -445,19 +456,25 @@ class Configuration:
                 children = []
 
                 for child in item_cfg["children"]:
-                    child_prop_dict = {"name": child["name"],
-                                       "type": child.type,
-                                       "properties": [],
-                                       "children": [],
-                                       "connections": child.connections}
+                    child_prop_dict = {
+                        "name": child["name"],
+                        "type": child.type,
+                        "properties": [],
+                        "children": [],
+                        "connections": child.connections,
+                    }
                     for prop in child.properties:
                         child_prop_dict["properties"].append(prop.__getstate__())
                     if hasattr(child, "brick"):
-                        child_prop_dict["brick"] = {"name": str(child.brick.objectName())}
-                        child_prop_dict["brick"]["class"] = child.brick.__class__.__name__
-                        #child_prop_dict["brick"]["signals"] = child.brick._Connectable__signal
-                        #child_prop_dict["brick"]["slots"] = child.brick._Connectable__slot
-                    #else:
+                        child_prop_dict["brick"] = {
+                            "name": str(child.brick.objectName())
+                        }
+                        child_prop_dict["brick"][
+                            "class"
+                        ] = child.brick.__class__.__name__
+                        # child_prop_dict["brick"]["signals"] = child.brick._Connectable__signal
+                        # child_prop_dict["brick"]["slots"] = child.brick._Connectable__slot
+                    # else:
                     #    child["signals"] = child.signals
                     #    child["slots"] = child.slots
 
@@ -470,15 +487,15 @@ class Configuration:
 
             wl.append(window_cfg_dict)
         return wl
-        #pprint.pprint(wl)
+        # pprint.pprint(wl)
 
     def save(self, filename):
         """Saves config"""
 
         if filename.endswith(".json"):
             json_dict = self.dump_tree()
-            with open(filename, 'w') as outfile:
-                  json.dump(json_dict, outfile)
+            with open(filename, "w") as outfile:
+                json.dump(json_dict, outfile)
             outfile.close()
             self.has_changed = False
 
@@ -486,30 +503,32 @@ class Configuration:
         elif filename.endswith(".yml"):
             try:
                 yaml_dict = self.dump_tree()
-                with open(filename, 'w') as outfile:
-                      yaml.dump(yaml_dict, outfile)
+                with open(filename, "w") as outfile:
+                    yaml.dump(yaml_dict, outfile)
                 outfile.close()
                 self.has_changed = False
 
                 return True
             except Exception as ex:
-                logging.getLogger("HWR").exception(\
-                   "Could not save configuration to %s:" % filename + \
-                   str(ex))
+                logging.getLogger("HWR").exception(
+                    "Could not save configuration to %s:" % filename + str(ex)
+                )
                 return False
         else:
             try:
                 cfg = repr(self.windows_list)
-            except:
-                logging.getLogger().exception("An exception occured " + \
-                                          "while serializing GUI objects")
+            except BaseException:
+                logging.getLogger().exception(
+                    "An exception occured " + "while serializing GUI objects"
+                )
                 return False
             else:
                 try:
                     config_file = open(filename, "w")
-                except:
-                    logging.getLogger().exception(\
-                        "Cannot save configuration to %s" % filename)
+                except BaseException:
+                    logging.getLogger().exception(
+                        "Cannot save configuration to %s" % filename
+                    )
                     return False
                 else:
                     config_file.write(cfg)
@@ -537,8 +556,7 @@ class Configuration:
                     brick = load_brick(child["type"], child["name"])
                     child["brick"] = brick
 
-                    new_item = BaseLayoutItems.BrickCfg(child["name"],
-                                                        child["type"])
+                    new_item = BaseLayoutItems.BrickCfg(child["name"], child["type"])
 
                     new_item["brick"] = brick
                     self.bricks[child["name"]] = new_item
@@ -548,20 +566,20 @@ class Configuration:
                         self.windows[child["name"]] = new_item
                     else:
                         NewItemClass = Configuration.classes[child["type"]]
-                        new_item = NewItemClass(child["name"],
-                                                child["type"])
+                        new_item = NewItemClass(child["name"], child["type"])
                         self.items[child["name"]] = new_item
 
                 if new_item is not None:
-                    if type(child["properties"]) == bytes:
-                    #if type(child["properties"]) == str:
+                    if isinstance(child["properties"], bytes):
+                        # if type(child["properties"]) == str:
                         try:
                             new_item.set_properties(pickle.loads(child["properties"]))
-                            #newItem.set_properties(pickle.loads(child["properties"].encode('utf8')))
-                        except:
-                            logging.getLogger().exception(\
-                                "Error: could not load properties " + \
-                                "for %s", child["name"])
+                            # newItem.set_properties(pickle.loads(child["properties"].encode('utf8')))
+                        except BaseException:
+                            logging.getLogger().exception(
+                                "Error: could not load properties " + "for %s",
+                                child["name"],
+                            )
                             new_item.properties = PropertyBag.PropertyBag()
                     else:
                         new_item.set_properties(child["properties"])
@@ -569,12 +587,12 @@ class Configuration:
                     child["properties"] = new_item.properties
                     new_item.__dict__ = child
 
-                    #try:
+                    # try:
                     #    new_item_signals = new_item["signals"]
                     #    new_item_slots = new_item["slots"]
-                    #except:
+                    # except:
                     #    new_item.__dict__ = child
-                    #else:
+                    # else:
                     #    new_item.__dict__ = child
                     #    new_item.slots = new_item_slots
                     #    new_item.signals = new_item_signals
@@ -582,6 +600,7 @@ class Configuration:
                     children[index] = new_item
                     load_children(child["children"])
                 index += 1
+
         load_children(self.windows_list)
 
     def is_container(self, item):
@@ -611,7 +630,7 @@ class Configuration:
     def reload_brick(self, brick_cfg):
         """Reloads brick
         """
-        if type(brick_cfg) == bytes:
+        if isinstance(brick_cfg, bytes):
             brick_cfg = self.find_item(brick_cfg)
 
         brick_name = brick_cfg["name"]
@@ -623,9 +642,7 @@ class Configuration:
             brick = load_brick(brick_type, brick_name)
 
             old_brick_cfg = parent["children"][index]
-            new_brick_cfg = BaseLayoutItems.BrickCfg(brick_name,
-                                                         brick_type,
-                                                         brick)
+            new_brick_cfg = BaseLayoutItems.BrickCfg(brick_name, brick_type, brick)
             parent["children"][index] = new_brick_cfg
             new_brick_cfg.set_properties(old_brick_cfg["properties"])
 

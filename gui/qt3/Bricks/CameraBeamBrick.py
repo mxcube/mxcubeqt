@@ -51,6 +51,8 @@ __category__ = "Camera"
 ##########                         BRICK                           ##########
 ##########                                                         ##########
 #############################################################################
+
+
 class CameraBeamBrick(BlissWidget):
     def __init__(self, parent, name):
         BlissWidget.__init__(self, parent, name)
@@ -58,8 +60,8 @@ class CameraBeamBrick(BlissWidget):
         """
         variables
         """
-        self.YBeam  = None
-        self.ZBeam  = None
+        self.YBeam = None
+        self.ZBeam = None
 
         """
         property
@@ -97,7 +99,7 @@ class CameraBeamBrick(BlissWidget):
         vlayout1 = qt.QVBoxLayout(self.calibFrame)
         vlayout1.setMargin(10)
 
-        self.table = qttable.QTable(0,3, self.calibFrame)
+        self.table = qttable.QTable(0, 3, self.calibFrame)
         self.table.setFocusPolicy(qt.QWidget.NoFocus)
         self.table.setSelectionMode(qttable.QTable.NoSelection)
         self.table.setSizePolicy(qt.QSizePolicy(qt.QSizePolicy.Minimum,
@@ -193,11 +195,11 @@ class CameraBeamBrick(BlissWidget):
             if self.table.numSelections() != -1:
                 self.table.clearSelection(True)
             if self.currIdx != -1:
-                aux = self.hwZoom.getPositionKeyValue(currentPos,"beamx")
+                aux = self.hwZoom.getPositionKeyValue(currentPos, "beamx")
                 if aux is None:
                     aux = "0"
                 beamy = float(aux)
-                aux = self.hwZoom.getPositionKeyValue(currentPos,"beamy")
+                aux = self.hwZoom.getPositionKeyValue(currentPos, "beamy")
                 if aux is None:
                     aux = "0"
                 beamz = float(aux)
@@ -226,7 +228,7 @@ class CameraBeamBrick(BlissWidget):
             self.ZBeam = 0
 
         self.emit(qt.PYSIGNAL("ChangeBeamPosition"),
-                      (self.YBeam, self.ZBeam))
+                  (self.YBeam, self.ZBeam))
 
     def saveCalibration(self):
         currentPos = self.hwZoom.getPosition()
@@ -236,6 +238,7 @@ class CameraBeamBrick(BlissWidget):
     """
     SLOTS
     """
+
     def getBeamPosition(self, position):
         position["ybeam"] = self.YBeam
         position["zbeam"] = self.ZBeam
@@ -253,4 +256,3 @@ class CameraBeamBrick(BlissWidget):
         else:
             # print "Someone ask to disable CameraBeamBrick."
             self.setEnabled(False)
-

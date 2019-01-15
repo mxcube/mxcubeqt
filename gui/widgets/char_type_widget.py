@@ -21,8 +21,7 @@ import QtImport
 
 from gui.widgets.routine_dc_char_widget_layout import RoutineDCWidgetLayout
 from gui.widgets.sad_char_widget_layout import SADWidgetLayout
-from gui.widgets.radiation_damage_char_widget_layout import \
-     RadiationDamageWidgetLayout
+from gui.widgets.radiation_damage_char_widget_layout import RadiationDamageWidgetLayout
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -30,7 +29,6 @@ __license__ = "LGPLv3+"
 
 
 class CharTypeWidget(QtImport.QWidget):
-
     def __init__(self, parent=None, name=None, fl=0):
 
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
@@ -73,17 +71,14 @@ class CharTypeWidget(QtImport.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.routine_dc_page.dose_limit_cbx.toggled.connect(\
-             self.enable_dose_ledit)
-        self.routine_dc_page.time_limit_cbx.toggled.connect(\
-             self.enable_time_ledit)
-        self.routine_dc_page.dose_time_bgroup.buttonClicked.connect(\
-             self._toggle_time_dose)
+        self.routine_dc_page.dose_limit_cbx.toggled.connect(self.enable_dose_ledit)
+        self.routine_dc_page.time_limit_cbx.toggled.connect(self.enable_time_ledit)
+        self.routine_dc_page.dose_time_bgroup.buttonClicked.connect(
+            self._toggle_time_dose
+        )
 
         # Other ---------------------------------------------------------------
-        self._toggle_time_dose(\
-             self.routine_dc_page.dose_time_bgroup.checkedId())
-
+        self._toggle_time_dose(self.routine_dc_page.dose_time_bgroup.checkedId())
 
     def enable_time_ledit(self, state):
         self.routine_dc_page.time_ledit.setEnabled(state)

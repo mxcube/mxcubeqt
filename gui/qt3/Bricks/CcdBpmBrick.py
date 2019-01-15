@@ -50,11 +50,14 @@ __category__ = "Camera"
 ##########                         BRICK                           ##########
 ##########                                                         ##########
 #############################################################################
+
+
 class CcdBpmBrick(BlissWidget):
     colorState = {
         True: '#00ee00',
         False: '#ff5555',
-        }
+    }
+
     def __init__(self, parent, name):
         BlissWidget.__init__(self, parent, name)
 
@@ -73,8 +76,8 @@ class CcdBpmBrick(BlissWidget):
         """
         Signal
         """
-        self.defineSignal('getView',())
-        self.defineSignal('beamPositionChanged',())
+        self.defineSignal('getView', ())
+        self.defineSignal('beamPositionChanged', ())
 
         """
         Slot
@@ -86,7 +89,7 @@ class CcdBpmBrick(BlissWidget):
         self.buildInterface()
 
     def bprint(self, msg):
-        print "CcdBpmBrick--%s"%msg
+        print "CcdBpmBrick--%s" % msg
 
     def buildInterface(self):
         vlayout = qt.QVBoxLayout(self)
@@ -284,7 +287,6 @@ class CcdBpmBrick(BlissWidget):
                      self.sendROI)
         hlayout2.addWidget(self.sendButton)
 
-
         vlayout3.addStretch(1)
 
         """
@@ -314,7 +316,6 @@ class CcdBpmBrick(BlissWidget):
         self.endxText.setTitleMinimumSize(titlesize)
         self.startyText.setTitleMinimumSize(titlesize)
         self.endyText.setTitleMinimumSize(titlesize)
-
 
         self.exposureText.setValueMaximumSize(valuesize)
         self.gainText.setValueMaximumSize(valuesize)
@@ -351,7 +352,7 @@ class CcdBpmBrick(BlissWidget):
 
             if self.hwo is not None:
                 self.connect(self.hwo, qt.PYSIGNAL('imageReceived'),
-                                self.imageReceived)
+                             self.imageReceived)
                 self.imageReceived()
 
     def run(self):
@@ -387,23 +388,23 @@ class CcdBpmBrick(BlissWidget):
         """
         self.imageReceived()
         if self.infoDict is not None:
-            #change the background color
+            # change the background color
             qcolor = qt.QColor(CcdBpmBrick.colorState[self.infoDict["live"]])
             self.liveControlToggle.setPaletteBackgroundColor(qcolor)
-            #change the background color
+            # change the background color
             qcolor = qt.QColor(CcdBpmBrick.colorState[self.infoDict["bpmon"]])
             self.bpmControlToggle.setPaletteBackgroundColor(qcolor)
 
-            self.exposureText.setText("%g"%(self.infoDict["time"],))
-            self.gainText.setText("%d"%(self.infoDict["gain"],))
-            self.thresholdText.setText("%g"%(self.infoDict["threshold"],))
+            self.exposureText.setText("%g" % (self.infoDict["time"],))
+            self.gainText.setText("%d" % (self.infoDict["gain"],))
+            self.thresholdText.setText("%g" % (self.infoDict["threshold"],))
 
-            self.startxText.setText("%d"%(self.infoDict["startx"],))
-            self.endxText.setText("%d"%(self.infoDict["endx"],))
-            self.startyText.setText("%d"%(self.infoDict["starty"],))
-            self.endyText.setText("%d"%(self.infoDict["endy"],))
+            self.startxText.setText("%d" % (self.infoDict["startx"],))
+            self.endxText.setText("%d" % (self.infoDict["endx"],))
+            self.startyText.setText("%d" % (self.infoDict["starty"],))
+            self.endyText.setText("%d" % (self.infoDict["endy"],))
 
-            #self.bprint("infoDict--startx=%d endx=%d starty=%d endy=%d"%(self.infoDict["startx"],
+            # self.bprint("infoDict--startx=%d endx=%d starty=%d endy=%d"%(self.infoDict["startx"],
             #        self.infoDict["endx"],
             #                                                           self.infoDict["starty"],
             #                                                           self.infoDict["endy"]))
@@ -440,13 +441,13 @@ class CcdBpmBrick(BlissWidget):
         self.startxText.setText(str(int(startx + x)))
         self.endxText.setText(str(int(startx + x + w - 1)))
         self.startyText.setText(str(int(starty + y)))
-        self.endyText.setText(str(int(starty + y+h-1)))
+        self.endyText.setText(str(int(starty + y + h - 1)))
 
     def imageReceived(self):
         if self.hwo is not None:
             self.infoDict = self.hwo.getBpmValues()
 
-            self.imageWidth  = int(self.infoDict["width"])
+            self.imageWidth = int(self.infoDict["width"])
             self.imageHeight = int(self.infoDict["height"])
 
             if self.liveControlToggle.isOn() != self.infoDict["live"]:
@@ -455,39 +456,42 @@ class CcdBpmBrick(BlissWidget):
             if self.bpmControlToggle.isOn() != self.infoDict["bpmon"]:
                 self.bpmControlToggle.setOn(self.infoDict["bpmon"])
 
-            self.exposureLabel.setText("%g"%(self.infoDict["time"],))
-            self.gainLabel.setText("%d"%(self.infoDict["gain"],))
-            self.thresholdLabel.setText("%g"%(self.infoDict["threshold"],))
+            self.exposureLabel.setText("%g" % (self.infoDict["time"],))
+            self.gainLabel.setText("%d" % (self.infoDict["gain"],))
+            self.thresholdLabel.setText("%g" % (self.infoDict["threshold"],))
 
             if self.infoDict["centerx"] is not None:
-                self.centerxLabel.setText("%d"%(self.infoDict["centerx"],))
+                self.centerxLabel.setText("%d" % (self.infoDict["centerx"],))
             if self.infoDict["centery"] is not None:
-                self.centeryLabel.setText("%d"%(self.infoDict["centery"],))
+                self.centeryLabel.setText("%d" % (self.infoDict["centery"],))
             if self.infoDict["fwhmx"] is not None:
-                self.fwhmxLabel.setText("%d"%(self.infoDict["fwhmx"],))
+                self.fwhmxLabel.setText("%d" % (self.infoDict["fwhmx"],))
             if self.infoDict["fwhmy"] is not None:
-                self.fwhmyLabel.setText("%d"%(self.infoDict["fwhmy"],))
+                self.fwhmyLabel.setText("%d" % (self.infoDict["fwhmy"],))
             if self.infoDict["intensity"] is not None:
-                self.intensityLabel.setText("%d"%(self.infoDict["intensity"],))
+                self.intensityLabel.setText("%d" % (self.infoDict["intensity"],))
             if self.infoDict["maxpix"] is not None:
-                self.maxpixLabel.setText("%d"%(self.infoDict["maxpix"],))
+                self.maxpixLabel.setText("%d" % (self.infoDict["maxpix"],))
             if self.infoDict["width"] is not None:
-                self.widthLabel.setText("%d"%(self.infoDict["width"],))
+                self.widthLabel.setText("%d" % (self.infoDict["width"],))
             if self.infoDict["height"] is not None:
-                self.heightLabel.setText("%d"%(self.infoDict["height"],))
+                self.heightLabel.setText("%d" % (self.infoDict["height"],))
             if self.infoDict["startx"] is not None:
-                self.startxLabel.setText("%d"%(self.infoDict["startx"],))
+                self.startxLabel.setText("%d" % (self.infoDict["startx"],))
             if self.infoDict["endx"] is not None:
-                self.endxLabel.setText("%d"%(self.infoDict["endx"],))
+                self.endxLabel.setText("%d" % (self.infoDict["endx"],))
             if self.infoDict["starty"] is not None:
-                self.startyLabel.setText("%d"%(self.infoDict["starty"],))
+                self.startyLabel.setText("%d" % (self.infoDict["starty"],))
             if self.infoDict["endy"] is not None:
-                self.endyLabel.setText("%d"%(self.infoDict["endy"],))
+                self.endyLabel.setText("%d" % (self.infoDict["endy"],))
 
             self.horizontal_flip = self.infoDict["fliph"]
-            self.vertical_flip   = self.infoDict["flipv"]
+            self.vertical_flip = self.infoDict["flipv"]
 
-            self.emit(qt.PYSIGNAL("beamPositionChanged"), (self.infoDict["centerx"],self.infoDict["centery"]))
+            self.emit(
+                qt.PYSIGNAL("beamPositionChanged"),
+                (self.infoDict["centerx"],
+                 self.infoDict["centery"]))
         else:
             self.infoDict = None
 
@@ -501,19 +505,19 @@ class CcdBpmBrick(BlissWidget):
 
     def sendROI(self):
         fromx = int(self.startxText.text())
-        tox   = int(self.endxText.text())
+        tox = int(self.endxText.text())
         fromy = int(self.startyText.text())
-        toy   = int(self.endyText.text())
+        toy = int(self.endyText.text())
 
         #self.bprint("SendROI (fromx=%d tox=%d fromy=%d toy=%d)"%(fromx,tox,fromy,toy))
 
         if self.hwo is not None:
             if self.horizontal_flip:
-                fromx = (self.imageWidth-1) - fromx
-                tox   = (self.imageWidth-1) - tox
+                fromx = (self.imageWidth - 1) - fromx
+                tox = (self.imageWidth - 1) - tox
             if self.vertical_flip:
-                fromy = (self.imageHeight-1) - fromy
-                toy   = (self.imageHeight-1) - toy
+                fromy = (self.imageHeight - 1) - fromy
+                toy = (self.imageHeight - 1) - toy
             self.hwo.setROI(fromx, tox, fromy, toy)
 
         else:
@@ -540,14 +544,14 @@ class CcdBpmBrick(BlissWidget):
     def setLive(self, liveOn):
         if self.hwo is not None:
             self.hwo.setLive(liveOn)
-            #change the background color
+            # change the background color
             qcolor = qt.QColor(CcdBpmBrick.colorState[liveOn])
             self.liveControlToggle.setPaletteBackgroundColor(qcolor)
 
     def setBpm(self, bpmOn):
         if self.hwo is not None:
             self.hwo.setBpm(bpmOn)
-            #change the background color
+            # change the background color
             qcolor = qt.QColor(CcdBpmBrick.colorState[bpmOn])
             self.bpmControlToggle.setPaletteBackgroundColor(qcolor)
 
@@ -584,7 +588,7 @@ class QubValue(qt.QWidget):
         self.layout.addWidget(self.valueWidget)
 
     def __returnPressed(self):
-        self.emit(qt.PYSIGNAL("returnPressed"),())
+        self.emit(qt.PYSIGNAL("returnPressed"), ())
 
     def setText(self, text):
         self.valueWidget.setText(text)
@@ -612,4 +616,3 @@ class QubValue(qt.QWidget):
 
     def titleSizeHint(self):
         return self.titleWidget.sizeHint()
-

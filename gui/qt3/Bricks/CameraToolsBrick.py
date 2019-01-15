@@ -10,7 +10,7 @@ Available tools are the following:
 
 add a list in the tool bar or in the menu to selected camera from a Meteor2
 server
-    
+
 [Properties]
 
 Falcon Select - ("None","Toolbar","Popup") - allow to select the different
@@ -34,7 +34,7 @@ getView - {"drawing"} - emitted to get a reference on the image viewer object.
 
 [Slots]
 
-                                                 
+
 [Comments]
 
 
@@ -56,15 +56,17 @@ __category__ = "Camera"
 #############################################################################
 ##########                                                         ##########
 ##########                         BRICK                           ##########
-##########                                                         ##########       
-#############################################################################       
+##########                                                         ##########
+#############################################################################
+
+
 class CameraToolsBrick(BlissWidget):
     def __init__(self, parent, name):
         BlissWidget.__init__(self, parent, name)
-        
+
         """
         variables
-        """        
+        """
         self.view = None
         self.firstCall = True
 
@@ -78,18 +80,18 @@ class CameraToolsBrick(BlissWidget):
                          ("none", "toolbar", "popup"), "none")
         self.falconMode = None
         self.falconAction = None
-                
+
         self.addProperty("Falcon", "string", "")
         self.falconHwo = None
 
         self.addProperty("Falcon #", "integer", 1)
         self.falconNumber = None
-                
+
         """
         Signal
         """
-        self.defineSignal('getView',())
- 
+        self.defineSignal('getView', ())
+
         """
         Slot
         """
@@ -98,8 +100,7 @@ class CameraToolsBrick(BlissWidget):
         widgets - NO APPEARANCE
         """
         self.setFixedSize(0, 0)
-                        
-               
+
     def propertyChanged(self, prop, oldValue, newValue):
         """
         FALCON
@@ -110,16 +111,16 @@ class CameraToolsBrick(BlissWidget):
                 self.falconMode = None
             if newValue == "popup":
                 self.falconMode = "contextmenu"
-            
+
         if prop == "Falcon":
             self.falconHwo = self.getHardwareObject(newValue)
 
         if prop == "Falcon #":
             self.falconNumber = newValue
-        
+
         if not self.firstCall:
             self.configureAction()
-            
+
     def run(self):
         """
         get view
@@ -128,14 +129,14 @@ class CameraToolsBrick(BlissWidget):
         self.emit(qt.PYSIGNAL("getView"), (view,))
         try:
             self.drawing = view["drawing"]
-            self.view = view["view"]        
-        except:
+            self.view = view["view"]
+        except BaseException:
             print "No View"
-                    
+
         self.configureAction()
-        
+
         self.firstCall = False
-    
+
     def configureAction(self):
         """
         FALCON
@@ -147,16 +148,16 @@ class CameraToolsBrick(BlissWidget):
                 """
                 cameras = []
                 for i in range(self.falconNumber):
-                    cameras.append("Camera %d"%i)
-                    
+                    cameras.append("Camera %d" % i)
+
                 self.falconAction = QubListAction(items=cameras,
                                                   name='Select Falcon Camera',
                                                   place=self.falconMode,
-                                                  actionInfo = 'Select Falcon Camera',
+                                                  actionInfo='Select Falcon Camera',
                                                   group='Tools')
                 self.connect(self.falconAction, qt.PYSIGNAL("ItemSelected"),
                              self.cameraSelected)
-                    
+
                 if self.view is not None:
                     actions = []
                     actions.append(self.falconAction)
@@ -167,8 +168,8 @@ class CameraToolsBrick(BlissWidget):
                 remove action
                 """
                 if self.view is not None:
-                    self.view.delAction(["Select Falcon Camera",])
-                    
+                    self.view.delAction(["Select Falcon Camera", ])
+
                 """
                 del action from view
                 """
@@ -178,24 +179,24 @@ class CameraToolsBrick(BlissWidget):
 
         if self.falconHwo is not None:
             try:
-                data = {'type':'tango','name':'VideoInput'}
-                vi = self.falconHwo.addChannel(data,'VideoInput')
+                data = {'type': 'tango', 'name': 'VideoInput'}
+                vi = self.falconHwo.addChannel(data, 'VideoInput')
                 videoinput = self.falconHwo.getChannelObject("VideoInput")
                 val = int(videoinput.getValue())
                 self.falconAction.setItemIndex(val - 1)
-            except:
+            except BaseException:
                 s = "Cannot get video input attribute"
                 logging.getLogger("Brick").error(s)
         else:
             logging.getLogger("Brick").error("No Falcon defined")
-                        
+
     """
     FALCON
-    """                                                           
+    """
+
     def cameraSelected(self, idx, camera):
         if self.falconHwo is not None:
             try:
-                self.falconHwo.getChannelObject("VideoInput").setValue(idx+1)
-            except:
+                self.falconHwo.getChannelObject("VideoInput").setValue(idx + 1)
+            except BaseException:
                 logging.getLogger("Brick").error("Cannot set video input attribute")
-         

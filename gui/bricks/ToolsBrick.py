@@ -25,14 +25,14 @@ from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]
 __license__ = "LGPLv3+"
-__category__ = 'General'
+__category__ = "General"
 
 
 class ToolsBrick(BaseWidget):
     """Adds a tool menu to the toolbar. Actions are configured via xml.
        Action call method from hwobj.
     """
- 
+
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -43,7 +43,7 @@ class ToolsBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property('mnemonic', 'string', '')
+        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -80,7 +80,7 @@ class ToolsBrick(BaseWidget):
         for key in self.action_dict.keys():
             tool = self.action_dict[key]
             if tool.get("expertMode") is not None:
-               key.setEnabled(is_expert_mode)
+                key.setEnabled(is_expert_mode)
 
     def init_tools(self):
         """Gets available methods and populates menubar with methods
@@ -91,9 +91,9 @@ class ToolsBrick(BaseWidget):
             if tool == "separator":
                 self.tools_menu.addSeparator()
             elif hasattr(tool["hwobj"], tool["method"]):
-                temp_action = self.tools_menu.addAction(\
-                    tool["display"],
-                    self.execute_tool)
+                temp_action = self.tools_menu.addAction(
+                    tool["display"], self.execute_tool
+                )
                 if tool.get("icon"):
                     temp_action.setIcon(Icons.load_icon(tool["icon"]))
                 temp_action.setDisabled(tool.get("expertMode", False))
@@ -107,8 +107,12 @@ class ToolsBrick(BaseWidget):
             if key == self.sender():
                 tool = self.action_dict[key]
                 if tool.get("confirmation"):
-                    conf_dialog = QtImport.QMessageBox(QtImport.QMessageBox.Question, "Question",
-                         str(tool["confirmation"]), QtImport.QMessageBox.Ok | QtImport.QMessageBox.Cancel)
+                    conf_dialog = QtImport.QMessageBox(
+                        QtImport.QMessageBox.Question,
+                        "Question",
+                        str(tool["confirmation"]),
+                        QtImport.QMessageBox.Ok | QtImport.QMessageBox.Cancel,
+                    )
                     rec = QtImport.QApplication.desktop().screenGeometry()
                     pos_x = rec.right() + rec.width() / 2 - conf_dialog.width() / 2
                     pos_y = rec.height() / 2

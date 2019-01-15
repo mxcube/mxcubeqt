@@ -8,4 +8,4 @@ if __name__ == "__main__":
         if _file.endswith('.ui'):
             py_file = _file.split('.')[0] + '.py'
             print 'pyuic -x ./ui_files/' + str(_file) + ' > ' + py_file
-            call('pyuic -x ./ui_files/' + str(_file) + ' > ' + py_file, shell = True)
+            call('pyuic -x ./ui_files/' + str(_file) + ' > ' + py_file, shell=True)

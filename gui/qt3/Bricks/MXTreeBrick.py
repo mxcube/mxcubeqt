@@ -6,27 +6,27 @@ import dc_tree_widget
 import logging
 import sys
 
-__category__ = 'mxCuBE'
+__category__ = "mxCuBE"
 
-ViewType = namedtuple('ViewType', ['ISPYB', 'MANUAL', 'SC'])
+ViewType = namedtuple("ViewType", ["ISPYB", "MANUAL", "SC"])
 TREE_VIEW_TYPE = ViewType(0, 1, 2)
+
 
 class MXTreeBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
         BaseComponents.BlissWidget.__init__(self, *args)
 
         reload(dc_tree_widget)
-        
+
         self.defineSlot("add_data_collection", ())
         self.defineSlot("get_selected_sample", ())
         self.defineSignal("hideParametersTab", ())
         self.defineSignal("hideSampleCentringTab", ())
         self.defineSignal("populateParameterTable", ())
         self.defineSignal("get_tree_selection_changed", ())
-        
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
-                                       QSizePolicy.Expanding))
-                                       
+
+        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding))
+
         self.view_combo_box = QComboBox(self, "view_combo_box")
         self.view_combo_box.insertItem("ISPyB")
         self.view_combo_box.insertItem("Manual")
@@ -50,31 +50,30 @@ class MXTreeBrick(BaseComponents.BlissWidget):
         self.ispyb_tree_widget.init_with_ispyb_data(get_sample_data())
         self.ispyb_tree_widget.hide()
 
-        QObject.connect(self.view_combo_box, SIGNAL("activated(int)"),
-                        self.combo_box_activated)
+        QObject.connect(
+            self.view_combo_box, SIGNAL("activated(int)"), self.combo_box_activated
+        )
 
         QVBoxLayout(self)
         self.layout().addWidget(self.view_combo_box)
         self.layout().addWidget(self.sc_tree_widget)
         self.layout().addWidget(self.cs_tree_widget)
         self.layout().addWidget(self.ispyb_tree_widget)
-        
 
     def combo_box_activated(self, index):
-       
-         if index == TREE_VIEW_TYPE.ISPYB:
-             self.cs_tree_widget.hide()
-             self.sc_tree_widget.hide()
-             self.ispyb_tree_widget.show()
-         elif index == TREE_VIEW_TYPE.MANUAL:
-             self.cs_tree_widget.show()
-             self.sc_tree_widget.hide()
-             self.ispyb_tree_widget.hide()
-         elif index == TREE_VIEW_TYPE.SC:
-             self.sc_tree_widget.show()
-             self.cs_tree_widget.hide()
-             self.ispyb_tree_widget.hide()
-             
+
+        if index == TREE_VIEW_TYPE.ISPYB:
+            self.cs_tree_widget.hide()
+            self.sc_tree_widget.hide()
+            self.ispyb_tree_widget.show()
+        elif index == TREE_VIEW_TYPE.MANUAL:
+            self.cs_tree_widget.show()
+            self.sc_tree_widget.hide()
+            self.ispyb_tree_widget.hide()
+        elif index == TREE_VIEW_TYPE.SC:
+            self.sc_tree_widget.show()
+            self.cs_tree_widget.hide()
+            self.ispyb_tree_widget.hide()
 
     def selection_changed(self, item, dc):
         if item.node_type == dc_tree_widget.ITEM_TYPES.SAMPLE:
@@ -85,12 +84,11 @@ class MXTreeBrick(BaseComponents.BlissWidget):
             self.emit(PYSIGNAL("hideSampleCentringTab"), (True,))
             self.emit(PYSIGNAL("hideParametersTab"), (False,))
             self.emit(PYSIGNAL("populateParameterTable"), (dc,))
-    
+
         self.emit(PYSIGNAL("tree_selection_changed"), (item,))
 
-
     def get_selected_sample(self, selected_sample_dict):
-        index =  self.view_combo_box.currentItem()
+        index = self.view_combo_box.currentItem()
         selected_sample = None
 
         if index == TREE_VIEW_TYPE.ISPYB:
@@ -103,15 +101,13 @@ class MXTreeBrick(BaseComponents.BlissWidget):
         if selected_sample:
             if selected_sample.node_type != dc_tree_widget.ITEM_TYPES.SAMPLE:
                 selected_sample = None
-        selected_sample_dict["sample_item"]=selected_sample
-
+        selected_sample_dict["sample_item"] = selected_sample
 
     def run(self):
         self.emit(PYSIGNAL("hideParametersTab"), (True,))
         self.emit(PYSIGNAL("hideSampleCentringTab"), (False,))
 
-    
-    def propertyChanged(self,propertyName,oldValue,newValue):
+    def propertyChanged(self, propertyName, oldValue, newValue):
         # SAMPLE CODE: HOW TO DEAL WITH PROPERTY CHANGES
         # (PROPERTIES ARE SHOWN IN PROPERTY EDITOR IN DESIGN MODE ;
         # PROPERTIES COME FROM ADDPROPERTY IN CONSTRUCTOR)
@@ -127,11 +123,10 @@ class MXTreeBrick(BaseComponents.BlissWidget):
         """
         pass
 
-
     def add_data_collection(self, parameters, collection_type):
 
-        index =  self.view_combo_box.currentItem()
-        
+        index = self.view_combo_box.currentItem()
+
         if index == TREE_VIEW_TYPE.ISPYB:
             self.ispyb_tree_widget.add_data_collection(parameters, collection_type)
         elif index == TREE_VIEW_TYPE.MANUAL:
@@ -140,23 +135,25 @@ class MXTreeBrick(BaseComponents.BlissWidget):
             self.sc_tree_widget.add_data_collection(parameters, collection_type)
 
 
-def get_sample_changer_data() :
+def get_sample_changer_data():
 
-    sc_data = [('#ABCDEF12345', 1, 1, '', 16),
-               ('#ABCDEF12345', 1, 2, '', 1),
-               ('#ABCDEF12345', 1, 3, '', 1),
-               ('#ABCDEF12345', 1, 4, '', 1),
-               ('#ABCDEF12345', 1, 5, '', 1),
-               ('#ABCDEF12345', 1, 6, '', 1),
-               ('#ABCDEF12345', 1, 7, '', 1),
-               ('#ABCDEF12345', 1, 8, '', 1),
-               ('#ABCDEF12345', 1, 9, '', 1),
-               ('#ABCDEF12345', 1, 10, '', 1),
-               ('#ABCDEF12345', 5, 10, '', 1)]
+    sc_data = [
+        ("#ABCDEF12345", 1, 1, "", 16),
+        ("#ABCDEF12345", 1, 2, "", 1),
+        ("#ABCDEF12345", 1, 3, "", 1),
+        ("#ABCDEF12345", 1, 4, "", 1),
+        ("#ABCDEF12345", 1, 5, "", 1),
+        ("#ABCDEF12345", 1, 6, "", 1),
+        ("#ABCDEF12345", 1, 7, "", 1),
+        ("#ABCDEF12345", 1, 8, "", 1),
+        ("#ABCDEF12345", 1, 9, "", 1),
+        ("#ABCDEF12345", 1, 10, "", 1),
+        ("#ABCDEF12345", 5, 10, "", 1),
+    ]
 
     return sc_data
 
 
 def get_sample_data():
-    sc_data = [('Current sample', '0:0', '', 16)]
+    sc_data = [("Current sample", "0:0", "", 16)]
     return sc_data

@@ -5,7 +5,8 @@ import logging
 import sys
 import pprint
 
-__category__ = 'mxCuBE_v3'
+__category__ = "mxCuBE_v3"
+
 
 class DCGBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):

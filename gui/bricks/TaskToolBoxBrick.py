@@ -51,7 +51,7 @@ class TaskToolBoxBrick(BaseWidget):
         self.ispyb_logged_in = False
         self.tree_brick = None
 
-        # Properties ---------------------------------------------------------- 
+        # Properties ----------------------------------------------------------
         self.add_property("beamline_setup", "string", "/beamline-setup")
         self.add_property("queue_model", "string", "/queue-model")
         self.add_property("useOscStartCbox", "boolean", False)
@@ -62,14 +62,14 @@ class TaskToolBoxBrick(BaseWidget):
         self.add_property("showAdvancedTask", "boolean", True)
         self.add_property("showStillScanTask", "boolean", False)
         self.add_property("showCollectNowButton", "boolean", False)
-       
+
         # Signals -------------------------------------------------------------
         self.define_signal("request_tree_brick", ())
 
         # Slots ---------------------------------------------------------------
         self.define_slot("logged_in", ())
         self.define_slot("set_session", ())
-        self.define_slot("selection_changed",())
+        self.define_slot("selection_changed", ())
         self.define_slot("user_group_saved", ())
         self.define_slot("set_tree_brick", ())
 
@@ -84,11 +84,11 @@ class TaskToolBoxBrick(BaseWidget):
         self.setLayout(self.main_layout)
 
         # SizePolicies --------------------------------------------------------
-        #self.setSizePolicy(QtImport.QSizePolicy.MinimumExpanding,
+        # self.setSizePolicy(QtImport.QSizePolicy.MinimumExpanding,
         #                   QtImport.QSizePolicy.MinimumExpanding)
 
-        # Other --------------------------------------------------------------- 
-        #self.setEnabled(self.ispyb_logged_in)
+        # Other ---------------------------------------------------------------
+        # self.setEnabled(self.ispyb_logged_in)
 
     def set_expert_mode(self, state):
         self.task_tool_box_widget.set_expert_mode(state)
@@ -98,99 +98,117 @@ class TaskToolBoxBrick(BaseWidget):
         if self.session_hwobj.session_id:
             self.setEnabled(True)
 
-        self.request_tree_brick.emit() 
+        self.request_tree_brick.emit()
         self.task_tool_box_widget.adjust_width(self.width())
 
     def user_group_saved(self, new_user_group):
         self.session_hwobj.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
         path = self.session_hwobj.get_base_image_directory() + "/" + str(new_user_group)
-        msg = 'Image path is: %s' % path
-        logging.getLogger('GUI').info(msg)
+        msg = "Image path is: %s" % path
+        logging.getLogger("GUI").info(msg)
 
     @QtImport.pyqtSlot(BaseWidget)
     def set_tree_brick(self, brick):
         self.tree_brick = brick
-        self.tree_brick.compression_state = self['useCompression'] == 1
+        self.tree_brick.compression_state = self["useCompression"] == 1
         self.task_tool_box_widget.set_tree_brick(brick)
-    
+
     @QtImport.pyqtSlot(int, str, str, int, str, str, bool)
-    def set_session(self, session_id, t_prop_code = None, prop_number = None,
-                    prop_id = None, start_date = None, prop_code = None, 
-                    is_inhouse = None):
+    def set_session(
+        self,
+        session_id,
+        t_prop_code=None,
+        prop_number=None,
+        prop_id=None,
+        start_date=None,
+        prop_code=None,
+        is_inhouse=None,
+    ):
         """
         Connected to the slot set_session and is called after a
-        request to get the current session from LIMS (ISPyB) is  
-        made. The signal is normally emitted by the brick that 
+        request to get the current session from LIMS (ISPyB) is
+        made. The signal is normally emitted by the brick that
         handles LIMS login, ie ProposalBrick.
         The session_id is '' if no session could be retrieved.
         """
-        if session_id is '':
+        if session_id is "":
             self.logged_in(True)
-
 
     @QtImport.pyqtSlot(bool)
     def logged_in(self, logged_in):
         """
-        Handels the signal logged_in from the brick the handles 
-        LIMS (ISPyB) login, ie ProposalBrick. The signal is 
+        Handels the signal logged_in from the brick the handles
+        LIMS (ISPyB) login, ie ProposalBrick. The signal is
         emitted when a user was succesfully logged in.
         """
-        logged_in = True        
+        logged_in = True
 
         self.ispyb_logged_in = logged_in
-        
+
         if self.session_hwobj is not None:
-            self.session_hwobj.set_user_group('')
+            self.session_hwobj.set_user_group("")
 
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)
-    
+
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'beamline_setup':
+        if property_name == "beamline_setup":
             self.beamline_setup_hwobj = self.get_hardware_object(new_value)
             if self.beamline_setup_hwobj:
                 if self.queue_model_hwobj:
                     self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
-                    self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-                self.graphics_manager_hwobj = self.beamline_setup_hwobj.shape_history_hwobj
+                    self.task_tool_box_widget.set_beamline_setup(
+                        self.beamline_setup_hwobj
+                    )
+                self.graphics_manager_hwobj = (
+                    self.beamline_setup_hwobj.shape_history_hwobj
+                )
                 if self.graphics_manager_hwobj:
-                    self.graphics_manager_hwobj.connect('pointSelected', self.point_selected)
-                    self.graphics_manager_hwobj.connect('pointDeleted', self.point_deleted) 
+                    self.graphics_manager_hwobj.connect(
+                        "pointSelected", self.point_selected
+                    )
+                    self.graphics_manager_hwobj.connect(
+                        "pointDeleted", self.point_deleted
+                    )
             else:
-                logging.getLogger('GUI').error('Could not load beamline setup '+\
-                                                          'check configuration !.')
-        elif property_name == 'queue_model':
+                logging.getLogger("GUI").error(
+                    "Could not load beamline setup " + "check configuration !."
+                )
+        elif property_name == "queue_model":
             self.queue_model_hwobj = self.get_hardware_object(new_value)
             if self.beamline_setup_hwobj:
                 self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
                 self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-        elif property_name == 'useOscStartCbox':
+        elif property_name == "useOscStartCbox":
             self.task_tool_box_widget.use_osc_start_cbox(new_value)
-        elif property_name == 'useCompression':
+        elif property_name == "useCompression":
             self.task_tool_box_widget.enable_compression(new_value)
-        elif property_name == 'showCollectNowButton':
+        elif property_name == "showCollectNowButton":
             self.task_tool_box_widget.collect_now_button.setVisible(new_value)
-        elif property_name == 'showDiscreetTask':
+        elif property_name == "showDiscreetTask":
             if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.discrete_page) 
+                self.task_tool_box_widget.hide_task(
+                    self.task_tool_box_widget.discrete_page
+                )
         elif property_name == "showHelicalTask":
             if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.helical_page)
+                self.task_tool_box_widget.hide_task(
+                    self.task_tool_box_widget.helical_page
+                )
         elif property_name == "showCharTask":
             if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.char_page)
+                self.task_tool_box_widget.hide_task(self.task_tool_box_widget.char_page)
         elif property_name == "showAdvancedTask":
             if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.advanced_page)
+                self.task_tool_box_widget.hide_task(
+                    self.task_tool_box_widget.advanced_page
+                )
         elif property_name == "showStillScanTask":
             if not new_value:
-                self.task_tool_box_widget.hide_task(\
-                     self.task_tool_box_widget.still_scan_page)
+                self.task_tool_box_widget.hide_task(
+                    self.task_tool_box_widget.still_scan_page
+                )
 
     def selection_changed(self, items):
         """
@@ -200,16 +218,21 @@ class TaskToolBoxBrick(BaseWidget):
         self.task_tool_box_widget.selection_changed(items)
 
     def point_selected(self, selected_position):
-        self.task_tool_box_widget.helical_page.\
-            centred_position_selection(selected_position)
-        self.task_tool_box_widget.discrete_page.\
-            centred_position_selection(selected_position)
-        self.task_tool_box_widget.char_page.\
-            centred_position_selection(selected_position)
-        self.task_tool_box_widget.energy_scan_page.\
-            centred_position_selection(selected_position)
-        self.task_tool_box_widget.xrf_spectrum_page.\
-            centred_position_selection(selected_position)
+        self.task_tool_box_widget.helical_page.centred_position_selection(
+            selected_position
+        )
+        self.task_tool_box_widget.discrete_page.centred_position_selection(
+            selected_position
+        )
+        self.task_tool_box_widget.char_page.centred_position_selection(
+            selected_position
+        )
+        self.task_tool_box_widget.energy_scan_page.centred_position_selection(
+            selected_position
+        )
+        self.task_tool_box_widget.xrf_spectrum_page.centred_position_selection(
+            selected_position
+        )
 
         self.task_tool_box_widget.discrete_page.refresh_current_item()
         self.task_tool_box_widget.helical_page.refresh_current_item()
@@ -221,4 +244,4 @@ class TaskToolBoxBrick(BaseWidget):
         """
         Callback for the DrawingEvent object called when a shape is deleted.
         """
-        self.task_tool_box_widget.helical_page.shape_deleted(shape) 
+        self.task_tool_box_widget.helical_page.shape_deleted(shape)

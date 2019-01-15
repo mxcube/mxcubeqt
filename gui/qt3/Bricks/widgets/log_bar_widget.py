@@ -4,8 +4,9 @@ import gevent
 
 from BlissFramework.Utils import widget_colors
 
+
 class LogBarWidget(qt.QWidget):
-    def __init__(self, parent = None, name = "log_bar_widget", fl = 0):
+    def __init__(self, parent=None, name="log_bar_widget", fl=0):
         qt.QWidget.__init__(self, parent, name, fl)
 
         self.text_edit = qt.QTextEdit(self, "text_edit")
@@ -31,4 +32,3 @@ class LogBarWidget(qt.QWidget):
         brush = self.text_edit.paper()
         brush.setColor(qt_color)
         self.text_edit.setPaper(brush)
-            

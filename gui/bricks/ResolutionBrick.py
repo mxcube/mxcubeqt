@@ -30,14 +30,16 @@ __category__ = "General"
 
 class ResolutionBrick(BaseWidget):
 
-    STATE_COLORS = (Colors.LIGHT_RED,
-                    Colors.LIGHT_RED,
-                    Colors.LIGHT_GREEN,
-                    Colors.LIGHT_YELLOW,
-                    Colors.LIGHT_YELLOW,
-                    Colors.LIGHT_YELLOW,
-                    QtImport.QColor(255,165,0),
-                    Colors.LIGHT_RED)   
+    STATE_COLORS = (
+        Colors.LIGHT_RED,
+        Colors.LIGHT_RED,
+        Colors.LIGHT_GREEN,
+        Colors.LIGHT_YELLOW,
+        Colors.LIGHT_YELLOW,
+        Colors.LIGHT_YELLOW,
+        QtImport.QColor(255, 165, 0),
+        Colors.LIGHT_RED,
+    )
 
     def __init__(self, *args):
 
@@ -54,14 +56,14 @@ class ResolutionBrick(BaseWidget):
         self.detector_distance_limits = None
         self.door_interlocked = True
 
-        # Properties ---------------------------------------------------------- 
-        self.add_property('resolution', 'string', '')
-        self.add_property('detectorDistance', 'string', '')
-        self.add_property('energy', 'string', '')
-        self.add_property('doorInterlock', 'string', '') 
-        self.add_property('defaultMode', 'combo',('Ang','mm'),'Ang')
-        self.add_property('mmFormatString','formatString','###.##')
-        self.add_property('angFormatString','formatString','##.###')        
+        # Properties ----------------------------------------------------------
+        self.add_property("resolution", "string", "")
+        self.add_property("detectorDistance", "string", "")
+        self.add_property("energy", "string", "")
+        self.add_property("doorInterlock", "string", "")
+        self.add_property("defaultMode", "combo", ("Ang", "mm"), "Ang")
+        self.add_property("mmFormatString", "formatString", "###.##")
+        self.add_property("angFormatString", "formatString", "##.###")
 
         self.group_box = QtImport.QGroupBox("Resolution", self)
         current_label = QtImport.QLabel("Current:", self.group_box)
@@ -70,10 +72,10 @@ class ResolutionBrick(BaseWidget):
         self.resolution_ledit = QtImport.QLineEdit(self.group_box)
         self.resolution_ledit.setReadOnly(True)
         self.detector_distance_ledit = QtImport.QLineEdit(self.group_box)
-        self.detector_distance_ledit.setReadOnly(True) 
+        self.detector_distance_ledit.setReadOnly(True)
 
         _new_value_widget = QtImport.QWidget(self)
-        set_to_label = QtImport.QLabel("Set to:",self.group_box)
+        set_to_label = QtImport.QLabel("Set to:", self.group_box)
         self.new_value_ledit = QtImport.QLineEdit(self.group_box)
         self.units_combobox = QtImport.QComboBox(_new_value_widget)
         self.stop_button = QtImport.QPushButton(_new_value_widget)
@@ -111,57 +113,68 @@ class ResolutionBrick(BaseWidget):
         self.units_combobox.activated.connect(self.unit_changed)
         self.stop_button.clicked.connect(self.stop_clicked)
 
-        # Other --------------------------------------------------------------- 
-        Colors.set_widget_color(self.new_value_ledit,
-                                       Colors.LINE_EDIT_ACTIVE,
-                                       QtImport.QPalette.Base)
-        self.new_value_validator = QtImport.QDoubleValidator(\
-             0, 15, 4, self.new_value_ledit)
+        # Other ---------------------------------------------------------------
+        Colors.set_widget_color(
+            self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
+        )
+        self.new_value_validator = QtImport.QDoubleValidator(
+            0, 15, 4, self.new_value_ledit
+        )
 
         self.units_combobox.addItem(chr(197))
         self.units_combobox.addItem("mm")
-        self.instance_synchronize("group_box",
-                                  "resolution_ledit",
-                                  "detector_distance_ledit",
-                                  "new_value_ledit",
-                                  "units_combobox")
+        self.instance_synchronize(
+            "group_box",
+            "resolution_ledit",
+            "detector_distance_ledit",
+            "new_value_ledit",
+            "units_combobox",
+        )
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'resolution':
+        if property_name == "resolution":
             if self.resolution_hwobj is not None:
-                self.disconnect(self.resolution_hwobj,
-                                'deviceReady',
-                                self.resolution_ready)
-                self.disconnect(self.resolution_hwobj,
-                                'deviceNotReady',
-                                self.resolution_not_ready)
-                self.disconnect(self.resolution_hwobj,
-                                'stateChanged',
-                                self.resolution_state_changed)
-                self.disconnect(self.resolution_hwobj,
-                                'positionChanged',
-                                self.resolution_value_changed)
-                self.disconnect(self.resolution_hwobj,
-                                'limitsChanged',
-                                self.resolution_limits_changed)
+                self.disconnect(
+                    self.resolution_hwobj, "deviceReady", self.resolution_ready
+                )
+                self.disconnect(
+                    self.resolution_hwobj, "deviceNotReady", self.resolution_not_ready
+                )
+                self.disconnect(
+                    self.resolution_hwobj, "stateChanged", self.resolution_state_changed
+                )
+                self.disconnect(
+                    self.resolution_hwobj,
+                    "positionChanged",
+                    self.resolution_value_changed,
+                )
+                self.disconnect(
+                    self.resolution_hwobj,
+                    "limitsChanged",
+                    self.resolution_limits_changed,
+                )
 
             self.resolution_hwobj = self.get_hardware_object(new_value)
             if self.resolution_hwobj is not None:
-                self.connect(self.resolution_hwobj,
-                             'deviceReady',
-                             self.resolution_ready)
-                self.connect(self.resolution_hwobj,
-                             'deviceNotReady',
-                             self.resolution_not_ready)
-                self.connect(self.resolution_hwobj,
-                             'stateChanged',
-                             self.resolution_state_changed)
-                self.connect(self.resolution_hwobj,
-                             'positionChanged',
-                             self.resolution_value_changed)
-                self.connect(self.resolution_hwobj,
-                             'limitsChanged',
-                             self.resolution_limits_changed)
+                self.connect(
+                    self.resolution_hwobj, "deviceReady", self.resolution_ready
+                )
+                self.connect(
+                    self.resolution_hwobj, "deviceNotReady", self.resolution_not_ready
+                )
+                self.connect(
+                    self.resolution_hwobj, "stateChanged", self.resolution_state_changed
+                )
+                self.connect(
+                    self.resolution_hwobj,
+                    "positionChanged",
+                    self.resolution_value_changed,
+                )
+                self.connect(
+                    self.resolution_hwobj,
+                    "limitsChanged",
+                    self.resolution_limits_changed,
+                )
 
                 if self.resolution_hwobj.isReady():
                     self.resolution_hwobj.update_values()
@@ -169,41 +182,61 @@ class ResolutionBrick(BaseWidget):
                 else:
                     self.disconnected()
             self.update_gui()
-        elif property_name == 'detectorDistance':
+        elif property_name == "detectorDistance":
             if self.detector_distance_hwobj is not None:
-                self.disconnect(self.detector_distance_hwobj,
-                                'deviceReady',
-                                self.detector_distance_ready)
-                self.disconnect(self.detector_distance_hwobj,
-                                'deviceNotReady',
-                                self.detector_distance_not_ready)
-                self.disconnect(self.detector_distance_hwobj,
-                                'stateChanged',
-                                self.detector_distance_state_changed)
-                self.disconnect(self.detector_distance_hwobj,
-                                'positionChanged',
-                                self.detector_distance_changed)
-                self.disconnect(self.detector_distance_hwobj,
-                                'limitsChanged',
-                                self.detector_distance_limits_changed)
+                self.disconnect(
+                    self.detector_distance_hwobj,
+                    "deviceReady",
+                    self.detector_distance_ready,
+                )
+                self.disconnect(
+                    self.detector_distance_hwobj,
+                    "deviceNotReady",
+                    self.detector_distance_not_ready,
+                )
+                self.disconnect(
+                    self.detector_distance_hwobj,
+                    "stateChanged",
+                    self.detector_distance_state_changed,
+                )
+                self.disconnect(
+                    self.detector_distance_hwobj,
+                    "positionChanged",
+                    self.detector_distance_changed,
+                )
+                self.disconnect(
+                    self.detector_distance_hwobj,
+                    "limitsChanged",
+                    self.detector_distance_limits_changed,
+                )
 
             self.detector_distance_hwobj = self.get_hardware_object(new_value)
             if self.detector_distance_hwobj is not None:
-                self.connect(self.detector_distance_hwobj, 
-                             'deviceReady',
-                             self.detector_distance_ready)
-                self.connect(self.detector_distance_hwobj,
-                             'deviceNotReady',
-                             self.detector_distance_not_ready)
-                self.connect(self.detector_distance_hwobj,
-                             'stateChanged',
-                             self.detector_distance_state_changed)
-                self.connect(self.detector_distance_hwobj,
-                             'positionChanged',
-                             self.detector_distance_changed)
-                self.connect(self.detector_distance_hwobj,
-                             'limitsChanged',
-                             self.detector_distance_limits_changed)
+                self.connect(
+                    self.detector_distance_hwobj,
+                    "deviceReady",
+                    self.detector_distance_ready,
+                )
+                self.connect(
+                    self.detector_distance_hwobj,
+                    "deviceNotReady",
+                    self.detector_distance_not_ready,
+                )
+                self.connect(
+                    self.detector_distance_hwobj,
+                    "stateChanged",
+                    self.detector_distance_state_changed,
+                )
+                self.connect(
+                    self.detector_distance_hwobj,
+                    "positionChanged",
+                    self.detector_distance_changed,
+                )
+                self.connect(
+                    self.detector_distance_hwobj,
+                    "limitsChanged",
+                    self.detector_distance_limits_changed,
+                )
 
                 if self.detector_distance_hwobj.is_ready():
                     self.detector_distance_hwobj.update_values()
@@ -211,27 +244,33 @@ class ResolutionBrick(BaseWidget):
                 else:
                     self.disconnected()
             self.update_gui()
-        elif property_name == 'energy':
+        elif property_name == "energy":
             if self.energy_hwobj is not None:
-                self.disconnect(self.energy_hwobj,
-                                'moveEnergyFinished',
-                                self.energy_changed)
+                self.disconnect(
+                    self.energy_hwobj, "moveEnergyFinished", self.energy_changed
+                )
             self.energy_hwobj = self.get_hardware_object(new_value)
             if self.energy_hwobj is not None:
-                self.connect(self.energy_hwobj, 
-                             'moveEnergyFinished', 
-                             self.energy_changed)
+                self.connect(
+                    self.energy_hwobj, "moveEnergyFinished", self.energy_changed
+                )
 
-        elif property_name == 'doorInterlock':
+        elif property_name == "doorInterlock":
             if self.door_interlock_hwobj is not None:
-                self.disconnect(self.door_interlock_hwobj,
-                                'doorInterlockStateChanged',
-                                self.door_interlock_state_changed)
-            self.door_interlock_hwobj = self.get_hardware_object(new_value, optional=True)
+                self.disconnect(
+                    self.door_interlock_hwobj,
+                    "doorInterlockStateChanged",
+                    self.door_interlock_state_changed,
+                )
+            self.door_interlock_hwobj = self.get_hardware_object(
+                new_value, optional=True
+            )
             if self.door_interlock_hwobj is not None:
-                self.connect(self.door_interlock_hwobj,
-                             'doorInterlockStateChanged',
-                             self.door_interlock_state_changed)
+                self.connect(
+                    self.door_interlock_hwobj,
+                    "doorInterlockStateChanged",
+                    self.door_interlock_state_changed,
+                )
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
@@ -239,34 +278,35 @@ class ResolutionBrick(BaseWidget):
         self.update_gui()
 
     def input_field_changed(self, input_field_text):
-        if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtImport.QValidator.Acceptable:
-            Colors.set_widget_color(\
-                self.new_value_ledit,
-                Colors.LINE_EDIT_CHANGED,
-                QtImport.QPalette.Base)
+        if (
+            self.new_value_validator.validate(input_field_text, 0)[0]
+            == QtImport.QValidator.Acceptable
+        ):
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+            )
         else:
-           Colors.set_widget_color(\
-                self.new_value_ledit,
-                Colors.LINE_EDIT_ERROR,
-                QtImport.QPalette.Base)
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
+            )
 
     def current_value_changed(self):
         input_field_text = self.new_value_ledit.text()
 
-        if self.new_value_validator.validate(input_field_text, 0)[0] == \
-           QtImport.QValidator.Acceptable:
+        if (
+            self.new_value_validator.validate(input_field_text, 0)[0]
+            == QtImport.QValidator.Acceptable
+        ):
             unit = self.units_combobox.currentText()
             value = float()
             self.new_value_ledit.setText("")
             if unit == chr(197):
                 self.set_resolution(float(input_field_text))
-            elif unit=="mm":
+            elif unit == "mm":
                 self.set_detector_distance(float(input_field_text))
-            Colors.set_widget_color(\
-                 self.new_value_ledit,
-                 Colors.LINE_EDIT_ACTIVE,
-                 QtImport.QPalette.Base)
+            Colors.set_widget_color(
+                self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
+            )
 
     def connected(self):
         self.setEnabled(True)
@@ -283,19 +323,21 @@ class ResolutionBrick(BaseWidget):
         if limits:
             self.resolution_limits = limits
             self.update_gui()
-    
+
     def create_tool_tip(self):
         tool_tip = ""
         if self.units_combobox.currentText() == "mm":
             if self.detector_distance_limits:
-                tool_tip = "Detector distance limits %0.4f : %0.4f mm" \
-                           %(self.detector_distance_limits[0],
-                             self.detector_distance_limits[1])
+                tool_tip = "Detector distance limits %0.4f : %0.4f mm" % (
+                    self.detector_distance_limits[0],
+                    self.detector_distance_limits[1],
+                )
         elif self.resolution_limits:
-            tool_tip = "Resolution limits %0.4f : %0.4f %s"\
-                       %(self.resolution_limits[0], 
-                         self.resolution_limits[1],
-                         chr(197))
+            tool_tip = "Resolution limits %0.4f : %0.4f %s" % (
+                self.resolution_limits[0],
+                self.resolution_limits[1],
+                chr(197),
+            )
         if not self.door_interlocked:
             tool_tip = "\n\nMove resolution command disabled."
             tool_tip += "\nLock the hutch doors to enable."
@@ -327,15 +369,18 @@ class ResolutionBrick(BaseWidget):
             self.get_detector_distance_limits()
             curr_detector_distance = self.detector_distance_hwobj.get_position()
             self.detector_distance_changed(curr_detector_distance)
-            self.detector_distance_state_changed(self.detector_distance_hwobj.get_state())
+            self.detector_distance_state_changed(
+                self.detector_distance_hwobj.get_state()
+            )
             if self.units_combobox.currentText() == "mm":
-                groupbox_title = 'Detector distance'
-                self.new_value_validator.setRange(self.detector_distance_limits[0],
-                                                  self.detector_distance_limits[1],
-                                                  2)
+                groupbox_title = "Detector distance"
+                self.new_value_validator.setRange(
+                    self.detector_distance_limits[0],
+                    self.detector_distance_limits[1],
+                    2,
+                )
         else:
             self.detector_distance_state_changed(None)
-
 
         if self.resolution_hwobj is None:
             resolution_ready = False
@@ -346,17 +391,16 @@ class ResolutionBrick(BaseWidget):
             except AttributeError:
                 resolution_ready = self.resolution_hwobj.isReady()
 
-
         if resolution_ready:
             self.get_resolution_limits()
             curr_resolution = self.resolution_hwobj.getPosition()
             self.resolution_value_changed(curr_resolution)
             self.resolution_state_changed(self.resolution_hwobj.getState())
             if self.units_combobox.currentText() != "mm":
-                groupbox_title = 'Resolution'
-                self.new_value_validator.setRange(self.resolution_limits[0],
-                                                  self.resolution_limits[1],
-                                                  3)
+                groupbox_title = "Resolution"
+                self.new_value_validator.setRange(
+                    self.resolution_limits[0], self.resolution_limits[1], 3
+                )
         else:
             self.resolution_state_changed(None)
 
@@ -385,18 +429,22 @@ class ResolutionBrick(BaseWidget):
 
     def set_detector_distance(self, value):
         if self.detector_distance_limits is not None:
-            if self.detector_distance_limits[0] < value < self.detector_distance_limits[1]:
+            if (
+                self.detector_distance_limits[0]
+                < value
+                < self.detector_distance_limits[1]
+            ):
                 self.detector_distance_hwobj.move(value)
 
     def energy_changed(self):
         self.get_resolution_limits(True)
 
-    def get_resolution_limits(self, force = False, resolution_ready = None):
+    def get_resolution_limits(self, force=False, resolution_ready=None):
         if self.resolution_limits is not None and force is False:
             return
 
         if resolution_ready is None:
-            resolution_ready=False
+            resolution_ready = False
             if self.resolution_hwobj is not None:
                 try:
                     if self.resolution_hwobj.connection.isSpecConnected():
@@ -405,7 +453,7 @@ class ResolutionBrick(BaseWidget):
                     resolution_ready = self.resolution_hwobj.isReady()
 
         if resolution_ready:
-            #TODO remove this check and use get_limits
+            # TODO remove this check and use get_limits
             if hasattr(self.resolution_hwobj, "getLimits"):
                 self.resolution_limits_changed(self.resolution_hwobj.getLimits())
             else:
@@ -413,7 +461,7 @@ class ResolutionBrick(BaseWidget):
         else:
             self.resolution_limits = None
 
-    def get_detector_distance_limits(self, force = False):
+    def get_detector_distance_limits(self, force=False):
         if self.detector_distance_limits is not None and force is False:
             return
 
@@ -423,21 +471,23 @@ class ResolutionBrick(BaseWidget):
                 if self.detector_distance_hwobj.connection.isSpecConnected():
                     detector_ready = self.detector_distance_hwobj.is_ready()
             except AttributeError:
-                detector_ready=self.detector_distance_hwobj.is_ready()
+                detector_ready = self.detector_distance_hwobj.is_ready()
 
         if detector_ready:
-            self.detector_distance_limits_changed(self.detector_distance_hwobj.get_limits())
+            self.detector_distance_limits_changed(
+                self.detector_distance_hwobj.get_limits()
+            )
         else:
             self.detector_distance_limits = None
 
     def resolution_value_changed(self, value):
         if value:
-            resolution_str = self['angFormatString'] % float(value)
+            resolution_str = self["angFormatString"] % float(value)
             self.resolution_ledit.setText("%s %s" % (resolution_str, u"\u212B"))
 
     def detector_distance_changed(self, value):
         if value:
-            detector_str = self['mmFormatString'] % value
+            detector_str = self["mmFormatString"] % value
             self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
@@ -456,7 +506,8 @@ class ResolutionBrick(BaseWidget):
                     self.new_value_ledit.setEnabled(True)
                 else:
                     self.new_value_ledit.setEnabled(False)
-                if state == self.detector_distance_hwobj.motor_states.MOVING: #or state == self.detector_distance_hwobj.motor_states.MOVESTARTED:
+                # or state == self.detector_distance_hwobj.motor_states.MOVESTARTED:
+                if state == self.detector_distance_hwobj.motor_states.MOVING:
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
@@ -477,8 +528,8 @@ class ResolutionBrick(BaseWidget):
                 self.new_value_ledit.setEnabled(True)
             else:
                 self.new_value_ledit.setEnabled(False)
-            if state == self.detector_distance_hwobj.motor_states.MOVING : #or \
-                #state == self.detector_distance_hwobj.motor_states.MOVESTARTED:
+            if state == self.detector_distance_hwobj.motor_states.MOVING:  # or \
+                # state == self.detector_distance_hwobj.motor_states.MOVESTARTED:
                 self.stop_button.setEnabled(True)
             else:
                 self.stop_button.setEnabled(False)
@@ -493,5 +544,5 @@ class ResolutionBrick(BaseWidget):
             self.detector_distance_hwobj.stop()
 
     def door_interlock_state_changed(self, state, state_message):
-        self.door_interlocked = state in ['locked_active', 'locked_inactive']
+        self.door_interlocked = state in ["locked_active", "locked_inactive"]
         self.update_gui()

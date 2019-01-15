@@ -29,7 +29,6 @@ __category__ = "General"
 
 
 class PhaseBrick(BaseWidget):
- 
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -40,14 +39,14 @@ class PhaseBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property('mnemonic', 'string', '')
+        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QtImport.QGroupBox("Phase", self) 
+        self.group_box = QtImport.QGroupBox("Phase", self)
         self.phase_combobox = QtImport.QComboBox(self.group_box)
 
         # Layout --------------------------------------------------------------
@@ -66,27 +65,31 @@ class PhaseBrick(BaseWidget):
 
         # Qt signal/slot connections ------------------------------------------
         self.phase_combobox.activated.connect(self.change_phase)
- 
+
         # Other ---------------------------------------------------------------
-        Colors.set_widget_color(self.phase_combobox,
-                                           Colors.LIGHT_GREEN,
-                                           QtImport.QPalette.Button)
- 
+        Colors.set_widget_color(
+            self.phase_combobox, Colors.LIGHT_GREEN, QtImport.QPalette.Button
+        )
+
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.diffractometer_hwobj is not None:
-                self.disconnect(self.diffractometer_hwobj,
-                                'minidiffPhaseChanged', 
-                                self.phase_changed)
+                self.disconnect(
+                    self.diffractometer_hwobj,
+                    "minidiffPhaseChanged",
+                    self.phase_changed,
+                )
 
             self.diffractometer_hwobj = self.get_hardware_object(new_value)
 
             if self.diffractometer_hwobj is not None:
                 self.init_phase_list()
-                
-                self.connect(self.diffractometer_hwobj,
-                             'minidiffPhaseChanged', 
-                             self.phase_changed)
+
+                self.connect(
+                    self.diffractometer_hwobj,
+                    "minidiffPhaseChanged",
+                    self.phase_changed,
+                )
                 self.diffractometer_hwobj.update_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
@@ -95,21 +98,22 @@ class PhaseBrick(BaseWidget):
         self.phase_combobox.clear()
         phase_list = self.diffractometer_hwobj.get_phase_list()
         if len(phase_list) > 0:
-           for phase in phase_list:
-               self.phase_combobox.addItem(phase)           
-           self.setEnabled(True)
+            for phase in phase_list:
+                self.phase_combobox.addItem(phase)
+            self.setEnabled(True)
         else:
-           self.setEnabled(False)
-    
+            self.setEnabled(False)
+
     def change_phase(self):
         if self.diffractometer_hwobj is not None:
-            self.diffractometer_hwobj.set_phase(self.phase_combobox.currentText(), timeout=None)
+            self.diffractometer_hwobj.set_phase(
+                self.phase_combobox.currentText(), timeout=None
+            )
 
     def phase_changed(self, phase):
-        if (phase.lower() != "unknown" and
-            self.phase_combobox.count() > 0):
-            #index = self.phase_combobox.findText(phase) 
-            #self.phase_combobox.setEditText(phase)
+        if phase.lower() != "unknown" and self.phase_combobox.count() > 0:
+            # index = self.phase_combobox.findText(phase)
+            # self.phase_combobox.setEditText(phase)
             self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
         else:
-            self.phase_combobox.setCurrentIndex(-1) 
+            self.phase_combobox.setCurrentIndex(-1)

@@ -28,7 +28,10 @@ from gui.widgets.acquisition_still_widget import AcquisitionStillWidget
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.processing_widget import ProcessingWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects, queue_model_enumerables
+from HardwareRepository.HardwareObjects import (
+    queue_model_objects,
+    queue_model_enumerables,
+)
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -36,10 +39,10 @@ __license__ = "LGPLv3+"
 
 
 class CreateStillScanWidget(CreateTaskBase):
-
-    def __init__(self,parent=None, name=None, fl=0):
-        CreateTaskBase.__init__(self, parent, name,
-            QtImport.Qt.WindowFlags(fl), "Still")
+    def __init__(self, parent=None, name=None, fl=0):
+        CreateTaskBase.__init__(
+            self, parent, name, QtImport.Qt.WindowFlags(fl), "Still"
+        )
 
         if not name:
             self.setObjectName("create_still_scan_widget")
@@ -50,15 +53,24 @@ class CreateStillScanWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._acq_widget =  AcquisitionStillWidget(self, "acquisition_widget",
-             layout='vertical', acq_params=self._acquisition_parameters,
-             path_template=self._path_template)
+        self._acq_widget = AcquisitionStillWidget(
+            self,
+            "acquisition_widget",
+            layout="vertical",
+            acq_params=self._acquisition_parameters,
+            path_template=self._path_template,
+        )
 
-        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
-            data_model=self._path_template, layout='vertical')
+        self._data_path_widget = DataPathWidget(
+            self,
+            "create_dc_path_widget",
+            data_model=self._path_template,
+            layout="vertical",
+        )
 
-        self._processing_widget = ProcessingWidget(self,
-             data_model=self._processing_parameters)
+        self._processing_widget = ProcessingWidget(
+            self, data_model=self._processing_parameters
+        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
@@ -72,12 +84,13 @@ class CreateStillScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._acq_widget.acqParametersChangedSignal.\
-             connect(self.acq_parameters_changed)
-        self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.path_template_changed)
-        self._processing_widget.enableProcessingSignal.connect(\
-             self._run_processing_toggled)
+        self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.connect(
+            self.path_template_changed
+        )
+        self._processing_widget.enableProcessingSignal.connect(
+            self._run_processing_toggled
+        )
 
         # Other ---------------------------------------------------------------
 
@@ -92,17 +105,18 @@ class CreateStillScanWidget(CreateTaskBase):
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.\
-                               detector_has_shutterless()
+            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
             self._acquisition_parameters.shutterless = has_shutter_less
 
-            self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters("default_acquisition_values")
+            self._acquisition_parameters = self._beamline_setup_hwobj.get_default_acquisition_parameters(
+                "default_acquisition_values"
+            )
             self._acquisition_parameters.num_triggers = 1
             self._acquisition_parameters.num_images_per_trigger = 1
-            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(\
-                self._beamline_setup_hwobj._get_run_processing_parallel())
- 
+            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
+                self._beamline_setup_hwobj._get_run_processing_parallel()
+            )
+
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
 
@@ -121,7 +135,7 @@ class CreateStillScanWidget(CreateTaskBase):
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
-            #self._processing_parameters = copy.deepcopy(self._processing_parameters)
+            # self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_parameters = sample_model.processing_parameters
             self._processing_widget.update_data_model(self._processing_parameters)
         elif isinstance(tree_item, queue_item.BasketQueueItem):
@@ -140,18 +154,20 @@ class CreateStillScanWidget(CreateTaskBase):
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
 
-                #self._acq_widget.disable_inverse_beam(True)
+                # self._acq_widget.disable_inverse_beam(True)
 
                 self._path_template = dc.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
 
                 self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
-                self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                    self._path_template)
-                #self.get_acquisition_widget().use_osc_start(True)
+                self._acq_widget.update_data_model(
+                    self._acquisition_parameters, self._path_template
+                )
+                # self.get_acquisition_widget().use_osc_start(True)
                 if len(dc.acquisitions) == 1:
-                    self.select_shape_with_cpos(self._acquisition_parameters.\
-                                                centred_position)
+                    self.select_shape_with_cpos(
+                        self._acquisition_parameters.centred_position
+                    )
 
                 self._processing_parameters = dc.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
@@ -171,9 +187,17 @@ class CreateStillScanWidget(CreateTaskBase):
 
         return tasks
 
-    def create_dc(self, sample, run_number=None, start_image=None,
-                  num_images=None, osc_start=None, sc=None,
-                  cpos=None, inverse_beam=False):
+    def create_dc(
+        self,
+        sample,
+        run_number=None,
+        start_image=None,
+        num_images=None,
+        osc_start=None,
+        sc=None,
+        cpos=None,
+        inverse_beam=False,
+    ):
         tasks = []
 
         # Acquisition for start position
@@ -199,14 +223,18 @@ class CreateStillScanWidget(CreateTaskBase):
         acq.acquisition_parameters.centred_position = cpos
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
-        dc = queue_model_objects.DataCollection([acq], sample.crystals[0],
-                                                processing_parameters)
+        dc = queue_model_objects.DataCollection(
+            [acq], sample.crystals[0], processing_parameters
+        )
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
-        dc.run_processing_after = self._processing_widget.processing_widget.\
-           run_processing_after_cbox.isChecked()
-        if self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked():
+        dc.run_processing_after = (
+            self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
+        )
+        if (
+            self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked()
+        ):
             dc.run_processing_parallel = "Still"
         dc.set_requires_centring(False)
 

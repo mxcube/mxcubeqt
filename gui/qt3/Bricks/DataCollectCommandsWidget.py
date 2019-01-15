@@ -3,34 +3,35 @@ from BlissFramework import Icons
 import logging
 import ProgressBarBrick
 
+
 class DataCollectCommandsWidget(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
 
-        box1=QHBox(self)
+        box1 = QHBox(self)
         self.stopButton = QToolButton(box1)
         self.stopButton.setTextPosition(QToolButton.BesideIcon)
         self.stopButton.setUsesTextLabel(True)
         self.stopButton.setTextLabel("Stop collection")
         self.stopButton.setPaletteBackgroundColor(QWidget.yellow)
-        QObject.connect(self.stopButton, SIGNAL('clicked()'), self.stopCollect)
+        QObject.connect(self.stopButton, SIGNAL("clicked()"), self.stopCollect)
 
-        spacer1=HorizontalSpacer3(box1)
+        spacer1 = HorizontalSpacer3(box1)
 
         self.skipButton = QToolButton(box1)
         self.skipButton.setTextPosition(QToolButton.BesideIcon)
         self.skipButton.setUsesTextLabel(True)
         self.skipButton.setTextLabel("Skip oscillation")
-        QObject.connect(self.skipButton, SIGNAL('clicked()'), self.skipOscillation)
+        QObject.connect(self.skipButton, SIGNAL("clicked()"), self.skipOscillation)
 
-        self.progressBar=ProgressBarBrick.ProgressBarBrick(self)
+        self.progressBar = ProgressBarBrick.ProgressBarBrick(self)
 
         self.abortButton = QToolButton(self)
         self.abortButton.setTextPosition(QToolButton.BesideIcon)
         self.abortButton.setUsesTextLabel(True)
         self.abortButton.setTextLabel("Abort!")
         self.abortButton.setPaletteBackgroundColor(QWidget.red)
-        QObject.connect(self.abortButton, SIGNAL('clicked()'), self.abortCollect)
+        QObject.connect(self.abortButton, SIGNAL("clicked()"), self.abortCollect)
 
         QGridLayout(self, 1, 3, 0, 0)
         self.layout().addWidget(box1, 0, 0)
@@ -38,34 +39,39 @@ class DataCollectCommandsWidget(QWidget):
         self.layout().addWidget(self.abortButton, 0, 2)
         self.layout().setSpacing(4)
 
-    def setIcons(self,stop_icon,abort_icon,skip_icon):
+    def setIcons(self, stop_icon, abort_icon, skip_icon):
         self.abortButton.setPixmap(Icons.load(abort_icon))
         self.stopButton.setPixmap(Icons.load(stop_icon))
         self.skipButton.setPixmap(Icons.load(skip_icon))
 
     def stopCollect(self):
-        stop_dialog=QMessageBox("Stop collection",\
-            "Are you sure you want to stop the current data collection?",\
-            QMessageBox.Question,QMessageBox.Yes,QMessageBox.No,\
-            QMessageBox.NoButton,self)
+        stop_dialog = QMessageBox(
+            "Stop collection",
+            "Are you sure you want to stop the current data collection?",
+            QMessageBox.Question,
+            QMessageBox.Yes,
+            QMessageBox.No,
+            QMessageBox.NoButton,
+            self,
+        )
 
-        s=self.font().pointSize()
+        s = self.font().pointSize()
         f = stop_dialog.font()
         f.setPointSize(s)
         stop_dialog.setFont(f)
         stop_dialog.updateGeometry()
-        if stop_dialog.exec_loop()==QMessageBox.Yes:
-            self.emit(PYSIGNAL("stopCollect"),())
+        if stop_dialog.exec_loop() == QMessageBox.Yes:
+            self.emit(PYSIGNAL("stopCollect"), ())
 
     def abortCollect(self):
-        self.emit(PYSIGNAL("abortCollect"),())
+        self.emit(PYSIGNAL("abortCollect"), ())
 
     def skipOscillation(self):
-        self.emit(PYSIGNAL("skipOscillation"),())
+        self.emit(PYSIGNAL("skipOscillation"), ())
 
-    def collectStarted(self,num_oscillations):
+    def collectStarted(self, num_oscillations):
         self.stopButton.setEnabled(True)
-        if num_oscillations>1:
+        if num_oscillations > 1:
             self.skipButton.setEnabled(True)
         self.abortButton.setEnabled(True)
 
@@ -79,8 +85,8 @@ class DataCollectCommandsWidget(QWidget):
         self.skipButton.setEnabled(False)
         self.abortButton.setEnabled(False)
 
-    #def cancelStop(self):
-    #    pass
+        # def cancelStop(self):
+        #    pass
 
         """
         QToolTip.add(self.prefixLabel,"Prefix for the image's filename")
@@ -127,15 +133,17 @@ class DataCollectCommandsWidget(QWidget):
         QToolTip.add(self.collectButton,"Starts the data collection")
         """
 
+
 class HorizontalSpacer(QWidget):
-    def __init__(self,*args):
-        QWidget.__init__(self,*args)
-        self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+    def __init__(self, *args):
+        QWidget.__init__(self, *args)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
 
 class HorizontalSpacer3(QWidget):
-    def __init__(self,*args):
-        QWidget.__init__(self,*args)
-        self.setSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
+    def __init__(self, *args):
+        QWidget.__init__(self, *args)
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
     def sizeHint(self):
-        return QSize(4,0)
+        return QSize(4, 0)

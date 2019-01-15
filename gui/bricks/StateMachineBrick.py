@@ -30,10 +30,9 @@ __category__ = "General"
 
 
 class Qt4_StateMachineBrick(BlissWidget):
-
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
-	
+
         # Hardware objects ----------------------------------------------------
         self.state_machine_hwobj = None
 
@@ -47,14 +46,14 @@ class Qt4_StateMachineBrick(BlissWidget):
         self.condition_value_dict = {}
 
         # Properties ----------------------------------------------------------
-        self.addProperty('hwobj_state_machine', 'string', '')
+        self.addProperty("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _cond_states_gbox = QGroupBox("States \ conditions", self)
+        _cond_states_gbox = QGroupBox(r"States \ conditions", self)
         self.splitter = QSplitter(Qt.Vertical, self)
         self.cond_states_table = QTableWidget(self.splitter)
         self.log_treewidget = QTreeWidget(self.splitter)
@@ -67,7 +66,7 @@ class Qt4_StateMachineBrick(BlissWidget):
         # Layout --------------------------------------------------------------
         _cond_states_gbox_vlayout = QVBoxLayout(_cond_states_gbox)
         _cond_states_gbox_vlayout.addWidget(self.splitter)
-        _cond_states_gbox_vlayout.setSpacing(2) 
+        _cond_states_gbox_vlayout.setSpacing(2)
         _cond_states_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
         _main_vlayout = QHBoxLayout(self)
@@ -79,38 +78,38 @@ class Qt4_StateMachineBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.cond_states_table.verticalHeader().setDefaultSectionSize(20)
         self.cond_states_table.horizontalHeader().setDefaultSectionSize(20)
-        #setSelectionMode(QAbstractItemView::SingleSelection);
+        # setSelectionMode(QAbstractItemView::SingleSelection);
         font = self.cond_states_table.font()
         font.setPointSize(8)
         self.cond_states_table.setFont(font)
 
         self.splitter.setSizes([200, 20])
         self.log_treewidget.setColumnCount(6)
-        self.log_treewidget.setHeaderLabels(\
-             ["State", "Start time", "End time",
-              "Total time", "Previous state", "Notes"])
+        self.log_treewidget.setHeaderLabels(
+            ["State", "Start time", "End time", "Total time", "Previous state", "Notes"]
+        )
         self.graph_graphics_view.setFixedSize(900, 600)
         self.graph_graphics_scene.setSceneRect(0, 0, 900, 600)
         self.graph_graphics_view.setScene(self.graph_graphics_scene)
         self.graph_graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.graph_graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)        
+        self.graph_graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.graph_graphics_view.setDragMode(QGraphicsView.RubberBandDrag)
         self.graph_graphics_view.setRenderHint(QPainter.Antialiasing)
         self.graph_graphics_view.setRenderHint(QPainter.TextAntialiasing)
 
     def propertyChanged(self, property_name, old_value, new_value):
-        if property_name == 'hwobj_state_machine':
+        if property_name == "hwobj_state_machine":
             if self.state_machine_hwobj is not None:
-                self.state_machine_hwobj.disconnect("stateChanged",
-                                                    self.state_changed)
-                self.state_machine_hwobj.disconnect("conditionChanged",
-                                                    self.condition_changed)
+                self.state_machine_hwobj.disconnect("stateChanged", self.state_changed)
+                self.state_machine_hwobj.disconnect(
+                    "conditionChanged", self.condition_changed
+                )
             self.state_machine_hwobj = self.getHardwareObject(new_value)
             if self.state_machine_hwobj is not None:
-                self.state_machine_hwobj.connect("stateChanged",
-                                                 self.state_changed)
-                self.state_machine_hwobj.connect("conditionChanged",
-                                                 self.condition_changed)
+                self.state_machine_hwobj.connect("stateChanged", self.state_changed)
+                self.state_machine_hwobj.connect(
+                    "conditionChanged", self.condition_changed
+                )
                 self.init_state_machine()
                 self.init_state_graph()
                 self.state_machine_hwobj.update_values()
@@ -124,13 +123,15 @@ class Qt4_StateMachineBrick(BlissWidget):
         self.trans_list = self.state_machine_hwobj.get_transition_list()
 
         self.cond_states_table.setRowCount(len(self.cond_list))
-        #conditions = []
-        #for key in self.cond_list.keys():
-        #    conditions.append(self.cond_list[key]['name'])  
-        #self.cond_states_table.setVerticalHeaderLabels(self.cond_list.keys())
+        # conditions = []
+        # for key in self.cond_list.keys():
+        #    conditions.append(self.cond_list[key]['name'])
+        # self.cond_states_table.setVerticalHeaderLabels(self.cond_list.keys())
 
         self.cond_states_table.setColumnCount(len(self.states_list))
-        self.cond_states_table.setHorizontalHeader(RotatedHeaderView(self.cond_states_table))
+        self.cond_states_table.setHorizontalHeader(
+            RotatedHeaderView(self.cond_states_table)
+        )
 
         states_name_list = []
         for index, state in enumerate(self.states_list):
@@ -151,8 +152,9 @@ class Qt4_StateMachineBrick(BlissWidget):
     def init_state_graph(self):
         for index, transition in enumerate(self.trans_list):
             start_coord, end_coord = self.get_coord_by_transition(transition)
-            graph_transition = GraphTransition(self, index, start_coord,
-                                               end_coord, transition)
+            graph_transition = GraphTransition(
+                self, index, start_coord, end_coord, transition
+            )
             self.trans_graph_node_list.append(graph_transition)
             self.graph_graphics_scene.addItem(graph_transition)
         for index, state in enumerate(self.states_list):
@@ -165,7 +167,7 @@ class Qt4_StateMachineBrick(BlissWidget):
         """State changed event"""
 
         self.log_treewidget.clear()
-        #state_list = [state_list]
+        # state_list = [state_list]
 
         for state in state_list:
             temp_item = QTreeWidgetItem()
@@ -173,7 +175,9 @@ class Qt4_StateMachineBrick(BlissWidget):
             temp_item.setText(1, state["start_time"])
             temp_item.setText(2, state["end_time"])
             temp_item.setText(3, state["total_time"])
-            temp_item.setText(4, self.get_state_by_name(state["previous_state"])["desc"])
+            temp_item.setText(
+                4, self.get_state_by_name(state["previous_state"])["desc"]
+            )
             self.log_treewidget.insertTopLevelItem(0, temp_item)
 
         for col in range(5):
@@ -184,7 +188,7 @@ class Qt4_StateMachineBrick(BlissWidget):
         for col, state in enumerate(self.states_list):
             for row, condition in enumerate(self.cond_list):
                 color = Qt4_widget_colors.WHITE
-                #if row % 5:
+                # if row % 5:
                 #    color = Qt4_widget_colors.WHITE
                 if not col % 5 or not row % 5:
                     color = Qt4_widget_colors.LIGHT_2_GRAY
@@ -194,24 +198,33 @@ class Qt4_StateMachineBrick(BlissWidget):
                 self.cond_states_table.item(row, col).setIcon(QIcon())
 
                 for index, translation in enumerate(self.trans_list):
-                    if translation["source"] == new_state["current_state"] and \
-                       translation["dest"] == state["name"]:
+                    if (
+                        translation["source"] == new_state["current_state"]
+                        and translation["dest"] == state["name"]
+                    ):
                         if condition["name"] in translation["conditions_true"]:
-                            self.cond_states_table.item(row, col).\
-                              setBackground(Qt4_widget_colors.LIGHT_GREEN)
-                            #self.cond_states_table.item(row, col).setText(str(index))
+                            self.cond_states_table.item(row, col).setBackground(
+                                Qt4_widget_colors.LIGHT_GREEN
+                            )
+                            # self.cond_states_table.item(row, col).setText(str(index))
                         elif condition["name"] in translation["conditions_false"]:
-                            self.cond_states_table.item(row, col).\
-                              setBackground(Qt4_widget_colors.LIGHT_RED)
-                            #self.cond_states_table.item(row, col).setText(str(index))
-                        if condition["name"] in translation["conditions_true"] or \
-                           condition["name"] in translation["conditions_false"]:
+                            self.cond_states_table.item(row, col).setBackground(
+                                Qt4_widget_colors.LIGHT_RED
+                            )
+                            # self.cond_states_table.item(row, col).setText(str(index))
+                        if (
+                            condition["name"] in translation["conditions_true"]
+                            or condition["name"] in translation["conditions_false"]
+                        ):
                             if condition["value"]:
-                                self.cond_states_table.item(row, col).setIcon(self.check_icon) 
+                                self.cond_states_table.item(row, col).setIcon(
+                                    self.check_icon
+                                )
                             else:
-                                self.cond_states_table.item(row, col).setIcon(self.reject_icon)
-                          
-                        
+                                self.cond_states_table.item(row, col).setIcon(
+                                    self.reject_icon
+                                )
+
                 if state["name"] == new_state["current_state"]:
                     if "error" in state.get("type", []):
                         color = Qt4_widget_colors.LIGHT_RED
@@ -220,8 +233,9 @@ class Qt4_StateMachineBrick(BlissWidget):
                     self.cond_states_table.item(row, col).setBackground(color)
 
         for graph_node in self.state_graph_node_list:
-            graph_node.setSelected(graph_node.state_dict["name"] == \
-                                   new_state["current_state"])
+            graph_node.setSelected(
+                graph_node.state_dict["name"] == new_state["current_state"]
+            )
         self.graph_graphics_scene.update()
 
     def condition_changed(self, condition_list):
@@ -250,8 +264,8 @@ class Qt4_StateMachineBrick(BlissWidget):
             if condition["name"] == name:
                 return index
 
-class GraphStateNode(QGraphicsItem):
 
+class GraphStateNode(QGraphicsItem):
     def __init__(self, parent, index, state_dict):
         QGraphicsItem.__init__(self)
         self.setFlags(QGraphicsItem.ItemIsSelectable)
@@ -259,8 +273,7 @@ class GraphStateNode(QGraphicsItem):
         self.setAcceptDrops(True)
         self.parent = parent
         self.rect = QRectF(0, 0, 0, 0)
-        self.setPos(state_dict["coord"][0],
-                    state_dict["coord"][1])
+        self.setPos(state_dict["coord"][0], state_dict["coord"][1])
 
         self.index = index
         self.state_dict = state_dict
@@ -287,8 +300,8 @@ class GraphStateNode(QGraphicsItem):
         paint_rect = QRect(-20, -20, 40, 40)
         painter.drawText(paint_rect, Qt.AlignCenter, str(self.index + 1))
 
-class GraphTransition(QGraphicsItem):
 
+class GraphTransition(QGraphicsItem):
     def __init__(self, parent, index, start_pos, end_pos, trans_dict):
         QGraphicsItem.__init__(self)
         self.parent = parent
@@ -308,10 +321,13 @@ class GraphTransition(QGraphicsItem):
         pen.setWidth(1)
         pen.setColor(Qt.black)
         painter.setPen(pen)
-        painter.drawLine(self.start_pos[0], self.start_pos[1],
-                         self.end_pos[0], self.end_pos[1])
-        painter.drawText(self.start_pos[0] + \
-                         (self.end_pos[0] - self.start_pos[0]) / 2.,
-                         self.start_pos[1] + \
-                         (self.end_pos[1] - self.start_pos[1]) / 2. + self.index,
-                         str(self.index + 1))
+        painter.drawLine(
+            self.start_pos[0], self.start_pos[1], self.end_pos[0], self.end_pos[1]
+        )
+        painter.drawText(
+            self.start_pos[0] + (self.end_pos[0] - self.start_pos[0]) / 2.0,
+            self.start_pos[1]
+            + (self.end_pos[1] - self.start_pos[1]) / 2.0
+            + self.index,
+            str(self.index + 1),
+        )

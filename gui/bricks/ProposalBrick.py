@@ -35,12 +35,13 @@ __category__ = "General"
 
 PROPOSAL_GUI_EVENT = QtImport.QEvent.User
 
-class ProposalGUIEvent(QtImport.QEvent):
 
+class ProposalGUIEvent(QtImport.QEvent):
     def __init__(self, method, arguments):
         QtImport.QEvent.__init__(self, PROPOSAL_GUI_EVENT)
         self.method = method
         self.arguments = arguments
+
 
 class ProposalBrick(BaseWidget):
 
@@ -58,8 +59,8 @@ class ProposalBrick(BaseWidget):
          - loginAsUser = True, Brick displays combobox with all
            proposals from ISPyB that are associated to the current user
          - loginAsUser = False. Brick displays combobox to choose proposal
-           type and linedits to enter proposal number and password. 
-           In this case user is authentificated with 
+           type and linedits to enter proposal number and password.
+           In this case user is authentificated with
            LDAP and proposal from ISPyB is retrieved.
         """
         BaseWidget.__init__(self, *args)
@@ -76,32 +77,32 @@ class ProposalBrick(BaseWidget):
         self.session = None
         self.person = None
         self.laboratory = None
-        #self.sessionId=None
+        # self.sessionId=None
         self.inhouseProposal = None
         self.instance_server_hwobj = None
         self.secondary_proposals = []
 
         # Properties ----------------------------------------------------------
-        self.add_property('instanceServer', 'string', '')
-        self.add_property('localLogin', 'string', '')
-        self.add_property('titlePrefix', 'string', '')
-        self.add_property('autoSessionUsers', 'string', '')
-        self.add_property('codes', 'string', 'fx ifx ih im ix ls mx opid')
-        self.add_property('secondaryProposals', 'string', '')
-        self.add_property('icons', 'string', '')
-        self.add_property('serverStartDelay', 'integer', 500)
-        self.add_property('dbConnection', 'string')
-        self.add_property('session', 'string', '/session')
+        self.add_property("instanceServer", "string", "")
+        self.add_property("localLogin", "string", "")
+        self.add_property("titlePrefix", "string", "")
+        self.add_property("autoSessionUsers", "string", "")
+        self.add_property("codes", "string", "fx ifx ih im ix ls mx opid")
+        self.add_property("secondaryProposals", "string", "")
+        self.add_property("icons", "string", "")
+        self.add_property("serverStartDelay", "integer", 500)
+        self.add_property("dbConnection", "string")
+        self.add_property("session", "string", "/session")
 
         # Signals ------------------------------------------------------------
-        self.define_signal('sessionSelected', ())
-        self.define_signal('setWindowTitle', ())
-        self.define_signal('loggedIn', ())
-        self.define_signal('userGroupSaved', ())
+        self.define_signal("sessionSelected", ())
+        self.define_signal("setWindowTitle", ())
+        self.define_signal("loggedIn", ())
+        self.define_signal("userGroupSaved", ())
 
         # Slots ---------------------------------------------------------------
-        self.define_slot('setButtonEnabled', ())
-        self.define_slot('impersonateProposal', ())
+        self.define_slot("setButtonEnabled", ())
+        self.define_slot("impersonateProposal", ())
 
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtImport.QGroupBox("ISPyB proposal", self)
@@ -117,39 +118,41 @@ class ProposalBrick(BaseWidget):
         password_label = QtImport.QLabel("   Password: ", self.login_as_proposal_widget)
         self.proposal_password_ledit = QtImport.QLineEdit(self.login_as_proposal_widget)
         self.proposal_password_ledit.setEchoMode(QtImport.QLineEdit.Password)
-        #self.proposal_password_ledit.setFixedWidth(40)
+        # self.proposal_password_ledit.setFixedWidth(40)
         self.login_button = QtImport.QPushButton("Login", self.login_as_proposal_widget)
         self.login_button.setFixedWidth(70)
         self.logout_button = QtImport.QPushButton("Logout", self.main_gbox)
         self.logout_button.hide()
         self.logout_button.setFixedWidth(70)
         self.login_as_proposal_widget.hide()
-        
+
         self.login_as_user_widget = QtImport.QWidget(self.main_gbox)
         self.proposal_combo = QtImport.QComboBox(self.login_as_user_widget)
 
         self.user_group_widget = QtImport.QWidget(self.main_gbox)
-        #self.title_label = QtGui.QLabel(self.user_group_widget)
-        #self.title_label.setAlignment(QtCore.Qt.AlignCenter)
+        # self.title_label = QtGui.QLabel(self.user_group_widget)
+        # self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.user_group_label = QtImport.QLabel("  Group: ", self.user_group_widget)
         self.user_group_ledit = QtImport.QLineEdit(self.user_group_widget)
         self.user_group_ledit.setFixedSize(100, 27)
         self.user_group_save_button = QtImport.QToolButton(self.user_group_widget)
         self.user_group_save_button.setText("Set")
         self.user_group_save_button.setFixedHeight(27)
-        self.saved_group = True 
+        self.saved_group = True
 
         # Layout --------------------------------------------------------------
         _user_group_widget_hlayout = QtImport.QHBoxLayout(self.user_group_widget)
         _user_group_widget_hlayout.setSpacing(2)
-        #_user_group_widget_hlayout.addWidget(self.title_label)
-        _user_group_widget_hlayout.addWidget(self.user_group_label) 
+        # _user_group_widget_hlayout.addWidget(self.title_label)
+        _user_group_widget_hlayout.addWidget(self.user_group_label)
         _user_group_widget_hlayout.addWidget(self.user_group_ledit)
         _user_group_widget_hlayout.addWidget(self.user_group_save_button)
         _user_group_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         self.user_group_widget.hide()
 
-        _login_as_proposal_widget_layout = QtImport.QHBoxLayout(self.login_as_proposal_widget)
+        _login_as_proposal_widget_layout = QtImport.QHBoxLayout(
+            self.login_as_proposal_widget
+        )
         _login_as_proposal_widget_layout.addWidget(code_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_type_combox)
         _login_as_proposal_widget_layout.addWidget(dash_label)
@@ -185,7 +188,7 @@ class ProposalBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
         self.proposal_password_ledit.returnPressed.connect(self.login)
         self.login_button.clicked.connect(self.login)
-        self.logout_button.clicked.connect(self.logout_clicked)  
+        self.logout_button.clicked.connect(self.logout_clicked)
         self.proposal_combo.activated.connect(self.proposal_combo_activated)
         self.user_group_save_button.clicked.connect(self.save_group)
         self.user_group_ledit.returnPressed.connect(self.save_group)
@@ -193,45 +196,45 @@ class ProposalBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
         """Colors.set_widget_color(self.proposal_type_combox,
-                                           Colors.LIGHT_RED, 
+                                           Colors.LIGHT_RED,
                                            QtGui.QPalette.Window)"""
-        Colors.set_widget_color(self.proposal_number_ledit,
-                                           Colors.LIGHT_RED,
-                                           QtImport.QPalette.Base)
-        Colors.set_widget_color(self.proposal_password_ledit,
-                                           Colors.LIGHT_RED,
-                                           QtImport.QPalette.Base)
- 
+        Colors.set_widget_color(
+            self.proposal_number_ledit, Colors.LIGHT_RED, QtImport.QPalette.Base
+        )
+        Colors.set_widget_color(
+            self.proposal_password_ledit, Colors.LIGHT_RED, QtImport.QPalette.Base
+        )
+
     def save_group(self):
         user_group = str(self.user_group_ledit.text())
 
         pattern = r"^[a-zA-Z0-9_-]*$"
-        valid = re.match(pattern, user_group, flags = 0).group() == user_group
-        
+        valid = re.match(pattern, user_group, flags=0).group() == user_group
+
         if valid:
             self.saved_group = True
-            Colors.set_widget_color(self.user_group_ledit,
-                                               Colors.LIGHT_GREEN,
-                                               QtImport.QPalette.Base)  
-            msg = 'User group set to: %s' % str(self.user_group_ledit.text())
+            Colors.set_widget_color(
+                self.user_group_ledit, Colors.LIGHT_GREEN, QtImport.QPalette.Base
+            )
+            msg = "User group set to: %s" % str(self.user_group_ledit.text())
             logging.getLogger("GUI").info(msg)
             self.userGroupSaved.emit(self.user_group_ledit.text())
         else:
-            msg = 'User group not valid, please enter a valid user group'
+            msg = "User group not valid, please enter a valid user group"
             logging.getLogger("GUI").info(msg)
-            Colors.set_widget_color(self.user_group_ledit,
-                                               Colors.LIGHT_RED,
-                                               QtImport.QPalette.Base)
-            
+            Colors.set_widget_color(
+                self.user_group_ledit, Colors.LIGHT_RED, QtImport.QPalette.Base
+            )
+
     def user_group_changed(self, value):
         if self.saved_group:
-            msg = 'User group changed, press set to apply change'
+            msg = "User group changed, press set to apply change"
             logging.getLogger("GUI").warning(msg)
-            Colors.set_widget_color(self.user_group_ledit,
-                                               Colors.LINE_EDIT_CHANGED,
-                                               QtImport.QPalette.Base)
+            Colors.set_widget_color(
+                self.user_group_ledit, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+            )
         self.saved_group = False
-        
+
     def customEvent(self, event):
         if self.is_running():
             if event.type() == PROPOSAL_GUI_EVENT:
@@ -239,23 +242,31 @@ class ProposalBrick(BaseWidget):
                     method = event.method
                     arguments = event.arguments
                 except (Exception, diag):
-                    logging.getLogger().exception("ProposalBrick2: problem in event! (%s)" % str(diag))
-                except:
+                    logging.getLogger().exception(
+                        "ProposalBrick2: problem in event! (%s)" % str(diag)
+                    )
+                except BaseException:
                     logging.getLogger().exception("ProposalBrick2: problem in event!")
                 else:
-                    #logging.getLogger().debug("ProposalBrick2: custom event method is %s" % method)
+                    # logging.getLogger().debug("ProposalBrick2: custom event method is %s" % method)
                     if callable(method):
                         try:
                             method(*arguments)
                         except Exception as diag:
-                            logging.getLogger().exception("ProposalBrick2: uncaught exception! (%s)" % str(diag))
-                        except:
-                            logging.getLogger().exception("ProposalBrick2: uncaught exception!")
+                            logging.getLogger().exception(
+                                "ProposalBrick2: uncaught exception! (%s)" % str(diag)
+                            )
+                        except BaseException:
+                            logging.getLogger().exception(
+                                "ProposalBrick2: uncaught exception!"
+                            )
                         else:
-                            #logging.getLogger().debug("ProposalBrick2: custom event finished")
+                            # logging.getLogger().debug("ProposalBrick2: custom event finished")
                             pass
                     else:
-                        logging.getLogger().warning('ProposalBrick2: uncallable custom event!')
+                        logging.getLogger().warning(
+                            "ProposalBrick2: uncallable custom event!"
+                        )
 
     # Enabled/disabled the login/logout button
     def setButtonEnabled(self, state):
@@ -264,16 +275,30 @@ class ProposalBrick(BaseWidget):
 
     def impersonateProposal(self, proposal_code, proposal_number):
         if BaseWidget.is_instance_user_id_inhouse():
-            self._do_login_as_proposal(proposal_code, proposal_number, None, \
-                self.lims_hwobj.beamline_name, impersonate = True)
+            self._do_login_as_proposal(
+                proposal_code,
+                proposal_number,
+                None,
+                self.lims_hwobj.beamline_name,
+                impersonate=True,
+            )
         else:
-            logging.getLogger().debug('ProposalBrick2: cannot impersonate unless logged as the inhouse user!')
+            logging.getLogger().debug(
+                "ProposalBrick2: cannot impersonate unless logged as the inhouse user!"
+            )
 
     # Opens the logout dialog (modal); if the answer is OK then logout the user
     def logout_clicked(self):
-        if QtImport.QMessageBox.question(self, "Confirm logout", 
-            "Press OK to logout.", QtImport.QMessageBox.Ok,
-            QtImport.QMessageBox.Cancel) == QtImport.QMessageBox.Ok:
+        if (
+            QtImport.QMessageBox.question(
+                self,
+                "Confirm logout",
+                "Press OK to logout.",
+                QtImport.QMessageBox.Ok,
+                QtImport.QMessageBox.Cancel,
+            )
+            == QtImport.QMessageBox.Ok
+        ):
             self.log_out()
 
     # Logout the user; reset the brick; changes from logout mode to login mode
@@ -282,26 +307,26 @@ class ProposalBrick(BaseWidget):
         self.proposal_number_ledit.setText("")
         self.proposal = None
         self.session = None
-        #self.sessionId=None
+        # self.sessionId=None
         self.person = None
         self.laboratory = None
         # Change mode from logout to login
-        if not self.login_as_user: 
+        if not self.login_as_user:
             self.login_as_proposal_widget.setEnabled(True)
             self.login_button.show()
             self.logout_button.hide()
-        #self.title_label.hide()
+        # self.title_label.hide()
         self.user_group_widget.hide()
-       
-        #resets active proposal
+
+        # resets active proposal
         self.reset_proposal()
- 
-        #self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
-        #QToolTip.add(self.proposalLabel,"")
-       
+
+        # self.proposalLabel.setText(ProposalBrick2.NOBODY_STR)
+        # QToolTip.add(self.proposalLabel,"")
+
         # Emit signals clearing the proposal and session
         self.setWindowTitle.emit(self["titlePrefix"])
-        #self.sessionSelected.emit(None, None, None, None, None, None, None)
+        # self.sessionSelected.emit(None, None, None, None, None, None, None)
         self.loggedIn.emit(False)
 
     def reset_proposal(self):
@@ -313,10 +338,10 @@ class ProposalBrick(BaseWidget):
     # Sets the current session; changes from login mode to logout mode
     def set_proposal(self, proposal, session):
         self.lims_hwobj.enable()
-        self.session_hwobj.proposal_code = proposal['code']
-        self.session_hwobj.session_id = session['sessionId']
-        self.session_hwobj.proposal_id = proposal['proposalId']
-        self.session_hwobj.proposal_number = proposal['number']
+        self.session_hwobj.proposal_code = proposal["code"]
+        self.session_hwobj.session_id = session["sessionId"]
+        self.session_hwobj.proposal_id = proposal["proposalId"]
+        self.session_hwobj.proposal_number = proposal["number"]
 
         # Change mode
         if not self.login_as_user:
@@ -327,23 +352,26 @@ class ProposalBrick(BaseWidget):
         # Store info in the brick
         self.proposal = proposal
         self.session = session
-        #self.person = person
-        #self.laboratory = laboratory
+        # self.person = person
+        # self.laboratory = laboratory
 
         code = proposal["code"].lower()
 
         if code == "":
             session_id = ""
-            logging.getLogger().warning("Using local login: the data collected won't be stored in the database")
+            logging.getLogger().warning(
+                "Using local login: the data collected won't be stored in the database"
+            )
             self.lims_hwobj.disable()
             expiration_time = 0
             self.loggedIn.emit(False)
         else:
-            msg = "Results in ISPyB will be stored under proposal %s%s - '%s'" % \
-                 (proposal["code"],
-                  str(proposal["number"]),
-                  proposal["title"])
-            logging.getLogger("GUI").debug(msg)  
+            msg = "Results in ISPyB will be stored under proposal %s%s - '%s'" % (
+                proposal["code"],
+                str(proposal["number"]),
+                proposal["title"],
+            )
+            logging.getLogger("GUI").debug(msg)
 
             codes_list = self["codes"].split()
             if code not in codes_list:
@@ -351,37 +379,44 @@ class ProposalBrick(BaseWidget):
                 self["codes"] = codes
 
             # Build the info for the interface
-            title = str(proposal['title'])
-            session_id = session['sessionId']
-            start_date = session['startDate'].split()[0]
-            end_date = session['endDate'].split()[0]
+            title = str(proposal["title"])
+            session_id = session["sessionId"]
+            start_date = session["startDate"].split()[0]
+            end_date = session["endDate"].split()[0]
             try:
-                comments = session['comments']
+                comments = session["comments"]
             except KeyError:
                 comments = None
 
-            #Not implemented in REST
+            # Not implemented in REST
             header = ""
 
             # Set interface info and signal the new session
-            proposal_text = "%s-%s" % (proposal['code'], proposal['number'])
-            #self.title_label.setText("<nobr>   User: <b>%s</b>" % proposal_text)
-            tooltip = "\n".join([proposal_text, header, title]) 
+            proposal_text = "%s-%s" % (proposal["code"], proposal["number"])
+            # self.title_label.setText("<nobr>   User: <b>%s</b>" % proposal_text)
+            tooltip = "\n".join([proposal_text, header, title])
             if comments:
-                tooltip += '\n'
-                tooltip += 'Comments: ' + comments 
-            #self.title_label.setToolTip(tooltip)
+                tooltip += "\n"
+                tooltip += "Comments: " + comments
+            # self.title_label.setToolTip(tooltip)
             self.user_group_widget.show()
             try:
-                end_time = session['endDate'].split()[1]
-                end_date_list = end_date.split('-')
-                end_time_list = end_time.split(':')
-                expiration_time = time.mktime((\
-                    int(end_date_list[0]),\
-                    int(end_date_list[1]),\
-                    int(end_date_list[2]),\
-                    23, 59, 59,\
-                    0, 0, 0))
+                end_time = session["endDate"].split()[1]
+                end_date_list = end_date.split("-")
+                end_time_list = end_time.split(":")
+                expiration_time = time.mktime(
+                    (
+                        int(end_date_list[0]),
+                        int(end_date_list[1]),
+                        int(end_date_list[2]),
+                        23,
+                        59,
+                        59,
+                        0,
+                        0,
+                        0,
+                    )
+                )
             except (TypeError, IndexError, ValueError):
                 expiration_time = 0
 
@@ -394,7 +429,7 @@ class ProposalBrick(BaseWidget):
             proposal["number"])
         self.setWindowTitle.emit(win_title)
         self.sessionSelected.emit(
-                  session_id, 
+                  session_id,
                   self.lims_hwobj.translate(proposal["code"],'gui'),
                   str(proposal["number"]),
                   proposal["proposalId"],
@@ -416,41 +451,47 @@ class ProposalBrick(BaseWidget):
         if not self.lims_hwobj:
             self.login_as_proposal_widget.hide()
             self.login_button.hide()
-            #self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
-            #self.title_label.show()
+            # self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
+            # self.title_label.show()
             self.user_group_widget.show()
             self.session_hwobj.proposal_code = ""
             self.session_hwobj.session_id = 1
             self.session_hwobj.proposal_id = ""
-            self.session_hwobj.proposal_number = "" 
-    
+            self.session_hwobj.proposal_number = ""
+
             self.setWindowTitle.emit(self["titlePrefix"])
-            #self.loggedIn.emit(False)
-            #self.sessionSelected.emit(None, None, None, None, None, None, None)
+            # self.loggedIn.emit(False)
+            # self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(True)
-            self.sessionSelected.emit(self.session_hwobj.session_id,
-                 str(os.environ["USER"]), 0, '', '',
-                 self.session_hwobj.session_id, False)
-        else: 
+            self.sessionSelected.emit(
+                self.session_hwobj.session_id,
+                str(os.environ["USER"]),
+                0,
+                "",
+                "",
+                self.session_hwobj.session_id,
+                False,
+            )
+        else:
             self.setWindowTitle.emit(self["titlePrefix"])
-            #self.sessionSelected.emit(None, None, None, None, None, None, None)
+            # self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(False)
 
             if self.login_as_user:
-               if os.getenv("SUDO_USER"):
-                   user_name = os.getenv("SUDO_USER")
-               else:
-                   user_name = os.getenv("USER")
-               self._do_login_as_user(user_name)
+                if os.getenv("SUDO_USER"):
+                    user_name = os.getenv("SUDO_USER")
+                else:
+                    user_name = os.getenv("USER")
+                self._do_login_as_user(user_name)
 
-        start_server_event = ProposalGUIEvent(self.start_servers,())
+        start_server_event = ProposalGUIEvent(self.start_servers, ())
         QtImport.QApplication.postEvent(self, start_server_event)
 
     def start_servers(self):
         if self.instance_server_hwobj is not None:
             self.instance_server_hwobj.initialize_instance()
 
-    def refuse_login(self, stat, message = None):
+    def refuse_login(self, stat, message=None):
         if message is not None:
             if stat is False:
                 icon = QtImport.QMessageBox.Critical
@@ -458,9 +499,15 @@ class ProposalBrick(BaseWidget):
                 icon = QtImport.QMessageBox.Warning
             elif stat is True:
                 icon = QtImport.QMessageBox.Information
-            msg_dialog = QtImport.QMessageBox("Register user", message, \
-                icon, QtImport.QMessageBox.Ok, QtImport.QMessageBox.NoButton,\
-                QtImport.QMessageBox.NoButton, self)
+            msg_dialog = QtImport.QMessageBox(
+                "Register user",
+                message,
+                icon,
+                QtImport.QMessageBox.Ok,
+                QtImport.QMessageBox.NoButton,
+                QtImport.QMessageBox.NoButton,
+                self,
+            )
             s = self.font().pointSize()
             f = msg_dialog.font()
             f.setPointSize(s)
@@ -471,19 +518,23 @@ class ProposalBrick(BaseWidget):
         self.setEnabled(True)
 
     def accept_login(self, proposal_dict, session_dict):
-        #self.setProposal(proposal_dict, person_dict, lab_dict, 
+        # self.setProposal(proposal_dict, person_dict, lab_dict,
         #                 session_dict, contact_dict)
         self.set_proposal(proposal_dict, session_dict)
         self.setEnabled(True)
 
     def set_ispyb_down(self):
-        msg_dialog = QtImport.QMessageBox("Register user", "Couldn't contact " + \
-            "the ISPyB database server: you've been logged as the local user.\n" + \
-            "Your experiments' information will not be stored in ISPyB!",\
-            QtImport.QMessageBox.Warning, 
-            QtImport.QMessageBox.Ok, 
+        msg_dialog = QtImport.QMessageBox(
+            "Register user",
+            "Couldn't contact "
+            + "the ISPyB database server: you've been logged as the local user.\n"
+            + "Your experiments' information will not be stored in ISPyB!",
+            QtImport.QMessageBox.Warning,
+            QtImport.QMessageBox.Ok,
             QtImport.QMessageBox.NoButton,
-            QtImport.QMessageBox.NoButton,self)
+            QtImport.QMessageBox.NoButton,
+            self,
+        )
         s = self.font().pointSize()
         f = msg_dialog.font()
         f.setPointSize(s)
@@ -492,24 +543,23 @@ class ProposalBrick(BaseWidget):
         msg_dialog.show()
 
         now = time.strftime("%Y-%m-%d %H:%M:S")
-        prop_dict = {'code' : '', 'number' : '', 'title' : '', 'proposalId' : ''}
-        ses_dict = {'sessionId' : '', 'startDate' : now, 'endDate' : now, 'comments' : ''}
+        prop_dict = {"code": "", "number": "", "title": "", "proposalId": ""}
+        ses_dict = {"sessionId": "", "startDate": now, "endDate": now, "comments": ""}
         try:
             locallogin_person = self.local_login_hwobj.person
         except AttributeError:
             locallogin_person = "local user"
-        pers_dict = {'familyName' : locallogin_person}
-        lab_dict = {'name': 'lab'}
-        cont_dict = {'familyName' : 'local contact'}
-        #self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
+        pers_dict = {"familyName": locallogin_person}
+        lab_dict = {"name": "lab"}
+        cont_dict = {"familyName": "local contact"}
+        # self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
         self.accept_login(prop_dict, ses_dict)
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
         self.saved_group = False
-        Colors.set_widget_color(self.user_group_ledit, 
-                                           Colors.WHITE)
-        self.user_group_ledit.setText('')
+        Colors.set_widget_color(self.user_group_ledit, Colors.WHITE)
+        self.user_group_ledit.setText("")
         self.setEnabled(False)
 
         if not self.login_as_user:
@@ -520,34 +570,47 @@ class ProposalBrick(BaseWidget):
 
             if prop_type == "" and prop_number == "":
                 if self.local_login_hwobj is None:
-                    return self.refuse_login(False,"Local login not configured.")
+                    return self.refuse_login(False, "Local login not configured.")
                 try:
                     locallogin_password = self.local_login_hwobj.password
                 except AttributeError:
-                    return self.refuse_login(False,"Local login not configured.")
+                    return self.refuse_login(False, "Local login not configured.")
 
                 if prop_password != locallogin_password:
-                    return self.refuse_login(None,"Invalid local login password.")
+                    return self.refuse_login(None, "Invalid local login password.")
 
                 now = time.strftime("%Y-%m-%d %H:%M:S")
-                prop_dict = {'code' : '', 'number' : '', 'title' : '', 'proposalId' : ''}
-                ses_dict = {'sessionId' : '', 'startDate' : now, 'endDate' : now, 'comments' : ''}
+                prop_dict = {"code": "", "number": "", "title": "", "proposalId": ""}
+                ses_dict = {
+                    "sessionId": "",
+                    "startDate": now,
+                    "endDate": now,
+                    "comments": "",
+                }
                 try:
                     locallogin_person = self.local_login_hwobj.person
                 except AttributeError:
                     locallogin_person = "local user"
-                pers_dict = {'familyName' : locallogin_person}
-                lab_dict = {'name' : 'local lab'}
-                cont_dict = {'familyName' : 'local contact'}
-                logging.getLogger().debug("ProposalBrick: local login password validated")
-             
-                #return self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
+                pers_dict = {"familyName": locallogin_person}
+                lab_dict = {"name": "local lab"}
+                cont_dict = {"familyName": "local contact"}
+                logging.getLogger().debug(
+                    "ProposalBrick: local login password validated"
+                )
+
+                # return self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict,
+                # cont_dict)
                 return self.accept_login(prop_dict, ses_dict)
 
-            if self.lims_hwobj == None:
-                return self.refuse_login(False,'Not connected to the ISPyB database, unable to get proposal.')
+            if self.lims_hwobj is None:
+                return self.refuse_login(
+                    False,
+                    "Not connected to the ISPyB database, unable to get proposal.",
+                )
 
-            self._do_login_as_proposal(prop_type, prop_number, prop_password, self.lims_hwobj.beamline_name)
+            self._do_login_as_proposal(
+                prop_type, prop_number, prop_password, self.lims_hwobj.beamline_name
+            )
 
     def pass_control(self, has_control_id):
         pass
@@ -556,36 +619,38 @@ class ProposalBrick(BaseWidget):
         pass
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'codes':
+        if property_name == "codes":
             self.set_codes(new_value)
-        elif property_name == 'localLogin':
+        elif property_name == "localLogin":
             self.local_login_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == 'dbConnection':
+        elif property_name == "dbConnection":
             self.lims_hwobj = self.get_hardware_object(new_value)
             self.login_as_user = self.lims_hwobj.get_login_type() == "user"
             if self.login_as_user:
-               self.login_as_user_widget.show()
-               self.login_as_proposal_widget.hide()
+                self.login_as_user_widget.show()
+                self.login_as_proposal_widget.hide()
             else:
-               self.login_as_user_widget.hide()
-               self.login_as_proposal_widget.show()
-        elif property_name == 'instanceServer':
+                self.login_as_user_widget.hide()
+                self.login_as_proposal_widget.show()
+        elif property_name == "instanceServer":
             if self.instance_server_hwobj is not None:
-                self.disconnect(self.instance_server_hwobj,
-                                'passControl',
-                                self.pass_control)
-                self.disconnect(self.instance_server_hwobj,
-                                'haveControl',
-                                self.have_control)
-            self.instance_server_hwobj = self.get_hardware_object(new_value, optional=True)
+                self.disconnect(
+                    self.instance_server_hwobj, "passControl", self.pass_control
+                )
+                self.disconnect(
+                    self.instance_server_hwobj, "haveControl", self.have_control
+                )
+            self.instance_server_hwobj = self.get_hardware_object(
+                new_value, optional=True
+            )
             if self.instance_server_hwobj is not None:
-                self.connect(self.instance_server_hwobj,
-                             'passControl',
-                             self.pass_control)
-                self.connect(self.instance_server_hwobj,
-                             'haveControl',
-                             self.have_control)
-        elif property_name == 'icons':
+                self.connect(
+                    self.instance_server_hwobj, "passControl", self.pass_control
+                )
+                self.connect(
+                    self.instance_server_hwobj, "haveControl", self.have_control
+                )
+        elif property_name == "icons":
             icons_list = new_value.split()
             try:
                 self.login_button.setIcon(Icons.load_icon(icons_list[0]))
@@ -595,22 +660,29 @@ class ProposalBrick(BaseWidget):
                 self.logout_button.setIcon(Icons.load_icon(icons_list[1]))
             except IndexError:
                 pass
-        elif property_name == 'session':
+        elif property_name == "session":
             self.session_hwobj = self.get_hardware_object(new_value)
-        elif property_name == 'secondaryProposals':
-            self.secondary_proposals = new_value.split() 
+        elif property_name == "secondaryProposals":
+            self.secondary_proposals = new_value.split()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
-    def _do_login_as_proposal(self, proposal_code, proposal_number, proposal_password, beamline_name, impersonate=False):
+    def _do_login_as_proposal(
+        self,
+        proposal_code,
+        proposal_number,
+        proposal_password,
+        beamline_name,
+        impersonate=False,
+    ):
         # Get proposal and sessions
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
+        logging.getLogger().debug("ProposalBrick: querying ISPyB database...")
         prop = self.lims_hwobj.getProposal(proposal_code, proposal_number)
 
         # Check if everything went ok
         prop_ok = True
         try:
-            prop_ok = (prop['status']['code'] == 'ok')
+            prop_ok = prop["status"]["code"] == "ok"
         except KeyError:
             prop_ok = False
         if not prop_ok:
@@ -618,8 +690,9 @@ class ProposalBrick(BaseWidget):
             BaseWidget.set_status_info("ispyb", "error")
         else:
             self.select_proposal(prop)
-            BaseWidget.set_status_info("user", "%s%s@%s" % \
-               (proposal_code, str(proposal_number), beamline_name))
+            BaseWidget.set_status_info(
+                "user", "%s%s@%s" % (proposal_code, str(proposal_number), beamline_name)
+            )
             BaseWidget.set_status_info("ispyb", "ready")
 
     def proposal_combo_activated(self, item_index):
@@ -627,10 +700,10 @@ class ProposalBrick(BaseWidget):
 
     def select_proposal(self, selected_proposal):
         beamline_name = self.lims_hwobj.beamline_name
-        proposal = selected_proposal['Proposal']
-        #person = selected_proposal['Person']
-        #laboratory = selected_proposal['Laboratory']
-        sessions = selected_proposal['Session']
+        proposal = selected_proposal["Proposal"]
+        # person = selected_proposal['Person']
+        # laboratory = selected_proposal['Laboratory']
+        sessions = selected_proposal["Session"]
         # Check if there are sessions in the proposal
         todays_session = None
         if sessions is None or len(sessions) == 0:
@@ -638,9 +711,9 @@ class ProposalBrick(BaseWidget):
         else:
             # Check for today's session
             for session in sessions:
-                beamline = session['beamlineName']
-                start_date = "%s 00:00:00" % session['startDate'].split()[0]
-                end_date = "%s 23:59:59" % session['endDate'].split()[0]
+                beamline = session["beamlineName"]
+                start_date = "%s 00:00:00" % session["startDate"].split()[0]
+                end_date = "%s 23:59:59" % session["endDate"].split()[0]
                 try:
                     start_struct = time.strptime(start_date, "%Y-%m-%d %H:%M:%S")
                 except ValueError:
@@ -663,67 +736,77 @@ class ProposalBrick(BaseWidget):
                                 break
 
         if todays_session is None:
-            is_inhouse = self.session_hwobj.is_inhouse(proposal["code"], proposal["number"])
+            is_inhouse = self.session_hwobj.is_inhouse(
+                proposal["code"], proposal["number"]
+            )
             if not is_inhouse:
                 if BaseWidget.is_instance_role_client():
-                    self.refuse_login(None, "You don't have a session scheduled for today!")
+                    self.refuse_login(
+                        None, "You don't have a session scheduled for today!"
+                    )
                     return
 
-                #if not self.askForNewSession():
+                # if not self.askForNewSession():
                 #    self.refuseLogin(None, None)
                 #    return
 
             current_time = time.localtime()
             start_time = time.strftime("%Y-%m-%d 00:00:00", current_time)
-            end_time = time.mktime(current_time) + 60 * 60 *24
+            end_time = time.mktime(current_time) + 60 * 60 * 24
             tomorrow = time.localtime(end_time)
             end_time = time.strftime("%Y-%m-%d 07:59:59", tomorrow)
 
             # Create a session
             new_session_dict = {}
-            new_session_dict['proposalId'] = selected_proposal['Proposal']['proposalId']
-            new_session_dict['startDate'] = start_time
-            new_session_dict['endDate'] = end_time
-            new_session_dict['beamlineName'] = beamline_name
-            new_session_dict['scheduled'] = 0
-            new_session_dict['nbShifts'] = 3
-            new_session_dict['comments'] = "Session created by MXCuBE"
+            new_session_dict["proposalId"] = selected_proposal["Proposal"]["proposalId"]
+            new_session_dict["startDate"] = start_time
+            new_session_dict["endDate"] = end_time
+            new_session_dict["beamlineName"] = beamline_name
+            new_session_dict["scheduled"] = 0
+            new_session_dict["nbShifts"] = 3
+            new_session_dict["comments"] = "Session created by MXCuBE"
             session_id = self.lims_hwobj.create_session(new_session_dict)
-            new_session_dict['sessionId'] = session_id
+            new_session_dict["sessionId"] = session_id
 
             todays_session = new_session_dict
             localcontact = None
         else:
-            session_id = todays_session['sessionId']
-            logging.getLogger().debug('ProposalBrick: getting local contact for %s' % session_id)
+            session_id = todays_session["sessionId"]
+            logging.getLogger().debug(
+                "ProposalBrick: getting local contact for %s" % session_id
+            )
             localcontact = self.lims_hwobj.get_session_local_contact(session_id)
 
-        #self.accept_login(selected_proposal['Proposal'], 
-        #                 selected_proposal['Person'], 
+        # self.accept_login(selected_proposal['Proposal'],
+        #                 selected_proposal['Person'],
         #                 selected_proposal['Laboratory'],
-        #                 todays_session, 
+        #                 todays_session,
         #                 localcontact)
-        self.accept_login(selected_proposal['Proposal'], todays_session)
-    
+        self.accept_login(selected_proposal["Proposal"], todays_session)
+
     def _do_login_as_user(self, user_name):
-        logging.getLogger().debug('ProposalBrick: querying ISPyB database...')
- 
+        logging.getLogger().debug("ProposalBrick: querying ISPyB database...")
+
         self.proposals = self.lims_hwobj.get_proposals_by_user(user_name)
 
         if len(self.proposals) == 0:
-            logging.getLogger("GUI").error("No proposals for user %s found in ISPyB" % user_name)
+            logging.getLogger("GUI").error(
+                "No proposals for user %s found in ISPyB" % user_name
+            )
             self.set_ispyb_down()
             BaseWidget.set_status_info("ispyb", "error")
-        else: 
+        else:
             self.proposal_combo.clear()
             proposal_tooltip = "Available proposals:"
             for proposal in self.proposals:
-                proposal_info = "%s%s - %s" % (proposal["Proposal"]["code"],
-                                               proposal["Proposal"]["number"],
-                                               proposal["Proposal"]["title"])
+                proposal_info = "%s%s - %s" % (
+                    proposal["Proposal"]["code"],
+                    proposal["Proposal"]["number"],
+                    proposal["Proposal"]["title"],
+                )
                 self.proposal_combo.addItem(proposal_info)
                 proposal_tooltip += "\n   %s" % proposal_info
-       
+
             if len(self.proposals) > 1:
                 proposal_index = self.select_todays_proposal(self.proposals)
                 self.proposal_combo.setEnabled(True)
@@ -736,14 +819,16 @@ class ProposalBrick(BaseWidget):
             self.proposal_combo.setCurrentIndex(proposal_index)
             proposal_info = "%s%s - %s" % (
                 self.proposals[proposal_index]["Proposal"]["code"],
-                self.proposals[proposal_index]["Proposal"]["number"],                           
-                self.proposals[proposal_index]["Proposal"]["title"])
+                self.proposals[proposal_index]["Proposal"]["number"],
+                self.proposals[proposal_index]["Proposal"]["title"],
+            )
             proposal_tooltip += "\nSelected proposal:\n   %s" % proposal_info
             self.proposal_combo.setToolTip(proposal_tooltip)
             logging.getLogger("GUI").info("ISPyB proposal: %s" % proposal_info)
 
-            BaseWidget.set_status_info("user", "%s@%s" % \
-               (user_name, self.lims_hwobj.beamline_name))
+            BaseWidget.set_status_info(
+                "user", "%s@%s" % (user_name, self.lims_hwobj.beamline_name)
+            )
             BaseWidget.set_status_info("ispyb", "ready")
 
     def select_todays_proposal(self, proposal_list):
@@ -752,23 +837,26 @@ class ProposalBrick(BaseWidget):
                   If no session found then returns first proposal
         """
         for prop_index, proposal in enumerate(proposal_list):
-            sessions = proposal['Session']
-            proposal_code_number = proposal["Proposal"]["code"] + \
-                                   proposal["Proposal"]["number"]
-            if len(sessions) > 0 and \
-               not proposal_code_number in self.secondary_proposals:
+            sessions = proposal["Session"]
+            proposal_code_number = (
+                proposal["Proposal"]["code"] + proposal["Proposal"]["number"]
+            )
+            if (
+                len(sessions) > 0
+                and not proposal_code_number in self.secondary_proposals
+            ):
                 # Check for today's session
                 for session in sessions:
-                    beamline = session['beamlineName']
-                    start_date = "%s 00:00:00" % session['startDate'].split()[0]
-                    end_date = "%s 23:59:59" % session['endDate'].split()[0]
+                    beamline = session["beamlineName"]
+                    start_date = "%s 00:00:00" % session["startDate"].split()[0]
+                    end_date = "%s 23:59:59" % session["endDate"].split()[0]
                     try:
-                        start_struct = time.strptime(start_date,"%Y-%m-%d %H:%M:%S")
+                        start_struct = time.strptime(start_date, "%Y-%m-%d %H:%M:%S")
                     except ValueError:
                         pass
                     else:
                         try:
-                            end_struct = time.strptime(end_date,"%Y-%m-%d %H:%M:%S")
+                            end_struct = time.strptime(end_date, "%Y-%m-%d %H:%M:%S")
                         except ValueError:
                             pass
                         else:
@@ -778,10 +866,12 @@ class ProposalBrick(BaseWidget):
                             # Check beamline name
                             if beamline == self.lims_hwobj.beamline_name:
                                 # Check date
-                                if current_time >= start_time and current_time <= end_time:
+                                if (
+                                    current_time >= start_time
+                                    and current_time <= end_time
+                                ):
                                     return prop_index
 
-              
         # If no proposal with valid session found then the last
         # proposal from the list is selected
         return len(proposal_list) - 1

@@ -56,7 +56,7 @@ class BlissSplashScreen(QtImport.QSplashScreen):
 
         self.gui_name = str(name)
         if len(self.gui_name) == 0:
-            self.gui_name = ' '
+            self.gui_name = " "
         self.repaint()
 
     def set_message(self, message):
@@ -74,19 +74,25 @@ class BlissSplashScreen(QtImport.QSplashScreen):
 
         painter.font().setPixelSize(pxsize)
         painter.setPen(QtImport.QPen(QtImport.Qt.black))
-        painter.drawText(QtImport.QRect(QtImport.QPoint(top_x, top_y),
-                         QtImport.QPoint(right_x, bot_y)),
-                         QtImport.Qt.AlignLeft | QtImport.Qt.AlignTop,
-                         "Starting MXCuBE. Please wait...")
+        painter.drawText(
+            QtImport.QRect(
+                QtImport.QPoint(top_x, top_y), QtImport.QPoint(right_x, bot_y)
+            ),
+            QtImport.Qt.AlignLeft | QtImport.Qt.AlignTop,
+            "Starting MXCuBE. Please wait...",
+        )
         painter.font().setPixelSize(pxsize * 2.5)
         painter.font().setPixelSize(pxsize)
 
         top_y = bot_y
         bot_y += 2 + painter.fontMetrics().height()
-        painter.drawText(QtImport.QRect(QtImport.QPoint(top_x, top_y),
-                         QtImport.QPoint(right_x, bot_y)),
-                         QtImport.Qt.AlignLeft | QtImport.Qt.AlignBottom,
-                         self._message)
+        painter.drawText(
+            QtImport.QRect(
+                QtImport.QPoint(top_x, top_y), QtImport.QPoint(right_x, bot_y)
+            ),
+            QtImport.Qt.AlignLeft | QtImport.Qt.AlignBottom,
+            self._message,
+        )
 
 
 class GUISupervisor(QtImport.QWidget):
@@ -111,7 +117,7 @@ class GUISupervisor(QtImport.QWidget):
         self.show_maximized = show_maximized
         self.no_border = no_border
         self.windows = []
-        self.splash_screen = BlissSplashScreen(Icons.load_pixmap('splash'))
+        self.splash_screen = BlissSplashScreen(Icons.load_pixmap("splash"))
 
         set_splash_screen(self.splash_screen)
         self.splash_screen.show()
@@ -126,13 +132,15 @@ class GUISupervisor(QtImport.QWidget):
         """Loads gui"""
         self.configuration = Configuration.Configuration()
         self.gui_config_file = gui_config_file
-        load_from_dict = gui_config_file.endswith(".json") or \
-                         gui_config_file.endswith(".yml")
+        load_from_dict = gui_config_file.endswith(".json") or gui_config_file.endswith(
+            ".yml"
+        )
 
         if self.gui_config_file:
             if hasattr(self, "splash_screen"):
-                self.splash_screen.set_gui_name(os.path.splitext(\
-                     os.path.basename(gui_config_file))[0])
+                self.splash_screen.set_gui_name(
+                    os.path.splitext(os.path.basename(gui_config_file))[0]
+                )
 
             if os.path.exists(gui_config_file):
                 filestat = os.stat(gui_config_file)
@@ -143,12 +151,16 @@ class GUISupervisor(QtImport.QWidget):
 
                 try:
                     gui_file = open(gui_config_file)
-                except:
-                    logging.getLogger().exception("Cannot open file %s",
-                                                  gui_config_file)
-                    QtImport.QMessageBox.warning(self, "Error",
-                           "Could not open file %s !" % gui_config_file,
-                           QtImport.QMessageBox.Ok)
+                except BaseException:
+                    logging.getLogger().exception(
+                        "Cannot open file %s", gui_config_file
+                    )
+                    QtImport.QMessageBox.warning(
+                        self,
+                        "Error",
+                        "Could not open file %s !" % gui_config_file,
+                        QtImport.QMessageBox.Ok,
+                    )
                 else:
                     # find mnemonics to speed up loading
                     # (using the 'require' feature from Hardware Repository)
@@ -165,11 +177,12 @@ class GUISupervisor(QtImport.QWidget):
                                         props = item["properties"]
                                     else:
                                         props = pickle.loads(item["properties"])
-                                    #props = pickle.loads(item["properties"].encode('utf8'))
-                                except:
-                                    logging.getLogger().exception(\
-                                        "Could not load properties for %s" % \
-                                        item["name"])
+                                    # props = pickle.loads(item["properties"].encode('utf8'))
+                                except BaseException:
+                                    logging.getLogger().exception(
+                                        "Could not load properties for %s"
+                                        % item["name"]
+                                    )
                                 else:
                                     item["properties"] = props
                                     try:
@@ -178,13 +191,16 @@ class GUISupervisor(QtImport.QWidget):
                                                 prop_value = prop["value"]
                                             else:
                                                 prop_value = prop.getValue()
-                                            if type(prop_value) == type('') and \
-                                               prop_value.startswith("/"):
+                                            if isinstance(
+                                                prop_value, type("")
+                                            ) and prop_value.startswith("/"):
                                                 mne_list.append(prop_value)
-                                    except:
-                                        logging.exception("Could not " + \
-                                          "build list of required " + \
-                                          "hardware objects")
+                                    except BaseException:
+                                        logging.exception(
+                                            "Could not "
+                                            + "build list of required "
+                                            + "hardware objects"
+                                        )
 
                                 continue
 
@@ -192,18 +208,19 @@ class GUISupervisor(QtImport.QWidget):
 
                         return mne_list
 
-                    failed_msg = "Cannot read configuration from file %s. " % \
-                                 gui_config_file
+                    failed_msg = (
+                        "Cannot read configuration from file %s. " % gui_config_file
+                    )
                     failed_msg += "Starting in designer mode with clean GUI."
 
                     try:
                         if gui_config_file.endswith(".json"):
-                            raw_config = json.load(gui_file) 
+                            raw_config = json.load(gui_file)
                         elif gui_config_file.endswith(".yml"):
                             raw_config = yaml.load(gui_file)
                         else:
                             raw_config = eval(gui_file.read())
-                    except:
+                    except BaseException:
                         logging.getLogger().exception(failed_msg)
 
                     self.splash_screen.set_message("Gathering H/O info...")
@@ -214,22 +231,26 @@ class GUISupervisor(QtImport.QWidget):
                     try:
                         self.splash_screen.set_message("Building GUI configuration...")
                         config = Configuration.Configuration(raw_config, load_from_dict)
-                    except:
+                    except BaseException:
                         logging.getLogger("GUI").exception(failed_msg)
-                        QtImport.QMessageBox.warning(self, "Error", failed_msg,
-                                            QtImport.QMessageBox.Ok)
+                        QtImport.QMessageBox.warning(
+                            self, "Error", failed_msg, QtImport.QMessageBox.Ok
+                        )
                     else:
                         self.configuration = config
 
                     try:
-                        user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                        user_settings_filename = os.path.join(
+                            self.user_file_dir, "settings.dat"
+                        )
                         user_settings_file = open(user_settings_filename)
                         self.user_settings = eval(user_settings_file.read())
-                    except:
+                    except BaseException:
                         self.user_settings = []
-                        logging.getLogger().error(\
-                            "Unable to read user settings file: %s" % \
-                            user_settings_filename)
+                        logging.getLogger().error(
+                            "Unable to read user settings file: %s"
+                            % user_settings_filename
+                        )
                     else:
                         user_settings_file.close()
 
@@ -245,10 +266,10 @@ class GUISupervisor(QtImport.QWidget):
 
                         self.framework.filename = gui_config_file
                         self.framework.configuration = config
-                        self.framework.setWindowTitle("GUI Builder - %s" % \
-                                                      gui_config_file)
-                        self.framework.gui_editor_window.\
-                             set_configuration(config)
+                        self.framework.setWindowTitle(
+                            "GUI Builder - %s" % gui_config_file
+                        )
+                        self.framework.gui_editor_window.set_configuration(config)
                         self.framework.gui_editor_window.draw_window_preview()
                         self.framework.show()
 
@@ -276,10 +297,9 @@ class GUISupervisor(QtImport.QWidget):
     def display(self):
         self.windows = []
         for window in self.configuration.windows_list:
-            display = GUIDisplay.WindowDisplayWidget(\
-                 None, window["name"],
-                 execution_mode=True,
-                 no_border=self.no_border)
+            display = GUIDisplay.WindowDisplayWidget(
+                None, window["name"], execution_mode=True, no_border=self.no_border
+            )
             self.windows.append(display)
             display.set_caption(window["properties"]["caption"])
             display.draw_preview(window, id(display))
@@ -318,9 +338,17 @@ class GUISupervisor(QtImport.QWidget):
                 main_window.resize(QtImport.QSize(width, height))
 
             # make connections
-            widgets_dict = dict([(isinstance(w.objectName, \
-                collections.Callable) and str(w.objectName()) or None, w) \
-                for w in QtImport.QApplication.allWidgets()])
+            widgets_dict = dict(
+                [
+                    (
+                        isinstance(w.objectName, collections.Callable)
+                        and str(w.objectName())
+                        or None,
+                        w,
+                    )
+                    for w in QtImport.QApplication.allWidgets()
+                ]
+            )
 
             def make_connections(items_list):
                 """Creates connections"""
@@ -329,29 +357,32 @@ class GUISupervisor(QtImport.QWidget):
                     try:
                         sender = widgets_dict[item["name"]]
                     except KeyError:
-                        logging.getLogger().error(\
-                            "Could not find receiver widget %s" % \
-                            item["name"])
+                        logging.getLogger().error(
+                            "Could not find receiver widget %s" % item["name"]
+                        )
                     else:
                         for connection in item["connections"]:
-                            _receiver = connection["receiver"] or \
-                                connection["receiverWindow"]
+                            _receiver = (
+                                connection["receiver"] or connection["receiverWindow"]
+                            )
                             try:
                                 receiver = widgets_dict[_receiver]
                             except KeyError:
-                                logging.getLogger().error("Could not find " + \
-                                   "receiver widget %s", _receiver)
+                                logging.getLogger().error(
+                                    "Could not find " + "receiver widget %s", _receiver
+                                )
                             else:
                                 try:
                                     slot = getattr(receiver, connection["slot"])
-                                    #etattr(sender, connection["signal"]).connect(slot)
+                                    # etattr(sender, connection["signal"]).connect(slot)
                                 except AttributeError:
-                                    logging.getLogger().error(\
-                                       "No slot '%s' " % connection["slot"] + \
-                                       "in receiver %s" % _receiver)
+                                    logging.getLogger().error(
+                                        "No slot '%s' " % connection["slot"]
+                                        + "in receiver %s" % _receiver
+                                    )
                                 else:
                                     getattr(sender, connection["signal"]).connect(slot)
-                                    #sender.connect(sender,
+                                    # sender.connect(sender,
                                     #    QtCore.SIGNAL(connection["signal"]),
                                     #    slot)
                     make_connections(item["children"])
@@ -380,7 +411,7 @@ class GUISupervisor(QtImport.QWidget):
     def finalize(self):
         """Finalize gui load"""
 
-        BaseWidget.set_run_mode(False) # call .stop() for each brick
+        BaseWidget.set_run_mode(False)  # call .stop() for each brick
 
         self.hardware_repository.close()
 
@@ -389,56 +420,74 @@ class GUISupervisor(QtImport.QWidget):
 
         self.save_size()
 
-    def save_size(self, configuration_suffix=''):
+    def save_size(self, configuration_suffix=""):
         """Saves window size and coordinates in the gui file"""
         display_config_list = []
 
         if not self.launch_in_design_mode:
             for window in self.windows:
                 window_cfg = self.configuration.windows[str(window.objectName())]
-                display_config_list.append({"name": window_cfg.name,
-                                            "posx": window.x(),
-                                            "posy": window.y(),
-                                            "width": window.width(),
-                                            "height": window.height()})
+                display_config_list.append(
+                    {
+                        "name": window_cfg.name,
+                        "posx": window.x(),
+                        "posy": window.y(),
+                        "width": window.width(),
+                        "height": window.height(),
+                    }
+                )
             try:
-                user_settings_filename = os.path.join(self.user_file_dir, "settings.dat")
+                user_settings_filename = os.path.join(
+                    self.user_file_dir, "settings.dat"
+                )
                 user_settings_file = open(user_settings_filename, "w")
                 user_settings_file.write(repr(display_config_list))
                 os.chmod(user_settings_filename, 0o660)
-            except:
-                logging.getLogger().exception(\
-                    "Unable to save window position and size in " + \
-                    "configuration file: %s" % user_settings_filename)
+            except BaseException:
+                logging.getLogger().exception(
+                    "Unable to save window position and size in "
+                    + "configuration file: %s" % user_settings_filename
+                )
             else:
                 user_settings_file.close()
- 
+
     def finish_init(self, gui_config_file):
         """Finalize gui init"""
 
         while True:
             try:
                 self.hardware_repository.connect()
-            except:
-                logging.getLogger().exception("Timeout while trying to " + \
-                    "connect to Hardware Repository server.")
-                message = \
-                   "Timeout while connecting to Hardware " + \
-                   "Repository server.\nMake sure the Hardware " + \
-                   "Repository Server is running on host:\n%s." % \
-                   str(self.hardware_repository.serverAddress).split(':')[0]
-                if QtImport.QMessageBox.warning(self,
-                       "Cannot connect to Hardware Repository", message,
-                       QtImport.QMessageBox.Retry | QtImport.QMessageBox.Cancel | \
-                       QtImport.QMessageBox.NoButton) == \
-                   QtImport.QMessageBox.Cancel:
-                    logging.getLogger().warning("Gave up trying to " + \
-                       "connect to Hardware Repository server.")
+            except BaseException:
+                logging.getLogger().exception(
+                    "Timeout while trying to "
+                    + "connect to Hardware Repository server."
+                )
+                message = (
+                    "Timeout while connecting to Hardware "
+                    + "Repository server.\nMake sure the Hardware "
+                    + "Repository Server is running on host:\n%s."
+                    % str(self.hardware_repository.serverAddress).split(":")[0]
+                )
+                if (
+                    QtImport.QMessageBox.warning(
+                        self,
+                        "Cannot connect to Hardware Repository",
+                        message,
+                        QtImport.QMessageBox.Retry
+                        | QtImport.QMessageBox.Cancel
+                        | QtImport.QMessageBox.NoButton,
+                    )
+                    == QtImport.QMessageBox.Cancel
+                ):
+                    logging.getLogger().warning(
+                        "Gave up trying to " + "connect to Hardware Repository server."
+                    )
                     break
             else:
-                logging.getLogger().info("Connected to Hardware " + \
-                    "Repository server %s" % \
-                    self.hardware_repository.serverAddress)
+                logging.getLogger().info(
+                    "Connected to Hardware "
+                    + "Repository server %s" % self.hardware_repository.serverAddress
+                )
                 break
 
         try:
@@ -448,7 +497,7 @@ class GUISupervisor(QtImport.QWidget):
                 set_splash_screen(None)
                 self.splash_screen.finish(main_widget)
             del self.splash_screen
-        except:
+        except BaseException:
             logging.getLogger().exception("exception while loading GUI file")
             QtImport.QApplication.exit()
 

@@ -1,12 +1,12 @@
-'''
+"""
 
 Doc please...
 
-'''
+"""
 
 __version__ = 1.0
 __author__ = "Matias Guijarro"
-__category__ = 'Motor'
+__category__ = "Motor"
 
 
 import logging
@@ -24,13 +24,15 @@ class TwoAxisAlignmentBrick(BlissWidget):
 
         self.verticalMotor = None
         self.horizontalMotor = None
-        self.motorStatesColors = [self.colorGroup().background(),
-                                  self.colorGroup().background(),
-                                  Qt.green,
-                                  Qt.yellow,
-                                  Qt.yellow,
-                                  Qt.red]
-        
+        self.motorStatesColors = [
+            self.colorGroup().background(),
+            self.colorGroup().background(),
+            Qt.green,
+            Qt.yellow,
+            Qt.yellow,
+            Qt.red,
+        ]
+
         # addProperty adds a property for the brick :
         #   - 1st argument is the name of the property ;
         #   - 2d argument is the type (one of string, integer, float, file, combo) ;
@@ -61,7 +63,7 @@ class TwoAxisAlignmentBrick(BlissWidget):
         self.cmdUp.setPixmap(Icons.load("up_small"))
         upBoxLayout.addWidget(self.lblUp, 0, Qt.AlignCenter)
         upBoxLayout.addWidget(self.cmdUp, 0)
-        
+
         downBox = QWidget(self)
         downBox.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         downBoxLayout = QVBoxLayout(downBox, 0, 0)
@@ -71,7 +73,7 @@ class TwoAxisAlignmentBrick(BlissWidget):
         self.lblDown.setFont(QFont("courier"))
         downBoxLayout.addWidget(self.cmdDown, 0)
         downBoxLayout.addWidget(self.lblDown, 0, Qt.AlignCenter)
-         
+
         leftBox = QHBox(self)
         leftBox.setSpacing(5)
         leftBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
@@ -91,7 +93,7 @@ class TwoAxisAlignmentBrick(BlissWidget):
         self.lblRight = QLabel(rightBox)
         self.lblRight.setAlignment(Qt.AlignCenter)
         self.lblRight.setFont(QFont("courier"))
-    
+
         centralBox = QVBox(self)
         centralBox.setSpacing(10)
         centralBox.setMargin(10)
@@ -121,12 +123,13 @@ class TwoAxisAlignmentBrick(BlissWidget):
         QObject.connect(self.cmdRight, SIGNAL("clicked()"), self.cmdRightClicked)
         QObject.connect(self.cmdDown, SIGNAL("clicked()"), self.cmdDownClicked)
         QObject.connect(self.cmdAbort, SIGNAL("clicked()"), self.cmdAbortClicked)
-        QObject.connect(self.cmdChangeStep, SIGNAL("clicked()"), self.cmdChangeStepClicked)
+        QObject.connect(
+            self.cmdChangeStep, SIGNAL("clicked()"), self.cmdChangeStepClicked
+        )
 
         self.currentVerticalLabel = self.lblUp
         self.currentHorizontalLabel = self.lblRight
         self.cmdAbort.setEnabled(False)
-        
 
     def updateHMotorPosition(self, position=None):
         if position is not None:
@@ -135,24 +138,26 @@ class TwoAxisAlignmentBrick(BlissWidget):
         else:
             mne = "h. motor"
             pos = "?"
-            
+
             if self.horizontalMotor is not None:
                 mne = self.horizontalMotor.userName()
-            
+
                 if self.horizontalMotor.isReady():
                     hpos = self.horizontalMotor.getPosition()
                     pos = self["formatString"] % hpos
-        
+
         for label in (self.lblLeft, self.lblRight):
             length = max(len(mne), len(str(pos)))
-            label.setFixedSize(label.fontMetrics().width(length*"#"), 2*label.fontMetrics().height())
-            
+            label.setFixedSize(
+                label.fontMetrics().width(length * "#"),
+                2 * label.fontMetrics().height(),
+            )
+
             if label == self.currentHorizontalLabel:
-                label.setText('%s\n%s' % (mne, pos))
+                label.setText("%s\n%s" % (mne, pos))
             else:
                 label.setText("")
                 label.setPaletteBackgroundColor(self.colorGroup().background())
-                
 
     def updateVMotorPosition(self, position=None):
         if position is not None:
@@ -161,84 +166,129 @@ class TwoAxisAlignmentBrick(BlissWidget):
         else:
             mne = "v. motor"
             pos = "?"
-        
+
             if self.verticalMotor is not None:
                 mne = self.verticalMotor.userName()
-            
+
                 if self.verticalMotor.isReady():
                     vpos = self.verticalMotor.getPosition()
                     pos = self["formatString"] % vpos
-          
+
         for label in (self.lblUp, self.lblDown):
-            label.setFixedSize(label.fontMetrics().width(mne + " " + str(pos)), label.fontMetrics().height())
-            
+            label.setFixedSize(
+                label.fontMetrics().width(mne + " " + str(pos)),
+                label.fontMetrics().height(),
+            )
+
             if label == self.currentVerticalLabel:
-                label.setText('%s %s' % (mne, pos))
+                label.setText("%s %s" % (mne, pos))
             else:
                 label.setText("")
                 label.setPaletteBackgroundColor(self.colorGroup().background())
-
 
     def updateMotorPositions(self):
         self.updateHMotorPosition()
         self.updateVMotorPosition()
 
-    
     def propertyChanged(self, property, oldValue, newValue):
-        if property == 'mnemonic':
+        if property == "mnemonic":
             if self.verticalMotor is not None and self.horizontalMotor is not None:
                 # remove connections previously established
-                self.disconnect(self.verticalMotor, PYSIGNAL("stateChanged"), self.updateVMotorState)
-                self.disconnect(self.horizontalMotor, PYSIGNAL("stateChanged"), self.updateHMotorState)
-                self.disconnect(self.verticalMotor, PYSIGNAL("positionChanged"), self.updateVMotorPosition)
-                self.disconnect(self.horizontalMotor, PYSIGNAL("positionChanged"), self.updateHMotorPosition)
+                self.disconnect(
+                    self.verticalMotor, PYSIGNAL("stateChanged"), self.updateVMotorState
+                )
+                self.disconnect(
+                    self.horizontalMotor,
+                    PYSIGNAL("stateChanged"),
+                    self.updateHMotorState,
+                )
+                self.disconnect(
+                    self.verticalMotor,
+                    PYSIGNAL("positionChanged"),
+                    self.updateVMotorPosition,
+                )
+                self.disconnect(
+                    self.horizontalMotor,
+                    PYSIGNAL("positionChanged"),
+                    self.updateHMotorPosition,
+                )
 
             equipment = self.getHardwareObject(newValue)
-       
+
             if equipment is not None:
                 try:
                     self.verticalMotor = equipment.getDeviceByRole("vertical")
                     self.horizontalMotor = equipment.getDeviceByRole("horizontal")
-                except:
-                    logging.getLogger().error("%s: could not find vertical and horizontal motors in Hardware Object %s", str(self.name()), equipment.name())
+                except BaseException:
+                    logging.getLogger().error(
+                        "%s: could not find vertical and horizontal motors in Hardware Object %s",
+                        str(self.name()),
+                        equipment.name(),
+                    )
                 else:
-                    if self.verticalMotor is not None and self.horizontalMotor is not None:
-                        self.connect(self.verticalMotor, PYSIGNAL("stateChanged"), self.updateVMotorState)
-                        self.connect(self.horizontalMotor, PYSIGNAL("stateChanged"), self.updateHMotorState)
-                        self.connect(self.verticalMotor, PYSIGNAL("positionChanged"), self.updateVMotorPosition)
-                        self.connect(self.horizontalMotor, PYSIGNAL("positionChanged"), self.updateHMotorPosition)
+                    if (
+                        self.verticalMotor is not None
+                        and self.horizontalMotor is not None
+                    ):
+                        self.connect(
+                            self.verticalMotor,
+                            PYSIGNAL("stateChanged"),
+                            self.updateVMotorState,
+                        )
+                        self.connect(
+                            self.horizontalMotor,
+                            PYSIGNAL("stateChanged"),
+                            self.updateHMotorState,
+                        )
+                        self.connect(
+                            self.verticalMotor,
+                            PYSIGNAL("positionChanged"),
+                            self.updateVMotorPosition,
+                        )
+                        self.connect(
+                            self.horizontalMotor,
+                            PYSIGNAL("positionChanged"),
+                            self.updateHMotorPosition,
+                        )
 
                         self.currentVerticalLabel = self.lblUp
                         self.currentHorizontalLabel = self.lblRight
 
                         # refresh labels
-                        self["formatString"] = self.getProperty("formatString").getUserValue()
+                        self["formatString"] = self.getProperty(
+                            "formatString"
+                        ).getUserValue()
                     else:
-                        logging.getLogger().error("%s: invalid vertical/horizontal motors in Hardware Object %s", str(self.name()), equipment.name())
-                        
+                        logging.getLogger().error(
+                            "%s: invalid vertical/horizontal motors in Hardware Object %s",
+                            str(self.name()),
+                            equipment.name(),
+                        )
+
             self.updateMotorPositions()
             self.updateMotorStates()
-        elif property == 'defaultStepSize':
+        elif property == "defaultStepSize":
             self.lblCurrentStep.setText("Current step : %s" % (newValue or "?"))
-        elif property == 'title':
+        elif property == "title":
             self.lblTitle.setText(newValue)
-        elif property == 'formatString':
+        elif property == "formatString":
             self.updateMotorPositions()
 
-             
     def setAbortState(self):
         for motor in (self.horizontalMotor, self.verticalMotor):
-            if motor is not None and motor.isReady() and motor.getState() == motor.MOVING:
+            if (
+                motor is not None
+                and motor.isReady()
+                and motor.getState() == motor.MOVING
+            ):
                 self.cmdAbort.setEnabled(True)
                 return
 
         self.cmdAbort.setEnabled(False)
 
-
     def updateMotorStates(self):
         self.updateVMotorState()
         self.updateHMotorState()
-
 
     def updateVMotorState(self, state=None):
         if state is None:
@@ -250,12 +300,12 @@ class TwoAxisAlignmentBrick(BlissWidget):
                     enabled = state > self.verticalMotor.UNUSABLE
         else:
             enabled = state > self.verticalMotor.UNUSABLE
-            
+
         color = self.motorStatesColors[state]
-        
+
         self.cmdDown.setEnabled(enabled)
         self.cmdUp.setEnabled(enabled)
-            
+
         for label in (self.lblDown, self.lblUp):
             label.setEnabled(enabled)
 
@@ -267,7 +317,6 @@ class TwoAxisAlignmentBrick(BlissWidget):
 
         self.updateVMotorPosition()
         self.setAbortState()
-        
 
     def updateHMotorState(self, state=None):
         if state is None:
@@ -279,12 +328,12 @@ class TwoAxisAlignmentBrick(BlissWidget):
                     enabled = state > self.horizontalMotor.UNUSABLE
         else:
             enabled = state > self.horizontalMotor.UNUSABLE
-            
+
         color = self.motorStatesColors[state]
-        
+
         self.cmdLeft.setEnabled(enabled)
         self.cmdRight.setEnabled(enabled)
-            
+
         for label in (self.lblLeft, self.lblRight):
             label.setEnabled(enabled)
 
@@ -296,44 +345,36 @@ class TwoAxisAlignmentBrick(BlissWidget):
 
         self.updateHMotorPosition()
         self.setAbortState()
- 
-        
+
     def cmdUpClicked(self):
         self.currentVerticalLabel = self.lblUp
         stepFactor = int(self["moveUpStepFactor"])
-        self.verticalMotor.moveRelative(self["defaultStepSize"]*stepFactor)
-        
+        self.verticalMotor.moveRelative(self["defaultStepSize"] * stepFactor)
 
     def cmdDownClicked(self):
         self.currentVerticalLabel = self.lblDown
         stepFactor = int(self["moveUpStepFactor"])
-        self.verticalMotor.moveRelative(-self["defaultStepSize"]*stepFactor)
-
+        self.verticalMotor.moveRelative(-self["defaultStepSize"] * stepFactor)
 
     def cmdLeftClicked(self):
         self.currentHorizontalLabel = self.lblLeft
         stepFactor = int(self["moveLeftStepFactor"])
-        self.horizontalMotor.moveRelative(self["defaultStepSize"]*stepFactor)
-
+        self.horizontalMotor.moveRelative(self["defaultStepSize"] * stepFactor)
 
     def cmdRightClicked(self):
         self.currentHorizontalLabel = self.lblRight
         stepFactor = int(self["moveLeftStepFactor"])
-        self.horizontalMotor.moveRelative(-self["defaultStepSize"]*stepFactor)
-
+        self.horizontalMotor.moveRelative(-self["defaultStepSize"] * stepFactor)
 
     def cmdChangeStepClicked(self):
-        newStep, ok = QInputDialog.getDouble("New step :", "Change step", self["defaultStepSize"], 0.00001, 100000, 5)
-        
+        newStep, ok = QInputDialog.getDouble(
+            "New step :", "Change step", self["defaultStepSize"], 0.00001, 100000, 5
+        )
+
         if ok:
             self["defaultStepSize"] = newStep
 
-    
     def cmdAbortClicked(self):
         for motor in (self.verticalMotor, self.horizontalMotor):
             if motor.getState() == motor.MOVING:
                 motor.stop()
-
-
-
-

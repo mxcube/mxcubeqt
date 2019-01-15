@@ -1,4 +1,3 @@
-
 #  Project: MXCuBE
 #  https://github.com/mxcube
 #
@@ -61,7 +60,7 @@ class TreeBrick(BaseWidget):
     populate_workflow_tab = QtImport.pyqtSignal(object)
     populate_advanced_widget = QtImport.pyqtSignal(object)
     populate_xray_imaging_widget = QtImport.pyqtSignal(object)
- 
+
     selection_changed = QtImport.pyqtSignal(object)
     set_directory = QtImport.pyqtSignal(str)
     set_prefix = QtImport.pyqtSignal(str)
@@ -92,7 +91,7 @@ class TreeBrick(BaseWidget):
         self.compression_state = True
         self.queue_autosave_action = None
 
-        # Properties ---------------------------------------------------------- 
+        # Properties ----------------------------------------------------------
         self.add_property("queue", "string", "/queue")
         self.add_property("queue_model", "string", "/queue-model")
         self.add_property("beamline_setup", "string", "/beamline-setup")
@@ -123,21 +122,21 @@ class TreeBrick(BaseWidget):
         self.define_signal("hide_sample_changer_tab", ())
         self.define_signal("hide_plate_manipulator_tab", ())
         self.define_signal("hide_char_parameters_tab", ())
-        self.define_signal("hide_energy_scan_tab",())
-        self.define_signal("hide_xrf_spectrum_tab",())
+        self.define_signal("hide_energy_scan_tab", ())
+        self.define_signal("hide_xrf_spectrum_tab", ())
         self.define_signal("hide_workflow_tab", ())
         self.define_signal("hide_advanced_tab", ())
         self.define_signal("hide_xray_imaging_tab", ())
         self.define_signal("populate_dc_parameter_widget", ())
         self.define_signal("populate_dc_group_widget", ())
-        self.define_signal("populate_char_parameter_widget",())
-        self.define_signal("populate_sample_details",())
+        self.define_signal("populate_char_parameter_widget", ())
+        self.define_signal("populate_sample_details", ())
         self.define_signal("populate_energy_scan_widget", ())
         self.define_signal("populate_xrf_spectrum_widget", ())
         self.define_signal("populate_workflow_tab", ())
         self.define_signal("populate_advanced_widget", ())
         self.define_signal("populate_xray_imaging_widget", ())
-        self.define_signal("selection_changed",())
+        self.define_signal("selection_changed", ())
         self.define_signal("set_directory", ())
         self.define_signal("set_prefix", ())
         self.define_signal("set_sample", ())
@@ -153,16 +152,17 @@ class TreeBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.sample_changer_widget = QtImport.load_ui_file(
-             "sample_changer_widget_layout.ui")
+            "sample_changer_widget_layout.ui"
+        )
 
-        #self.refresh_pixmap = Icons.load("Refresh2.png")
-        #self.sample_changer_widget.synch_button.setIcon(QtGui.QIcon(self.refresh_pixmap))
-        #self.sample_changer_widget.synch_button.setText("Synch ISPyB")
+        # self.refresh_pixmap = Icons.load("Refresh2.png")
+        # self.sample_changer_widget.synch_button.setIcon(QtGui.QIcon(self.refresh_pixmap))
+        # self.sample_changer_widget.synch_button.setText("Synch ISPyB")
 
         self.dc_tree_widget = DataCollectTree(self)
         self.dc_tree_widget.selection_changed_cb = self.selection_changed_cb
         self.dc_tree_widget.run_cb = self.run
-        #self.dc_tree_widget.clear_centred_positions_cb = \
+        # self.dc_tree_widget.clear_centred_positions_cb = \
         #    self.clear_centred_positions
 
         # Layout --------------------------------------------------------------
@@ -170,34 +170,41 @@ class TreeBrick(BaseWidget):
         __main_layout.addWidget(self.sample_changer_widget)
         __main_layout.addWidget(self.dc_tree_widget)
         __main_layout.setSpacing(0)
-        __main_layout.setContentsMargins(0, 0, 0, 0) 
+        __main_layout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.sample_changer_widget.details_button.clicked.connect(\
-             self.toggle_sample_changer_tab)
-        self.sample_changer_widget.filter_cbox.activated.connect(\
-             self.mount_mode_combo_changed)
-        self.sample_changer_widget.centring_cbox.activated.connect(\
-             self.dc_tree_widget.set_centring_method)
-        self.sample_changer_widget.synch_ispyb_button.clicked.connect(\
-             self.refresh_sample_list)
-        #self.sample_changer_widget.tree_options_button.clicked.connect(\
+        self.sample_changer_widget.details_button.clicked.connect(
+            self.toggle_sample_changer_tab
+        )
+        self.sample_changer_widget.filter_cbox.activated.connect(
+            self.mount_mode_combo_changed
+        )
+        self.sample_changer_widget.centring_cbox.activated.connect(
+            self.dc_tree_widget.set_centring_method
+        )
+        self.sample_changer_widget.synch_ispyb_button.clicked.connect(
+            self.refresh_sample_list
+        )
+        # self.sample_changer_widget.tree_options_button.clicked.connect(\
         #     self.open_tree_options_dialog)
-        self.sample_changer_widget.filter_combo.activated.connect(\
-             self.filter_combo_changed)
-        self.sample_changer_widget.filter_ledit.textChanged.connect(\
-             self.filter_text_changed)
-        self.sample_changer_widget.sample_combo.activated.connect(\
-             self.sample_combo_changed)
+        self.sample_changer_widget.filter_combo.activated.connect(
+            self.filter_combo_changed
+        )
+        self.sample_changer_widget.filter_ledit.textChanged.connect(
+            self.filter_text_changed
+        )
+        self.sample_changer_widget.sample_combo.activated.connect(
+            self.sample_combo_changed
+        )
 
-        # Other --------------------------------------------------------------- 
+        # Other ---------------------------------------------------------------
         self.enable_collect(True)
         self.sample_changer_widget.synch_ispyb_button.setEnabled(False)
-        #self.setFixedWidth(315) 
-        #self.sample_changer_widget.setFixedHeight(46)
-        #self.dc_tree_widget.set_centring_method(1)
+        # self.setFixedWidth(315)
+        # self.sample_changer_widget.setFixedHeight(46)
+        # self.dc_tree_widget.set_centring_method(1)
 
     # Framework 2 method
     def run(self):
@@ -205,39 +212,41 @@ class TreeBrick(BaseWidget):
            Emits signals to close tabs"""
 
         self.tools_menu = QtImport.QMenu("Queue", self)
-        self.tools_menu.addAction("Save",
-                                  self.save_queue)
-        self.tools_menu.addAction("Load",
-                                  self.load_queue)
-        self.queue_autosave_action = self.tools_menu.addAction(\
-             "Auto save", self.queue_autosave_clicked)
+        self.tools_menu.addAction("Save", self.save_queue)
+        self.tools_menu.addAction("Load", self.load_queue)
+        self.queue_autosave_action = self.tools_menu.addAction(
+            "Auto save", self.queue_autosave_clicked
+        )
 
         self.queue_autosave_action.setCheckable(True)
-        self.queue_autosave_action.setChecked(self['enableQueueAutoSave'])
-        self.queue_autosave_action.setEnabled(self['enableQueueAutoSave'])
+        self.queue_autosave_action.setChecked(self["enableQueueAutoSave"])
+        self.queue_autosave_action.setEnabled(self["enableQueueAutoSave"])
         self.tools_menu.addSeparator()
 
-        self.queue_undo_action = self.tools_menu.addAction(\
-             "Undo last action", self.queue_undo_clicked)
+        self.queue_undo_action = self.tools_menu.addAction(
+            "Undo last action", self.queue_undo_clicked
+        )
         self.queue_undo_action.setEnabled(False)
-        self.queue_redo_action = self.tools_menu.addAction(\
-             "Redo last action", self.queue_redo_clicked)
+        self.queue_redo_action = self.tools_menu.addAction(
+            "Redo last action", self.queue_redo_clicked
+        )
         self.queue_redo_action.setEnabled(False)
         self.tools_menu.addSeparator()
 
-        self.queue_sync_action = self.tools_menu.addAction(\
-             "Sync with ISPyB", self.queue_sync_clicked)
+        self.queue_sync_action = self.tools_menu.addAction(
+            "Sync with ISPyB", self.queue_sync_clicked
+        )
         self.queue_sync_action.setEnabled(False)
 
         if BaseWidget._menuBar is not None:
-            BaseWidget._menuBar.insert_menu(self.tools_menu, 1) 
+            BaseWidget._menuBar.insert_menu(self.tools_menu, 1)
 
         self.hide_dc_parameters_tab.emit(True)
         self.hide_dcg_tab.emit(True)
         self.hide_sample_centring_tab.emit(False)
         self.hide_char_parameters_tab.emit(True)
         self.hide_sample_changer_tab.emit(True)
-        self.hide_plate_manipulator_tab.emit(True) 
+        self.hide_plate_manipulator_tab.emit(True)
         self.hide_sample_tab.emit(True)
         self.hide_energy_scan_tab.emit(True)
         self.hide_xrf_spectrum_tab.emit(True)
@@ -255,33 +264,44 @@ class TreeBrick(BaseWidget):
         elif property_name == "useCentringMethods":
             self.sample_changer_widget.centring_cbox.setEnabled(new_value)
             self.sample_changer_widget.centring_mode_label.setEnabled(new_value)
-        elif property_name == 'queue':            
+        elif property_name == "queue":
             self.queue_hwobj = self.get_hardware_object(new_value)
             self.dc_tree_widget.queue_hwobj = self.queue_hwobj
-            self.connect(self.queue_hwobj, 'show_workflow_tab',
-                         self.show_workflow_tab_from_model)
+            self.connect(
+                self.queue_hwobj, "show_workflow_tab", self.show_workflow_tab_from_model
+            )
 
-            self.connect(self.queue_hwobj, 'queue_entry_execute_started',
-                         self.queue_entry_execution_started)
+            self.connect(
+                self.queue_hwobj,
+                "queue_entry_execute_started",
+                self.queue_entry_execution_started,
+            )
 
-            self.connect(self.queue_hwobj, 'queue_entry_execute_finished',
-                         self.queue_entry_execution_finished)
+            self.connect(
+                self.queue_hwobj,
+                "queue_entry_execute_finished",
+                self.queue_entry_execution_finished,
+            )
 
-            self.connect(self.queue_hwobj, 'queue_paused', 
-                         self.queue_paused_handler)
+            self.connect(self.queue_hwobj, "queue_paused", self.queue_paused_handler)
 
-            self.connect(self.queue_hwobj, 'queue_execution_finished', 
-                         self.queue_execution_finished)
+            self.connect(
+                self.queue_hwobj,
+                "queue_execution_finished",
+                self.queue_execution_finished,
+            )
 
-            self.connect(self.queue_hwobj, 'queue_stopped', 
-                         self.queue_stop_handler)
-        elif property_name == 'queue_model':
+            self.connect(self.queue_hwobj, "queue_stopped", self.queue_stop_handler)
+        elif property_name == "queue_model":
             self.queue_model_hwobj = self.get_hardware_object(new_value)
             self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
-            self.dc_tree_widget.confirm_dialog.queue_model_hwobj = self.queue_model_hwobj
-            self.connect(self.queue_model_hwobj, 'child_added',
-                         self.dc_tree_widget.add_to_view)
-        elif property_name == 'beamline_setup':
+            self.dc_tree_widget.confirm_dialog.queue_model_hwobj = (
+                self.queue_model_hwobj
+            )
+            self.connect(
+                self.queue_model_hwobj, "child_added", self.dc_tree_widget.add_to_view
+            )
+        elif property_name == "beamline_setup":
             bl_setup = self.get_hardware_object(new_value)
             self.dc_tree_widget.beamline_setup_hwobj = bl_setup
             self.diffractometer_hwobj = bl_setup.diffractometer_hwobj
@@ -289,122 +309,164 @@ class TreeBrick(BaseWidget):
             self.lims_hwobj = bl_setup.lims_client_hwobj
 
             if bl_setup.sample_changer_hwobj is not None:
-               self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
+                self.sample_changer_hwobj = bl_setup.sample_changer_hwobj
             else:
-               logging.getLogger("GUI").\
-                    debug("TreeBrick: sample changer hwobj not defined.")
+                logging.getLogger("GUI").debug(
+                    "TreeBrick: sample changer hwobj not defined."
+                )
 
             if bl_setup.plate_manipulator_hwobj is not None:
-               self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
-               self.dc_tree_widget.init_plate_navigator(self.plate_manipulator_hwobj)
+                self.plate_manipulator_hwobj = bl_setup.plate_manipulator_hwobj
+                self.dc_tree_widget.init_plate_navigator(self.plate_manipulator_hwobj)
             else:
-               logging.getLogger("GUI").\
-                    debug("TreeBrick: plate manipulator hwobj not defined.")
+                logging.getLogger("GUI").debug(
+                    "TreeBrick: plate manipulator hwobj not defined."
+                )
 
             if self.sample_changer_hwobj is not None:
-                self.connect(self.sample_changer_hwobj, 
-                             SampleChanger.STATE_CHANGED_EVENT,
-                             self.sample_load_state_changed)
-                self.connect(self.sample_changer_hwobj,
-                             SampleChanger.SELECTION_CHANGED_EVENT,
-                             self.sample_selection_changed)
-                self.connect(self.sample_changer_hwobj,
-                             SampleChanger.INFO_CHANGED_EVENT, 
-                             self.set_sample_pin_icon)
-                self.connect(self.sample_changer_hwobj,
-                             SampleChanger.STATUS_CHANGED_EVENT,
-                             self.sample_changer_status_changed)
+                self.connect(
+                    self.sample_changer_hwobj,
+                    SampleChanger.STATE_CHANGED_EVENT,
+                    self.sample_load_state_changed,
+                )
+                self.connect(
+                    self.sample_changer_hwobj,
+                    SampleChanger.SELECTION_CHANGED_EVENT,
+                    self.sample_selection_changed,
+                )
+                self.connect(
+                    self.sample_changer_hwobj,
+                    SampleChanger.INFO_CHANGED_EVENT,
+                    self.set_sample_pin_icon,
+                )
+                self.connect(
+                    self.sample_changer_hwobj,
+                    SampleChanger.STATUS_CHANGED_EVENT,
+                    self.sample_changer_status_changed,
+                )
                 self.sample_changer_hwobj.update_values()
             if self.plate_manipulator_hwobj is not None:
-                self.connect(self.plate_manipulator_hwobj,
-                             SampleChanger.STATE_CHANGED_EVENT,
-                             self.sample_load_state_changed)
-                self.connect(self.plate_manipulator_hwobj,
-                             SampleChanger.INFO_CHANGED_EVENT,
-                             self.plate_info_changed)
+                self.connect(
+                    self.plate_manipulator_hwobj,
+                    SampleChanger.STATE_CHANGED_EVENT,
+                    self.sample_load_state_changed,
+                )
+                self.connect(
+                    self.plate_manipulator_hwobj,
+                    SampleChanger.INFO_CHANGED_EVENT,
+                    self.plate_info_changed,
+                )
                 self.plate_manipulator_hwobj.update_values()
 
-            self.connect(bl_setup.shape_history_hwobj,
-                         "shapeCreated",
-                         self.dc_tree_widget.shape_created)
-            self.connect(bl_setup.shape_history_hwobj,
-                         "shapeChanged",
-                         self.dc_tree_widget.shape_changed)
-            self.connect(bl_setup.shape_history_hwobj,
-                         "shapeDeleted",
-                         self.dc_tree_widget.shape_deleted)
-            self.connect(bl_setup.shape_history_hwobj,
-                         "diffractometerReady",
-                         self.diffractometer_ready_changed)
-            self.connect(bl_setup.diffractometer_hwobj,
-                         "newAutomaticCentringPoint",
-                         self.diffractometer_automatic_centring_done)
-            self.connect(bl_setup.diffractometer_hwobj, 
-                         "minidiffPhaseChanged",
-                         self.diffractometer_phase_changed)
-            self.diffractometer_phase_changed(\
-                 bl_setup.diffractometer_hwobj.get_current_phase())
+            self.connect(
+                bl_setup.shape_history_hwobj,
+                "shapeCreated",
+                self.dc_tree_widget.shape_created,
+            )
+            self.connect(
+                bl_setup.shape_history_hwobj,
+                "shapeChanged",
+                self.dc_tree_widget.shape_changed,
+            )
+            self.connect(
+                bl_setup.shape_history_hwobj,
+                "shapeDeleted",
+                self.dc_tree_widget.shape_deleted,
+            )
+            self.connect(
+                bl_setup.shape_history_hwobj,
+                "diffractometerReady",
+                self.diffractometer_ready_changed,
+            )
+            self.connect(
+                bl_setup.diffractometer_hwobj,
+                "newAutomaticCentringPoint",
+                self.diffractometer_automatic_centring_done,
+            )
+            self.connect(
+                bl_setup.diffractometer_hwobj,
+                "minidiffPhaseChanged",
+                self.diffractometer_phase_changed,
+            )
+            self.diffractometer_phase_changed(
+                bl_setup.diffractometer_hwobj.get_current_phase()
+            )
 
             if hasattr(bl_setup, "ppu_control_hwobj"):
-                self.connect(bl_setup.ppu_control_hwobj,
-                             'ppuStatusChanged',
-                             self.ppu_status_changed)
+                self.connect(
+                    bl_setup.ppu_control_hwobj,
+                    "ppuStatusChanged",
+                    self.ppu_status_changed,
+                )
                 bl_setup.ppu_control_hwobj.update_values()
             if hasattr(bl_setup, "safety_shutter_hwobj"):
-                self.connect(bl_setup.safety_shutter_hwobj,
-                             'shutterStateChanged',
-                             self.shutter_state_changed)
+                self.connect(
+                    bl_setup.safety_shutter_hwobj,
+                    "shutterStateChanged",
+                    self.shutter_state_changed,
+                )
                 bl_setup.safety_shutter_hwobj.update_values()
-                #self.shutter_state_changed(bl_setup.safety_shutter_hwobj.getShutterState())
+                # self.shutter_state_changed(bl_setup.safety_shutter_hwobj.getShutterState())
             if hasattr(bl_setup, "machine_info_hwobj"):
-                self.connect(bl_setup.machine_info_hwobj,
-                             'machineCurrentChanged',
-                             self.machine_current_changed)
+                self.connect(
+                    bl_setup.machine_info_hwobj,
+                    "machineCurrentChanged",
+                    self.machine_current_changed,
+                )
 
             has_shutter_less = bl_setup.detector_has_shutterless()
             if has_shutter_less:
                 self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
-        elif property_name == 'xml_rpc_server':
+        elif property_name == "xml_rpc_server":
             xml_rpc_server_hwobj = self.get_hardware_object(new_value)
 
             if xml_rpc_server_hwobj:
-                self.connect(xml_rpc_server_hwobj,
-                             'add_to_queue',
-                             self.add_to_queue)
-                self.connect(xml_rpc_server_hwobj,
-                             'start_queue',
-                             self.dc_tree_widget.collect_items)
-                self.connect(xml_rpc_server_hwobj,
-                             'open_dialog',
-                             self.open_xmlrpc_dialog)
-        elif property_name == 'hwobj_state_machine':
-              self.state_machine_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == 'redis_client':
-              self.redis_client_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == 'hwobj_unittest':
-              self.unittest_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == 'scOneName':
-              self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
-        elif property_name == 'scTwoName':
-              self.sample_changer_widget.filter_cbox.setItemText(2, new_value) 
-        elif property_name == 'usePlateNavigator':
-              self.dc_tree_widget.plate_navigator_cbox.setVisible(new_value)
-        elif property_name == 'useHistoryView':
-              #self.dc_tree_widget.history_tree_widget.setVisible(new_value)
-              self.dc_tree_widget.history_enable_cbox.setVisible(new_value)
+                self.connect(xml_rpc_server_hwobj, "add_to_queue", self.add_to_queue)
+                self.connect(
+                    xml_rpc_server_hwobj,
+                    "start_queue",
+                    self.dc_tree_widget.collect_items,
+                )
+                self.connect(
+                    xml_rpc_server_hwobj, "open_dialog", self.open_xmlrpc_dialog
+                )
+        elif property_name == "hwobj_state_machine":
+            self.state_machine_hwobj = self.get_hardware_object(
+                new_value, optional=True
+            )
+        elif property_name == "redis_client":
+            self.redis_client_hwobj = self.get_hardware_object(new_value, optional=True)
+        elif property_name == "hwobj_unittest":
+            self.unittest_hwobj = self.get_hardware_object(new_value, optional=True)
+        elif property_name == "scOneName":
+            self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
+        elif property_name == "scTwoName":
+            self.sample_changer_widget.filter_cbox.setItemText(2, new_value)
+        elif property_name == "usePlateNavigator":
+            self.dc_tree_widget.plate_navigator_cbox.setVisible(new_value)
+        elif property_name == "useHistoryView":
+            # self.dc_tree_widget.history_tree_widget.setVisible(new_value)
+            self.dc_tree_widget.history_enable_cbox.setVisible(new_value)
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     @QtImport.pyqtSlot(int, str, str, int, str, str, bool)
-    def set_session(self, session_id, t_prop_code = None, prop_number = None,
-                    prop_id = None, start_date = None, prop_code = None,
-                    is_inhouse = None):
+    def set_session(
+        self,
+        session_id,
+        t_prop_code=None,
+        prop_number=None,
+        prop_id=None,
+        start_date=None,
+        prop_code=None,
+        is_inhouse=None,
+    ):
         self.session_hwobj.set_session_start_date(str(start_date))
 
     @QtImport.pyqtSlot()
     def set_requested_tree_brick(self):
         self.get_tree_brick.emit(self)
-  
+
     @QtImport.pyqtSlot(bool)
     def logged_in(self, logged_in):
         """
@@ -416,46 +478,62 @@ class TreeBrick(BaseWidget):
         """
         loaded_queue_index = None
         self.is_logged_in = logged_in
-        #self.enable_collect(logged_in)
+        # self.enable_collect(logged_in)
 
-        #if not logged_in:
+        # if not logged_in:
         if True:
             self.dc_tree_widget.sample_mount_method = 0
             self.dc_tree_widget.populate_free_pin()
             self.dc_tree_widget.plate_navigator_cbox.setVisible(False)
 
-            if self.sample_changer_hwobj is not None and \
-               self.diffractometer_hwobj.use_sample_changer():
+            if (
+                self.sample_changer_hwobj is not None
+                and self.diffractometer_hwobj.use_sample_changer()
+            ):
                 sc_basket_content, sc_sample_content = self.get_sc_content()
                 if sc_basket_content and sc_sample_content:
-                    sc_basket_list, sc_sample_list = self.dc_tree_widget.\
-                         samples_from_sc_content(sc_basket_content, sc_sample_content)
+                    sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                        sc_basket_content, sc_sample_content
+                    )
                     self.dc_tree_widget.sample_mount_method = 1
-                    self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
-                         self.dc_tree_widget.sample_mount_method)
+                    self.dc_tree_widget.populate_tree_widget(
+                        sc_basket_list,
+                        sc_sample_list,
+                        self.dc_tree_widget.sample_mount_method,
+                    )
                     self.sample_changer_widget.details_button.setText("Show SC-details")
- 
-            if self.plate_manipulator_hwobj is not None and \
-               self.diffractometer_hwobj.in_plate_mode():
-                if self['usePlateNavigator']:
+
+            if (
+                self.plate_manipulator_hwobj is not None
+                and self.diffractometer_hwobj.in_plate_mode()
+            ):
+                if self["usePlateNavigator"]:
                     self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
                 self.dc_tree_widget.beamline_setup_hwobj.set_plate_mode(True)
                 if plate_sample_content:
-                     plate_row_list, plate_sample_list = self.dc_tree_widget.\
-                        samples_from_sc_content(plate_row_content, plate_sample_content)
-                     self.dc_tree_widget.sample_mount_method = 2
-                     self.dc_tree_widget.populate_tree_widget(plate_row_list, 
-                         plate_sample_list, self.dc_tree_widget.sample_mount_method)
-                     self.sample_changer_widget.details_button.setText("Show Plate-details")
+                    plate_row_list, plate_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                        plate_row_content, plate_sample_content
+                    )
+                    self.dc_tree_widget.sample_mount_method = 2
+                    self.dc_tree_widget.populate_tree_widget(
+                        plate_row_list,
+                        plate_sample_list,
+                        self.dc_tree_widget.sample_mount_method,
+                    )
+                    self.sample_changer_widget.details_button.setText(
+                        "Show Plate-details"
+                    )
 
-            self.sample_changer_widget.filter_cbox.setCurrentIndex(\
-                 self.dc_tree_widget.sample_mount_method)
-            self.dc_tree_widget.filter_sample_list(\
-                 self.dc_tree_widget.sample_mount_method)
+            self.sample_changer_widget.filter_cbox.setCurrentIndex(
+                self.dc_tree_widget.sample_mount_method
+            )
+            self.dc_tree_widget.filter_sample_list(
+                self.dc_tree_widget.sample_mount_method
+            )
 
             if self.dc_tree_widget.sample_mount_method > 0:
-                #Enable buttons related to sample changer
+                # Enable buttons related to sample changer
                 self.sample_changer_widget.filter_cbox.setEnabled(True)
                 self.sample_changer_widget.details_button.setEnabled(True)
                 self.dc_tree_widget.scroll_to_item()
@@ -467,10 +545,10 @@ class TreeBrick(BaseWidget):
             loaded_queue_index = self.load_queue()
             self.dc_tree_widget.samples_initialized = True
 
-        #if not self.dc_tree_widget.samples_initialized
+        # if not self.dc_tree_widget.samples_initialized
         #    self.dc_tree_widget.sample_tree_widget_selection()
         #    self.dc_tree_widget.set_sample_pin_icon()
-        #self.dc_tree_widget.scroll_to_item()
+        # self.dc_tree_widget.scroll_to_item()
 
     def enable_collect(self, state):
         """
@@ -484,41 +562,42 @@ class TreeBrick(BaseWidget):
         self.dc_tree_widget.enable_collect(state)
 
     def queue_entry_execution_started(self, queue_entry):
-        self.current_queue_entry = queue_entry 
+        self.current_queue_entry = queue_entry
         self.enable_widgets.emit(False)
         self.dc_tree_widget.queue_entry_execution_started(queue_entry)
-        #BaseWidget.set_status_info("status", "Queue started", "running")
+        # BaseWidget.set_status_info("status", "Queue started", "running")
 
     def queue_entry_execution_finished(self, queue_entry, status):
         self.current_queue_entry = None
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
         self.enable_widgets.emit(True)
-      
+
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
-            BaseWidget.set_status_info("collect", "%s : %s" % \
-                (queue_entry.get_type_str(), status))
+            BaseWidget.set_status_info(
+                "collect", "%s : %s" % (queue_entry.get_type_str(), status)
+            )
 
     def queue_paused_handler(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_paused_handler(status)
 
     def queue_execution_finished(self, status):
-        #self.enable_widgets.emit(True)
+        # self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_execution_completed(status)
 
     def queue_stop_handler(self, status):
         self.enable_widgets.emit(True)
         self.dc_tree_widget.queue_stop_handler(status)
-        #BaseWidget.set_status_info("status", "Queue stoped")
+        # BaseWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
         self.diffractometer_ready.emit(self.diffractometer_hwobj.is_ready())
-        
+
         try:
             info_message = self.diffractometer_hwobj.get_status()
         except AttributeError:
             info_message = None
-            
+
         if info_message is None and status:
             info_message = "Ready"
             info_status = "ready"
@@ -527,13 +606,11 @@ class TreeBrick(BaseWidget):
             info_status = "running"
         else:
             info_status = "ready"
-            
+
         BaseWidget.set_status_info("diffractometer", info_message, info_status)
-        
 
     def diffractometer_automatic_centring_done(self, point):
-        if self.dc_tree_widget.centring_method == \
-            CENTRING_METHOD.LOOP:
+        if self.dc_tree_widget.centring_method == CENTRING_METHOD.LOOP:
             message_box = QtImport.QMessageBox()
             message_box.setIcon(QtImport.QMessageBox.Question)
             message_box.setWindowTitle("Optical centring with user confirmation.")
@@ -542,31 +619,34 @@ class TreeBrick(BaseWidget):
             message_box.addButton("Try again", QtImport.QMessageBox.RejectRole)
 
             if self.current_queue_entry:
-                message_box.addButton("Skip following entry",
-                                      QtImport.QMessageBox.NoRole)
+                message_box.addButton(
+                    "Skip following entry", QtImport.QMessageBox.NoRole
+                )
 
             result = message_box.exec_()
             if result == QtImport.QMessageBox.AcceptRole:
                 self.diffractometer_hwobj.automatic_centring_try_count = 0
             elif result == QtImport.QMessageBox.RejectRole:
-                logging.getLogger("GUI").info(\
-                    "Optical centring result rejected. " + \
-                    "Trying once again.")
+                logging.getLogger("GUI").info(
+                    "Optical centring result rejected. " + "Trying once again."
+                )
             else:
                 self.diffractometer_hwobj.automatic_centring_try_count = 0
                 if self.current_queue_entry:
-                    logging.getLogger("GUI").info(\
-                        "Optical centring rejected " + \
-                        "and the following queue entries skipped")
+                    logging.getLogger("GUI").info(
+                        "Optical centring rejected "
+                        + "and the following queue entries skipped"
+                    )
                     task_group_entry = self.current_queue_entry.get_container()
                     for child_entry in task_group_entry.get_queue_entry_list():
                         child_entry.set_enabled(False)
 
     def samples_from_lims(self, samples):
-        barcode_samples, location_samples = \
-            self.dc_tree_widget.samples_from_lims(samples)
-        l_samples = dict()            
-   
+        barcode_samples, location_samples = self.dc_tree_widget.samples_from_lims(
+            samples
+        )
+        l_samples = dict()
+
         # TODO: add test for sample changer type, here code is for Robodiff only
         for location, l_sample in location_samples.iteritems():
             if l_sample.lims_location != (None, None):
@@ -588,15 +668,15 @@ class TreeBrick(BaseWidget):
         accordingly.
         """
         lims_client = self.lims_hwobj
-        log = logging.getLogger("user_level_log") 
+        log = logging.getLogger("user_level_log")
 
-        self.lims_samples = lims_client.get_samples(\
-             self.session_hwobj.proposal_id,
-             self.session_hwobj.session_id)
+        self.lims_samples = lims_client.get_samples(
+            self.session_hwobj.proposal_id, self.session_hwobj.session_id
+        )
 
         basket_list = []
-        sample_list = []        
-        self.filtered_lims_samples = [] 
+        sample_list = []
+        self.filtered_lims_samples = []
         sample_changer = None
 
         self.sample_changer_widget.sample_combo.clear()
@@ -604,35 +684,37 @@ class TreeBrick(BaseWidget):
             try:
                 if sample.containerSampleChangerLocation:
                     self.filtered_lims_samples.append(sample)
-                    item_text = "%s-%s" %(sample.proteinAcronym, sample.sampleName)
+                    item_text = "%s-%s" % (sample.proteinAcronym, sample.sampleName)
                     self.sample_changer_widget.sample_combo.addItem(item_text)
-            except:
-                pass 
+            except BaseException:
+                pass
 
         self.sample_changer_widget.sample_label.setEnabled(True)
         self.sample_changer_widget.sample_combo.setEnabled(True)
         self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
-                 
+
         if self.dc_tree_widget.sample_mount_method == 1:
             sample_changer = self.sample_changer_hwobj
         elif self.dc_tree_widget.sample_mount_method == 2:
             sample_changer = self.plate_manipulator_hwobj
 
-        #if len(self.lims_samples) == 0:
+        # if len(self.lims_samples) == 0:
         #    log.warning("No sample available in LIMS")
         #    self.mount_mode_combo_changed(self.sample_changer_widget.filter_cbox.currentIndex())
-        #    return 
-     
+        #    return
+
         if sample_changer is not None:
-            (barcode_samples, location_samples) = \
-             self.dc_tree_widget.samples_from_lims(self.lims_samples)
+            (barcode_samples, location_samples) = self.dc_tree_widget.samples_from_lims(
+                self.lims_samples
+            )
             sc_basket_content, sc_sample_content = self.get_sc_content()
-            sc_basket_list, sc_sample_list = self.dc_tree_widget.\
-              samples_from_sc_content(sc_basket_content, sc_sample_content)
+            sc_basket_list, sc_sample_list = self.dc_tree_widget.samples_from_sc_content(
+                sc_basket_content, sc_sample_content
+            )
 
             basket_list = sc_basket_list
-            
-            #self.queue_sync_action.setEnabled(True)
+
+            # self.queue_sync_action.setEnabled(True)
             for sc_sample in sc_sample_list:
                 # Get the sample in lims with the barcode
                 # sc_sample.code
@@ -640,44 +722,58 @@ class TreeBrick(BaseWidget):
                 # There was a sample with that barcode
                 if lims_sample:
                     if lims_sample.lims_location == sc_sample.location:
-                        log.debug("Found sample in ISPyB for location %s" % \
-                                  str(sc_sample.location))
+                        log.debug(
+                            "Found sample in ISPyB for location %s"
+                            % str(sc_sample.location)
+                        )
                         sample_list.append(lims_sample)
                     else:
-                        log.warning("The sample with the barcode (%s) exists" + \
-                                    " in LIMS but the location does not mat"  + \
-                                    "ch. Sample changer location: %s, LIMS "  + \
-                                    "location %s" % (sc_sample.code,
-                                                     sc_sample.location,
-                                                     lims_sample.lims_location))
+                        log.warning(
+                            "The sample with the barcode (%s) exists"
+                            + " in LIMS but the location does not mat"
+                            + "ch. Sample changer location: %s, LIMS "
+                            + "location %s"
+                            % (
+                                sc_sample.code,
+                                sc_sample.location,
+                                lims_sample.lims_location,
+                            )
+                        )
                         sample_list.append(sc_sample)
-                else: # No sample with that barcode, continue with location
+                else:  # No sample with that barcode, continue with location
                     lims_sample = location_samples.get(sc_sample.location)
                     if lims_sample:
                         if lims_sample.lims_code:
-                            log.warning("The sample has a barcode in LIMS, but " + \
-                                        "the SC has no barcode information for " + \
-                                        "this sample. For location: %s" % \
-                                        str(sc_sample.location))
+                            log.warning(
+                                "The sample has a barcode in LIMS, but "
+                                + "the SC has no barcode information for "
+                                + "this sample. For location: %s"
+                                % str(sc_sample.location)
+                            )
                             sample_list.append(lims_sample)
                         else:
-                            log.debug("Found sample in ISPyB for location %s" % \
-                                      str(sc_sample.location))
+                            log.debug(
+                                "Found sample in ISPyB for location %s"
+                                % str(sc_sample.location)
+                            )
                             sample_list.append(lims_sample)
                     else:
                         if lims_sample:
-                            if lims_sample.lims_location != None:
-                                log.warning("No barcode was provided in ISPyB " + \
-                                            "which makes it impossible to verify if" + \
-                                            "the locations are correct, assuming " + \
-                                            "that the positions are correct.")
+                            if lims_sample.lims_location is not None:
+                                log.warning(
+                                    "No barcode was provided in ISPyB "
+                                    + "which makes it impossible to verify if"
+                                    + "the locations are correct, assuming "
+                                    + "that the positions are correct."
+                                )
                                 sample_list.append(lims_sample)
                         else:
-                            #log.warning("No sample in ISPyB for location %s" % \
+                            # log.warning("No sample in ISPyB for location %s" % \
                             #            str(sc_sample.location))
                             sample_list.append(sc_sample)
-            self.dc_tree_widget.populate_tree_widget(basket_list, sample_list, 
-                 self.dc_tree_widget.sample_mount_method)
+            self.dc_tree_widget.populate_tree_widget(
+                basket_list, sample_list, self.dc_tree_widget.sample_mount_method
+            )
             self.dc_tree_widget.de_select_items()
 
     def sample_combo_changed(self, index):
@@ -695,7 +791,7 @@ class TreeBrick(BaseWidget):
     def get_sc_content(self):
         """
         Gets the 'raw' data from the sample changer.
-        
+
         :returns: A list with tuples, containing the sample information.
         """
         sc_basket_content = []
@@ -706,16 +802,17 @@ class TreeBrick(BaseWidget):
             basket_code = basket.getID() or ""
             basket_name = basket.getName()
             is_present = basket.isPresent()
-            sc_basket_content.append((basket_index+1, basket, basket_name))
-             
+            sc_basket_content.append((basket_index + 1, basket, basket_name))
+
         for sample in self.sample_changer_hwobj.getSampleList():
             matrix = sample.getID() or ""
             basket_index = sample.getContainer().getIndex()
             sample_index = sample.getIndex()
             basket_code = sample.getContainer().getID() or ""
             sample_name = sample.getName()
-            sc_sample_content.append((matrix, basket_index + 1, 
-                                      sample_index + 1, sample_name))
+            sc_sample_content.append(
+                (matrix, basket_index + 1, sample_index + 1, sample_name)
+            )
         return sc_basket_content, sc_sample_content
 
     def get_plate_content(self):
@@ -725,7 +822,7 @@ class TreeBrick(BaseWidget):
         plate_sample_content = []
 
         for row in self.plate_manipulator_hwobj.getBasketList():
-            row_index = row.getIndex() 
+            row_index = row.getIndex()
             row_code = row.getID() or ""
             row_name = row.getName()
             is_present = row.isPresent()
@@ -738,16 +835,15 @@ class TreeBrick(BaseWidget):
             sample_name = sample.getName()
             coords = sample.getCoords()
             matrix = sample.getID() or ""
-            #vial_index = ":".join(map(str, coords[1:]))
-            plate_sample_content.append((matrix, coords[0], 
-                                         coords[1], sample_name))
- 
+            # vial_index = ":".join(map(str, coords[1:]))
+            plate_sample_content.append((matrix, coords[0], coords[1], sample_name))
+
         return plate_row_content, plate_sample_content
 
     def status_msg_changed(self, msg, color):
         """
         Status message from the SampleChangerBrick.
-        
+
         :param msg: The message
         :type msg: str
 
@@ -772,8 +868,9 @@ class TreeBrick(BaseWidget):
         :returns: None
         """
         s_color = SC_STATE_COLOR.get(state, "UNKNOWN")
-        Colors.set_widget_color(self.sample_changer_widget.details_button,
-                                           QtImport.QColor(s_color))
+        Colors.set_widget_color(
+            self.sample_changer_widget.details_button, QtImport.QColor(s_color)
+        )
         self.dc_tree_widget.scroll_to_item()
         if self.diffractometer_hwobj.in_plate_mode():
             self.dc_tree_widget.plate_navigator_widget.refresh_plate_location()
@@ -790,7 +887,7 @@ class TreeBrick(BaseWidget):
 
     def plate_info_changed(self):
         self.set_sample_pin_icon()
-        self.dc_tree_widget.plate_navigator_widget.refresh_plate_location() 
+        self.dc_tree_widget.plate_navigator_widget.refresh_plate_location()
         self.dc_tree_widget.scroll_to_item()
 
     def show_sample_centring_tab(self):
@@ -838,9 +935,9 @@ class TreeBrick(BaseWidget):
         self.hide_advanced_tab.emit(True)
         self.hide_xray_imaging_tab.emit(True)
 
-    def populate_dc_parameters_tab(self, item = None):
+    def populate_dc_parameters_tab(self, item=None):
         self.populate_dc_parameter_widget.emit(item)
-        
+
     def show_datacollection_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show SC-details")
         self.hide_dcg_tab.emit(True)
@@ -856,7 +953,7 @@ class TreeBrick(BaseWidget):
         self.hide_xray_imaging_tab.emit(True)
         self.populate_dc_parameters_tab(item)
 
-    def populate_dc_group_tab(self, item = None):
+    def populate_dc_group_tab(self, item=None):
         self.populate_dc_group_widget.emit(item)
 
     def show_char_parameters_tab(self, item):
@@ -884,7 +981,7 @@ class TreeBrick(BaseWidget):
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
         self.hide_char_parameters_tab.emit(True)
-        self.hide_sample_tab.emit(True) 
+        self.hide_sample_tab.emit(True)
         self.hide_energy_scan_tab.emit(False)
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
@@ -933,7 +1030,7 @@ class TreeBrick(BaseWidget):
 
     def show_workflow_tab_from_model(self):
         self.show_workflow_tab(None)
-        
+
     def show_workflow_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show SC-details")
         self.hide_dcg_tab.emit(True)
@@ -941,17 +1038,17 @@ class TreeBrick(BaseWidget):
         self.hide_sample_changer_tab.emit(True)
         self.hide_plate_manipulator_tab.emit(True)
         self.hide_char_parameters_tab.emit(True)
-        self.hide_sample_tab.emit(True) 
+        self.hide_sample_tab.emit(True)
         self.hide_energy_scan_tab.emit(True)
         self.hide_xrf_spectrum_tab.emit(False)
         self.hide_workflow_tab.emit(False)
         self.hide_advanced_tab.emit(True)
         self.hide_xray_imaging_tab.emit(True)
 
-        running = self.queue_hwobj.is_executing() 
+        running = self.queue_hwobj.is_executing()
         self.populate_workflow_tab(item, running=running)
 
-    def populate_workflow_tab(self, item, running = False):
+    def populate_workflow_tab(self, item, running=False):
         self.populate_workflow_tab.emit(item, running)
 
     def show_xray_imaging_tab(self, item):
@@ -974,15 +1071,17 @@ class TreeBrick(BaseWidget):
 
     def mount_mode_combo_changed(self, index):
         self.dc_tree_widget.filter_sample_list(index)
-        self.sample_changer_widget.details_button.setEnabled(index > 0) 
-        self.sample_changer_widget.synch_ispyb_button.setEnabled(index < 2 and self.is_logged_in)
-        #self.sample_changer_widget.sample_label.setEnabled(False)
-        #self.sample_changer_widget.sample_combo.setEnabled(index == 0)
+        self.sample_changer_widget.details_button.setEnabled(index > 0)
+        self.sample_changer_widget.synch_ispyb_button.setEnabled(
+            index < 2 and self.is_logged_in
+        )
+        # self.sample_changer_widget.sample_label.setEnabled(False)
+        # self.sample_changer_widget.sample_combo.setEnabled(index == 0)
         if index == 0:
             self.hide_sample_changer_tab.emit(True)
             self.hide_plate_manipulator_tab.emit(True)
-        
-    def toggle_sample_changer_tab(self): 
+
+    def toggle_sample_changer_tab(self):
         if self.current_view == self.sample_changer_widget:
             self.current_view = None
             if self.dc_tree_widget.sample_mount_method == 1:
@@ -1003,7 +1102,7 @@ class TreeBrick(BaseWidget):
                 self.hide_plate_manipulator_tab.emit(False)
                 self.sample_changer_widget.details_button.setText("Hide Plate-details")
             self.hide_sample_tab.emit(True)
-        
+
     def selection_changed_cb(self, items):
         if len(items) == 1:
             item = items[0]
@@ -1012,7 +1111,7 @@ class TreeBrick(BaseWidget):
                 self.emit_set_sample(item)
                 self.emit_set_directory()
                 self.emit_set_prefix(item)
-                #self.populate_edna_parameter_widget(item)
+                # self.populate_edna_parameter_widget(item)
             elif isinstance(item, queue_item.DataCollectionQueueItem):
                 data_collection = item.get_model()
                 if data_collection.is_mesh():
@@ -1051,14 +1150,18 @@ class TreeBrick(BaseWidget):
         items = self.dc_tree_widget.get_selected_items()
         return items
 
-    def add_to_queue(self, task_list, parent_tree_item = None, set_on = True):
-        if not parent_tree_item :
+    def add_to_queue(self, task_list, parent_tree_item=None, set_on=True):
+        if not parent_tree_item:
             parent_tree_item = self.dc_tree_widget.get_mounted_sample_item()
         self.dc_tree_widget.add_to_queue(task_list, parent_tree_item, set_on)
 
     def open_xmlrpc_dialog(self, dialog_dict):
-        QtImport.QMessageBox.information(self, "Message from beamline operator",
-            dialog_dict["msg"], QtImport.QMessageBox.Ok) 
+        QtImport.QMessageBox.information(
+            self,
+            "Message from beamline operator",
+            dialog_dict["msg"],
+            QtImport.QMessageBox.Ok,
+        )
 
     def select_last_added_item(self):
         self.dc_tree_widget.select_last_added_item()
@@ -1066,7 +1169,7 @@ class TreeBrick(BaseWidget):
     def filter_combo_changed(self, filter_index):
         """Filters sample treewidget based on the selected filter criteria:
            0 : No filter
-           1 : Star 
+           1 : Star
            2 : Sample name
            3 : Protein name
            4 : Basket index
@@ -1076,99 +1179,106 @@ class TreeBrick(BaseWidget):
            8 : Helical
            9 : Characterisation
            10: Energy Scan
-           11: XRF spectrum            
+           11: XRF spectrum
         """
-        self.sample_changer_widget.filter_ledit.setEnabled(\
-             filter_index in (2, 3, 4))
+        self.sample_changer_widget.filter_ledit.setEnabled(filter_index in (2, 3, 4))
         self.clear_filter()
         if filter_index > 0:
-            item_iterator = QtImport.QTreeWidgetItemIterator(\
-                  self.dc_tree_widget.sample_tree_widget)
+            item_iterator = QtImport.QTreeWidgetItemIterator(
+                self.dc_tree_widget.sample_tree_widget
+            )
             item = item_iterator.value()
             while item:
-                  hide = False
-                  item_model = item.get_model()
-                  if filter_index == 1:
-                      hide = not item.has_star()
-                  elif filter_index == 5:
-                      if isinstance(item, queue_item.DataCollectionQueueItem):
-                          hide = not item_model.is_executed()
-                  elif filter_index == 6:
-                      if isinstance(item, queue_item.DataCollectionQueueItem):
-                          hide = item_model.is_executed()
-                  elif filter_index == 7:
-                      if isinstance(item, queue_item.DataCollectionQueueItem):
-                          hide = item_model.is_helical()
-                      else:
-                          hide = True
-                  elif filter_index == 8:
-                      if isinstance(item, queue_item.DataCollectionQueueItem):
-                          hide = not item_model.is_helical()
-                      else:
-                          hide = True
-                  elif filter_index == 9:
-                      hide = not isinstance(item, queue_item.CharacterisationQueueItem)
-                  elif filter_index == 10:
-                      hide = not isinstance(item, queue_item.EnergyScanQueueItem)
-                  elif filter_index == 11:
-                      hide = not isinstance(item, queue_item.XRFSpectrumQueueItem)
-                  #elif filter_index == 11:
-                  #    hide = not isinstance(item, queue_item.AdvancedQueueItem)
-                  if type(item) not in (queue_item.TaskQueueItem,
-                                        queue_item.SampleQueueItem,
-                                        queue_item.BasketQueueItem,
-                                        queue_item.DataCollectionGroupQueueItem):
-                      item.set_hidden(hide)
-                  item_iterator += 1
-                  item = item_iterator.value()
+                hide = False
+                item_model = item.get_model()
+                if filter_index == 1:
+                    hide = not item.has_star()
+                elif filter_index == 5:
+                    if isinstance(item, queue_item.DataCollectionQueueItem):
+                        hide = not item_model.is_executed()
+                elif filter_index == 6:
+                    if isinstance(item, queue_item.DataCollectionQueueItem):
+                        hide = item_model.is_executed()
+                elif filter_index == 7:
+                    if isinstance(item, queue_item.DataCollectionQueueItem):
+                        hide = item_model.is_helical()
+                    else:
+                        hide = True
+                elif filter_index == 8:
+                    if isinstance(item, queue_item.DataCollectionQueueItem):
+                        hide = not item_model.is_helical()
+                    else:
+                        hide = True
+                elif filter_index == 9:
+                    hide = not isinstance(item, queue_item.CharacterisationQueueItem)
+                elif filter_index == 10:
+                    hide = not isinstance(item, queue_item.EnergyScanQueueItem)
+                elif filter_index == 11:
+                    hide = not isinstance(item, queue_item.XRFSpectrumQueueItem)
+                # elif filter_index == 11:
+                #    hide = not isinstance(item, queue_item.AdvancedQueueItem)
+                if type(item) not in (
+                    queue_item.TaskQueueItem,
+                    queue_item.SampleQueueItem,
+                    queue_item.BasketQueueItem,
+                    queue_item.DataCollectionGroupQueueItem,
+                ):
+                    item.set_hidden(hide)
+                item_iterator += 1
+                item = item_iterator.value()
 
-        self.dc_tree_widget.hide_empty_baskets()     
+        self.dc_tree_widget.hide_empty_baskets()
 
     def filter_text_changed(self, new_text):
-        item_iterator = QtImport.QTreeWidgetItemIterator(\
-             self.dc_tree_widget.sample_tree_widget) 
+        item_iterator = QtImport.QTreeWidgetItemIterator(
+            self.dc_tree_widget.sample_tree_widget
+        )
         item = item_iterator.value()
         filter_index = self.sample_changer_widget.filter_combo.currentIndex()
 
         while item:
-              hide = False
-              new_text = str(new_text)
-              if filter_index == 2:
-                  if isinstance(item, queue_item.SampleQueueItem):
-                      hide = not new_text in item.text(0)
-              elif filter_index == 3:
-                  if isinstance(item, queue_item.SampleQueueItem):
-                      hide = not new_text in item.get_model().crystals[0].protein_acronym
-              elif filter_index == 4:
-                  if isinstance(item, queue_item.BasketQueueItem):
-                      if new_text.isdigit(): 
-                          # Display one basket
-                          hide = int(new_text) != item.get_model().location[0]
-                      else: 
-                          # Display several baskets. Separated with ","
-                          enable_baskat_list = new_text.split(',')
-                          if len(enable_baskat_list) > 1:
-                              hide = item.get_model().location[0] not in enable_baskat_list
-              item.set_hidden(hide) 
-              item_iterator += 1
-              item = item_iterator.value()
+            hide = False
+            new_text = str(new_text)
+            if filter_index == 2:
+                if isinstance(item, queue_item.SampleQueueItem):
+                    hide = not new_text in item.text(0)
+            elif filter_index == 3:
+                if isinstance(item, queue_item.SampleQueueItem):
+                    hide = not new_text in item.get_model().crystals[0].protein_acronym
+            elif filter_index == 4:
+                if isinstance(item, queue_item.BasketQueueItem):
+                    if new_text.isdigit():
+                        # Display one basket
+                        hide = int(new_text) != item.get_model().location[0]
+                    else:
+                        # Display several baskets. Separated with ","
+                        enable_baskat_list = new_text.split(",")
+                        if len(enable_baskat_list) > 1:
+                            hide = (
+                                item.get_model().location[0] not in enable_baskat_list
+                            )
+            item.set_hidden(hide)
+            item_iterator += 1
+            item = item_iterator.value()
 
         if filter_index != 3:
             self.dc_tree_widget.hide_empty_baskets()
-        
+
     def clear_filter(self):
-        item_iterator = QtImport.QTreeWidgetItemIterator(\
-             self.dc_tree_widget.sample_tree_widget)
+        item_iterator = QtImport.QTreeWidgetItemIterator(
+            self.dc_tree_widget.sample_tree_widget
+        )
         item = item_iterator.value()
         while item:
-              item.set_hidden(False)
-              item_iterator += 1
-              item = item_iterator.value() 
+            item.set_hidden(False)
+            item_iterator += 1
+            item = item_iterator.value()
 
     def diffractometer_phase_changed(self, phase):
-        if self.enable_collect_conditions.get("diffractometer") != (phase != "BeamLocation"):
-            self.enable_collect_conditions["diffractometer"] = \
-                phase != "BeamLocation"
+        if self.enable_collect_conditions.get("diffractometer") != (
+            phase != "BeamLocation"
+        ):
+            self.enable_collect_conditions["diffractometer"] = phase != "BeamLocation"
             self.update_enable_collect()
 
     def ppu_status_changed(self, in_error, status_msg):
@@ -1188,9 +1298,11 @@ class TreeBrick(BaseWidget):
             self.update_enable_collect()
 
     def update_enable_collect(self):
-        enable_collect = all(item == True for item in self.enable_collect_conditions.values())
+        enable_collect = all(
+            item == True for item in self.enable_collect_conditions.values()
+        )
 
-        #if self.dc_tree_widget.enable_collect_condition == enable_collect:
+        # if self.dc_tree_widget.enable_collect_condition == enable_collect:
         #    return
 
         if enable_collect:
@@ -1202,15 +1314,21 @@ class TreeBrick(BaseWidget):
             for key, value in self.enable_collect_conditions.iteritems():
                 if value == False:
                     if key == "diffractometer":
-                        logging.getLogger("GUI").warning("  - Diffractometer is in beam location phase")
+                        logging.getLogger("GUI").warning(
+                            "  - Diffractometer is in beam location phase"
+                        )
                     elif key == "shutter":
-                        logging.getLogger("GUI").warning("  - Safety shutter is closed " + \
-                               "(Open the safety shutter to enable collections)")
+                        logging.getLogger("GUI").warning(
+                            "  - Safety shutter is closed "
+                            + "(Open the safety shutter to enable collections)"
+                        )
                     elif key == "ppu":
                         logging.getLogger("GUI").error("  - PPU is in error state")
                     elif key == "machine_current":
-                        logging.getLogger("GUI").error("  - Machine current is to low " + \
-                               "(Wait till the machine current reaches 90 mA)")
+                        logging.getLogger("GUI").error(
+                            "  - Machine current is to low "
+                            + "(Wait till the machine current reaches 90 mA)"
+                        )
         self.dc_tree_widget.enable_collect_condition = enable_collect
         self.dc_tree_widget.toggle_collect_button_enabled()
 
@@ -1218,17 +1336,19 @@ class TreeBrick(BaseWidget):
         """Saves queue in the file"""
         if self.redis_client_hwobj is not None:
             self.redis_client_hwobj.save_queue()
-        #else:
+        # else:
         #    self.dc_tree_widget.save_queue()
 
     def auto_save_queue(self):
         """Saves queue in the file"""
         if self.queue_autosave_action is not None:
-            if self.queue_autosave_action.isChecked() and \
-               self.dc_tree_widget.samples_initialized:
+            if (
+                self.queue_autosave_action.isChecked()
+                and self.dc_tree_widget.samples_initialized
+            ):
                 if self.redis_client_hwobj is not None:
                     self.redis_client_hwobj.save_queue()
-                #else:
+                # else:
                 #    self.dc_tree_widget.save_queue()
 
     def load_queue(self):
@@ -1240,11 +1360,10 @@ class TreeBrick(BaseWidget):
 
             if loaded_model is not None:
                 self.dc_tree_widget.sample_tree_widget.clear()
-                model_map = {"free-pin" : 0,
-                             "ispyb" : 1,
-                             "plate" : 2}
-                self.sample_changer_widget.filter_cbox.\
-                      setCurrentIndex(model_map[loaded_model])
+                model_map = {"free-pin": 0, "ispyb": 1, "plate": 2}
+                self.sample_changer_widget.filter_cbox.setCurrentIndex(
+                    model_map[loaded_model]
+                )
                 self.mount_mode_combo_changed(model_map[loaded_model])
                 self.select_last_added_item()
                 self.dc_tree_widget.scroll_to_item(self.dc_tree_widget.last_added_item)
@@ -1253,7 +1372,7 @@ class TreeBrick(BaseWidget):
 
     def queue_autosave_clicked(self):
         """Enable/disable queue autosave"""
-        pass    
+        pass
 
     def queue_undo_clicked(self):
         """If queue autosave is enabled then undo last change"""
@@ -1273,17 +1392,14 @@ class TreeBrick(BaseWidget):
     def data_path_changed(self, conflict):
         """Data path changed event. Used in state machine"""
         self.dc_tree_widget.item_parameters_changed()
-        self.set_condition_state("data_path_valid",
-                                 not conflict)
+        self.set_condition_state("data_path_valid", not conflict)
 
     def acq_parameters_changed(self, conflict):
         """Acq parameter changed event. Used in state machine"""
         self.dc_tree_widget.item_parameters_changed()
-        self.set_condition_state("acq_parameters_valid",
-                                 len(conflict) == 0)
+        self.set_condition_state("acq_parameters_valid", len(conflict) == 0)
 
     def set_condition_state(self, condition_name, value):
         """Sets condition to defined state"""
         if self.state_machine_hwobj is not None:
-            self.state_machine_hwobj.condition_changed(condition_name,
-                                                       value)
+            self.state_machine_hwobj.condition_changed(condition_name, value)

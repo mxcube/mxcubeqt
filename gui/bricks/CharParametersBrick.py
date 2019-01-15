@@ -29,7 +29,6 @@ __category__ = "Task"
 
 
 class CharParametersBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -49,10 +48,10 @@ class CharParametersBrick(BaseWidget):
         # Slots ---------------------------------------------------------------
         self.define_slot("populate_char_parameter_widget", {})
 
-        # Graphic elements ---------------------------------------------------- 
+        # Graphic elements ----------------------------------------------------
         self.stacked_widget = QtImport.QStackedWidget(self)
         self.parameters_widget = CharParametersWidget(self)
-        self.toggle_page_button = QtImport.QPushButton('View Results', self)
+        self.toggle_page_button = QtImport.QPushButton("View Results", self)
         self.toggle_page_button.setFixedWidth(100)
 
         self.results_view = WebViewWidget(self)
@@ -62,26 +61,29 @@ class CharParametersBrick(BaseWidget):
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.stacked_widget)
-        #_main_vlayout.addStretch(0)
+        # _main_vlayout.addStretch(0)
         _main_vlayout.addWidget(self.toggle_page_button)
 
         # SizePolicies -------------------------------------------------------
-        self.results_view.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                                        QtImport.QSizePolicy.Expanding)
+        self.results_view.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
         # Qt signal/slot connections ------------------------------------------
         self.toggle_page_button.clicked.connect(self.toggle_page)
 
-        # Other --------------------------------------------------------------- 
+        # Other ---------------------------------------------------------------
         self.stacked_widget.setCurrentWidget(self.parameters_widget)
         self.parameters_widget.collection_type = None
         self.toggle_page_button.setDisabled(True)
 
     def populate_char_parameter_widget(self, item):
-        self.parameters_widget.path_widget._base_image_dir = \
-             self.session_hwobj.get_base_image_directory()
-        self.parameters_widget.path_widget._base_process_dir = \
-             self.session_hwobj.get_base_process_directory()
+        self.parameters_widget.path_widget._base_image_dir = (
+            self.session_hwobj.get_base_image_directory()
+        )
+        self.parameters_widget.path_widget._base_process_dir = (
+            self.session_hwobj.get_base_process_directory()
+        )
 
         char = item.get_model()
 
@@ -93,8 +95,9 @@ class CharParametersBrick(BaseWidget):
             if char.html_report is not None:
                 self.results_view.set_url(char.html_report)
             else:
-                self.results_view.set_static_page(\
-                    "<center><h1>Characterisation failed</h1></center>") 
+                self.results_view.set_static_page(
+                    "<center><h1>Characterisation failed</h1></center>"
+                )
         else:
             self.parameters_widget.set_enabled(True)
             self.stacked_widget.setCurrentWidget(self.parameters_widget)
@@ -112,10 +115,10 @@ class CharParametersBrick(BaseWidget):
             self.toggle_page_button.setText("View Results")
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'tunable-energy':
-            self.parameters_widget.acq_widget.set_tunable_energy(new_value)            
-        elif property_name == 'session':
+        if property_name == "tunable-energy":
+            self.parameters_widget.acq_widget.set_tunable_energy(new_value)
+        elif property_name == "session":
             self.session_hwobj = self.get_hardware_object(new_value)
-        elif property_name == 'beamline_setup':            
+        elif property_name == "beamline_setup":
             beamline_setup = self.get_hardware_object(new_value)
             self.parameters_widget.set_beamline_setup(beamline_setup)

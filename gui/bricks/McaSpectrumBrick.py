@@ -20,9 +20,10 @@
 import logging
 
 from QtImport import *
-#from PyQt4 import QtGui
-#from PyQt4 import QtCore
-#from PyQt4 import uic
+
+# from PyQt4 import QtGui
+# from PyQt4 import QtCore
+# from PyQt4 import uic
 
 from PyMca import McaAdvancedFit
 from PyMca import ConfigDict
@@ -46,22 +47,21 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         """
         BlissWidget.__init__(self, *args)
 
-        self.defineSlot('setData',())
-       
+        self.defineSlot("setData", ())
+
         self.mcafit = McaAdvancedFit.McaAdvancedFit(self)
         self.mcafit.dismissButton.hide()
 
-        #self.scan_plot_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
+        # self.scan_plot_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
         #                        "widgets/ui_files/Qt4_scan_plot_widget.ui"))
 
         # Layout --------------------------------------------------------------
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(self.mcafit)
-        #main_layout.addWidget(self.scan_plot_widget)
+        # main_layout.addWidget(self.scan_plot_widget)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(main_layout)   
-        
+        self.setLayout(main_layout)
 
     def setData(self, data, calib, config):
         """
@@ -73,11 +73,11 @@ class Qt4_McaSpectrumBrick(BlissWidget):
                 self._configure(config)
                 configured = True
             data = Numeric.array(data)
-            x = Numeric.array(data[:,0]).astype(Numeric.Float)
-            y = Numeric.array(data[:,1]).astype(Numeric.Float)
+            x = Numeric.array(data[:, 0]).astype(Numeric.Float)
+            y = Numeric.array(data[:, 1]).astype(Numeric.Float)
             xmin = float(config["min"])
             xmax = float(config["max"])
-            #self.mcafit.refreshWidgets()
+            # self.mcafit.refreshWidgets()
             calib = Numeric.ravel(calib).tolist()
             """kw = {}
             kw.update(config)
@@ -85,29 +85,36 @@ class Qt4_McaSpectrumBrick(BlissWidget):
             kw['xmax'] = xmax
             kw['calibration'] = calib"""
             self.mcafit.setdata(x, y)
-            #elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
+            # elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
             self.mcafit._energyAxis = False
             self.mcafit.toggleEnergyAxis()
-            #result = self._fit()
-            #pyarch file name and directory
+            # result = self._fit()
+            # pyarch file name and directory
             pf = config["legend"].split(".")
             pd = pf[0].split("/")
             outfile = pd[-1]
-            outdir = config['htmldir']
-            sourcename = config['legend']
-
+            outdir = config["htmldir"]
+            sourcename = config["legend"]
 
             if configured:
-                report = McaAdvancedFit.QtMcaAdvancedFitReport.\
-                     QtMcaAdvancedFitReport(None, outfile=outfile, outdir=outdir,
-                     fitresult=result, sourcename=sourcename, 
-                     plotdict={'logy':False}, table=2)
+                report = McaAdvancedFit.QtMcaAdvancedFitReport.QtMcaAdvancedFitReport(
+                    None,
+                    outfile=outfile,
+                    outdir=outdir,
+                    fitresult=result,
+                    sourcename=sourcename,
+                    plotdict={"logy": False},
+                    table=2,
+                )
 
                 text = report.getText()
                 report.writeReport(text=text)
-  
-        except:
-            logging.getLogger().exception('McaSpectrumBrick: problem fitting %s %s %s' % (str(data),str(calib),str(config)))
+
+        except BaseException:
+            logging.getLogger().exception(
+                "McaSpectrumBrick: problem fitting %s %s %s"
+                % (str(data), str(calib), str(config))
+            )
 
     def _fit(self):
         """
@@ -115,28 +122,28 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         """
         return self.mcafit.fit()
 
-    def _configure(self,config):
+    def _configure(self, config):
         """
         Descript. :
         """
         d = ConfigDict.ConfigDict()
         d.read(config["file"])
-        if not d.has_key('concentrations'):
-            d['concentrations']= {}
-        if not d.has_key('attenuators'):
-            d['attenuators']= {}
-            d['attenuators']['Matrix'] = [1, 'Water', 1.0, 0.01, 45.0, 45.0]
-        if config.has_key('flux'):
-            d['concentrations']['flux'] = float(config['flux'])
-        if config.has_key('time'):
-            d['concentrations']['time'] = float(config['time'])
+        if "concentrations" not in d:
+            d["concentrations"] = {}
+        if "attenuators" not in d:
+            d["attenuators"] = {}
+            d["attenuators"]["Matrix"] = [1, "Water", 1.0, 0.01, 45.0, 45.0]
+        if "flux" in config:
+            d["concentrations"]["flux"] = float(config["flux"])
+        if "time" in config:
+            d["concentrations"]["time"] = float(config["time"])
         self.mcafit.mcafit.configure(d)
 
     def clear(self):
         """
         Descript. :
         """
-        #TODO make with clear
+        # TODO make with clear
         x = Numeric.array([0]).astype(Numeric.Float)
         y = Numeric.array([0]).astype(Numeric.Float)
         self.mcafit.setdata(x, y)

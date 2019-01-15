@@ -30,11 +30,10 @@ from gui.widgets.snapshot_widget import SnapshotWidget
 
 __credits__ = ["MXCuBE colaboration"]
 __license__ = "LGPLv3+"
-__category__ = 'Task'
+__category__ = "Task"
 
 
 class AdvancedBrick(BaseWidget):
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -53,7 +52,7 @@ class AdvancedBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.tool_box = QtImport.QToolBox(self)
-        self.parameters_widget = AdvancedParametersWidget(self) 
+        self.parameters_widget = AdvancedParametersWidget(self)
         self.results_widget = AdvancedResultsWidget(self)
 
         self.line_parameters_widget = AdvancedParametersWidget(self)
@@ -75,51 +74,61 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        
 
     def populate_advanced_widget(self, item):
-        self.parameters_widget._data_path_widget._base_image_dir = \
+        self.parameters_widget._data_path_widget._base_image_dir = (
             self.session_hwobj.get_base_image_directory()
-        self.parameters_widget._data_path_widget._base_process_dir = \
+        )
+        self.parameters_widget._data_path_widget._base_process_dir = (
             self.session_hwobj.get_base_process_directory()
+        )
 
-        self.line_parameters_widget._data_path_widget._base_image_dir = \
+        self.line_parameters_widget._data_path_widget._base_image_dir = (
             self.session_hwobj.get_base_image_directory()
-        self.line_parameters_widget._data_path_widget._base_process_dir = \
+        )
+        self.line_parameters_widget._data_path_widget._base_process_dir = (
             self.session_hwobj.get_base_process_directory()
+        )
 
-        #self.parameters_widget.populate_widget(item)
-        #self.results_widget.populate_widget(item)
+        # self.parameters_widget.populate_widget(item)
+        # self.results_widget.populate_widget(item)
 
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
             self.parameters_widget.populate_widget(item, data_collection)
-            self.results_widget.populate_widget(item, data_collection)   
+            self.results_widget.populate_widget(item, data_collection)
 
-            self.line_parameters_widget.populate_widget(item, item.get_model().line_collection)
-            self.line_results_widget.populate_widget(item, item.get_model().line_collection) 
+            self.line_parameters_widget.populate_widget(
+                item, item.get_model().line_collection
+            )
+            self.line_results_widget.populate_widget(
+                item, item.get_model().line_collection
+            )
         else:
             data_collection = item.get_model()
             self.parameters_widget.populate_widget(item, data_collection)
-            self.results_widget.populate_widget(item, data_collection) 
+            self.results_widget.populate_widget(item, data_collection)
 
-        self.line_parameters_widget.setEnabled(isinstance(item, queue_item.XrayCenteringQueueItem))
-        self.line_results_widget.setEnabled(isinstance(item, queue_item.XrayCenteringQueueItem))
+        self.line_parameters_widget.setEnabled(
+            isinstance(item, queue_item.XrayCenteringQueueItem)
+        )
+        self.line_results_widget.setEnabled(
+            isinstance(item, queue_item.XrayCenteringQueueItem)
+        )
 
         try:
-            self.snapshot_widget.display_snapshot(\
-                 data_collection.grid.get_snapshot())
-        except:
+            self.snapshot_widget.display_snapshot(data_collection.grid.get_snapshot())
+        except BaseException:
             pass
 
         self.tool_box.setCurrentWidget(self.results_widget)
 
     def property_changed(self, property_name, old_value, new_value):
         """
-        Overriding BaseComponents.BaseWidget (propertyChanged object) 
+        Overriding BaseComponents.BaseWidget (propertyChanged object)
         run method.
         """
-        if property_name == 'beamline_setup':
+        if property_name == "beamline_setup":
             bl_setup = self.get_hardware_object(new_value)
             self.session_hwobj = bl_setup.session_hwobj
             self.parameters_widget.set_beamline_setup(bl_setup)

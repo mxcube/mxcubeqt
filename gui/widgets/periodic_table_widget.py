@@ -22,19 +22,20 @@ from QtImport import *
 
 PYMCA_IMPORTED = False
 try:
-   if qt_variant == "PyQt5":
-       from PyMca5.PyMca import QPeriodicTable
-   else:
-       from PyMca import QPeriodicTable
-   PYMCA_IMPORTED = True
-except:
-   pass
-   
+    if qt_variant == "PyQt5":
+        from PyMca5.PyMca import QPeriodicTable
+    else:
+        from PyMca import QPeriodicTable
+    PYMCA_IMPORTED = True
+except BaseException:
+    pass
+
 
 class PeriodicTableWidget(QWidget):
     """
     Descript. :
-    """ 
+    """
+
     elementEdgeSelectedSignal = pyqtSignal(str, str)
 
     def __init__(self, parent=None, name=None, fl=0):
@@ -65,7 +66,7 @@ class PeriodicTableWidget(QWidget):
         if not PYMCA_IMPORTED:
             _edge_hlayout.addWidget(self.periodic_elements_combo)
         _edge_hlayout.addWidget(edge_label)
-        _edge_hlayout.addWidget(self.edge_combo)  
+        _edge_hlayout.addWidget(self.edge_combo)
         _edge_hlayout.addStretch(0)
         _edge_hlayout.setSpacing(2)
         _edge_hlayout.setContentsMargins(0, 0, 0, 0)
@@ -84,8 +85,7 @@ class PeriodicTableWidget(QWidget):
         if PYMCA_IMPORTED:
             self.periodic_table.edgeSelectedSignal.connect(self.edge_selected)
         else:
-            self.periodic_elements_combo.activated.connect(\
-                  self.element_combo_activated)
+            self.periodic_elements_combo.activated.connect(self.element_combo_activated)
         self.edge_combo.addItem("K")
         self.edge_combo.activated.connect(self.edge_combo_activated)
         self.edge_combo.setEnabled(False)
@@ -95,8 +95,7 @@ class PeriodicTableWidget(QWidget):
     def element_combo_activated(self, element):
         self.selected_element = str(self.periodic_elements_combo.currentText())
         self.selected_edge = str(self.edge_combo.currentText())
-        self.elementEdgeSelectedSignal.emit(self.selected_element,
-                                            self.selected_edge)
+        self.elementEdgeSelectedSignal.emit(self.selected_element, self.selected_edge)
 
     def edge_selected(self, element, edge):
         self.selected_element = str(element)
@@ -105,16 +104,15 @@ class PeriodicTableWidget(QWidget):
 
         self.edge_combo.clear()
         if edge == "K":
-            edge_list = ("K")
+            edge_list = "K"
         else:
             edge_list = ("L1", "L2", "L3")
         for item in edge_list:
             self.edge_combo.addItem(item)
         self.edge_combo.setCurrentIndex(edge_list.index(item))
         self.edge_combo.setEnabled(self.edge_combo.count() > 1)
-        self.elementEdgeSelectedSignal.emit(self.selected_element, 
-                                            self.selected_edge)
-        
+        self.elementEdgeSelectedSignal.emit(self.selected_element, self.selected_edge)
+
     def set_current_element_edge(self, element, edge):
         if PYMCA_IMPORTED:
             self.periodic_table.table_element_clicked(element, edge)
@@ -124,17 +122,18 @@ class PeriodicTableWidget(QWidget):
 
     def edge_combo_activated(self, item_index):
         self.selected_edge = str(self.edge_combo.currentText())
-        self.elementEdgeSelectedSignal.emit(self.selected_element,
-                                            self.selected_edge)
+        self.elementEdgeSelectedSignal.emit(self.selected_element, self.selected_edge)
 
     def set_elements(self, elements):
         if PYMCA_IMPORTED:
             self.periodic_table.setElements(elements)
         else:
             for element in elements:
-                self.periodic_elements_combo.addItem(element['symbol']) 
+                self.periodic_elements_combo.addItem(element["symbol"])
 
-if PYMCA_IMPORTED: 
+
+if PYMCA_IMPORTED:
+
     class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
 
         edgeSelectedSignal = pyqtSignal(str, str)
@@ -142,33 +141,33 @@ if PYMCA_IMPORTED:
         def __init__(self, *args):
             QPeriodicTable.QPeriodicTable.__init__(self, *args)
 
-            self.elements_dict={}
-            if qt_variant == 'PyQt5':
+            self.elements_dict = {}
+            if qt_variant == "PyQt5":
                 self.elementClicked.connect(self.table_element_clicked)
             else:
-                QObject.connect(self,
-                                SIGNAL('elementClicked'),
-                                self.table_element_clicked)
+                QObject.connect(
+                    self, SIGNAL("elementClicked"), self.table_element_clicked
+                )
             for b in self.eltButton:
-                self.eltButton[b].colors[0]= QColor(Qt.green)
-                self.eltButton[b].colors[1]= QColor(Qt.darkGreen)
+                self.eltButton[b].colors[0] = QColor(Qt.green)
+                self.eltButton[b].colors[1] = QColor(Qt.darkGreen)
                 self.eltButton[b].setEnabled(False)
             for el in QPeriodicTable.Elements:
-                symbol=el[0]
-                self.elements_dict[symbol]=el
-    
+                symbol = el[0]
+                self.elements_dict[symbol] = el
+
         def elementEnter(self, symbol, z, name):
             b = self.eltButton[symbol]
             if b.isEnabled():
                 b.setCurrent(True)
-  
+
         def elementLeave(self, symbol):
             b = self.eltButton[symbol]
             if b.isEnabled():
                 b.setCurrent(False)
 
         def table_element_clicked(self, symbol, energy=None):
-            if type(symbol) is tuple and len(symbol) > 0:
+            if isinstance(symbol, tuple) and len(symbol) > 0:
                 symbol = symbol[0]
 
             if energy is None:
@@ -181,10 +180,10 @@ if PYMCA_IMPORTED:
                 name = self.elements_dict[symbol][4]
                 txt = "%s - %s (%s,%s)" % (symbol, energy, index, name)
                 self.eltLabel.setText(txt)
-                self.edgeSelectedSignal.emit(symbol ,energy)
-                #self.widgetSynchronizeSignal([symbol, energy])
+                self.edgeSelectedSignal.emit(symbol, energy)
+                # self.widgetSynchronizeSignal([symbol, energy])
 
-        def setElements(self,elements):
+        def setElements(self, elements):
             self.energies_dict = {}
             for b in self.eltButton:
                 self.eltButton[b].setEnabled(False)
@@ -198,6 +197,6 @@ if PYMCA_IMPORTED:
                 b = self.eltButton[symbol]
                 b.setEnabled(True)
 
-        def widgetSynchronize(self,state):
+        def widgetSynchronize(self, state):
             symbol = state[0]
             self.tableElementChanged(symbol)

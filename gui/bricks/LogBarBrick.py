@@ -32,12 +32,14 @@ __category__ = "Log"
 
 
 class LogBarBrick(BaseWidget):
-    COLORS = {logging.NOTSET: QtImport.Qt.lightGray,
-              logging.DEBUG: QtImport.Qt.darkGreen, 
-              logging.INFO: QtImport.Qt.darkBlue,
-              logging.WARNING: QtImport.QColor(255, 185, 56), 
-              logging.ERROR: QtImport.Qt.red,
-              logging.CRITICAL: QtImport.Qt.red}
+    COLORS = {
+        logging.NOTSET: QtImport.Qt.lightGray,
+        logging.DEBUG: QtImport.Qt.darkGreen,
+        logging.INFO: QtImport.Qt.darkBlue,
+        logging.WARNING: QtImport.QColor(255, 185, 56),
+        logging.ERROR: QtImport.Qt.red,
+        logging.CRITICAL: QtImport.Qt.red,
+    }
 
     def __init__(self, *args):
 
@@ -49,7 +51,7 @@ class LogBarBrick(BaseWidget):
         self.max_log_lines = -1
 
         # Properties ----------------------------------------------------------
-        self.add_property('maxLogLines', 'integer', -1)
+        self.add_property("maxLogLines", "integer", -1)
 
         # Signals -------------------------------------------------------------
 
@@ -72,7 +74,7 @@ class LogBarBrick(BaseWidget):
         GUILogHandler.GUILogHandler().register(self)
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == 'maxLogLines':
+        if property_name == "maxLogLines":
             self.max_log_lines = new_value
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
@@ -84,18 +86,21 @@ class LogBarBrick(BaseWidget):
     def append_log_record(self, record):
         """Appends a new log line to the text edit
         """
-        if self.is_running() and record.name in ('user_level_log', 'GUI'):
+        if self.is_running() and record.name in ("user_level_log", "GUI"):
             msg = record.getMessage()
             level = record.getLevel()
             self._status_bar_widget.text_edit.setTextColor(LogBarBrick.COLORS[level])
-            self._status_bar_widget.text_edit.append(\
-                "[%s %s]  %s" % (record.getDate(), record.getTime(), msg))
+            self._status_bar_widget.text_edit.append(
+                "[%s %s]  %s" % (record.getDate(), record.getTime(), msg)
+            )
 
-            #if level == logging.WARNING or level == logging.ERROR:
+            # if level == logging.WARNING or level == logging.ERROR:
             #    self._status_bar_widget.toggle_background_color()
             text_document = self._status_bar_widget.text_edit.document()
-            if self.max_log_lines > -1 and \
-               text_document.blockCount() > self.max_log_lines:
+            if (
+                self.max_log_lines > -1
+                and text_document.blockCount() > self.max_log_lines
+            ):
                 cursor = QtImport.QTextCursor(text_document.firstBlock())
                 cursor.select(QtImport.QTextCursor.BlockUnderCursor)
                 cursor.removeSelectedText()

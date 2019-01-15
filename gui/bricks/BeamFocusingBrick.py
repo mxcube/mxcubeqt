@@ -32,7 +32,7 @@ class Qt4_BeamFocusingBrick(BlissWidget):
     """
     Descript. :
     """
- 
+
     def __init__(self, *args):
         """
         Descript. :
@@ -45,7 +45,7 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty('mnemonic', 'string', '')
+        self.addProperty("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -70,13 +70,13 @@ class Qt4_BeamFocusingBrick(BlissWidget):
 
         # Qt signal/slot connections ------------------------------------------
         self.beam_focusing_combo.activated.connect(self.change_focus_mode)
- 
+
         # SizePolicies --------------------------------------------------------
 
-        # Other --------------------------------------------------------------- 
-        Qt4_widget_colors.set_widget_color(self.beam_focusing_combo,
-                                           Qt4_widget_colors.LIGHT_GREEN,
-                                           QPalette.Button)
+        # Other ---------------------------------------------------------------
+        Qt4_widget_colors.set_widget_color(
+            self.beam_focusing_combo, Qt4_widget_colors.LIGHT_GREEN, QPalette.Button
+        )
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -84,19 +84,23 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         """
         if property_name == "mnemonic":
             if self.beam_focusing_hwobj is not None:
-                self.disconnect(self.beam_focusing_hwobj, 
-                                'focusingModeChanged', 
-                                self.focus_mode_changed)
+                self.disconnect(
+                    self.beam_focusing_hwobj,
+                    "focusingModeChanged",
+                    self.focus_mode_changed,
+                )
             self.beam_focusing_hwobj = self.getHardwareObject(new_value)
             if self.beam_focusing_hwobj is not None:
-                self.connect(self.beam_focusing_hwobj, 
-                             'focusingModeChanged', 
-                             self.focus_mode_changed)
+                self.connect(
+                    self.beam_focusing_hwobj,
+                    "focusingModeChanged",
+                    self.focus_mode_changed,
+                )
                 mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
                 self.focus_mode_changed(mode, beam_size)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
-    
+
     def init_focus_mode_combo(self):
         self.beam_focusing_combo.blockSignals(True)
         self.beam_focusing_combo.clear()
@@ -110,14 +114,16 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         txt = self.beam_focusing_hwobj.get_focus_mode_message(focus_mode_name)
 
         if len(txt) > 0:
-            confDialog = QMessageBox.warning(None, "Focus mode", txt,
-                  QMessageBox.Ok, QMessageBox.Cancel)
+            confDialog = QMessageBox.warning(
+                None, "Focus mode", txt, QMessageBox.Ok, QMessageBox.Cancel
+            )
             if confDialog == QMessageBox.Ok:
                 self.beam_focusing_combo.setCurrentIndex(-1)
                 self.beam_focusing_hwobj.set_focus_mode(focus_mode_name)
             else:
-                self.beam_focusing_combo.setCurrentIndex(\
-                    self.beam_focusing_combo.findText(self.active_focus_mode))
+                self.beam_focusing_combo.setCurrentIndex(
+                    self.beam_focusing_combo.findText(self.active_focus_mode)
+                )
         else:
             self.beam_focusing_combo.setCurrentIndex(-1)
             self.beam_focusing_hwobj.set_focus_mode(focus_mode_name)
@@ -128,11 +134,11 @@ class Qt4_BeamFocusingBrick(BlissWidget):
         if self.active_focus_mode is None:
             self.beam_focusing_combo.clear()
             self.setEnabled(False)
-            self.beam_focusing_combo.setCurrentIndex(-1) 
+            self.beam_focusing_combo.setCurrentIndex(-1)
         else:
             self.init_focus_mode_combo()
             self.setEnabled(True)
-            index = self.beam_focusing_combo.findText(self.active_focus_mode) 
+            index = self.beam_focusing_combo.findText(self.active_focus_mode)
             self.beam_focusing_combo.setCurrentIndex(index)
 
         self.beam_focusing_combo.blockSignals(False)

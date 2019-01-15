@@ -46,38 +46,44 @@ class Qt4_MarvinBrick(BlissWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty('formatString', 'formatString', '#.#')
-        self.addProperty('hwobj_sample_changer', '', '/sc-generic')
+        self.addProperty("formatString", "formatString", "#.#")
+        self.addProperty("hwobj_sample_changer", "", "/sc-generic")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.status_gbox = QGroupBox('Status', self)
-        self.mounted_sample_ledit = QLineEdit('', self)
-        self.sample_detected_ledit = QLineEdit('', self)
-        self.focus_mode_ledit = QLineEdit('', self)
+        self.status_gbox = QGroupBox("Status", self)
+        self.mounted_sample_ledit = QLineEdit("", self)
+        self.sample_detected_ledit = QLineEdit("", self)
+        self.focus_mode_ledit = QLineEdit("", self)
 
-        self.puck_switches_gbox = QGroupBox('Puck switches', self)
+        self.puck_switches_gbox = QGroupBox("Puck switches", self)
         self.puck_switches_table = QTableWidget(self.puck_switches_gbox)
-        self.central_puck_ledit = QLineEdit('No center puck', self.puck_switches_gbox)
+        self.central_puck_ledit = QLineEdit("No center puck", self.puck_switches_gbox)
 
-        self.control_gbox = QGroupBox('Control', self)
+        self.control_gbox = QGroupBox("Control", self)
         self.open_lid_button = QPushButton("Open lid", self.control_gbox)
         self.close_lid_button = QPushButton("Close lid", self.control_gbox)
         self.base_to_center_button = QPushButton("Base to center", self.control_gbox)
         self.center_to_base_button = QPushButton("Center to base", self.control_gbox)
         self.dry_gripper_button = QPushButton("Dry gripper", self.control_gbox)
 
-        self.status_list_gbox = QGroupBox('Status list', self)
+        self.status_list_gbox = QGroupBox("Status list", self)
         self.status_table = QTableWidget(self)
 
         # Layout --------------------------------------------------------------
         _status_gbox_gridlayout = QGridLayout(self.status_gbox)
-        _status_gbox_gridlayout.addWidget(QLabel("Mounted sample", self.status_list_gbox), 0, 0)
-        _status_gbox_gridlayout.addWidget(QLabel("Sample detected", self.status_list_gbox), 1, 0)
-        _status_gbox_gridlayout.addWidget(QLabel("Focus mode", self.status_list_gbox), 2, 0)
+        _status_gbox_gridlayout.addWidget(
+            QLabel("Mounted sample", self.status_list_gbox), 0, 0
+        )
+        _status_gbox_gridlayout.addWidget(
+            QLabel("Sample detected", self.status_list_gbox), 1, 0
+        )
+        _status_gbox_gridlayout.addWidget(
+            QLabel("Focus mode", self.status_list_gbox), 2, 0
+        )
         _status_gbox_gridlayout.addWidget(self.mounted_sample_ledit, 0, 1)
         _status_gbox_gridlayout.addWidget(self.sample_detected_ledit, 1, 1)
         _status_gbox_gridlayout.addWidget(self.focus_mode_ledit, 2, 1)
@@ -89,8 +95,8 @@ class Qt4_MarvinBrick(BlissWidget):
         _puck_switches_gbox_vlayout.addWidget(self.puck_switches_table)
         _puck_switches_gbox_vlayout.addWidget(self.central_puck_ledit)
         _puck_switches_gbox_vlayout.setSpacing(2)
-        _puck_switches_gbox_vlayout.setContentsMargins(0, 0, 0, 0)       
-  
+        _puck_switches_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
+
         _status_vbox_layout = QVBoxLayout(self.status_list_gbox)
         _status_vbox_layout.addWidget(self.status_table)
         _status_vbox_layout.setSpacing(2)
@@ -123,10 +129,10 @@ class Qt4_MarvinBrick(BlissWidget):
         self.dry_gripper_button.clicked.connect(self.dry_gripper_clicked)
 
         # Other ---------------------------------------------------------------
-        #self.mounted_sample_ledit.setFixedWidth(100)
-        #self.sample_detected_ledit.setFixedWidth(100)
-        #self.last_command_ledit.setFixedWidth(100)
-        #self.current_command_ledit.setFixedWidth(100)
+        # self.mounted_sample_ledit.setFixedWidth(100)
+        # self.sample_detected_ledit.setFixedWidth(100)
+        # self.last_command_ledit.setFixedWidth(100)
+        # self.current_command_ledit.setFixedWidth(100)
 
         self.mounted_sample_ledit.setFixedWidth(80)
         self.sample_detected_ledit.setFixedWidth(80)
@@ -149,32 +155,38 @@ class Qt4_MarvinBrick(BlissWidget):
             self.puck_switches_table.setColumnWidth(col_index, 33)
 
         self.status_table.setColumnCount(3)
-        self.status_table.setHorizontalHeaderLabels(["Property", "Description", "Value"])
+        self.status_table.setHorizontalHeaderLabels(
+            ["Property", "Description", "Value"]
+        )
 
         self.puck_switches_gbox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        #self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        # self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
         Descript. :
         """
-        if property_name == 'hwobj_sample_changer':
+        if property_name == "hwobj_sample_changer":
             if self.sample_changer_hwobj:
-                self.disconnect(self.sample_changer_hwobj,
-                                'statusListChanged',
-                                self.status_list_changed)
-                self.disconnect(self.sample_changer_hwobj,
-                                'infoDictChanged',
-                                self.info_dict_changed)
+                self.disconnect(
+                    self.sample_changer_hwobj,
+                    "statusListChanged",
+                    self.status_list_changed,
+                )
+                self.disconnect(
+                    self.sample_changer_hwobj, "infoDictChanged", self.info_dict_changed
+                )
             self.sample_changer_hwobj = self.getHardwareObject(new_value)
             if self.sample_changer_hwobj:
                 self.init_tables()
-                self.connect(self.sample_changer_hwobj,
-                             'statusListChanged',
-                             self.status_list_changed)
-                self.connect(self.sample_changer_hwobj,
-                             'infoDictChanged',
-                             self.info_dict_changed)
+                self.connect(
+                    self.sample_changer_hwobj,
+                    "statusListChanged",
+                    self.status_list_changed,
+                )
+                self.connect(
+                    self.sample_changer_hwobj, "infoDictChanged", self.info_dict_changed
+                )
                 self.sample_changer_hwobj.update_values()
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -194,11 +206,10 @@ class Qt4_MarvinBrick(BlissWidget):
 
         self.status_table.resizeColumnToContents(0)
         self.status_table.resizeColumnToContents(1)
-            
 
     def status_list_changed(self, status_list):
         for status in status_list:
-            property_status_list = status.split(':')
+            property_status_list = status.split(":")
             if len(property_status_list) < 2:
                 continue
 
@@ -206,57 +217,65 @@ class Qt4_MarvinBrick(BlissWidget):
             prop_value = property_status_list[1]
 
             if prop_name in self.status_str_desc:
-                self.status_table.item(self.index_dict[prop_name], 2).setText(prop_value)
-  
+                self.status_table.item(self.index_dict[prop_name], 2).setText(
+                    prop_value
+                )
+
     def info_dict_changed(self, info_dict):
-        self.mounted_sample_ledit.setText("%s : %s" % \
-                                          (info_dict.get('mounted_puck'),
-                                           info_dict.get('mounted_sample')))
+        self.mounted_sample_ledit.setText(
+            "%s : %s" % (info_dict.get("mounted_puck"), info_dict.get("mounted_sample"))
+        )
         if info_dict.get("focus_mode"):
             self.focus_mode_ledit.setText(info_dict.get("focus_mode"))
 
         for index in range(self.puck_switches_table.columnCount()):
-            self.puck_switches_table.item(0, index).setBackground(Qt4_widget_colors.LIGHT_GRAY)
+            self.puck_switches_table.item(0, index).setBackground(
+                Qt4_widget_colors.LIGHT_GRAY
+            )
             if info_dict.get("puck_switches", 0) & pow(2, index) > 0:
-                self.puck_switches_table.item(0, index).setBackground(Qt4_widget_colors.LIGHT_GREEN)
+                self.puck_switches_table.item(0, index).setBackground(
+                    Qt4_widget_colors.LIGHT_GREEN
+                )
 
         if info_dict.get("centre_puck"):
-            Qt4_widget_colors.set_widget_color(self.central_puck_ledit,
-                                               Qt4_widget_colors.LIGHT_GREEN,
-                                               QPalette.Base)
-            if info_dict.get("mounted_puck"):  
-                self.central_puck_ledit.setText("Center puck: %d" % \
-                                                info_dict.get("mounted_puck"))
+            Qt4_widget_colors.set_widget_color(
+                self.central_puck_ledit, Qt4_widget_colors.LIGHT_GREEN, QPalette.Base
+            )
+            if info_dict.get("mounted_puck"):
+                self.central_puck_ledit.setText(
+                    "Center puck: %d" % info_dict.get("mounted_puck")
+                )
             else:
                 self.central_puck_ledit.setText("No center puck")
-            if info_dict.get('mounted_puck', 0) - 1 >= 0:
-                self.puck_switches_table.item(0, info_dict.get('mounted_puck', 0) - 1).\
-                     setBackground(Qt4_widget_colors.LIGHT_GREEN)
-            
+            if info_dict.get("mounted_puck", 0) - 1 >= 0:
+                self.puck_switches_table.item(
+                    0, info_dict.get("mounted_puck", 0) - 1
+                ).setBackground(Qt4_widget_colors.LIGHT_GREEN)
+
         else:
-            Qt4_widget_colors.set_widget_color(self.central_puck_ledit,
-                                               Qt4_widget_colors.LIGHT_GRAY,
-                                               QPalette.Base)
+            Qt4_widget_colors.set_widget_color(
+                self.central_puck_ledit, Qt4_widget_colors.LIGHT_GRAY, QPalette.Base
+            )
 
         if info_dict.get("sample_detected"):
             self.sample_detected_ledit.setText("True")
-            Qt4_widget_colors.set_widget_color(self.sample_detected_ledit,
-                                               Qt4_widget_colors.LIGHT_GREEN,
-                                               QPalette.Base)
+            Qt4_widget_colors.set_widget_color(
+                self.sample_detected_ledit, Qt4_widget_colors.LIGHT_GREEN, QPalette.Base
+            )
         else:
             self.sample_detected_ledit.setText("False")
-            Qt4_widget_colors.set_widget_color(self.sample_detected_ledit,
-                                               Qt4_widget_colors.LIGHT_GRAY,
-                                               QPalette.Base) 
-       
+            Qt4_widget_colors.set_widget_color(
+                self.sample_detected_ledit, Qt4_widget_colors.LIGHT_GRAY, QPalette.Base
+            )
+
         self.base_to_center_button.setDisabled(info_dict.get("centre_puck", True))
         self.center_to_base_button.setEnabled(info_dict.get("centre_puck", False))
         self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
         self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
-        #self.sample_detected_ledit = QLineEdit('', self)
-        #self.last_command_ledit = QLineEdit('', self)
-        #self.current_command_ledit = QLineEdit('', self)
+        # self.sample_detected_ledit = QLineEdit('', self)
+        # self.last_command_ledit = QLineEdit('', self)
+        # self.current_command_ledit = QLineEdit('', self)
 
     def open_lid_clicked(self):
         self.sample_changer_hwobj.open_lid()
@@ -269,6 +288,6 @@ class Qt4_MarvinBrick(BlissWidget):
 
     def center_to_base_clicked(self):
         self.sample_changer_hwobj.center_to_base()
-  
+
     def dry_gripper_clicked(self):
         self.sample_changer_hwobj.dry_gripper()

@@ -28,13 +28,14 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 
-STATES = {'unknown': Qt4_widget_colors.GRAY,
-          'ready': Qt4_widget_colors.LIGHT_BLUE,
-          'error': Qt4_widget_colors.LIGHT_RED}
+STATES = {
+    "unknown": Qt4_widget_colors.GRAY,
+    "ready": Qt4_widget_colors.LIGHT_BLUE,
+    "error": Qt4_widget_colors.LIGHT_RED,
+}
 
 
 class Qt4_FluxBrick(BlissWidget):
-
     def __init__(self, *args):
         """Main init"""
 
@@ -45,15 +46,15 @@ class Qt4_FluxBrick(BlissWidget):
 
         # Internal values -----------------------------------------------------
 
-        # Properties (name, type, default value, comment)---------------------- 
+        # Properties (name, type, default value, comment)----------------------
 
         # Properties for hwobj initialization ---------------------------------
-        self.addProperty('hwobj_flux', 'string', '')
+        self.addProperty("hwobj_flux", "string", "")
 
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-         
+
         # Graphic elements ----------------------------------------------------
         flux_label = QLabel("Flux:", self)
         beam_label = QLabel("Beam:", self)
@@ -76,21 +77,17 @@ class Qt4_FluxBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
         flux_label.setMaximumWidth(40)
 
-        # Other --------------------------------------------------------------- 
+        # Other ---------------------------------------------------------------
 
     def propertyChanged(self, property_name, old_value, new_value):
         """Method called when user changes a property in the gui builder"""
 
-        if property_name == 'hwobj_flux':
+        if property_name == "hwobj_flux":
             if self.flux_hwobj is not None:
-                self.disconnect(self.flux_hwobj,
-                                'fluxChanged',
-                                self.flux_changed)
+                self.disconnect(self.flux_hwobj, "fluxChanged", self.flux_changed)
             self.flux_hwobj = self.getHardwareObject(new_value)
             if self.flux_hwobj is not None:
-                self.connect(self.flux_hwobj,
-                             'fluxChanged',
-                             self.flux_changed)
+                self.connect(self.flux_hwobj, "fluxChanged", self.flux_changed)
                 self.flux_changed(self.flux_hwobj.get_flux_info())
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)

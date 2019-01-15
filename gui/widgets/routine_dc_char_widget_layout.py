@@ -25,8 +25,7 @@ __license__ = "LGPLv3+"
 
 
 class RoutineDCWidgetLayout(QtImport.QWidget):
-
-    def __init__(self, parent = None, name = None, flags = 0):
+    def __init__(self, parent=None, name=None, flags=0):
 
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(flags))
 
@@ -55,13 +54,13 @@ class RoutineDCWidgetLayout(QtImport.QWidget):
 
         # Layout --------------------------------------------------------------
         _main_gridlayout = QtImport.QGridLayout(self)
-        _main_gridlayout.addWidget(self.min_dose_radio, 0, 0) #, 2, 1)
+        _main_gridlayout.addWidget(self.min_dose_radio, 0, 0)  # , 2, 1)
         _main_gridlayout.addWidget(self.min_time_radio, 1, 0)
         _main_gridlayout.addWidget(self.dose_limit_cbx, 0, 1)
-        _main_gridlayout.addWidget(self.time_limit_cbx, 1, 1)       
+        _main_gridlayout.addWidget(self.time_limit_cbx, 1, 1)
         _main_gridlayout.addWidget(self.dose_ledit, 0, 2)
         _main_gridlayout.addWidget(self.time_ledit, 1, 2)
-        _main_gridlayout.addWidget(self.radiation_damage_cbx, 2, 0, 1, 2)  
+        _main_gridlayout.addWidget(self.radiation_damage_cbx, 2, 0, 1, 2)
         _main_gridlayout.setColumnStretch(3, 0)
 
         # SizePolicies --------------------------------------------------------
@@ -70,18 +69,17 @@ class RoutineDCWidgetLayout(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
         self.languageChange()
-        #self.resize(QtCore.QSize(380,114).expandedTo(self.minimumSizeHint()))
-        #self.setAttribute(QtCore.Qt.WA_WState_Polished)
+        # self.resize(QtCore.QSize(380,114).expandedTo(self.minimumSizeHint()))
+        # self.setAttribute(QtCore.Qt.WA_WState_Polished)
 
     def languageChange(self):
         self.setWindowTitle(self.__tr("RoutineDCWidget"))
-        #self.dose_time_bgroup.setTitle(QtGui.QString.null)
+        # self.dose_time_bgroup.setTitle(QtGui.QString.null)
         self.min_dose_radio.setText(self.__tr("Use min dose"))
         self.min_time_radio.setText(self.__tr("Use min time"))
         self.dose_limit_cbx.setText(self.__tr("Dose limit MGy:"))
         self.time_limit_cbx.setText(self.__tr("Total time limit (s):"))
         self.radiation_damage_cbx.setText(self.__tr("Account for radiation damage"))
 
-
-    def __tr(self,s,c = None):
-        return QtImport.QApplication.translate("RoutineDCWidgetLayout",s,c)
+    def __tr(self, s, c=None):
+        return QtImport.QApplication.translate("RoutineDCWidgetLayout", s, c)

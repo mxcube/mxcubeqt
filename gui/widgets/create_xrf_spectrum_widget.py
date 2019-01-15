@@ -34,12 +34,12 @@ __license__ = "LGPLv3+"
 
 
 class CreateXRFSpectrumWidget(CreateTaskBase):
+    def __init__(self, parent=None, name=None, fl=0):
 
-    def __init__(self, parent = None, name = None, fl = 0):
+        CreateTaskBase.__init__(
+            self, parent, name, QtImport.Qt.WindowFlags(fl), "XRF spectrum"
+        )
 
-        CreateTaskBase.__init__(self, parent, name, 
-            QtImport.Qt.WindowFlags(fl), 'XRF spectrum')
- 
         if name is not None:
             self.setObjectName(name)
 
@@ -51,22 +51,23 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._data_path_widget = DataPathWidget(self, 
-             data_model = self._path_template, layout = 'vertical')
+        self._data_path_widget = DataPathWidget(
+            self, data_model=self._path_template, layout="vertical"
+        )
 
-        _parameters_gbox = QtImport.QGroupBox('Parameters', self)
+        _parameters_gbox = QtImport.QGroupBox("Parameters", self)
         _count_time_label = QtImport.QLabel("Count time (sec.):", _parameters_gbox)
         self.count_time_ledit = QtImport.QLineEdit("1", _parameters_gbox)
-        #self.count_time_ledit.setMaximumWidth(75)
-        self.adjust_transmission_cbox = QtImport.QCheckBox(\
-             "Adjust transmission", _parameters_gbox)
+        # self.count_time_ledit.setMaximumWidth(75)
+        self.adjust_transmission_cbox = QtImport.QCheckBox(
+            "Adjust transmission", _parameters_gbox
+        )
         self.adjust_transmission_cbox.setChecked(True)
-        
 
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QtImport.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
-        _parameters_gbox_hlayout.addWidget(self.count_time_ledit) 
+        _parameters_gbox_hlayout.addWidget(self.count_time_ledit)
         _parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
         _parameters_gbox_hlayout.addStretch(0)
         _parameters_gbox_hlayout.setSpacing(2)
@@ -82,10 +83,12 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.path_template_changed)
-        self.adjust_transmission_cbox.stateChanged.connect(\
-             self.adjust_transmission_state_changed)
+        self._data_path_widget.pathTemplateChangedSignal.connect(
+            self.path_template_changed
+        )
+        self.adjust_transmission_cbox.stateChanged.connect(
+            self.adjust_transmission_state_changed
+        )
 
         # Other ---------------------------------------------------------------
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
@@ -101,7 +104,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self.xrf_spectrum_model = queue_model_objects.XRFSpectrum()
         self._path_template.start_num = 1
         self._path_template.num_files = 1
-        self._path_template.suffix = 'raw'
+        self._path_template.suffix = "raw"
         self._path_template.compression = False
 
     def single_item_selection(self, tree_item):
@@ -112,32 +115,33 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
             if self.xrf_spectrum_model.is_executed():
                 self.setDisabled(True)
             else:
-                self.setDisabled(False)    
+                self.setDisabled(False)
 
             if self.xrf_spectrum_model.get_path_template():
                 self._path_template = self.xrf_spectrum_model.get_path_template()
 
             self._data_path_widget.update_data_model(self._path_template)
-        elif not(isinstance(tree_item, queue_item.SampleQueueItem) or \
-                 isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)):
+        elif not (
+            isinstance(tree_item, queue_item.SampleQueueItem)
+            or isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)
+        ):
             self.setDisabled(True)
 
     def approve_creation(self):
-        #base_result = CreateTaskBase.approve_creation(self)
+        # base_result = CreateTaskBase.approve_creation(self)
         base_result = True
         self.count_time = None
 
         try:
-           self.count_time = float(str(self.count_time_ledit.text()))
-        except:
-           logging.getLogger("GUI").\
-                error("Incorrect count time value.")
+            self.count_time = float(str(self.count_time_ledit.text()))
+        except BaseException:
+            logging.getLogger("GUI").error("Incorrect count time value.")
 
         return base_result and self.count_time
 
-
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
+
     def _create_task(self, sample, shape):
         data_collections = []
 
@@ -155,17 +159,16 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
                     cpos.snapshot_image = snapshot
 
             path_template = self._create_path_template(sample, self._path_template)
-           
+
             xrf_spectrum = queue_model_objects.XRFSpectrum(sample, path_template, cpos)
             xrf_spectrum.set_name(path_template.get_prefix())
             xrf_spectrum.set_number(path_template.run_number)
-            xrf_spectrum.count_time = self.count_time  
+            xrf_spectrum.count_time = self.count_time
             xrf_spectrum.adjust_transmission = self.adjust_transmission_cbox.isChecked()
-            
+
             data_collections.append(xrf_spectrum)
         else:
-            logging.getLogger("GUI").\
-                error("No count time specified.") 
+            logging.getLogger("GUI").error("No count time specified.")
 
         return data_collections
 

@@ -37,33 +37,40 @@ __license__ = "LGPLv3+"
 
 
 class CreateHelicalWidget(CreateTaskBase):
+    def __init__(self, parent=None, name=None, fl=0):
 
-    def __init__(self, parent = None,name = None, fl = 0):
-
-        CreateTaskBase.__init__(self, parent, name, fl, 'Helical')
+        CreateTaskBase.__init__(self, parent, name, fl, "Helical")
 
         if not name:
             self.setObjectName("create_helical_widget")
-        self.init_models() 
-         
+        self.init_models()
+
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
         self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
-        self._lines_widget = QtImport.load_ui_file(
-            "helical_line_widget_layout.ui")
+        self._lines_widget = QtImport.load_ui_file("helical_line_widget_layout.ui")
 
-        self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
-             layout='vertical', acq_params=self._acquisition_parameters,
-             path_template=self._path_template)
+        self._acq_widget = AcquisitionWidget(
+            self,
+            "acquisition_widget",
+            layout="vertical",
+            acq_params=self._acquisition_parameters,
+            path_template=self._path_template,
+        )
 
-        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
-             data_model=self._path_template, layout='vertical')
+        self._data_path_widget = DataPathWidget(
+            self,
+            "create_dc_path_widget",
+            data_model=self._path_template,
+            layout="vertical",
+        )
 
-        self._processing_widget = ProcessingWidget(self,
-             data_model=self._processing_parameters)
+        self._processing_widget = ProcessingWidget(
+            self, data_model=self._processing_parameters
+        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
@@ -78,35 +85,38 @@ class CreateHelicalWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._lines_widget.lines_treewidget.itemSelectionChanged.connect(\
-             self.lines_treewidget_selection_changed)
-        self._lines_widget.create_line_button.clicked.connect(\
-             self.create_line_button_clicked)
-        self._lines_widget.create_auto_line_button.clicked.connect(\
-             self.create_auto_line_button_clicked)
-        self._lines_widget.remove_line_button.clicked.connect(\
-             self.remove_line_button_clicked)  
-        self._lines_widget.overlay_cbox.stateChanged.connect(\
-             self.overlay_toggled)
-        self._lines_widget.overlay_slider.valueChanged.connect(\
-             self.overlay_alpha_changed)
-        self._lines_widget.swap_points_button.clicked.connect(\
-             self.swap_points_clicked)
+        self._lines_widget.lines_treewidget.itemSelectionChanged.connect(
+            self.lines_treewidget_selection_changed
+        )
+        self._lines_widget.create_line_button.clicked.connect(
+            self.create_line_button_clicked
+        )
+        self._lines_widget.create_auto_line_button.clicked.connect(
+            self.create_auto_line_button_clicked
+        )
+        self._lines_widget.remove_line_button.clicked.connect(
+            self.remove_line_button_clicked
+        )
+        self._lines_widget.overlay_cbox.stateChanged.connect(self.overlay_toggled)
+        self._lines_widget.overlay_slider.valueChanged.connect(
+            self.overlay_alpha_changed
+        )
+        self._lines_widget.swap_points_button.clicked.connect(self.swap_points_clicked)
 
-        self._acq_widget.acqParametersChangedSignal.\
-             connect(self.acq_parameters_changed)
-        self._acq_widget.madEnergySelectedSignal.connect(\
-             self.mad_energy_selected)
-        self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.path_template_changed)
+        self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
+        self._acq_widget.madEnergySelectedSignal.connect(self.mad_energy_selected)
+        self._data_path_widget.pathTemplateChangedSignal.connect(
+            self.path_template_changed
+        )
 
-        self._processing_widget.enableProcessingSignal.connect(\
-             self._run_processing_toggled)
+        self._processing_widget.enableProcessingSignal.connect(
+            self._run_processing_toggled
+        )
 
         # Other ---------------------------------------------------------------
         for col in range(self._lines_widget.lines_treewidget.columnCount()):
             self._lines_widget.lines_treewidget.resizeColumnToContents(col)
-        #self._processing_widget.processing_widget.\
+        # self._processing_widget.processing_widget.\
         #     run_processing_parallel_cbox.setChecked(False)
 
         self.enable_widgets(False)
@@ -120,38 +130,39 @@ class CreateHelicalWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
-  
+
         if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.\
-                               detector_has_shutterless()
+            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
             self._acquisition_parameters.shutterless = has_shutter_less
 
-            self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters("default_helical_values")
-            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(\
-                self._beamline_setup_hwobj._get_run_processing_parallel())
+            self._acquisition_parameters = self._beamline_setup_hwobj.get_default_acquisition_parameters(
+                "default_helical_values"
+            )
+            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
+                self._beamline_setup_hwobj._get_run_processing_parallel()
+            )
 
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
-       
+
         # At startup, if scene loaded from file, then update listwidget
         shapes = self._graphics_manager_hwobj.get_shapes()
-        for shape in shapes: 
+        for shape in shapes:
             if isinstance(shape, GraphicsItemLine):
                 self.shape_created(shape, "Line")
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
             self._lines_widget.lines_treewidget.clearSelection()
-            #info_str_list = QStringList()
+            # info_str_list = QStringList()
             info_str_list = []
             info_str_list.append(shape.get_display_name())
             info_str_list.append("%d" % shape.get_points_index()[0])
             info_str_list.append("%d" % shape.get_points_index()[1])
-            
-            lines_treewidget_item = QtImport.QTreeWidgetItem(\
-                self._lines_widget.lines_treewidget,
-                info_str_list)
+
+            lines_treewidget_item = QtImport.QTreeWidgetItem(
+                self._lines_widget.lines_treewidget, info_str_list
+            )
             lines_treewidget_item.setSelected(True)
             self._lines_map[shape] = lines_treewidget_item
 
@@ -159,10 +170,10 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def shape_deleted(self, shape, shape_type):
         if shape_type == "Line" and self._lines_map.get(shape):
-            shape_index = self._lines_widget.lines_treewidget.\
-                 indexFromItem(self._lines_map[shape])
-            self._lines_widget.lines_treewidget.\
-                 takeTopLevelItem(shape_index.row())
+            shape_index = self._lines_widget.lines_treewidget.indexFromItem(
+                self._lines_map[shape]
+            )
+            self._lines_widget.lines_treewidget.takeTopLevelItem(shape_index.row())
             self._lines_map.pop(shape)
 
     def shape_changed(self, shape, shape_type):
@@ -173,14 +184,15 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)
-   
+
         if len(self._lines_widget.lines_treewidget.selectedItems()) == 0:
-            logging.getLogger("GUI").\
-                warning("No lines selected, please select one or more lines.")
+            logging.getLogger("GUI").warning(
+                "No lines selected, please select one or more lines."
+            )
             return False
         else:
             return base_result
-            
+
     def update_processing_parameters(self, crystal):
         self._processing_parameters.space_group = crystal.space_group
         self._processing_parameters.cell_a = crystal.cell_a
@@ -200,8 +212,10 @@ class CreateHelicalWidget(CreateTaskBase):
         for shape in self._graphics_manager_hwobj.get_shapes():
             if isinstance(shape, GraphicsItemLine):
                 (start_cpos_index, end_cpos_index) = shape.get_points_index()
-                if start_cpos_index == start_cpos.index and \
-                   end_cpos_index == end_cpos.index:
+                if (
+                    start_cpos_index == start_cpos.index
+                    and end_cpos_index == end_cpos.index
+                ):
                     self._graphics_manager_hwobj.select_shape(shape)
                     shape.set_num_images(num_images)
                     selected_line = shape
@@ -209,8 +223,8 @@ class CreateHelicalWidget(CreateTaskBase):
                     self._lines_widget.overlay_slider.setEnabled(True)
                     self._lines_widget.overlay_cbox.setEnabled(True)
 
-        #de-select previous selected list items and
-        #select the current shape (Line).
+        # de-select previous selected list items and
+        # select the current shape (Line).
         """
         for (list_item, shape) in self._lines_map.iteritems():
             if selected_line == shape:
@@ -221,11 +235,11 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-                                                             
+
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_model = tree_item.get_model()
             self._processing_parameters = sample_model.processing_parameters
-            #self._processing_parameters = copy.deepcopy(self._processing_parameters)
+            # self._processing_parameters = copy.deepcopy(self._processing_parameters)
             self._processing_widget.update_data_model(self._processing_parameters)
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
@@ -237,22 +251,27 @@ class CreateHelicalWidget(CreateTaskBase):
 
                 self._path_template = data_collection.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
-                self._acquisition_parameters = data_collection.acquisitions[0].\
-                                               acquisition_parameters
+                self._acquisition_parameters = data_collection.acquisitions[
+                    0
+                ].acquisition_parameters
 
                 if len(data_collection.acquisitions) == 2:
-                    start_cpos = data_collection.acquisitions[0].acquisition_parameters.\
-                                 centred_position
-                    end_cpos = data_collection.acquisitions[1].acquisition_parameters.\
-                               centred_position
-                    num_images = data_collection.acquisitions[0].acquisition_parameters.\
-                                 num_images
+                    start_cpos = data_collection.acquisitions[
+                        0
+                    ].acquisition_parameters.centred_position
+                    end_cpos = data_collection.acquisitions[
+                        1
+                    ].acquisition_parameters.centred_position
+                    num_images = data_collection.acquisitions[
+                        0
+                    ].acquisition_parameters.num_images
                     self.select_shape_with_cpos(start_cpos, end_cpos, num_images)
 
-                self._acq_widget.update_data_model(self._acquisition_parameters,
-                                                   self._path_template)
-                #self.get_acquisition_widget().use_osc_start(True)
-                
+                self._acq_widget.update_data_model(
+                    self._acquisition_parameters, self._path_template
+                )
+                # self.get_acquisition_widget().use_osc_start(True)
+
                 self._processing_parameters = data_collection.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
             else:
@@ -260,58 +279,62 @@ class CreateHelicalWidget(CreateTaskBase):
         else:
             self.setDisabled(True)
 
-        if isinstance(tree_item, queue_item.SampleQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or \
-           isinstance(tree_item, queue_item.DataCollectionQueueItem):
+        if (
+            isinstance(tree_item, queue_item.SampleQueueItem)
+            or isinstance(tree_item, queue_item.DataCollectionGroupQueueItem)
+            or isinstance(tree_item, queue_item.DataCollectionQueueItem)
+        ):
 
             self._processing_widget.update_data_model(self._processing_parameters)
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
-  
-    def _create_task(self,  sample, shape):
+            self._acq_widget.update_data_model(
+                self._acquisition_parameters, self._path_template
+            )
+
+    def _create_task(self, sample, shape):
         data_collections = []
 
         for shape in self.get_selected_shapes():
             snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
 
             # Acquisition for start position
-            start_acq = self._create_acq(sample) 
-           
-            start_graphical_point, end_graphical_point = \
-                shape.get_graphical_points() 
+            start_acq = self._create_acq(sample)
 
-            start_acq.acquisition_parameters.\
-                centred_position = copy.deepcopy(start_graphical_point.get_centred_position())
-            start_acq.acquisition_parameters.centred_position.\
-                snapshot_image = snapshot
+            start_graphical_point, end_graphical_point = shape.get_graphical_points()
+
+            start_acq.acquisition_parameters.centred_position = copy.deepcopy(
+                start_graphical_point.get_centred_position()
+            )
+            start_acq.acquisition_parameters.centred_position.snapshot_image = snapshot
 
             start_acq.path_template.suffix = self._session_hwobj.suffix
 
             # Add another acquisition for the end position
             end_acq = self._create_acq(sample)
 
-            end_acq.acquisition_parameters.\
-                centred_position = copy.deepcopy(end_graphical_point.get_centred_position())
-            end_acq.acquisition_parameters.centred_position.\
-                snapshot_image = snapshot
+            end_acq.acquisition_parameters.centred_position = copy.deepcopy(
+                end_graphical_point.get_centred_position()
+            )
+            end_acq.acquisition_parameters.centred_position.snapshot_image = snapshot
 
             end_acq.path_template.suffix = self._session_hwobj.suffix
 
             processing_parameters = copy.deepcopy(self._processing_parameters)
 
-            dc = queue_model_objects.DataCollection([start_acq, end_acq],
-                                    sample.crystals[0],
-                                    processing_parameters)
+            dc = queue_model_objects.DataCollection(
+                [start_acq, end_acq], sample.crystals[0], processing_parameters
+            )
 
             dc.set_name(start_acq.path_template.get_prefix())
             dc.set_number(start_acq.path_template.run_number)
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
             dc.set_requires_centring(False)
-            dc.run_processing_after = self._processing_widget.processing_widget.\
-               run_processing_after_cbox.isChecked()
-            if self._processing_widget.processing_widget.\
-               run_processing_parallel_cbox.isChecked():
-               dc.run_processing_parallel = "LineScan"
+            dc.run_processing_after = (
+                self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
+            )
+            if (
+                self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked()
+            ):
+                dc.run_processing_parallel = "LineScan"
 
             data_collections.append(dc)
             self._path_template.run_number += 1
@@ -319,12 +342,15 @@ class CreateHelicalWidget(CreateTaskBase):
         return data_collections
 
     def lines_treewidget_selection_changed(self):
-        self.enable_widgets(\
-            len(self._lines_widget.lines_treewidget.selectedItems()) > 0)
-        self._lines_widget.remove_line_button.setEnabled(\
-            len(self._lines_widget.lines_treewidget.selectedItems()) > 0)
-        self._lines_widget.swap_points_button.setEnabled(\
-            len(self._lines_widget.lines_treewidget.selectedItems()) > 0)
+        self.enable_widgets(
+            len(self._lines_widget.lines_treewidget.selectedItems()) > 0
+        )
+        self._lines_widget.remove_line_button.setEnabled(
+            len(self._lines_widget.lines_treewidget.selectedItems()) > 0
+        )
+        self._lines_widget.swap_points_button.setEnabled(
+            len(self._lines_widget.lines_treewidget.selectedItems()) > 0
+        )
 
         for shape, list_item in self._lines_map.iteritems():
             self._graphics_manager_hwobj.select_shape(shape, list_item.isSelected())

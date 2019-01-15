@@ -27,8 +27,7 @@ __license__ = "LGPLv3+"
 
 
 class OptimisationParametersWidgetLayout(QtImport.QWidget):
-
-    def __init__(self,parent = None,name = None,fl = 0):
+    def __init__(self, parent=None, name=None, fl=0):
 
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
 
@@ -41,7 +40,8 @@ class OptimisationParametersWidgetLayout(QtImport.QWidget):
 
         # Graphic elements ----------------------------------------------------
         self.opt_param_widget = QtImport.load_ui_file(
-             "optimization_parameters_widget_layout.ui")
+            "optimization_parameters_widget_layout.ui"
+        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)

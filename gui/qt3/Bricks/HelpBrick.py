@@ -7,7 +7,8 @@ from qt import *
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework import Icons
 
- __category__ = 'gui_utils'
+__category__ = "gui_utils"
+
 
 class ToolButton(QToolButton):
     def __init__(self, parent, icon, text=None, callback=None, tooltip=None):
@@ -30,33 +31,33 @@ class ToolButton(QToolButton):
             QToolTip.add(self, tooltip)
 
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        
+
 
 class HelpBrick(BlissWidget):
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
 
         self.addProperty("help_url", "string", "http://intranet")
-        self.addProperty("browser", "combo", ("default", "mozilla", "netscape"), "default")
+        self.addProperty(
+            "browser", "combo", ("default", "mozilla", "netscape"), "default"
+        )
 
-        self.cmdShowHelp = ToolButton(self, "rescue", "Help !", self.cmdShowHelpClicked, "Open help web page")
+        self.cmdShowHelp = ToolButton(
+            self, "rescue", "Help !", self.cmdShowHelpClicked, "Open help web page"
+        )
 
         QVBoxLayout(self)
         self.layout().addWidget(self.cmdShowHelp)
 
         self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
 
-
     def cmdShowHelpClicked(self):
         if self["browser"] != "default":
-           browser = webbrowser.get(self["browser"])
+            browser = webbrowser.get(self["browser"])
         else:
-           browser = webbrowser
+            browser = webbrowser
 
         try:
             webbrowser.open(self["help_url"])
-        except:
+        except BaseException:
             logging.getLogger().exception("%s: could not open web browser", self.name())
-
-    
-    

@@ -22,6 +22,7 @@ from QtImport import *
 import numpy as np
 import pyqtgraph as pg
 
+
 class TwoDimenisonalPlotWidget(QWidget):
     """
     Descript. :
@@ -36,15 +37,15 @@ class TwoDimenisonalPlotWidget(QWidget):
 
         self.plot_widget = pg.PlotWidget()
         self.image_view = pg.ImageView()
- 
+
         self.plot_widget.showGrid(x=True, y=True)
         self.curves_dict = {}
 
         self.vlayout = QVBoxLayout(self)
-        #self.vlayout.addWidget(self.plot_widget)
+        # self.vlayout.addWidget(self.plot_widget)
         self.vlayout.addWidget(self.image_view)
 
-        #self.curve.setPen((200,200,100))
+        # self.curve.setPen((200,200,100))
         self.setFixedSize(600, 300)
 
         colors = [(0, 0, 0),
@@ -53,17 +54,17 @@ class TwoDimenisonalPlotWidget(QWidget):
                   (255, 255, 255)]
         cmap = pg.ColorMap(pos=np.linspace(0.0, 1.0, 4), color=colors)
         self.image_view.setColorMap(cmap)
-        #self.image_view.setAutoVisible(y=True)
+        # self.image_view.setAutoVisible(y=True)
 
-        #self.image_view.sigMouseMoveEvent.connect(self.mouse_moved)
-        #self.image_view.mouseDoubleClickEvent.connect(self.mouse_double_clicked)
-        #self.image_view.mousePressEvent
+        # self.image_view.sigMouseMoveEvent.connect(self.mouse_moved)
+        # self.image_view.mouseDoubleClickEvent.connect(self.mouse_double_clicked)
+        # self.image_view.mousePressEvent
 
         self.image_view.scene.sigMouseMoved.connect(self.mouse_moved)
- 
+
     def add_curve(self, key, x_array, y_array, linestyle, label, color, marker):
         curve = self.plot_widget.plot(symbolPen='w', symbolSize=5)
-        curve.setPen((200,200,100))
+        curve.setPen((200, 200, 100))
         self.curves_dict[key] = curve
 
     def plot_result(self, result, aspect=None):
@@ -72,12 +73,13 @@ class TwoDimenisonalPlotWidget(QWidget):
     def update_curves(self, result):
         for key in result.keys():
             if key in self.curves_dict:
-               self.curves_dict[key].setData(y=result['spots_num'], x=result['x_array'])
- 
-    def adjust_axes(self, result_key):
-        pass 
+                self.curves_dict[key].setData(
+                    y=result['spots_num'], x=result['x_array'])
 
-    def clear(self): 
+    def adjust_axes(self, result_key):
+        pass
+
+    def clear(self):
         pass
 
     def mouse_moved(self, mouse_event):

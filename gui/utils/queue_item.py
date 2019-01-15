@@ -38,6 +38,7 @@ class QueueItem(QtImport.QTreeWidgetItem):
     """
     Use this class to create a new type of item for the collect tree/queue.
     """
+
     normal_brush = QtImport.QBrush(QtImport.Qt.black)
     highlighted_brush = QtImport.QBrush(QtImport.QColor(128, 128, 128))
     normal_pen = QtImport.QPen(QtImport.Qt.black)
@@ -46,9 +47,9 @@ class QueueItem(QtImport.QTreeWidgetItem):
     bg_normal_brush = QtImport.QBrush(QtImport.Qt.white)
 
     def __init__(self, *args, **kwargs):
-        
+
         QtImport.QTreeWidgetItem.__init__(self, args[0])
-        self.deletable = kwargs.pop('deletable', False)
+        self.deletable = kwargs.pop("deletable", False)
         self.pen = QueueItem.normal_pen
         self.brush = QueueItem.normal_brush
         self.bg_brush = QueueItem.bg_normal_brush
@@ -60,17 +61,17 @@ class QueueItem(QtImport.QTreeWidgetItem):
         self._font_is_bold = False
         self._star = False
         self._base_tool_tip = ""
-        self.setText(1, '')
- 
+        self.setText(1, "")
+
     def listView(self):
-        #remove this
+        # remove this
         return self.treeWidget()
 
     def setOn(self, state):
         """
         Backward compatability, because QueueManager and other
-        hwobj are using this method to change state 
-        """ 
+        hwobj are using this method to change state
+        """
         if self._checkable:
             if state:
                 check_state = QtImport.Qt.Checked
@@ -84,7 +85,7 @@ class QueueItem(QtImport.QTreeWidgetItem):
         """
         sets check state for item and all children and parent
         if they exist
-        """   
+        """
         self._previous_check_state = self.checkState(0)
         if isinstance(self, DataCollectionGroupQueueItem):
             self._checkable = False
@@ -98,7 +99,7 @@ class QueueItem(QtImport.QTreeWidgetItem):
             self.parent().setCheckState(column, check_state)
 
         if not self._checkable:
-            check_state = QtImport.Qt.Unchecked  
+            check_state = QtImport.Qt.Unchecked
         QtImport.QTreeWidgetItem.setCheckState(self, column, check_state)
         if self._queue_entry:
             self._queue_entry.set_enabled(check_state > 0)
@@ -122,8 +123,8 @@ class QueueItem(QtImport.QTreeWidgetItem):
         if new_state != self._previous_check_state:
             self.setCheckState(0, self.checkState(0))
             if isinstance(self, DataCollectionGroupQueueItem):
-               for index in range(self.childCount()):
-                   self.child(index).setCheckState(0, self.checkState(0))  
+                for index in range(self.childCount()):
+                    self.child(index).setCheckState(0, self.checkState(0))
 
     def move_item(self, after):
         self.parent().takeChild(self.parent().indexOfChild(self))
@@ -132,12 +133,12 @@ class QueueItem(QtImport.QTreeWidgetItem):
         container_qe = self.get_queue_entry().get_container()
         after_qe = after.get_queue_entry()
         container_qe.swap(after_qe, self.get_queue_entry())
-        
-    def setHighlighted(self, enable):    
+
+    def setHighlighted(self, enable):
         """
         Controls highlighting of the list item.
 
-        :param enable: Highlighted True, or not highlighted False.  
+        :param enable: Highlighted True, or not highlighted False.
         :type enable: bool
         """
         if enable:
@@ -175,7 +176,7 @@ class QueueItem(QtImport.QTreeWidgetItem):
         :returns: The last item of this child.
         :rtype: QueueItem
         """
-        if self.childCount() > 0: 
+        if self.childCount() > 0:
             return self.child(self.childCount())
 
     def set_checkable(self, state):
@@ -209,7 +210,9 @@ class QueueItem(QtImport.QTreeWidgetItem):
         grand_children_list = []
         for child_index in range(self.childCount()):
             for grand_child_index in range(self.child(child_index).childCount()):
-                grand_children_list.append(self.child(child_index).child(grand_child_index))
+                grand_children_list.append(
+                    self.child(child_index).child(grand_child_index)
+                )
         return grand_children_list
 
     def set_strike_out(self, state):
@@ -220,28 +223,27 @@ class QueueItem(QtImport.QTreeWidgetItem):
 
 class SampleQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        #kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
-        #kwargs['deletable'] = False
+        # kwargs['controller'] = QtGui.QCheckListItem.CheckBoxController
+        # kwargs['deletable'] = False
         self.mounted_style = False
 
         QueueItem.__init__(self, *args, **kwargs)
-        
 
     def update_pin_icon(self):
         dc_tree_widget = self.listView().parent()
 
         if dc_tree_widget._loaded_sample_item:
             dc_tree_widget._loaded_sample_item.setIcon(0, QtImport.QPixmap())
-            
+
         dc_tree_widget._loaded_sample_item = self
         self.setIcon(0, QtImport.QIcon(dc_tree_widget.pin_pixmap))
 
-    def set_mounted_style(self, state, clear_background = False):
+    def set_mounted_style(self, state, clear_background=False):
         self.mounted_style = state
 
         if state:
             self.setIcon(0, PIN_ICON)
-            self.setBackground(0, QtImport.QBrush(Colors.PLUM)) 
+            self.setBackground(0, QtImport.QBrush(Colors.PLUM))
             self.setBackground(1, QtImport.QBrush(Colors.PLUM))
             self.setSelected(True)
             bold_fond = self.font(1)
@@ -253,7 +255,7 @@ class SampleQueueItem(QueueItem):
             self.setIcon(0, QtImport.QIcon())
 
             if clear_background:
-               self.set_background_color(0)  
+                self.set_background_color(0)
             else:
                 queue_entry = self.get_queue_entry()
 
@@ -262,26 +264,29 @@ class SampleQueueItem(QueueItem):
 
             self.setSelected(False)
             self.setFontBold(False)
-            self.setText(1, '')
+            self.setText(1, "")
 
     def reset_style(self):
-        #QueueItem.reset_style(self)
+        # QueueItem.reset_style(self)
         self.set_background_color(0)
         self.setFontBold(False)
         self.setHighlighted(False)
-        self.set_mounted_style(self.mounted_style, clear_background = True)
-            
+        self.set_mounted_style(self.mounted_style, clear_background=True)
+
+
 class BasketQueueItem(QueueItem):
     """
     In principle is just a group of samples (for example puck)
     """
+
     def __init__(self, *args, **kwargs):
         QueueItem.__init__(self, *args, **kwargs)
 
+
 class TaskQueueItem(QueueItem):
     def __init__(self, *args, **kwargs):
-        kwargs['deletable'] = True
-        
+        kwargs["deletable"] = True
+
         QueueItem.__init__(self, *args, **kwargs)
 
     def get_sample_view_item(self):
@@ -290,10 +295,11 @@ class TaskQueueItem(QueueItem):
         elif self.parent():
             return self.parent().get_sample_view_item()
 
+
 class DataCollectionGroupQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
-    
+
 
 class DataCollectionQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
@@ -313,8 +319,7 @@ class DataCollectionQueueItem(TaskQueueItem):
     def update_tool_tip(self):
         dc_model = self.get_model()
         dc_parameters = dc_model.as_dict()
-        dc_parameters_table = \
-          '''<b>Collection parameters:</b>
+        dc_parameters_table = """<b>Collection parameters:</b>
              <table border='0.5'>
              <tr><td>Osc start</td><td>%.2f</td></tr>
              <tr><td>Osc range</td><td>%.2f</td></tr>
@@ -324,41 +329,51 @@ class DataCollectionQueueItem(TaskQueueItem):
              <tr><td>Resolution</td><td>%.2f Ang</td></tr>
              <tr><td>Transmission</td><td>%.2f %%</td></tr>
              </table>
-          ''' % (dc_parameters["osc_start"],
-                 dc_parameters["osc_range"],
-                 dc_parameters["num_images"],
-                 dc_parameters["exp_time"],
-                 dc_parameters["energy"],
-                 dc_parameters["resolution"],
-                 dc_parameters["transmission"])
+          """ % (
+            dc_parameters["osc_start"],
+            dc_parameters["osc_range"],
+            dc_parameters["num_images"],
+            dc_parameters["exp_time"],
+            dc_parameters["energy"],
+            dc_parameters["resolution"],
+            dc_parameters["transmission"],
+        )
 
         processing_table = ""
         if len(dc_model.processing_msg_list) > 0:
-            processing_table = \
-              '''</br></br>
+            processing_table = """</br></br>
                  <b>Processing info:</b>
                  <table border='0.5'>
-              '''
+              """
             for msg in dc_model.processing_msg_list:
                 if msg[2] in ("failed"):
-                    proc_msg = "<font color=#FE0000>%s: %s %s</font>" % (msg[1], msg[2], msg[3])
+                    proc_msg = "<font color=#FE0000>%s: %s %s</font>" % (
+                        msg[1],
+                        msg[2],
+                        msg[3],
+                    )
                 else:
                     proc_msg = "%s: %s" % (msg[1], msg[2])
-                processing_table += "<tr><td>%s</td><td>%s</td></tr>" % (msg[0], proc_msg)
+                processing_table += "<tr><td>%s</td><td>%s</td></tr>" % (
+                    msg[0],
+                    proc_msg,
+                )
 
             processing_table += "</table>"
 
-        
-        tool_tip = '''<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+        tool_tip = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
                     <html lang="en">
                     <body>
                        %s
                        %s
                     </body>
-                    </html>''' % (dc_parameters_table,
-                                  processing_table)
+                    </html>""" % (
+            dc_parameters_table,
+            processing_table,
+        )
 
         self.setToolTip(0, tool_tip)
+
 
 class CharacterisationQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
@@ -389,31 +404,34 @@ class SampleCentringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
+
 class OpticalCentringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
+
 class XrayCenteringQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
+
 
 class XrayImagingQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
 
-MODEL_VIEW_MAPPINGS = \
-    {queue_model_objects.DataCollection: DataCollectionQueueItem,
-     queue_model_objects.Characterisation: CharacterisationQueueItem,
-     queue_model_objects.EnergyScan: EnergyScanQueueItem,
-     queue_model_objects.XRFSpectrum: XRFSpectrumQueueItem,
-     queue_model_objects.SampleCentring: SampleCentringQueueItem,
-     queue_model_objects.OpticalCentring: OpticalCentringQueueItem,
-     queue_model_objects.Sample: SampleQueueItem,
-     queue_model_objects.Basket: BasketQueueItem, 
-     queue_model_objects.Workflow: GenericWorkflowQueueItem,
-     queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
-     queue_model_objects.XrayCentering: XrayCenteringQueueItem,
-     queue_model_objects.XrayImaging: XrayImagingQueueItem,
-     queue_model_objects.TaskGroup: DataCollectionGroupQueueItem}
-
+MODEL_VIEW_MAPPINGS = {
+    queue_model_objects.DataCollection: DataCollectionQueueItem,
+    queue_model_objects.Characterisation: CharacterisationQueueItem,
+    queue_model_objects.EnergyScan: EnergyScanQueueItem,
+    queue_model_objects.XRFSpectrum: XRFSpectrumQueueItem,
+    queue_model_objects.SampleCentring: SampleCentringQueueItem,
+    queue_model_objects.OpticalCentring: OpticalCentringQueueItem,
+    queue_model_objects.Sample: SampleQueueItem,
+    queue_model_objects.Basket: BasketQueueItem,
+    queue_model_objects.Workflow: GenericWorkflowQueueItem,
+    queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
+    queue_model_objects.XrayCentering: XrayCenteringQueueItem,
+    queue_model_objects.XrayImaging: XrayImagingQueueItem,
+    queue_model_objects.TaskGroup: DataCollectionGroupQueueItem,
+}

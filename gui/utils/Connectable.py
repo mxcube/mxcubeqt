@@ -23,45 +23,39 @@ __license__ = "LGPLv3+"
 
 
 class Connectable(object):
-
     def __init__(self):
         self.__signal = {}
         self.__slot = {}
 
-
     def define_signal(self, signal_name, signal_args):
         try:
             args = tuple(signal_args)
-        except:
+        except BaseException:
             print("'", signal_args, "' is not a valid arguments tuple.")
             raise ValueError
-        
+
         self.__signal[str(signal_name)] = args
 
     def define_slot(self, slot_name, slot_args):
         try:
             args = tuple(slot_args)
-        except:
+        except BaseException:
             print("'", slot_args, "' is not a valid arguments tuple.")
             raise ValueError
-        
-        self.__slot[str(slot_name)] = args
 
+        self.__slot[str(slot_name)] = args
 
     def reset_signals(self):
         self.__signal = {}
 
-
     def reset_slots(self):
         self.__slot = {}
-
 
     def remove_signal(self, signal_name):
         try:
             del self.__signal[str(signal_name)]
         except KeyError:
             pass
-        
 
     def remove_slot(self, slot_name):
         try:
@@ -69,18 +63,14 @@ class Connectable(object):
         except KeyError:
             pass
 
-
     def has_signal(self, signal_name):
         return signal_name in self.__signal
 
-
     def has_slot(self, slot_name):
         return slot_name in self.__slot
-    
 
     def get_signals(self):
         return self.__signal
-
 
     def get_slots(self):
         return self.__slot

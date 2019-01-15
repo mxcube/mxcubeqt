@@ -50,14 +50,14 @@ class Qt4_BeamAlignBrick(BlissWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty('mnemonic', 'string', '')
+        self.addProperty("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.group_box = QGroupBox('Beam align', self) 
+        self.group_box = QGroupBox("Beam align", self)
         self.align_button = QPushButton("Align", self.group_box)
 
         # Layout --------------------------------------------------------------
@@ -66,7 +66,7 @@ class Qt4_BeamAlignBrick(BlissWidget):
         _group_box_vlayout.addStretch()
         _group_box_vlayout.setSpacing(0)
         _group_box_vlayout.setContentsMargins(0, 0, 0, 0)
-        
+
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.group_box)
         _main_vlayout.setSpacing(0)
@@ -75,7 +75,7 @@ class Qt4_BeamAlignBrick(BlissWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.align_button.clicked.connect(self.align_beam_clicked)    
+        self.align_button.clicked.connect(self.align_beam_clicked)
 
         # Other ---------------------------------------------------------------
 
@@ -83,7 +83,7 @@ class Qt4_BeamAlignBrick(BlissWidget):
         """
         Descript. :
         """
-        if property_name == 'mnemonic':
+        if property_name == "mnemonic":
             self.beam_align_hwobj = self.getHardwareObject(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)

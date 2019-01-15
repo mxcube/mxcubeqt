@@ -6,17 +6,20 @@ import queue_model_enumerables
 
 from widgets.reference_image_widget import ReferenceImageWidget
 from widgets.char_type_widget import CharTypeWidget
-from widgets.optimisation_parameters_widget_layout\
-    import OptimisationParametersWidgetLayout
-from widgets.radiation_damage_model_widget_layout\
-    import RadiationDamageModelWidgetLayout
+from widgets.optimisation_parameters_widget_layout import (
+    OptimisationParametersWidgetLayout,
+)
+from widgets.radiation_damage_model_widget_layout import (
+    RadiationDamageModelWidgetLayout,
+)
 from widgets.widget_utils import DataModelInputBinder
-from widgets.vertical_crystal_dimension_widget_layout\
-    import VerticalCrystalDimensionWidgetLayout
+from widgets.vertical_crystal_dimension_widget_layout import (
+    VerticalCrystalDimensionWidgetLayout,
+)
 
 
 class CharParametersWidget(qt.QWidget):
-    def __init__(self, parent = None, name = "parameter_widget"):
+    def __init__(self, parent=None, name="parameter_widget"):
         qt.QWidget.__init__(self, parent, name)
 
         #
@@ -27,7 +30,7 @@ class CharParametersWidget(qt.QWidget):
         self._char_params_mib = DataModelInputBinder(self._char_params)
         self._tree_view_item = None
         self.previous_energy = None
-        
+
         self.add_dc_cb = None
 
         self.char_type_widget = CharTypeWidget(self)
@@ -39,8 +42,9 @@ class CharParametersWidget(qt.QWidget):
         self.path_widget = self.reference_img_widget.path_widget
         self.opt_parameters_widget = OptimisationParametersWidgetLayout(self)
         self.rad_dmg_widget = RadiationDamageModelWidgetLayout(self)
-        widget_ui = os.path.join(os.path.dirname(__file__),
-                                 'ui_files/snapshot_widget_layout.ui')
+        widget_ui = os.path.join(
+            os.path.dirname(__file__), "ui_files/snapshot_widget_layout.ui"
+        )
         widget = qtui.QWidgetFactory.create(widget_ui)
         widget.reparent(self, qt.QPoint(0, 0))
         self.position_widget = widget
@@ -55,15 +59,15 @@ class CharParametersWidget(qt.QWidget):
         # Layout
         #
         v_layout = qt.QVBoxLayout(self, 11, 15, "main_layout")
-        rone_hlayout = qt.QHBoxLayout(v_layout, 15, "rone" )
+        rone_hlayout = qt.QHBoxLayout(v_layout, 15, "rone")
         rone_cone_vlayout = qt.QVBoxLayout(rone_hlayout, 15, "rone_cone")
         rtwo_hlayout = qt.QHBoxLayout(v_layout, 15, "rtwo")
         rthree_hlayout = qt.QHBoxLayout(v_layout, 15, "rtwo")
 
         rone_hlayout.addWidget(self.position_widget)
-        rone_cone_vlayout.addWidget(self.reference_img_widget)        
+        rone_cone_vlayout.addWidget(self.reference_img_widget)
         rone_hlayout.addStretch()
-        
+
         rtwo_hlayout.addWidget(self.char_type_widget)
         rtwo_hlayout.addWidget(self.opt_parameters_widget)
         rtwo_hlayout.addStretch(10)
@@ -74,210 +78,262 @@ class CharParametersWidget(qt.QWidget):
         rthree_hlayout.addStretch(10)
         v_layout.addStretch(10)
 
-
         #
         # Widget logic
-        # 
-        self.toggle_permitted_range(self.\
-            opt_parameters_widget.permitted_range_cbx.isOn())
-        qt.QObject.connect(self.opt_parameters_widget.permitted_range_cbx,
-                           qt.SIGNAL("toggled(bool)"),
-                           self.toggle_permitted_range)
+        #
+        self.toggle_permitted_range(
+            self.opt_parameters_widget.permitted_range_cbx.isOn()
+        )
+        qt.QObject.connect(
+            self.opt_parameters_widget.permitted_range_cbx,
+            qt.SIGNAL("toggled(bool)"),
+            self.toggle_permitted_range,
+        )
 
+        self._char_params_mib.bind_value_update(
+            "min_dose",
+            self.routine_dc_widget.dose_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('min_dose',
-                                                 self.routine_dc_widget.dose_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "min_time",
+            self.routine_dc_widget.time_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('min_time',
-                                                 self.routine_dc_widget.time_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "use_min_dose", self.routine_dc_widget.min_dose_radio, bool, None
+        )
 
+        self._char_params_mib.bind_value_update(
+            "use_min_time", self.routine_dc_widget.min_time_radio, bool, None
+        )
 
-        self._char_params_mib.bind_value_update('use_min_dose',
-                                                 self.routine_dc_widget.min_dose_radio,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "account_rad_damage",
+            self.routine_dc_widget.radiation_damage_cbx,
+            bool,
+            None,
+        )
 
-        self._char_params_mib.bind_value_update('use_min_time',
-                                                 self.routine_dc_widget.min_time_radio,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "auto_res", self.sad_widget.automatic_resolution_radio, bool, None
+        )
 
-        self._char_params_mib.bind_value_update('account_rad_damage',
-                                                 self.routine_dc_widget.radiation_damage_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "sad_res",
+            self.sad_widget.sad_resolution_ledit,
+            float,
+            qt.QDoubleValidator(0.5, 20, 3, self),
+        )
 
-        self._char_params_mib.bind_value_update('auto_res',
-                                                 self.sad_widget.automatic_resolution_radio,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "opt_sad", self.sad_widget.optimised_sad_cbx, bool, None
+        )
 
-        self._char_params_mib.bind_value_update('sad_res',
-                                                 self.sad_widget.sad_resolution_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.5, 20, 3, self))
+        self._char_params_mib.bind_value_update(
+            "determine_rad_params", self.rad_dmg_char_widget.rad_damage_cbx, bool, None
+        )
 
-        self._char_params_mib.bind_value_update('opt_sad',
-                                                 self.sad_widget.optimised_sad_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "burn_osc_start",
+            self.rad_dmg_char_widget.burn_osc_start_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('determine_rad_params',
-                                                 self.rad_dmg_char_widget.rad_damage_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "burn_osc_interval",
+            self.rad_dmg_char_widget.burn_osc_interval_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('burn_osc_start',
-                                                 self.rad_dmg_char_widget.burn_osc_start_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "use_aimed_resolution",
+            self.opt_parameters_widget.maximum_res_cbx,
+            bool,
+            None,
+        )
 
-        self._char_params_mib.bind_value_update('burn_osc_interval',
-                                                 self.rad_dmg_char_widget.burn_osc_interval_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "use_aimed_multiplicity",
+            self.opt_parameters_widget.aimed_mult_cbx,
+            bool,
+            None,
+        )
 
-        self._char_params_mib.bind_value_update('use_aimed_resolution',
-                                                 self.opt_parameters_widget.maximum_res_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "aimed_resolution",
+            self.opt_parameters_widget.maximum_res_ledit,
+            float,
+            qt.QDoubleValidator(0.01, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('use_aimed_multiplicity',
-                                                 self.opt_parameters_widget.aimed_mult_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "aimed_multiplicity",
+            self.opt_parameters_widget.aimed_mult_ledit,
+            float,
+            qt.QDoubleValidator(0.01, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('aimed_resolution',
-                                                 self.opt_parameters_widget.maximum_res_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.01, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "aimed_i_sigma",
+            self.opt_parameters_widget.i_over_sigma_ledit,
+            float,
+            qt.QDoubleValidator(0.01, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('aimed_multiplicity',
-                                                 self.opt_parameters_widget.aimed_mult_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.01, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "aimed_completness",
+            self.opt_parameters_widget.aimed_comp_ledit,
+            float,
+            qt.QDoubleValidator(0.01, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('aimed_i_sigma',
-                                                 self.opt_parameters_widget.i_over_sigma_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.01, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "strategy_complexity", self.opt_parameters_widget.start_comp_cbox, int, None
+        )
 
-        self._char_params_mib.bind_value_update('aimed_completness',
-                                                 self.opt_parameters_widget.aimed_comp_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.01, 1000, 2, self))
-        
-        self._char_params_mib.bind_value_update('strategy_complexity',
-                                                 self.opt_parameters_widget.start_comp_cbox,
-                                                 int,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "use_permitted_rotation",
+            self.opt_parameters_widget.permitted_range_cbx,
+            bool,
+            None,
+        )
 
-        self._char_params_mib.bind_value_update('use_permitted_rotation',
-                                                 self.opt_parameters_widget.permitted_range_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "permitted_phi_start",
+            self.opt_parameters_widget.phi_start_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('permitted_phi_start',
-                                                 self.opt_parameters_widget.phi_start_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "permitted_phi_end",
+            self.opt_parameters_widget.phi_end_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('permitted_phi_end',
-                                                 self.opt_parameters_widget.phi_end_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "low_res_pass_strat",
+            self.opt_parameters_widget.low_res_pass_cbx,
+            bool,
+            None,
+        )
 
-        self._char_params_mib.bind_value_update('low_res_pass_strat',
-                                                 self.opt_parameters_widget.low_res_pass_cbx,
-                                                 bool,
-                                                 None)
+        self._char_params_mib.bind_value_update(
+            "rad_suscept",
+            self.rad_dmg_widget.sensetivity_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('rad_suscept',
-                                                 self.rad_dmg_widget.sensetivity_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "beta",
+            self.rad_dmg_widget.beta_over_gray_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('beta',
-                                                 self.rad_dmg_widget.beta_over_gray_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "gamma",
+            self.rad_dmg_widget.gamma_over_gray_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('gamma',
-                                                 self.rad_dmg_widget.gamma_over_gray_ledit,
-                                                 float,
-                                                 qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "max_crystal_vdim",
+            self.vertical_dimension_widget.max_vdim_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('max_crystal_vdim',
-                                            self.vertical_dimension_widget.max_vdim_ledit,
-                                            float,
-                                            qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "min_crystal_vdim",
+            self.vertical_dimension_widget.min_vdim_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('min_crystal_vdim',
-                                            self.vertical_dimension_widget.min_vdim_ledit,
-                                            float,
-                                            qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "min_crystal_vphi",
+            self.vertical_dimension_widget.min_vphi_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('min_crystal_vphi',
-                                            self.vertical_dimension_widget.min_vphi_ledit,
-                                            float,
-                                            qt.QDoubleValidator(0.0, 1000, 2, self))
+        self._char_params_mib.bind_value_update(
+            "max_crystal_vphi",
+            self.vertical_dimension_widget.max_vphi_ledit,
+            float,
+            qt.QDoubleValidator(0.0, 1000, 2, self),
+        )
 
-        self._char_params_mib.bind_value_update('max_crystal_vphi',
-                                            self.vertical_dimension_widget.max_vphi_ledit,
-                                            float,
-                                            qt.QDoubleValidator(0.0, 1000, 2, self))
-
-        #self._char_params_mib.bind_value_update('space_group',
+        # self._char_params_mib.bind_value_update('space_group',
         #                                        self.vertical_dimension_widget.space_group_ledit,
         #                                        str,
         #                                        None)
 
+        self.vertical_dimension_widget.space_group_ledit.insertStrList(
+            queue_model_enumerables.XTAL_SPACEGROUPS
+        )
 
-        self.vertical_dimension_widget.space_group_ledit.\
-            insertStrList(queue_model_enumerables.XTAL_SPACEGROUPS)
+        qt.QObject.connect(
+            self.char_type_widget.charact_type_tbox,
+            qt.SIGNAL("currentChanged(int)"),
+            self.update_char_type,
+        )
 
-        qt.QObject.connect(self.char_type_widget.charact_type_tbox,
-                           qt.SIGNAL("currentChanged(int)"),
-                           self.update_char_type)
+        qt.QObject.connect(
+            self.rad_dmg_char_widget.rad_damage_cbx,
+            qt.SIGNAL("toggled(bool)"),
+            self.enable_opt_parameters_widget,
+        )
 
-        qt.QObject.connect(self.rad_dmg_char_widget.rad_damage_cbx,
-                           qt.SIGNAL("toggled(bool)"),
-                           self.enable_opt_parameters_widget)
+        qt.QObject.connect(
+            self.opt_parameters_widget.maximum_res_cbx,
+            qt.SIGNAL("toggled(bool)"),
+            self.enable_maximum_res_ledit,
+        )
 
-        qt.QObject.connect(self.opt_parameters_widget.maximum_res_cbx,
-                           qt.SIGNAL("toggled(bool)"),
-                           self.enable_maximum_res_ledit)
+        qt.QObject.connect(
+            self.opt_parameters_widget.aimed_mult_cbx,
+            qt.SIGNAL("toggled(bool)"),
+            self.enable_aimed_mult_ledit,
+        )
 
-        qt.QObject.connect(self.opt_parameters_widget.aimed_mult_cbx,
-                           qt.SIGNAL("toggled(bool)"),
-                           self.enable_aimed_mult_ledit)
+        qt.QObject.connect(
+            self.path_widget.data_path_widget_layout.child("prefix_ledit"),
+            qt.SIGNAL("textChanged(const QString &)"),
+            self._prefix_ledit_change,
+        )
 
-        qt.QObject.connect(self.path_widget.data_path_widget_layout.child('prefix_ledit'), 
-                           qt.SIGNAL("textChanged(const QString &)"), 
-                           self._prefix_ledit_change)
-        
-        qt.QObject.connect(self.path_widget.data_path_widget_layout.child('run_number_ledit'), 
-                           qt.SIGNAL("textChanged(const QString &)"), 
-                           self._run_number_ledit_change)
+        qt.QObject.connect(
+            self.path_widget.data_path_widget_layout.child("run_number_ledit"),
+            qt.SIGNAL("textChanged(const QString &)"),
+            self._run_number_ledit_change,
+        )
 
-        qt.QObject.connect(self.vertical_dimension_widget.space_group_ledit,
-                           qt.SIGNAL("activated(int)"),
-                           self._space_group_change)
+        qt.QObject.connect(
+            self.vertical_dimension_widget.space_group_ledit,
+            qt.SIGNAL("activated(int)"),
+            self._space_group_change,
+        )
 
-        qt.QObject.connect(qt.qApp, qt.PYSIGNAL('tab_changed'),
-                           self.tab_changed)
+        qt.QObject.connect(qt.qApp, qt.PYSIGNAL("tab_changed"), self.tab_changed)
 
     def _space_group_change(self, index):
-        self._char_params.space_group = queue_model_enumerables.\
-                                        XTAL_SPACEGROUPS[index]
+        self._char_params.space_group = queue_model_enumerables.XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
-        index  = 0
-        
+        index = 0
+
         if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
             index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
 
@@ -285,8 +341,7 @@ class CharParametersWidget(qt.QWidget):
         self.vertical_dimension_widget.space_group_ledit.setCurrentItem(index)
 
     def _prefix_ledit_change(self, new_value):
-        prefix = self._data_collection.acquisitions[0].\
-                 path_template.get_prefix()
+        prefix = self._data_collection.acquisitions[0].path_template.get_prefix()
         self._char.set_name(prefix)
         self._tree_view_item.setText(0, self._char.get_name())
 
@@ -303,7 +358,7 @@ class CharParametersWidget(qt.QWidget):
 
     def update_char_type(self, index):
         self._char_params.experiment_type = index
-    
+
     def toggle_permitted_range(self, status):
         self.opt_parameters_widget.phi_start_ledit.setEnabled(status)
         self.opt_parameters_widget.phi_end_ledit.setEnabled(status)
@@ -337,19 +392,24 @@ class CharParametersWidget(qt.QWidget):
         self._char_params = self._char.characterisation_parameters
         self._char_params_mib.set_model(self._char.characterisation_parameters)
         self._set_space_group(self._char_params.space_group)
-       
-        self.acq_widget.update_data_model(self._char.reference_image_collection.\
-                                          acquisitions[0].acquisition_parameters,
-                                          self._char.reference_image_collection.\
-                                          acquisitions[0].path_template)
-        
-        self.path_widget.update_data_model(self._char.reference_image_collection.\
-                                           acquisitions[0].path_template)
-        
-        if self._data_collection.acquisitions[0].acquisition_parameters.\
-                centred_position.snapshot_image:
-            image = self._data_collection.acquisitions[0].\
-                acquisition_parameters.centred_position.snapshot_image
+
+        self.acq_widget.update_data_model(
+            self._char.reference_image_collection.acquisitions[
+                0
+            ].acquisition_parameters,
+            self._char.reference_image_collection.acquisitions[0].path_template,
+        )
+
+        self.path_widget.update_data_model(
+            self._char.reference_image_collection.acquisitions[0].path_template
+        )
+
+        if self._data_collection.acquisitions[
+            0
+        ].acquisition_parameters.centred_position.snapshot_image:
+            image = self._data_collection.acquisitions[
+                0
+            ].acquisition_parameters.centred_position.snapshot_image
             image = image.scale(427, 320)
             self.position_widget.child("svideo").setPixmap(qt.QPixmap(image))
 
@@ -357,10 +417,11 @@ class CharParametersWidget(qt.QWidget):
         self.enable_opt_parameters_widget(self._char_params.determine_rad_params)
         self.enable_maximum_res_ledit(self._char_params.use_aimed_resolution)
         self.enable_aimed_mult_ledit(self._char_params.use_aimed_multiplicity)
-        
-        item = self.char_type_widget.charact_type_tbox.\
-               item(self._char_params.experiment_type)
-        
+
+        item = self.char_type_widget.charact_type_tbox.item(
+            self._char_params.experiment_type
+        )
+
         self.char_type_widget.charact_type_tbox.setCurrentItem(item)
         self.char_type_widget.toggle_time_dose()
         crystal = self._char.reference_image_collection.crystal

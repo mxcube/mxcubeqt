@@ -14,7 +14,7 @@ from queue_model_enumerables import EXPERIMENT_TYPE
 
 
 class TaskToolBoxWidget(qt.QWidget):
-    def __init__(self, parent = None, name = "task_toolbox"):
+    def __init__(self, parent=None, name="task_toolbox"):
         qt.QWidget.__init__(self, parent, name)
 
         # Data atributes
@@ -22,21 +22,21 @@ class TaskToolBoxWidget(qt.QWidget):
         self.tree_brick = None
         self.previous_page_index = 0
 
-        #Layout
+        # Layout
         self.v_layout = qt.QVBoxLayout(self)
         self.v_layout.setSpacing(10)
         self.method_group_box = qt.QVGroupBox("Collection method", self)
         font = self.method_group_box.font()
         font.setPointSize(12)
         self.method_group_box.setFont(font)
-    
-        self.tool_box = qt.QToolBox(self.method_group_box , "tool_box")
+
+        self.tool_box = qt.QToolBox(self.method_group_box, "tool_box")
         self.tool_box.setFixedWidth(475)
         font = self.tool_box.font()
         font.setPointSize(10)
         self.tool_box.setFont(font)
-        
-        self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
+
+        self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete")
         self.discrete_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.char_page.setBackgroundMode(qt.QWidget.PaletteBackground)
@@ -44,8 +44,8 @@ class TaskToolBoxWidget(qt.QWidget):
         self.helical_page.setBackgroundMode(qt.QWidget.PaletteBackground)
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        self.workflow_page = CreateWorkflowWidget(self.tool_box, 'workflow')
-        
+        self.workflow_page = CreateWorkflowWidget(self.tool_box, "workflow")
+
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         self.tool_box.addItem(self.helical_page, "Helical Collection")
@@ -58,22 +58,27 @@ class TaskToolBoxWidget(qt.QWidget):
         self.create_task_button.setIconSet(qt.QIconSet(self.add_pixmap))
         msg = "Add the collection method to the selected sample"
         qt.QToolTip.add(self.create_task_button, msg)
-        
+
         self.v_layout.addWidget(self.method_group_box)
 
         self.button_hlayout = qt.QHBoxLayout(None)
-        self.spacer = qt.QSpacerItem(1, 20, qt.QSizePolicy.Expanding,
-                                     qt.QSizePolicy.Minimum)
+        self.spacer = qt.QSpacerItem(
+            1, 20, qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum
+        )
         self.button_hlayout.addItem(self.spacer)
         self.button_hlayout.addWidget(self.create_task_button)
         self.method_group_box.layout().setSpacing(10)
         self.method_group_box.layout().addLayout(self.button_hlayout)
 
-        qt.QObject.connect(self.create_task_button, qt.SIGNAL("clicked()"),
-                           self.create_task_button_click)
+        qt.QObject.connect(
+            self.create_task_button,
+            qt.SIGNAL("clicked()"),
+            self.create_task_button_click,
+        )
 
-        qt.QObject.connect(self.tool_box, qt.SIGNAL("currentChanged( int )"),
-                           self.current_page_changed)
+        qt.QObject.connect(
+            self.tool_box, qt.SIGNAL("currentChanged( int )"), self.current_page_changed
+        )
 
     def set_tree_brick(self, brick):
         """
@@ -98,7 +103,9 @@ class TaskToolBoxWidget(qt.QWidget):
             self.tool_box.removeItem(self.energy_scan_page)
             self.energy_scan_page.hide()
         else:
-            self.energy_scan_page.set_energy_scan_hwobj(beamline_setup_hwobj.energyscan_hwobj)
+            self.energy_scan_page.set_energy_scan_hwobj(
+                beamline_setup_hwobj.energyscan_hwobj
+            )
 
     def update_data_path_model(self):
         for i in range(0, self.tool_box.count()):
@@ -106,34 +113,37 @@ class TaskToolBoxWidget(qt.QWidget):
             item.init_data_path_model()
             item.update_selection()
 
-            
     def ispyb_logged_in(self, logged_in):
         """
         Handels the signal logged_in from the brick the handles LIMS (ISPyB)
-        login, ie ProposalBrick. The signal is emitted when a user was 
+        login, ie ProposalBrick. The signal is emitted when a user was
         succesfully logged in.
         """
         for i in range(0, self.tool_box.count()):
             self.tool_box.item(i).ispyb_logged_in(logged_in)
-            
-    def current_page_changed(self, page_index):
-        tree_items =  self.tree_brick.get_selected_items()
 
-        if len(tree_items) > 0:        
+    def current_page_changed(self, page_index):
+        tree_items = self.tree_brick.get_selected_items()
+
+        if len(tree_items) > 0:
             tree_item = tree_items[0]
 
-            # Get the directory form the previous page and update 
+            # Get the directory form the previous page and update
             # the new page with the direcotry and run_number from the old.
             # IFF sample or group selected.
-            if isinstance(tree_item, queue_item.DataCollectionGroupQueueItem) or\
-                    isinstance(tree_item, queue_item.SampleQueueItem):
+            if isinstance(
+                tree_item, queue_item.DataCollectionGroupQueueItem
+            ) or isinstance(tree_item, queue_item.SampleQueueItem):
                 new_pt = self.tool_box.item(page_index)._path_template
-                previous_pt = self.tool_box.item(self.previous_page_index)._path_template
+                previous_pt = self.tool_box.item(
+                    self.previous_page_index
+                )._path_template
                 new_pt.directory = previous_pt.directory
-                #issu #91 - carry over file prefix. Remove this comment later
+                # issu #91 - carry over file prefix. Remove this comment later
                 new_pt.base_prefix = previous_pt.base_prefix
-                new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-                    get_next_run_number(new_pt)
+                new_pt.run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+                    new_pt
+                )
 
             self.tool_box.item(page_index).selection_changed(tree_items)
             self.previous_page_index = page_index
@@ -142,8 +152,8 @@ class TaskToolBoxWidget(qt.QWidget):
         """
         Descript. : Called by the parent widget when selection in the tree changes.
                     It also enables/disables add to queue button.
-                    If one tree item is selected then tool_box current page is set 
-                    to the page associated to the item. For example if a energy scan 
+                    If one tree item is selected then tool_box current page is set
+                    to the page associated to the item. For example if a energy scan
                     item is selected then create_energy_scan tool box page is selected.
                     Add to queue is disable if sample centring is selected
         """
@@ -151,7 +161,7 @@ class TaskToolBoxWidget(qt.QWidget):
             if isinstance(items[0], queue_item.SampleCentringQueueItem):
                 self.create_task_button.setEnabled(False)
             else:
-                self.create_task_button.setEnabled(True)   
+                self.create_task_button.setEnabled(True)
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
                 data_collection = items[0].get_model()
                 if data_collection.experiment_type == EXPERIMENT_TYPE.HELICAL:
@@ -175,16 +185,16 @@ class TaskToolBoxWidget(qt.QWidget):
             for shape in shapes:
                 self.create_task(task_model, shape)
         else:
-            self.create_task(task_model)  
+            self.create_task(task_model)
 
     def create_task_button_click(self):
         if self.tool_box.currentItem().approve_creation():
             items = self.tree_brick.get_selected_items()
 
             if not items:
-                logging.getLogger("user_level_log").\
-                    warning("Select the sample or group you "\
-                            "would like to add to.")
+                logging.getLogger("user_level_log").warning(
+                    "Select the sample or group you " "would like to add to."
+                )
             else:
                 for item in items:
                     shapes = self.shape_history.selected_shapes
@@ -196,8 +206,10 @@ class TaskToolBoxWidget(qt.QWidget):
                     elif isinstance(task_model, queue_model_objects.Basket):
                         for sample_node in task_model.get_sample_list():
                             child_task_model = self.create_task_group(sample_node)
-                            item = self.tree_brick.dc_tree_widget.get_item_by_model(child_task_model).get_sample_view_item()
-                            self._create_task(item, child_task_model, shapes) 
+                            item = self.tree_brick.dc_tree_widget.get_item_by_model(
+                                child_task_model
+                            ).get_sample_view_item()
+                            self._create_task(item, child_task_model, shapes)
                     else:
                         self._create_task(item, task_model, shapes)
 
@@ -214,13 +226,12 @@ class TaskToolBoxWidget(qt.QWidget):
         group_task_node.set_name(group_name)
         num = task_model.get_next_number_for_name(group_name)
         group_task_node.set_number(num)
-                         
-        self.tree_brick.queue_model_hwobj.\
-        add_child(task_model, group_task_node)
+
+        self.tree_brick.queue_model_hwobj.add_child(task_model, group_task_node)
 
         return group_task_node
 
-    def create_task(self, task_node, shape = None):
+    def create_task(self, task_node, shape=None):
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
@@ -234,4 +245,6 @@ class TaskToolBoxWidget(qt.QWidget):
         # The selected item is a task, make a copy.
         else:
             new_node = self.tree_brick.queue_model_hwobj.copy_node(task_node)
-            self.tree_brick.queue_model_hwobj.add_child(task_node.get_parent(), new_node)
+            self.tree_brick.queue_model_hwobj.add_child(
+                task_node.get_parent(), new_node
+            )

@@ -35,7 +35,7 @@ __license__ = "LGPLv3+"
 
 
 class AdvancedParametersWidget(QtImport.QWidget):
-    def __init__(self, parent = None, name = "advanced_parameters_widget"):
+    def __init__(self, parent=None, name="advanced_parameters_widget"):
         QtImport.QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
@@ -55,8 +55,7 @@ class AdvancedParametersWidget(QtImport.QWidget):
         # Graphic elements ----------------------------------------------------
         _dc_parameters_widget = QtImport.QWidget(self)
         self._data_path_widget = DataPathWidget(_dc_parameters_widget)
-        self._acq_widget = AcquisitionWidget(_dc_parameters_widget,
-                                            layout = 'horizontal')
+        self._acq_widget = AcquisitionWidget(_dc_parameters_widget, layout="horizontal")
 
         # Layout --------------------------------------------------------------
         _dc_parameters_widget_layout = QtImport.QVBoxLayout(_dc_parameters_widget)
@@ -73,12 +72,11 @@ class AdvancedParametersWidget(QtImport.QWidget):
         _main_hlayout.addStretch(0)
 
         # Qt signal/slot connections ------------------------------------------
-        #self._acq_widget.acqParametersChangedSignal.\
+        # self._acq_widget.acqParametersChangedSignal.\
         #     connect(self.acq_parameters_changed)
-        #self._data_path_widget.pathTemplateChangedSignal.\
+        # self._data_path_widget.pathTemplateChangedSignal.\
         #     connect(self.acq_parameters_changed)
-        self._acq_widget.madEnergySelectedSignal.connect(\
-             self.mad_energy_selected)
+        self._acq_widget.madEnergySelectedSignal.connect(self.mad_energy_selected)
 
         # Ohter ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
@@ -96,10 +94,11 @@ class AdvancedParametersWidget(QtImport.QWidget):
         if state:
             path_template.mad_prefix = name
         else:
-            path_template.mad_prefix = ''
+            path_template.mad_prefix = ""
 
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
-          get_next_run_number(path_template)
+        run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+            path_template
+        )
 
         self._data_path_widget.set_run_number(run_number)
         self._data_path_widget.set_prefix(path_template.base_prefix)
@@ -115,35 +114,43 @@ class AdvancedParametersWidget(QtImport.QWidget):
         self._tree_view_item = tree_view_item
         self._data_collection = data_collection
 
-        #if isinstance(tree_view_item, queue_item.XrayCenteringQueueItem):
+        # if isinstance(tree_view_item, queue_item.XrayCenteringQueueItem):
         #    self._data_collection = tree_view_item.get_model().reference_image_collection
-        #else:
+        # else:
         #    self._data_collection = tree_view_item.get_model()
         executed = self._data_collection.is_executed()
 
         self._acq_widget.setEnabled(not executed)
         self._data_path_widget.setEnabled(not executed)
 
-        self._acquisition_mib = DataModelInputBinder(self._data_collection.\
-             acquisitions[0].acquisition_parameters)
+        self._acquisition_mib = DataModelInputBinder(
+            self._data_collection.acquisitions[0].acquisition_parameters
+        )
 
         # The acq_widget sends a signal to the path_widget, and it relies
         # on that both models upto date, we need to refactor this part
         # so that both models are set before taking ceratin actions.
         # This workaround, works for the time beeing.
-        self._data_path_widget._data_model = self._data_collection.\
-             acquisitions[0].path_template
-        self._data_path_widget.update_data_model(self._data_collection.\
-              acquisitions[0].path_template)
+        self._data_path_widget._data_model = self._data_collection.acquisitions[
+            0
+        ].path_template
+        self._data_path_widget.update_data_model(
+            self._data_collection.acquisitions[0].path_template
+        )
 
-        self._acq_widget.update_data_model(\
-             self._data_collection.acquisitions[0].acquisition_parameters,
-             self._data_collection.acquisitions[0].path_template)
-        #self._acq_widget.use_osc_start(False)
+        self._acq_widget.update_data_model(
+            self._data_collection.acquisitions[0].acquisition_parameters,
+            self._data_collection.acquisitions[0].path_template,
+        )
+        # self._acq_widget.use_osc_start(False)
 
-        self._acq_widget.acq_widget_layout.num_images_ledit.setDisabled(data_collection.is_mesh())
+        self._acq_widget.acq_widget_layout.num_images_ledit.setDisabled(
+            data_collection.is_mesh()
+        )
         invalid = self._acquisition_mib.validate_all()
         if invalid:
-            msg = "This data collection has one or more incorrect parameters,"+\
-                  " correct the fields marked in red to solve the problem."
+            msg = (
+                "This data collection has one or more incorrect parameters,"
+                + " correct the fields marked in red to solve the problem."
+            )
             logging.getLogger("GUI").warning(msg)

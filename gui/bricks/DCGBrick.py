@@ -29,7 +29,6 @@ __category__ = "Task"
 
 
 class DCGBrick(BaseWidget):
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 

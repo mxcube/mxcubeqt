@@ -29,45 +29,49 @@ __category__ = "General"
 
 
 class DetectorStatusBrick(BaseWidget):
- 
-    STATES = {'unknown': Colors.LIGHT_GRAY,
-              'OK': Colors.LIGHT_BLUE,
-              'BAD': Colors.LIGHT_RED}
-    DETECTOR_STATES = {'busy': Colors.LIGHT_GREEN,
-                       'error': Colors.LIGHT_RED,
-                       'initializing': Colors.LIGHT_YELLOW,
-                       'calibrating': Colors.LIGHT_YELLOW,
-                       'configuring': Colors.LIGHT_YELLOW,
-                       'slave': Colors.LIGHT_RED,
-                       'exposing': Colors.LIGHT_GREEN,
-                       'ready': Colors.LIGHT_BLUE,
-                       'uninitialized': Colors.LIGHT_GRAY} 
- 
+
+    STATES = {
+        "unknown": Colors.LIGHT_GRAY,
+        "OK": Colors.LIGHT_BLUE,
+        "BAD": Colors.LIGHT_RED,
+    }
+    DETECTOR_STATES = {
+        "busy": Colors.LIGHT_GREEN,
+        "error": Colors.LIGHT_RED,
+        "initializing": Colors.LIGHT_YELLOW,
+        "calibrating": Colors.LIGHT_YELLOW,
+        "configuring": Colors.LIGHT_YELLOW,
+        "slave": Colors.LIGHT_RED,
+        "exposing": Colors.LIGHT_GREEN,
+        "ready": Colors.LIGHT_BLUE,
+        "uninitialized": Colors.LIGHT_GRAY,
+    }
+
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.detector_hwobj = None 
+        self.detector_hwobj = None
 
         # Internal variables --------------------------------------------------
 
-        # Properties ---------------------------------------------------------- 
-        self.add_property('mnemonic', 'string', '')
-        #self.defineSlot('collectStarted',())
+        # Properties ----------------------------------------------------------
+        self.add_property("mnemonic", "string", "")
+        # self.defineSlot('collectStarted',())
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _main_groupbox = QtImport.QGroupBox("Detector status", self) 
+        _main_groupbox = QtImport.QGroupBox("Detector status", self)
         self.status_label = QtImport.QLabel("<b>unknown status</b>", _main_groupbox)
         self.frame_rate_label = QtImport.QLabel("   Frame rate     : ", _main_groupbox)
         self.temperature_label = QtImport.QLabel("   Temperature:", _main_groupbox)
         self.humidity_label = QtImport.QLabel("   Humidity:     ", _main_groupbox)
 
-        # Layout -------------------------------------------------------------- 
+        # Layout --------------------------------------------------------------
         _main_groupbox_vlayout = QtImport.QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.status_label)
         _main_groupbox_vlayout.addWidget(self.frame_rate_label)
@@ -85,15 +89,17 @@ class DetectorStatusBrick(BaseWidget):
 
         # Qt signal/slot connections ------------------------------------------
 
-        # Other --------------------------------------------------------------- 
-        Colors.set_widget_color(self.status_label, 
-           DetectorStatusBrick.DETECTOR_STATES['uninitialized'])
-        Colors.set_widget_color(self.temperature_label, 
-           DetectorStatusBrick.STATES['unknown'])
-        Colors.set_widget_color(self.humidity_label, 
-            DetectorStatusBrick.STATES['unknown']) 
-        Colors.set_widget_color(self.frame_rate_label,
-            DetectorStatusBrick.STATES['OK'])        
+        # Other ---------------------------------------------------------------
+        Colors.set_widget_color(
+            self.status_label, DetectorStatusBrick.DETECTOR_STATES["uninitialized"]
+        )
+        Colors.set_widget_color(
+            self.temperature_label, DetectorStatusBrick.STATES["unknown"]
+        )
+        Colors.set_widget_color(
+            self.humidity_label, DetectorStatusBrick.STATES["unknown"]
+        )
+        Colors.set_widget_color(self.frame_rate_label, DetectorStatusBrick.STATES["OK"])
 
         self.status_label.setMinimumHeight(20)
         self.status_label.setAlignment(QtImport.Qt.AlignCenter)
@@ -104,64 +110,69 @@ class DetectorStatusBrick(BaseWidget):
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.detector_hwobj is not None:
-                self.disconnect(self.detector_hwobj,
-                                'temperatureChanged',
-                                self.temperature_changed)
-                self.disconnect(self.detector_hwobj,
-                                'humidityChanged',
-                                self.humidity_changed)
-                self.disconnect(self.detector_hwobj,
-                                'statusChanged',
-                                self.status_changed)
-                self.disconnect(self.detector_hwobj,
-                                'frameRateChanged',
-                                self.frame_rate_changed)
+                self.disconnect(
+                    self.detector_hwobj, "temperatureChanged", self.temperature_changed
+                )
+                self.disconnect(
+                    self.detector_hwobj, "humidityChanged", self.humidity_changed
+                )
+                self.disconnect(
+                    self.detector_hwobj, "statusChanged", self.status_changed
+                )
+                self.disconnect(
+                    self.detector_hwobj, "frameRateChanged", self.frame_rate_changed
+                )
             self.detector_hwobj = self.get_hardware_object(new_value)
             if self.detector_hwobj is not None:
-                self.connect(self.detector_hwobj,
-                             'temperatureChanged',
-                             self.temperature_changed)
-                self.connect(self.detector_hwobj,
-                             'humidityChanged',
-                             self.humidity_changed)
-                self.connect(self.detector_hwobj,
-                             'statusChanged',
-                             self.status_changed)
-                self.connect(self.detector_hwobj,
-                             'frameRateChanged',
-                             self.frame_rate_changed)
-                self.detector_hwobj.update_values()             
+                self.connect(
+                    self.detector_hwobj, "temperatureChanged", self.temperature_changed
+                )
+                self.connect(
+                    self.detector_hwobj, "humidityChanged", self.humidity_changed
+                )
+                self.connect(self.detector_hwobj, "statusChanged", self.status_changed)
+                self.connect(
+                    self.detector_hwobj, "frameRateChanged", self.frame_rate_changed
+                )
+                self.detector_hwobj.update_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
-     
+
     def status_changed(self, status, status_message):
         if status:
             self.status_label.setText("<b>%s</b>" % status.title())
-            Colors.set_widget_color(\
-                   self.status_label,
-                   DetectorStatusBrick.DETECTOR_STATES.get(status, Colors.LIGHT_GRAY))
+            Colors.set_widget_color(
+                self.status_label,
+                DetectorStatusBrick.DETECTOR_STATES.get(status, Colors.LIGHT_GRAY),
+            )
             self.setToolTip(status_message)
 
     def temperature_changed(self, value, status_ok):
         if value is not None:
-            unit = u'\N{DEGREE SIGN}'
-            self.temperature_label.setText("   Temperature : %0.1f%s" %(value, unit))
-        if status_ok: 
-            Colors.set_widget_color(self.temperature_label,
-                DetectorStatusBrick.STATES['OK'])
+            unit = u"\N{DEGREE SIGN}"
+            self.temperature_label.setText("   Temperature : %0.1f%s" % (value, unit))
+        if status_ok:
+            Colors.set_widget_color(
+                self.temperature_label, DetectorStatusBrick.STATES["OK"]
+            )
         else:
-            Colors.set_widget_color(self.temperature_label,
-                DetectorStatusBrick.STATES['BAD'])
+            Colors.set_widget_color(
+                self.temperature_label, DetectorStatusBrick.STATES["BAD"]
+            )
 
     def humidity_changed(self, value, status_ok):
         if value is not None:
-            self.humidity_label.setText("   Humidity         : %0.1f%s" %(value, chr(37)))
+            self.humidity_label.setText(
+                "   Humidity         : %0.1f%s" % (value, chr(37))
+            )
         if status_ok:
-            Colors.set_widget_color(self.humidity_label,
-                DetectorStatusBrick.STATES['OK'])
+            Colors.set_widget_color(
+                self.humidity_label, DetectorStatusBrick.STATES["OK"]
+            )
         else:
-            Colors.set_widget_color(self.humidity_label,
-                DetectorStatusBrick.STATES['BAD'])
+            Colors.set_widget_color(
+                self.humidity_label, DetectorStatusBrick.STATES["BAD"]
+            )
 
     def frame_rate_changed(self, value):
         if value is not None:

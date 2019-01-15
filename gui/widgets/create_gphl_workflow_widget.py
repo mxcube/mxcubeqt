@@ -40,11 +40,11 @@ __license__ = "LGPLv3+"
 
 
 class CreateGphlWorkflowWidget(CreateTaskBase):
-
     def __init__(self, parent=None, name=None, fl=0):
 
-        CreateTaskBase.__init__(self, parent, name,
-                                QtImport.Qt.WindowFlags(fl), 'GphlWorkflow')
+        CreateTaskBase.__init__(
+            self, parent, name, QtImport.Qt.WindowFlags(fl), "GphlWorkflow"
+        )
 
         if not name:
             self.setObjectName("create_gphl_workflow_widget")
@@ -58,19 +58,20 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._workflow_type_widget = QtImport.QGroupBox('Workflow type', self)
+        self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
 
         self._workflow_cbox = QtImport.QComboBox(self._workflow_type_widget)
-        self._gphl_acq_widget = QtImport.QGroupBox('Acquisition', self)
-        self._gphl_acq_param_widget =  GphlAcquisitionWidget(
+        self._gphl_acq_widget = QtImport.QGroupBox("Acquisition", self)
+        self._gphl_acq_param_widget = GphlAcquisitionWidget(
             self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
-        self._gphl_diffractcal_widget =  GphlDiffractcalWidget(
+        self._gphl_diffractcal_widget = GphlDiffractcalWidget(
             self._gphl_acq_widget, "gphl_diffractcal_widget"
         )
 
-        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
-                                                layout='vertical')
+        self._data_path_widget = DataPathWidget(
+            self, "create_dc_path_widget", layout="vertical"
+        )
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.file_name_label.hide()
         data_path_layout.file_name_value_label.hide()
@@ -89,18 +90,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._gphl_acq_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._workflow_cbox.currentIndexChanged[str].connect(
-            self.workflow_selected
-        )
-
+        self._workflow_cbox.currentIndexChanged[str].connect(self.workflow_selected)
 
         # set up popup data dialog
-        self.gphl_data_dialog = GphlDataDialog(self, 'GPhL Workflow Data')
+        self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
         self.gphl_data_dialog.continueClickedSignal.connect(self.data_acquired)
         # self.connect(self.gphl_data_dialog, qt.PYSIGNAL("continue_clicked"),
@@ -117,8 +115,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._workflow_cbox.addItem(workflow_name)
             self.workflow_selected(workflow_names[0])
 
-            workflow_hwobj.connect('gphlParametersNeeded',
-                                   self.gphl_data_dialog.open_dialog)
+            workflow_hwobj.connect(
+                "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
+            )
 
     def workflow_selected(self, name):
         # necessary as this comes in as a QString object
@@ -128,11 +127,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         xx.setCurrentIndex(xx.findText(name))
 
         parameters = self._workflow_hwobj.get_available_workflows()[name]
-        beam_energies = parameters.get('beam_energies', {})
-        strategy_type = parameters.get('strategy_type')
-        if strategy_type == 'transcal':
+        beam_energies = parameters.get("beam_energies", {})
+        strategy_type = parameters.get("strategy_type")
+        if strategy_type == "transcal":
             self._gphl_acq_widget.hide()
-        elif strategy_type == 'diffractcal':
+        elif strategy_type == "diffractcal":
             # TODO update this
             self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()
@@ -140,14 +139,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
-            self._gphl_acq_param_widget.populate_widget(
-                beam_energies=beam_energies,
-            )
+            self._gphl_acq_param_widget.populate_widget(beam_energies=beam_energies)
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.show()
 
-        prefix = parameters.get('prefix')
+        prefix = parameters.get("prefix")
         if prefix is not None:
             self.current_prefix = prefix
 
@@ -211,9 +208,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
             tree_brick = self._tree_brick
             if tree_brick:
-                tree_brick.dc_tree_widget.confirm_dialog.continueClickedSignal\
-                    .connect(self.continue_button_click)
-
+                tree_brick.dc_tree_widget.confirm_dialog.continueClickedSignal.connect(
+                    self.continue_button_click
+                )
 
         wf = queue_model_objects.GphlWorkflow(self._workflow_hwobj)
         wf_type = str(self._workflow_cbox.currentText())
@@ -226,47 +223,49 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf.set_number(wf.path_template.run_number)
 
         wf_parameters = ho.get_available_workflows()[wf_type]
-        strategy_type = wf_parameters.get('strategy_type')
-        wf.set_interleave_order(wf_parameters.get('interleaveOrder', ''))
-        if strategy_type.startswith('transcal'):
+        strategy_type = wf_parameters.get("strategy_type")
+        wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
+        if strategy_type.startswith("transcal"):
             expected_resolution = None
 
-        elif strategy_type.startswith('diffractcal'):
+        elif strategy_type.startswith("diffractcal"):
             expected_resolution = self._gphl_diffractcal_widget.get_parameter_value(
-                'expected_resolution'
+                "expected_resolution"
             )
-            ss = self._gphl_diffractcal_widget.get_parameter_value('test_crystal')
+            ss = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
             crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss)
             wf.set_space_group(crystal_data.space_group)
             wf.set_cell_parameters(
-                tuple(getattr(crystal_data, tag)
-                      for tag in ('a', 'b', 'c', 'alpha', 'beta', 'gamma'))
+                tuple(
+                    getattr(crystal_data, tag)
+                    for tag in ("a", "b", "c", "alpha", "beta", "gamma")
+                )
             )
         else:
             # Coulds be native_... phasing_... etc.
             expected_resolution = self._gphl_acq_param_widget.get_parameter_value(
-                'expected_resolution'
+                "expected_resolution"
             )
 
             dd = self._gphl_acq_param_widget.get_energy_dict()
             wf.set_beam_energies(dd)
 
             wf.set_space_group(
-                self._gphl_acq_param_widget.get_parameter_value('space_group')
+                self._gphl_acq_param_widget.get_parameter_value("space_group")
             )
-            tag = self._gphl_acq_param_widget.get_parameter_value('crystal_system')
+            tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
             if tag:
                 data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
                 crystal_system = data.crystal_system
                 point_groups = data.point_groups
-                if len(point_groups) == 1 or point_groups[0] == '32':
+                if len(point_groups) == 1 or point_groups[0] == "32":
                     # '32' is a special case; '312' and '321' are also returned as '32'
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
         wf.set_expected_resolution(expected_resolution)
-        
+
         tasks.append(wf)
 
         return tasks

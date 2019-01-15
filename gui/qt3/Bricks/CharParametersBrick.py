@@ -5,7 +5,8 @@ from BlissFramework import BaseComponents
 from widgets.char_parameters_widget import CharParametersWidget
 
 
-__category__ = 'mxCuBE_v3'
+__category__ = "mxCuBE_v3"
+
 
 class CharParametersBrick(BaseComponents.BlissWidget):
     def __init__(self, *args):
@@ -19,13 +20,14 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         self.addProperty("beamline_setup", "string", "/beamline-setup")
 
         # Qt-Slots
-        self.defineSlot("populate_edna_parameter_widget",({}))
+        self.defineSlot("populate_edna_parameter_widget", ({}))
 
-        # Layout        
-        self.stack = qt.QWidgetStack(self, 'stack')
+        # Layout
+        self.stack = qt.QWidgetStack(self, "stack")
         self.parameters_widget = CharParametersWidget(self)
-        self.toggle_page_button = qt.QPushButton('View Results', 
-                                              self, 'toggle_page_button')
+        self.toggle_page_button = qt.QPushButton(
+            "View Results", self, "toggle_page_button"
+        )
         self.toggle_page_button.setFixedWidth(100)
 
         self.results_view = qt.QTextBrowser(self, "results_view")
@@ -41,17 +43,19 @@ class CharParametersBrick(BaseComponents.BlissWidget):
         # Logic
         self.stack.raiseWidget(self.parameters_widget)
         self.parameters_widget.collection_type = None
-        qt.QObject.connect(self.toggle_page_button, 
-                           qt.SIGNAL('clicked()'),
-                           self.toggle_page)
+        qt.QObject.connect(
+            self.toggle_page_button, qt.SIGNAL("clicked()"), self.toggle_page
+        )
 
         self.toggle_page_button.setDisabled(True)
 
     def populate_edna_parameter_widget(self, item):
-        self.parameters_widget.path_widget._base_image_dir = \
+        self.parameters_widget.path_widget._base_image_dir = (
             self.session_hwobj.get_base_image_directory()
-        self.parameters_widget.path_widget._base_process_dir = \
+        )
+        self.parameters_widget.path_widget._base_process_dir = (
             self.session_hwobj.get_base_process_directory()
+        )
 
         char = item.get_model()
 
@@ -61,13 +65,16 @@ class CharParametersBrick(BaseComponents.BlissWidget):
             self.parameters_widget.set_enabled(False)
 
             if char.html_report:
-                if self.results_view.mimeSourceFactory().\
-                       data(char.html_report) == None:
-                    self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
+                if self.results_view.mimeSourceFactory().data(char.html_report) is None:
+                    self.results_view.setText(
+                        "<center><h1>Characterisation failed</h1></center>"
+                    )
                 else:
                     self.results_view.setSource(char.html_report)
             else:
-                self.results_view.setText("<center><h1>Characterisation failed</h1></center>") 
+                self.results_view.setText(
+                    "<center><h1>Characterisation failed</h1></center>"
+                )
         else:
             self.parameters_widget.set_enabled(True)
             self.stack.raiseWidget(self.parameters_widget)
@@ -86,10 +93,10 @@ class CharParametersBrick(BaseComponents.BlissWidget):
 
     # Framework-2 callback
     def propertyChanged(self, property_name, old_value, new_value):
-        if property_name == 'tunable-energy':
-            self.parameters_widget.acq_widget.set_tunable_energy(new_value)            
-        elif property_name == 'session':
+        if property_name == "tunable-energy":
+            self.parameters_widget.acq_widget.set_tunable_energy(new_value)
+        elif property_name == "session":
             self.session_hwobj = self.getHardwareObject(new_value)
-        elif property_name == 'beamline_setup':            
+        elif property_name == "beamline_setup":
             beamline_setup = self.getHardwareObject(new_value)
             self.parameters_widget.set_beamline_setup(beamline_setup)

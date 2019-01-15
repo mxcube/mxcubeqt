@@ -27,32 +27,33 @@ from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]
 __license__ = "LGPLv3+"
-__category__ = 'Motor'
+__category__ = "Motor"
 
 
 class KappaPhiMotorsBrick(BaseWidget):
 
-    STATE_COLORS = (Colors.LIGHT_RED, 
-                    Colors.DARK_GRAY,
-                    Colors.LIGHT_GREEN,
-                    Colors.LIGHT_YELLOW,  
-                    Colors.LIGHT_YELLOW,
-                    Colors.LIGHT_YELLOW)
+    STATE_COLORS = (
+        Colors.LIGHT_RED,
+        Colors.DARK_GRAY,
+        Colors.LIGHT_GREEN,
+        Colors.LIGHT_YELLOW,
+        Colors.LIGHT_YELLOW,
+        Colors.LIGHT_YELLOW,
+    )
 
-    def __init__(self,*args):
-        BaseWidget.__init__(self,*args)
+    def __init__(self, *args):
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
         self.diffractometer_hwobj = None
 
-        # Internal values ----------------------------------------------------- 
-        
+        # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property('mnemonic','string','')
-        self.add_property('label','string','')
-        self.add_property('showStop', 'boolean', True)
-        self.add_property('defaultStep', 'string', '10.0')
+        self.add_property("mnemonic", "string", "")
+        self.add_property("label", "string", "")
+        self.add_property("showStop", "boolean", True)
+        self.add_property("defaultStep", "string", "10.0")
 
         # Signals ------------------------------------------------------------
 
@@ -66,13 +67,13 @@ class KappaPhiMotorsBrick(BaseWidget):
         self.kappaphi_dspinbox = QtImport.QDoubleSpinBox(_main_gbox)
         self.kappaphi_dspinbox.setRange(-360, 360)
         self.step_cbox = QtImport.QComboBox(_main_gbox)
-        self.step_button_icon = Icons.load_icon('TileCascade2')
+        self.step_button_icon = Icons.load_icon("TileCascade2")
         self.close_button = QtImport.QPushButton(_main_gbox)
         self.stop_button = QtImport.QPushButton(_main_gbox)
 
         # Layout --------------------------------------------------------------
         _main_gbox_hlayout = QtImport.QHBoxLayout(_main_gbox)
-        _main_gbox_hlayout.addWidget(QtImport.QLabel("Kappa:", _main_gbox)) 
+        _main_gbox_hlayout.addWidget(QtImport.QLabel("Kappa:", _main_gbox))
         _main_gbox_hlayout.addWidget(self.kappa_dspinbox)
         _main_gbox_hlayout.addWidget(QtImport.QLabel("Phi:", _main_gbox))
         _main_gbox_hlayout.addWidget(self.kappaphi_dspinbox)
@@ -102,11 +103,11 @@ class KappaPhiMotorsBrick(BaseWidget):
         self.step_cbox.activated.connect(self.go_to_step)
         self.step_cbox.activated.connect(self.step_changed)
         self.step_cbox.textChanged.connect(self.step_edited)
- 
+
         self.close_button.clicked.connect(self.close_clicked)
         self.stop_button.clicked.connect(self.stop_clicked)
-       
-        #self.stop_button.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Minimum)
+
+        # self.stop_button.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Minimum)
         # Other ---------------------------------------------------------------
         self.kappa_dspinbox.setAlignment(QtImport.Qt.AlignRight)
         self.kappa_dspinbox.setFixedWidth(75)
@@ -114,49 +115,59 @@ class KappaPhiMotorsBrick(BaseWidget):
         self.kappaphi_dspinbox.setFixedWidth(75)
 
         self.step_cbox.setEditable(True)
-        self.step_cbox.setValidator(QtImport.QDoubleValidator(0, 360, 5, self.step_cbox))
+        self.step_cbox.setValidator(
+            QtImport.QDoubleValidator(0, 360, 5, self.step_cbox)
+        )
         self.step_cbox.setDuplicatesEnabled(False)
         self.step_cbox.setFixedHeight(27)
 
-        self.close_button.setIcon(Icons.load_icon('Home2'))
+        self.close_button.setIcon(Icons.load_icon("Home2"))
         self.close_button.setFixedSize(27, 27)
 
-        self.stop_button.setIcon(Icons.load_icon('Stop2'))
+        self.stop_button.setIcon(Icons.load_icon("Stop2"))
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedSize(27, 27)
-        
-    def property_changed(self,property_name, old_value, new_value):
-        if property_name == 'mnemonic':
+
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "mnemonic":
             if self.diffractometer_hwobj is not None:
-                self.disconnect(self.diffractometer_hwobj,
-                                "kappaMotorMoved",
-                                self.kappa_motor_moved) 
-                self.disconnect(self.diffractometer_hwobj,
-                                "kappaPhiMotorMoved",
-                                self.kappaphi_motor_moved)
-                self.disconnect(self.diffractometer_hwobj,
-                                "minidiffStatusChanged",
-                                self.diffractometer_state_changed)
+                self.disconnect(
+                    self.diffractometer_hwobj, "kappaMotorMoved", self.kappa_motor_moved
+                )
+                self.disconnect(
+                    self.diffractometer_hwobj,
+                    "kappaPhiMotorMoved",
+                    self.kappaphi_motor_moved,
+                )
+                self.disconnect(
+                    self.diffractometer_hwobj,
+                    "minidiffStatusChanged",
+                    self.diffractometer_state_changed,
+                )
             self.diffractometer_hwobj = self.get_hardware_object(new_value)
             if self.diffractometer_hwobj is not None:
-                self.connect(self.diffractometer_hwobj,
-                             "kappaMotorMoved",
-                             self.kappa_motor_moved)            
-                self.connect(self.diffractometer_hwobj,
-                             "kappaPhiMotorMoved",
-                             self.kappaphi_motor_moved)
-                self.connect(self.diffractometer_hwobj,
-                             "minidiffStatusChanged",
-                             self.diffractometer_state_changed)
+                self.connect(
+                    self.diffractometer_hwobj, "kappaMotorMoved", self.kappa_motor_moved
+                )
+                self.connect(
+                    self.diffractometer_hwobj,
+                    "kappaPhiMotorMoved",
+                    self.kappaphi_motor_moved,
+                )
+                self.connect(
+                    self.diffractometer_hwobj,
+                    "minidiffStatusChanged",
+                    self.diffractometer_state_changed,
+                )
                 self.diffractometer_state_changed("Ready")
             else:
                 self.setEnabled(False)
-        elif property_name == 'showStop':
+        elif property_name == "showStop":
             if new_value:
                 self.stop_button.show()
             else:
                 self.stop_button.hide()
-        elif property_name == 'defaultStep':
+        elif property_name == "defaultStep":
             if new_value != "":
                 self.set_line_step(float(new_value))
                 self.step_changed(None)
@@ -170,70 +181,78 @@ class KappaPhiMotorsBrick(BaseWidget):
         self.diffractometer_hwobj.close_kappa()
 
     def change_position(self):
-        self.diffractometer_hwobj.move_kappa_and_phi(\
-             self.kappa_dspinbox.value(),
-             self.kappaphi_dspinbox.value())                 
+        self.diffractometer_hwobj.move_kappa_and_phi(
+            self.kappa_dspinbox.value(), self.kappaphi_dspinbox.value()
+        )
 
     def kappa_value_edited(self, text):
-        Colors.set_widget_color(self.kappa_dspinbox.lineEdit(),
-                                       Colors.LINE_EDIT_CHANGED,
-                                       QtImport.QPalette.Base)
+        Colors.set_widget_color(
+            self.kappa_dspinbox.lineEdit(),
+            Colors.LINE_EDIT_CHANGED,
+            QtImport.QPalette.Base,
+        )
 
     def kappaphi_value_edited(self, text):
-        Colors.set_widget_color(self.kappaphi_dspinbox.lineEdit(),
-                                       Colors.LINE_EDIT_CHANGED,
-                                       QtImport.QPalette.Base)
+        Colors.set_widget_color(
+            self.kappaphi_dspinbox.lineEdit(),
+            Colors.LINE_EDIT_CHANGED,
+            QtImport.QPalette.Base,
+        )
 
     def kappa_value_accepted(self):
-        self.diffractometer_hwobj.move_kappa_and_phi(\
-             self.kappa_dspinbox.value(),
-             self.kappaphi_dspinbox.value())
-        
+        self.diffractometer_hwobj.move_kappa_and_phi(
+            self.kappa_dspinbox.value(), self.kappaphi_dspinbox.value()
+        )
+
     def kappa_motor_moved(self, value):
         self.kappa_dspinbox.blockSignals(True)
-        #txt = '?' if value is None else '%s' %\
+        # txt = '?' if value is None else '%s' %\
         #      str(self['formatString'] % value)
         self.kappa_dspinbox.setValue(value)
         self.kappa_dspinbox.blockSignals(False)
 
     def kappaphi_motor_moved(self, value):
         self.kappaphi_dspinbox.blockSignals(True)
-        #txt = '?' if value is None else '%s' %\
+        # txt = '?' if value is None else '%s' %\
         #      str(self['formatString'] % value)
-        self.kappaphi_dspinbox.setValue(value)   
+        self.kappaphi_dspinbox.setValue(value)
         self.kappaphi_dspinbox.blockSignals(False)
 
     def diffractometer_state_changed(self, state):
         if self.diffractometer_hwobj.in_plate_mode():
             self.setDisabled(True)
             return
-        
+
         if state == "Ready":
             self.kappa_dspinbox.setEnabled(True)
             self.kappaphi_dspinbox.setEnabled(True)
             self.close_button.setEnabled(True)
             self.stop_button.setEnabled(False)
-            Colors.set_widget_color(\
+            Colors.set_widget_color(
                 self.kappa_dspinbox.lineEdit(),
                 Colors.LIGHT_GREEN,
-                QtImport.QPalette.Base)
-            Colors.set_widget_color(\
+                QtImport.QPalette.Base,
+            )
+            Colors.set_widget_color(
                 self.kappaphi_dspinbox.lineEdit(),
                 Colors.LIGHT_GREEN,
-                QtImport.QPalette.Base)
+                QtImport.QPalette.Base,
+            )
         else:
             self.kappa_dspinbox.setEnabled(False)
-            self.kappaphi_dspinbox.setEnabled(False) 
+            self.kappaphi_dspinbox.setEnabled(False)
             self.close_button.setEnabled(False)
             self.stop_button.setEnabled(True)
-            Colors.set_widget_color(\
+            Colors.set_widget_color(
                 self.kappa_dspinbox.lineEdit(),
-                Colors.LIGHT_YELLOW, 
-                QtImport.QPalette.Base)
-            QtImport.Colors.set_widget_color(\
+                Colors.LIGHT_YELLOW,
+                QtImport.QPalette.Base,
+            )
+            QtImport.Colors.set_widget_color(
                 self.kappaphi_dspinbox.lineEdit(),
                 QtImport.Colors.LIGHT_YELLOW,
-                QtImport.QPalette.Base)
+                QtImport.QPalette.Base,
+            )
 
     def go_to_step(self, step_index):
         step = str(self.step_cbox.currentText())
@@ -253,25 +272,28 @@ class KappaPhiMotorsBrick(BaseWidget):
             self.step_cbox.setCurrentIndex(self.step_cbox.count() - 1)
 
     def step_changed(self, step):
-        Colors.set_widget_color(self.step_cbox.lineEdit(),
-             QtImport.Qt.white, QtImport.QPalette.Base)
+        Colors.set_widget_color(
+            self.step_cbox.lineEdit(), QtImport.Qt.white, QtImport.QPalette.Base
+        )
 
     def step_edited(self, step):
         """Paints step combobox when value is edited
         """
-        Colors.set_widget_color(self.step_cbox.lineEdit(),
-                                       Colors.LINE_EDIT_CHANGED,
-                                       QtImport.QPalette.Button)
+        Colors.set_widget_color(
+            self.step_cbox.lineEdit(),
+            Colors.LINE_EDIT_CHANGED,
+            QtImport.QPalette.Button,
+        )
+
 
 class SpinBoxEvent(QtImport.QObject):
 
     returnPressedSignal = QtImport.pyqtSignal()
     contextMenuSignal = QtImport.pyqtSignal()
 
-    def eventFilter(self,  obj,  event):
+    def eventFilter(self, obj, event):
         if event.type() == QtImport.QEvent.KeyPress:
-            if event.key() in [QtImport.Qt.Key_Enter,
-                               QtImport.Qt.Key_Return]:
+            if event.key() in [QtImport.Qt.Key_Enter, QtImport.Qt.Key_Return]:
                 self.returnPressedSignal.emit()
 
         elif event.type() == QtImport.QEvent.MouseButtonRelease:

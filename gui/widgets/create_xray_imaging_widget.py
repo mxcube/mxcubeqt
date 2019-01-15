@@ -19,7 +19,7 @@
 
 import copy
 
-import  QtImport
+import QtImport
 
 from gui.utils import queue_item
 from gui.widgets.create_task_base import CreateTaskBase
@@ -28,7 +28,10 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
 
 from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
-from HardwareRepository.HardwareObjects import queue_model_objects, queue_model_enumerables
+from HardwareRepository.HardwareObjects import (
+    queue_model_objects,
+    queue_model_enumerables,
+)
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -39,32 +42,43 @@ class CreateXrayImagingWidget(CreateTaskBase):
     """Widget used to create xray imaging method
     """
 
-    def __init__(self, parent=None,name=None, fl=0):
-        CreateTaskBase.__init__(self, parent, name, 
-            QtImport.Qt.WindowFlags(fl), 'XrayImaging')
+    def __init__(self, parent=None, name=None, fl=0):
+        CreateTaskBase.__init__(
+            self, parent, name, QtImport.Qt.WindowFlags(fl), "XrayImaging"
+        )
 
         if not name:
             self.setObjectName("create_xray_imaging_widget")
 
         # Hardware objects ----------------------------------------------------
- 
+
         # Internal variables --------------------------------------------------
         self._xray_imaging_parameters = None
         self._processing_parameters = None
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._xray_imaging_parameters_widget = XrayImagingParametersWidget(\
-             self, 'xray_imaging_widget',
-             xray_imaging_params=self._xray_imaging_parameters)
+        self._xray_imaging_parameters_widget = XrayImagingParametersWidget(
+            self,
+            "xray_imaging_widget",
+            xray_imaging_params=self._xray_imaging_parameters,
+        )
 
-        self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
-             layout='vertical', acq_params=self._acquisition_parameters,
-             path_template=self._path_template)
+        self._acq_widget = AcquisitionWidget(
+            self,
+            "acquisition_widget",
+            layout="vertical",
+            acq_params=self._acquisition_parameters,
+            path_template=self._path_template,
+        )
         self._acq_widget.grid_mode = False
 
-        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget', 
-             data_model=self._path_template, layout='vertical')
+        self._data_path_widget = DataPathWidget(
+            self,
+            "create_dc_path_widget",
+            data_model=self._path_template,
+            layout="vertical",
+        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
@@ -78,10 +92,10 @@ class CreateXrayImagingWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._acq_widget.acqParametersChangedSignal.\
-             connect(self.acq_parameters_changed)
-        self._data_path_widget.pathTemplateChangedSignal.\
-             connect(self.path_template_changed)
+        self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
+        self._data_path_widget.pathTemplateChangedSignal.connect(
+            self.path_template_changed
+        )
 
         # Other ---------------------------------------------------------------
         self._acq_widget.use_osc_start(False)
@@ -119,9 +133,10 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self._xray_imaging_parameters = queue_model_objects.XrayImagingParameters()
         if self._beamline_setup_hwobj is not None:
-            self._acquisition_parameters = self._beamline_setup_hwobj.\
-                get_default_acquisition_parameters("default_imaging_values")
-            self._path_template.suffix = 'tiff'
+            self._acquisition_parameters = self._beamline_setup_hwobj.get_default_acquisition_parameters(
+                "default_imaging_values"
+            )
+            self._path_template.suffix = "tiff"
 
     def set_beamline_setup(self, bl_setup_hwobj):
         """
@@ -131,8 +146,9 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self._xray_imaging_parameters_widget.set_beamline_setup(bl_setup_hwobj)
         bl_setup_hwobj.detector_distance_hwobj.connect(
-             'positionChanged',
-             self._xray_imaging_parameters_widget.set_detector_distance)
+            "positionChanged",
+            self._xray_imaging_parameters_widget.set_detector_distance,
+        )
 
     def single_item_selection(self, tree_item):
         """
@@ -143,27 +159,30 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
             self._xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)
-            self._xray_imaging_parameters_widget.update_data_model(\
-                 self._xray_imaging_parameters)
+            self._xray_imaging_parameters_widget.update_data_model(
+                self._xray_imaging_parameters
+            )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                 self._beamline_setup_hwobj.detector_distance_hwobj.get_position()
+                self._beamline_setup_hwobj.detector_distance_hwobj.get_position()
             )
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.XrayImagingQueueItem):
-            data_model= tree_item.get_model()
+            data_model = tree_item.get_model()
 
             self._path_template = data_model.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
             self._acquisition_parameters = data_model.acquisition.acquisition_parameters
-            self._acq_widget.update_data_model(self._acquisition_parameters,
-                                               self._path_template)
+            self._acq_widget.update_data_model(
+                self._acquisition_parameters, self._path_template
+            )
 
             self._xray_imaging_parameters = data_model.xray_imaging_parameters
-            self._xray_imaging_parameters_widget.update_data_model(self._xray_imaging_parameters)
-    
+            self._xray_imaging_parameters_widget.update_data_model(
+                self._xray_imaging_parameters
+            )
 
             self.setDisabled(False)
 
@@ -181,14 +200,14 @@ class CreateXrayImagingWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
 
-        #self._path_template.run_number += 1
-        xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters) 
+        # self._path_template.run_number += 1
+        xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)
         acq = self._create_acq(sample)
         acq.acquisition_parameters.centred_position = cpos
 
-        dc = queue_model_objects.XrayImaging(xray_imaging_parameters,
-                                             acq,
-                                             sample.crystals[0])
+        dc = queue_model_objects.XrayImaging(
+            xray_imaging_parameters, acq, sample.crystals[0]
+        )
         dc.set_name(acq.path_template.get_prefix())
         dc.set_number(acq.path_template.run_number)
 

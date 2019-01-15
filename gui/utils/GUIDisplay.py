@@ -23,9 +23,10 @@ __status__ = "Production"
 
 
 import os
+
 # LNLS
 # python2.7
-#import new
+# import new
 # python3.4
 import sys
 import time
@@ -69,38 +70,46 @@ class CustomMenuBar(QtImport.QMenuBar):
         self.original_style = None
 
         # Graphic elements ----------------------------------------------------
-        #self.menubar = QtGui.QMenuBar(self)
+        # self.menubar = QtGui.QMenuBar(self)
         self.file_menu = self.addMenu("File")
-        self.expert_mode_action = self.file_menu.addAction(\
-             "Expert mode", self.expert_mode_clicked)
+        self.expert_mode_action = self.file_menu.addAction(
+            "Expert mode", self.expert_mode_clicked
+        )
         self.expert_mode_action.setCheckable(True)
-        self.reload_hwr_action = self.file_menu.addAction(\
-             "Reload hardware objects", self.reload_hwr_clicked)
+        self.reload_hwr_action = self.file_menu.addAction(
+            "Reload hardware objects", self.reload_hwr_clicked
+        )
         self.reload_hwr_action.setEnabled(False)
-        self.brick_properties_action = self.file_menu.addAction(\
-             "Edit brick properties", self.edit_brick_properties)
+        self.brick_properties_action = self.file_menu.addAction(
+            "Edit brick properties", self.edit_brick_properties
+        )
         self.file_menu.addAction("Quit", self.quit_clicked)
 
         self.view_menu = self.addMenu("View")
-        self.view_toolbar_action = self.view_menu.addAction(\
-             "Graphics toolbar", self.view_toolbar_clicked)
+        self.view_toolbar_action = self.view_menu.addAction(
+            "Graphics toolbar", self.view_toolbar_clicked
+        )
         self.view_toolbar_action.setCheckable(True)
         self.view_menu.addSeparator()
-        
+
         self.view_windows_menu = self.view_menu.addMenu("Windows")
         self.view_windows_menu.setEnabled(False)
 
-        self.view_maximize_action = self.view_menu.addAction(\
-             "Show maximized window", self.view_max_clicked)
-        self.view_normal_action = self.view_menu.addAction(\
-             "Show normal window", self.view_normal_clicked)
-        self.view_minimize_action = self.view_menu.addAction(\
-             "Minimize window", self.view_min_clicked)
+        self.view_maximize_action = self.view_menu.addAction(
+            "Show maximized window", self.view_max_clicked
+        )
+        self.view_normal_action = self.view_menu.addAction(
+            "Show normal window", self.view_normal_clicked
+        )
+        self.view_minimize_action = self.view_menu.addAction(
+            "Minimize window", self.view_min_clicked
+        )
 
         self.expert_mode_action.setCheckable(True)
         self.help_menu = self.addMenu("Help")
-        self.info_for_developers_action = self.help_menu.addAction(\
-             "Information for developers", self.info_for_developers_clicked)
+        self.info_for_developers_action = self.help_menu.addAction(
+            "Information for developers", self.info_for_developers_clicked
+        )
         self.info_for_developers_action.setEnabled(False)
         self.help_menu.addAction("User manual", self.user_manual_clicked)
         self.help_menu.addAction("Shortcuts", self.shortcuts_clicked)
@@ -113,26 +122,23 @@ class CustomMenuBar(QtImport.QMenuBar):
         self.bricks_properties_editor.close()
 
         # Layout --------------------------------------------------------------
-        self.setSizePolicy(QtImport.QSizePolicy.MinimumExpanding,
-                           QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed
+        )
 
         # Qt signal/slot connections ------------------------------------------
-        self.bricks_properties_editor.propertyEditedSignal.connect(\
-             self.property_edited)
+        self.bricks_properties_editor.propertyEditedSignal.connect(self.property_edited)
 
         # Other ---------------------------------------------------------------
         self.expert_mode_checkboxStdColor = None
-        self.menu_items = [self.file_menu,
-                           self.view_menu,
-                           self.help_menu]
-        #self.setwindowIcon(Icons.load_icon("desktop_icon"))
+        self.menu_items = [self.file_menu, self.view_menu, self.help_menu]
+        # self.setwindowIcon(Icons.load_icon("desktop_icon"))
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
-                self.bricks_properties_editor.add_brick(\
-                     widget.objectName(), 
-                     widget)
-        self.bricks_properties_editor.bricks_listwidget.\
-             sortItems(QtImport.Qt.AscendingOrder)
+                self.bricks_properties_editor.add_brick(widget.objectName(), widget)
+        self.bricks_properties_editor.bricks_listwidget.sortItems(
+            QtImport.Qt.AscendingOrder
+        )
 
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
@@ -164,22 +170,28 @@ class CustomMenuBar(QtImport.QMenuBar):
         """Ask for expert mode password"""
 
         if not self.original_style:
-            #This should be based on instance connection
+            # This should be based on instance connection
             # restore colour if master/client/etc
             self.original_style = self.styleSheet()
         if self.expert_mode_action.isChecked():
-            res = QtImport.QInputDialog.getText(self,
-                "Switch to expert mode", "Please enter the password:",
-                QtImport.QLineEdit.Password)
+            res = QtImport.QInputDialog.getText(
+                self,
+                "Switch to expert mode",
+                "Please enter the password:",
+                QtImport.QLineEdit.Password,
+            )
             if res[1]:
                 if str(res[0]) == self.expert_pwd:
                     self.set_exp_mode(True)
                     self.expert_mode_action.setChecked(True)
                 else:
                     self.expert_mode_action.setChecked(False)
-                    QtImport.QMessageBox.critical(self,
-                         "Switch to expert mode", "Wrong password!",
-                         QtImport.QMessageBox.Ok)
+                    QtImport.QMessageBox.critical(
+                        self,
+                        "Switch to expert mode",
+                        "Wrong password!",
+                        QtImport.QMessageBox.Ok,
+                    )
             else:
                 self.expert_mode_action.setChecked(False)
         else:
@@ -197,21 +209,21 @@ class CustomMenuBar(QtImport.QMenuBar):
 
         if state:
             # switch to expert mode
-            #QObject.emit(self.parent,
+            # QObject.emit(self.parent,
             #                    SIGNAL("enableExpertMode"),
             #                    True)
             self.parent.enableExpertModeSignal.emit(True)
             # go through all bricks and execute the method
             for widget in QtImport.QApplication.allWidgets():
-                if hasattr(widget, 'set_expert_mode'):
+                if hasattr(widget, "set_expert_mode"):
                     widget.set_expert_mode(True)
                 if isinstance(widget, BaseWidget):
                     try:
                         widget.set_expert_mode(True)
-                    except:
-                        logging.getLogger().exception(\
-                           "Could not set %s to expert mode" % \
-                           widget.objectName())
+                    except BaseException:
+                        logging.getLogger().exception(
+                            "Could not set %s to expert mode" % widget.objectName()
+                        )
             self.set_color("orange")
         else:
             # switch to user mode
@@ -219,14 +231,14 @@ class CustomMenuBar(QtImport.QMenuBar):
             # go through all bricks and execute the method
             for widget in QtImport.QApplication.allWidgets():
                 if hasattr(widget, "set_expert_mode"):
-                #if isinstance(widget, BaseWidget):
+                    # if isinstance(widget, BaseWidget):
                     widget.setWhatsThis("")
                     try:
                         widget.set_expert_mode(False)
-                    except:
-                        logging.getLogger().exception(\
-                            "Could not set %s to user mode" % \
-                            widget.objectName())
+                    except BaseException:
+                        logging.getLogger().exception(
+                            "Could not set %s to user mode" % widget.objectName()
+                        )
             if self.original_style:
                 self.setStyleSheet(self.original_style)
 
@@ -251,18 +263,23 @@ class CustomMenuBar(QtImport.QMenuBar):
     def about_clicked(self):
         """Display dialog with info about mxcube"""
 
-        QtImport.QMessageBox.about(\
+        QtImport.QMessageBox.about(
             self,
             "About MXCuBE",
             """<b>MXCuBE v %s </b>
                <p>Macromolecular Xtallography Customized Beamline Environment<p>
-               Python %s - Qt %s - PyQt %s on %s"""%(__version__,
-            platform.python_version(), QT_VERSION_STR,
-            QT_VERSION_STR, platform.system()))
+               Python %s - Qt %s - PyQt %s on %s"""
+            % (
+                __version__,
+                platform.python_version(),
+                QT_VERSION_STR,
+                QT_VERSION_STR,
+                platform.system(),
+            ),
+        )
 
     def shortcuts_clicked(self):
-        shortcuts_text = \
-           """<b>Ctrl + 1</b>   : start 3 click centering<br>
+        shortcuts_text = """<b>Ctrl + 1</b>   : start 3 click centering<br>
               <b>Ctrl + 2</b>   : save new centering point<br>
               <b>Ctrl + 3</b>   : create new helical line<br>
               <b>Ctrl + 4</b>   : start grid drawing<br><br>
@@ -272,10 +289,7 @@ class CustomMenuBar(QtImport.QMenuBar):
               <b>Ctrl + +/-</b> : zoom in/out<br><br>
               <b>Mouse wheel +/-</b> : rotate sample
            """
-        QtImport.QMessageBox.about(\
-            self,
-            "Available shortcuts",
-            shortcuts_text)
+        QtImport.QMessageBox.about(self, "Available shortcuts", shortcuts_text)
 
     def quit_clicked(self):
         """Exit mxcube"""
@@ -292,22 +306,22 @@ class CustomMenuBar(QtImport.QMenuBar):
         if os.path.exists(filename):
             webbrowser.open(filename)
         else:
-            logging.getLogger().error("Could not find html file %s. " + \
-               "Use sphinx to build documentation (in doc dir execute " + \
-               "'sphinx-build source build')" % filename)
+            logging.getLogger().error(
+                "Could not find html file %s. "
+                + "Use sphinx to build documentation (in doc dir execute "
+                + "'sphinx-build source build')" % filename
+            )
 
     def user_manual_clicked(self):
         """Opens user manual"""
 
         path_list = os.path.dirname(__file__).split(os.sep)
         filename = os.path.join(*path_list[:-2])
-        filename = os.path.join(os.sep, filename,
-                                "docs/build/user_manual.html")
+        filename = os.path.join(os.sep, filename, "docs/build/user_manual.html")
         if os.path.exists(filename):
             webbrowser.open(filename)
         else:
-            logging.getLogger().error(\
-                "Could not find html file %s" % filename)
+            logging.getLogger().error("Could not find html file %s" % filename)
 
     def set_color(self, color):
         """Sets menubar color"""
@@ -347,9 +361,10 @@ class CustomMenuBar(QtImport.QMenuBar):
             self.preview_windows = {}
             for window in windows_list:
                 self.preview_windows[window.base_caption] = window
-                temp_menu = self.view_windows_menu.addAction(window.base_caption, 
-                           partial(self.view_window, window.base_caption))
-            
+                temp_menu = self.view_windows_menu.addAction(
+                    window.base_caption, partial(self.view_window, window.base_caption)
+                )
+
     def view_window(self, window_caption):
         """Displays selected window"""
         self.preview_windows[window_caption].show()
@@ -366,16 +381,18 @@ class CustomToolBar(QtImport.QToolBar):
 
         QtImport.QToolBar.__init__(self)
 
-        self.setSizePolicy(QtImport.QSizePolicy.MinimumExpanding,
-                           QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed
+        )
+
 
 class CustomGroupBox(QtImport.QGroupBox):
-
     def __init__(self, *args, **kwargs):
         QtImport.QGroupBox.__init__(self, args[0])
         self.setObjectName(args[1])
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                           QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
         if kwargs["layout"] == "horizontal":
             __group_box_layout = QtImport.QHBoxLayout(self)
@@ -390,6 +407,7 @@ class CustomGroupBox(QtImport.QGroupBox):
         for child in self.children():
             if hasattr(child, "setVisible"):
                 child.setVisible(state == True)
+
 
 class WindowDisplayWidget(QtImport.QScrollArea):
     """Main widget"""
@@ -419,26 +437,32 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             """Sets fixed size"""
 
             if fixed_size >= 0:
-                hor_size_policy = self.orientation == "horizontal" and \
-                    QtImport.QSizePolicy.Fixed or \
-                    QtImport.QSizePolicy.MinimumExpanding
-                ver_size_policy = hor_size_policy == \
-                    QtImport.QSizePolicy.Fixed and \
-                    QtImport.QSizePolicy.MinimumExpanding or \
-                    QtImport.QSizePolicy.Fixed
+                hor_size_policy = (
+                    self.orientation == "horizontal"
+                    and QtImport.QSizePolicy.Fixed
+                    or QtImport.QSizePolicy.MinimumExpanding
+                )
+                ver_size_policy = (
+                    hor_size_policy == QtImport.QSizePolicy.Fixed
+                    and QtImport.QSizePolicy.MinimumExpanding
+                    or QtImport.QSizePolicy.Fixed
+                )
 
                 if self.orientation == "horizontal":
                     self.setFixedWidth(fixed_size)
                 else:
                     self.setFixedHeight(fixed_size)
             else:
-                hor_size_policy = self.orientation == "horizontal" and \
-                    QtImport.QSizePolicy.Expanding or \
-                    QtImport.QSizePolicy.MinimumExpanding
-                ver_size_policy = hor_size_policy == \
-                    QtImport.QSizePolicy.Expanding and \
-                    QtImport.QSizePolicy.MinimumExpanding or \
-                    QtImport.QSizePolicy.Expanding
+                hor_size_policy = (
+                    self.orientation == "horizontal"
+                    and QtImport.QSizePolicy.Expanding
+                    or QtImport.QSizePolicy.MinimumExpanding
+                )
+                ver_size_policy = (
+                    hor_size_policy == QtImport.QSizePolicy.Expanding
+                    and QtImport.QSizePolicy.MinimumExpanding
+                    or QtImport.QSizePolicy.Expanding
+                )
             self.setSizePolicy(hor_size_policy, ver_size_policy)
 
         def paintEvent(self, event):
@@ -451,28 +475,22 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             painter = QtImport.QPainter(self)
             painter.setPen(QtImport.QPen(QtImport.Qt.black, 3))
 
-            if self.orientation == 'horizontal':
+            if self.orientation == "horizontal":
                 height = self.height() / 2
                 painter.drawLine(0, height, self.width(), height)
                 painter.drawLine(0, height, 5, height - 5)
                 painter.drawLine(0, height, 5, height + 5)
-                painter.drawLine(self.width(), height,
-                                 self.width() - 5, height - 5)
-                painter.drawLine(self.width(), height,
-                                 self.width() - 5, height + 5)
+                painter.drawLine(self.width(), height, self.width() - 5, height - 5)
+                painter.drawLine(self.width(), height, self.width() - 5, height + 5)
             else:
                 width = self.width() / 2
-                painter.drawLine(self.width() / 2, 0,
-                                 self.width() / 2, self.height())
+                painter.drawLine(self.width() / 2, 0, self.width() / 2, self.height())
                 painter.drawLine(width, 0, width - 5, 5)
                 painter.drawLine(width, 0, width + 5, 5)
-                painter.drawLine(width, self.height(),
-                                 width - 5, self.height() - 5)
-                painter.drawLine(width, self.height(),
-                                 width + 5, self.height() - 5)
+                painter.drawLine(width, self.height(), width - 5, self.height() - 5)
+                painter.drawLine(width, self.height(), width + 5, self.height() - 5)
 
     class CustomFrame(QtImport.QFrame):
-
         def __init__(self, *args, **kwargs):
             """init"""
             QtImport.QFrame.__init__(self, args[0])
@@ -482,19 +500,21 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.dialog = None
             self.origin_parent = self.parent()
             self.origin_index = None
-            execution_mode = kwargs.get('execution_mode', False)
+            execution_mode = kwargs.get("execution_mode", False)
 
             if not execution_mode:
                 self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
 
-            if kwargs.get('layout') == 'vertical':
+            if kwargs.get("layout") == "vertical":
                 __frame_layout = QtImport.QVBoxLayout(self)
             else:
                 __frame_layout = QtImport.QHBoxLayout(self)
 
-            self.open_in_dialog_button = QtImport.QPushButton(Icons.load_icon("UnLock"), "")
+            self.open_in_dialog_button = QtImport.QPushButton(
+                Icons.load_icon("UnLock"), ""
+            )
             self.open_in_dialog_button.setFixedWidth(30)
-            #self.open_in_dialog_button.setObjectName("pin")
+            # self.open_in_dialog_button.setObjectName("pin")
             self.open_in_dialog_button.setVisible(False)
 
             self.dialog = QtImport.QDialog(self.parent())
@@ -520,11 +540,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 self.dialog_layout.removeWidget(self)
                 self.origin_parent.layout().insertWidget(self.origin_index, self)
                 self.dialog.close()
-  
+
         def set_background_color(self, color):
-            Colors.set_widget_color(self,
-                                           color,
-                                           QtImport.QPalette.Background)
+            Colors.set_widget_color(self, color, QtImport.QPalette.Background)
 
         def set_expert_mode(self, expert_mode):
             self.open_in_dialog_button.setVisible(expert_mode)
@@ -553,33 +571,32 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
     def verticalBox(*args, **kwargs):
         """Vertical box"""
-        kwargs['layout'] = 'vertical'
+        kwargs["layout"] = "vertical"
         return WindowDisplayWidget.CustomFrame(*args, **kwargs)
 
     def horizontalBox(*args, **kwargs):
         """Horizontal box"""
 
-        kwargs['layout'] = 'horizontal'
+        kwargs["layout"] = "horizontal"
         return WindowDisplayWidget.CustomFrame(*args, **kwargs)
 
     def horizontalGroupBox(*args, **kwargs):
         """Horizontal group box"""
 
-        kwargs['layout'] = 'horizontal'
+        kwargs["layout"] = "horizontal"
         return CustomGroupBox(*args, **kwargs)
 
     def verticalGroupBox(*args, **kwargs):
         """Vertical group box"""
 
-        kwargs['layout'] = 'vertical'
+        kwargs["layout"] = "vertical"
         return CustomGroupBox(*args, **kwargs)
 
     class CustomTabWidget(QtImport.QTabWidget):
         """Tab widget"""
 
-        #notebookPageChangedSignal = pyqtSignal(str)
+        # notebookPageChangedSignal = pyqtSignal(str)
         tabChangedSignal = QtImport.pyqtSignal(int, object)
-        
 
         def __init__(self, *args, **kwargs):
             """init"""
@@ -590,15 +607,15 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.close_tab_button = None
             self.pinned = True
 
-            #self.tab_widgets = []
+            # self.tab_widgets = []
             self.countChanged = {}
-            self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                               QtImport.QSizePolicy.Expanding)
+            self.setSizePolicy(
+                QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            )
             self.currentChanged.connect(self._page_changed)
 
             self.dialog = QtImport.QDialog(self.parent())
             self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
- 
 
         def _page_changed(self, index):
             """Page changed event"""
@@ -613,20 +630,20 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 count = label_list[-1]
                 try:
                     found = count[0] == "("
-                except:
+                except BaseException:
                     pass
                 else:
                     try:
                         found = count[-1] == ")"
-                    except:
+                    except BaseException:
                         pass
-            except:
+            except BaseException:
                 pass
             if found:
                 orig_label = " ".join(label_list[0:-1])
             else:
                 orig_label = " ".join(label_list)
-            #self.notebookPageChangedSignal.emit(orig_label)
+            # self.notebookPageChangedSignal.emit(orig_label)
             self.tabChangedSignal.emit(index, page)
 
             tab_name = self.objectName()
@@ -646,20 +663,28 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             try:
                 # LNLS
                 # python2.7
-                #self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
+                # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
                 # python3.4
-                self.__dict__[slot_name.replace(" ", "_")] = \
-                     types.MethodType(tab_slot, self)
-            except:
-                logging.getLogger().exception(\
-                     "Could not add slot %s " % slot_name + \
-                     "in %s" % self.objectName())
+                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                    tab_slot, self
+                )
+            except BaseException:
+                logging.getLogger().exception(
+                    "Could not add slot %s " % slot_name + "in %s" % self.objectName()
+                )
             slot_name = "hidePage_%s" % label
 
-            def tab_slot(self, hide=True, page={"widget" : scroll_area, \
-                         "label": label,
-                         "index": self.indexOf(scroll_area),
-                         "icon": icon, "hidden": False}):
+            def tab_slot(
+                self,
+                hide=True,
+                page={
+                    "widget": scroll_area,
+                    "label": label,
+                    "index": self.indexOf(scroll_area),
+                    "icon": icon,
+                    "hidden": False,
+                },
+            ):
 
                 if hide:
                     if not page["hidden"]:
@@ -669,69 +694,80 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 else:
                     if page["hidden"]:
                         if icon:
-                            self.insertTab(page["index"],
-                                           page["widget"],
-                                           Icons.load_icon(icon),
-                                           label)
+                            self.insertTab(
+                                page["index"],
+                                page["widget"],
+                                Icons.load_icon(icon),
+                                label,
+                            )
                         else:
-                            self.insertTab(page["index"],
-                                           page["widget"],
-                                           page["label"])
-                        slot_name = "showPage_%s" % page["label"].replace(' ', '_')
+                            self.insertTab(page["index"], page["widget"], page["label"])
+                        slot_name = "showPage_%s" % page["label"].replace(" ", "_")
                         getattr(self, slot_name)()
                         page["hidden"] = False
                         self.setCurrentWidget(page["widget"])
                     else:
-                        slot_name = "showPage_%s" % page["label"].replace(' ', '_')
+                        slot_name = "showPage_%s" % page["label"].replace(" ", "_")
                         getattr(self, slot_name)()
                         self.setCurrentWidget(page["widget"])
+
             try:
                 # LNLS
                 # python2.7
-                #self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
+                # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
                 # python3.4
-                self.__dict__[slot_name.replace(" ", "_")] = \
-                     types.MethodType(tab_slot, self)
-            except:
-                logging.getLogger().exception(\
-                     "Could not add slot %s " % slot_name + \
-                     "in %s" % str(self.objectName()))
+                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                    tab_slot, self
+                )
+            except BaseException:
+                logging.getLogger().exception(
+                    "Could not add slot %s " % slot_name
+                    + "in %s" % str(self.objectName())
+                )
 
             # add 'enable page' slot
             slot_name = "enablePage_%s" % label
+
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.page(page_index).setEnabled(enable)
 
             try:
                 # LNLS
                 # python2.7
-                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
-                self.__dict__[slot_name.replace(" ", "_")] = \
-                     types.MethodType(tab_slot, self)
-            except:
-                logging.getLogger().exception(\
-                     "Could not add slot %s " % slot_name + \
-                     "in %s" % str(self.objectName()))
+                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                    tab_slot, self
+                )
+            except BaseException:
+                logging.getLogger().exception(
+                    "Could not add slot %s " % slot_name
+                    + "in %s" % str(self.objectName())
+                )
 
             # add 'enable tab' slot
             slot_name = "enableTab_%s" % label
+
             def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.setTabEnabled(page_index, enable)
+
             try:
                 # LNLS
                 # python2.7
-                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
-                self.__dict__[slot_name.replace(" ", "_")] = \
-                     types.MethodType(tab_slot, self)
-            except:
-                logging.getLogger().exception(\
-                     "Could not add slot %s " % slot_name + \
-                     "in %s" % str(self.objectName()))
+                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                    tab_slot, self
+                )
+            except BaseException:
+                logging.getLogger().exception(
+                    "Could not add slot %s " % slot_name
+                    + "in %s" % str(self.objectName())
+                )
 
             # add 'tab reset count' slot
             slot_name = "resetTabCount_%s" % label
+
             def tab_slot(self, erase_count, page_index=self.indexOf(scroll_area)):
                 tab_label = str(self.tabLabel(self.page(page_index)))
                 label_list = tab_label.split()
@@ -740,22 +776,22 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     count = label_list[-1]
                     try:
                         found = count[0] == "("
-                    except:
+                    except BaseException:
                         pass
                     else:
                         try:
                             found = count[-1] == ")"
-                        except:
+                        except BaseException:
                             pass
-                except:
+                except BaseException:
                     pass
                 if found:
                     try:
-                        num = int(count[1: -1])
-                    except:
+                        num = int(count[1:-1])
+                    except BaseException:
                         pass
                     else:
-                        new_label = " ".join(label_list[0: -1])
+                        new_label = " ".join(label_list[0:-1])
                         if not erase_count:
                             new_label += " (0)"
                         self.countChanged[page_index] = False
@@ -766,21 +802,26 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         new_label += " (0)"
                         self.countChanged[page_index] = False
                         self.setTabLabel(self.page(page_index), new_label)
+
             try:
                 # LNLS
                 # python2.7
-                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
-                self.__dict__[slot_name.replace(" ", "_")] = \
-                    types.MethodType(tab_slot, self)
-            except:
-                logging.getLogger().exception(\
-                    "Could not add slot %s " % slot_name + \
-                    "in %s" % str(self.name()))
+                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                    tab_slot, self
+                )
+            except BaseException:
+                logging.getLogger().exception(
+                    "Could not add slot %s " % slot_name + "in %s" % str(self.name())
+                )
 
             # add 'tab increase count' slot
             slot_name = "incTabCount_%s" % label
-            def tab_slot(self, delta, only_if_hidden, page_index=self.indexOf(scroll_area)):
+
+            def tab_slot(
+                self, delta, only_if_hidden, page_index=self.indexOf(scroll_area)
+            ):
                 if only_if_hidden and page_index == self.currentPageIndex():
                     return
                 tab_label = str(self.tabLabel(self.page(page_index)))
@@ -790,23 +831,23 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     count = label_list[-1]
                     try:
                         found = count[0] == "("
-                    except:
+                    except BaseException:
                         pass
                     else:
                         try:
                             found = count[-1] == ")"
-                        except:
+                        except BaseException:
                             pass
-                except:
+                except BaseException:
                     pass
                 if found:
                     try:
-                        num = int(count[1: -1])
-                    except:
+                        num = int(count[1:-1])
+                    except BaseException:
                         pass
                     else:
-                        new_label = " ".join(label_list[0: -1])
-                        new_label += " (%d)" % (num+delta)
+                        new_label = " ".join(label_list[0:-1])
+                        new_label += " (%d)" % (num + delta)
                         self.countChanged[page_index] = True
                         self.setTabLabel(self.page(page_index), new_label)
                 else:
@@ -814,21 +855,23 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     new_label += " (%d)" % delta
                     self.countChanged[page_index] = True
                     self.setTabLabel(self.page(page_index), new_label)
+
             try:
                 # LNLS
                 # python2.7
-                #self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
+                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
-                self.__dict__[slot_name.replace(" ", "_")] = \
-                    types.MethodType(tab_slot, self)
-            except:
-                logging.getLogger().exception(\
-                    "Could not add slot %s " % slot_name + \
-                    "in %s" % str(self.objectName()))
+                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                    tab_slot, self
+                )
+            except BaseException:
+                logging.getLogger().exception(
+                    "Could not add slot %s " % slot_name
+                    + "in %s" % str(self.objectName())
+                )
 
             # that's the real page
             return scroll_area
-
 
     class label(QtImport.QLabel):
         """Label"""
@@ -837,20 +880,21 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             """init"""
 
             QtImport.QLabel.__init__(self, args[0])
-            self.setSizePolicy(QtImport.QSizePolicy.Fixed,
-                               QtImport.QSizePolicy.Fixed)
+            self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
 
-    items = {"vbox": verticalBox,
-             "hbox": horizontalBox,
-             "vgroupbox": verticalGroupBox,
-             "hgroupbox": horizontalGroupBox,
-             "vspacer": verticalSpacer,
-             "hspacer": horizontalSpacer,
-             "icon": label,
-             "label": label,
-             "tab": CustomTabWidget,
-             "hsplitter": horizontalSplitter,
-             "vsplitter": verticalSplitter}
+    items = {
+        "vbox": verticalBox,
+        "hbox": horizontalBox,
+        "vgroupbox": verticalGroupBox,
+        "hgroupbox": horizontalGroupBox,
+        "vspacer": verticalSpacer,
+        "hspacer": horizontalSpacer,
+        "icon": label,
+        "label": label,
+        "tab": CustomTabWidget,
+        "hsplitter": horizontalSplitter,
+        "vsplitter": verticalSplitter,
+    }
 
     brickChangedSignal = QtImport.pyqtSignal(str, str, str, tuple, bool)
     tabChangedSignal = QtImport.pyqtSignal(str, int)
@@ -867,7 +911,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         self.additional_windows = {}
         self.__put_back_colors = None
-        self.execution_mode = kwargs.get('execution_mode', False)
+        self.execution_mode = kwargs.get("execution_mode", False)
         self.preview_items = []
         self.current_window = None
         self.base_caption = ""
@@ -876,7 +920,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self.progress_dialog_base_label = ""
 
         self.central_widget = QtImport.QWidget(self.widget())
-        #self.central_widget.setObjectName("deee")
+        # self.central_widget.setObjectName("deee")
         self.central_widget_layout = QtImport.QVBoxLayout(self.central_widget)
         self.central_widget_layout.setSpacing(0)
         self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -890,16 +934,18 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._statusbar.hide()
 
         self._progress_dialog = QtImport.QProgressDialog(self)
-        self._progress_dialog.setWindowFlags(QtImport.Qt.Window | \
-                                             QtImport.Qt.WindowTitleHint | \
-                                             QtImport.Qt.CustomizeWindowHint)
+        self._progress_dialog.setWindowFlags(
+            QtImport.Qt.Window
+            | QtImport.Qt.WindowTitleHint
+            | QtImport.Qt.CustomizeWindowHint
+        )
         self._progress_dialog.setWindowTitle("Please wait...")
         self._progress_dialog.setCancelButton(None)
         self._progress_dialog.setModal(True)
 
-        #_statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
-        #_statusbar_hlayout.setSpacing(2)
-        #_statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
+        # _statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
+        # _statusbar_hlayout.setSpacing(2)
+        # _statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._menubar)
@@ -911,17 +957,14 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         self._menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
-        self.setWindowFlags(self.windowFlags() |
-                            QtImport.Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(self.windowFlags() | QtImport.Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(Icons.load_icon("desktop_icon"))
 
         self._menubar.saveConfigSignal.connect(self.save_config_requested)
 
-       
- 
     def save_config_requested(self):
         pass
-        #print self.central_widget.parent().parent()
+        # print self.central_widget.parent().parent()
 
     def view_toolbar_toggled(self, state):
         """Toggle toolbar visibility"""
@@ -941,14 +984,16 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
     def set_status_bar(self):
         """Sets statusbar"""
- 
+
         self._statusbar_user_label = QtImport.QLabel("-")
         self._statusbar_state_label = QtImport.QLabel(" <b>State: -</b>")
-        self._statusbar_diffractometer_label = QtImport.QLabel(" <b>Diffractometer: -</b>")
+        self._statusbar_diffractometer_label = QtImport.QLabel(
+            " <b>Diffractometer: -</b>"
+        )
         self._statusbar_sc_label = QtImport.QLabel(" <b>Sample changer: -</b>")
         self._statusbar_last_collect_label = QtImport.QLabel(" <b>Last collect: -</b>")
         self._progress_bar = QtImport.QProgressBar()
-        #TODO make it via property
+        # TODO make it via property
         self._progress_bar.setEnabled(False)
         self._progress_bar.setVisible(False)
 
@@ -984,7 +1029,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         if info_type == "user":
             selected_label = self._statusbar_user_label
-            msg = info_message 
+            msg = info_message
         elif info_type == "status":
             selected_label = self._statusbar_state_label
             msg = " <b>State: </b> %s" % info_message
@@ -996,39 +1041,37 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             msg = " <b>Sample changer: </b> %s" % info_message
         elif info_type == "collect":
             selected_label = self._statusbar_last_collect_label
-            msg = " <b>Last collect: </b> %s (%s)" % \
-                (info_message, time.strftime("%Y-%m-%d %H:%M:%S"))
+            msg = " <b>Last collect: </b> %s (%s)" % (
+                info_message,
+                time.strftime("%Y-%m-%d %H:%M:%S"),
+            )
         elif info_type == "file_system":
             selected_label = self._file_system_status_label
         elif info_type == "edna":
             selected_label = self._edna_status_label
         elif info_type == "ispyb":
             selected_label = self._ispyb_status_label
-         
 
-        if msg: 
+        if msg:
             selected_label.setText(msg)
-        if selected_label in (None, 
-                              self._statusbar_user_label,
-                              self._statusbar_last_collect_label):
-            return 
+        if selected_label in (
+            None,
+            self._statusbar_user_label,
+            self._statusbar_last_collect_label,
+        ):
+            return
 
         if info_state:
             info_state = info_state.lower()
 
-        if info_state in ("ready", "success") or \
-           info_message.lower() == "ready":
-            Colors.set_widget_color(selected_label,
-                                           Colors.LIGHT_GREEN)
+        if info_state in ("ready", "success") or info_message.lower() == "ready":
+            Colors.set_widget_color(selected_label, Colors.LIGHT_GREEN)
         elif info_state == "action_req":
-            Colors.set_widget_color(selected_label,
-                                           Colors.LIGHT_ORANGE)
+            Colors.set_widget_color(selected_label, Colors.LIGHT_ORANGE)
         elif info_state == "error" or "alarm" in info_message.lower():
-            Colors.set_widget_color(selected_label,
-                                           Colors.LIGHT_RED)
+            Colors.set_widget_color(selected_label, Colors.LIGHT_RED)
         else:
-            Colors.set_widget_color(selected_label,
-                                           Colors.LIGHT_YELLOW)
+            Colors.set_widget_color(selected_label, Colors.LIGHT_YELLOW)
 
     def init_progress_bar(self, progress_type, number_of_steps):
         self._progress_bar.setEnabled(True)
@@ -1043,7 +1086,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._progress_bar.setEnabled(False)
 
     def open_progress_dialog(self, msg, max_steps):
-        QtImport.QApplication.setOverrideCursor(QtImport.QCursor(QtImport.Qt.BusyCursor))
+        QtImport.QApplication.setOverrideCursor(
+            QtImport.QCursor(QtImport.Qt.BusyCursor)
+        )
         self.progress_dialog_base_label = msg
         self._progress_dialog.setWindowTitle(msg)
         self._progress_dialog.setLabelText(msg)
@@ -1056,7 +1101,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self._progress_dialog.setLabelText(msg)
 
     def close_progress_dialog(self):
-        QtImport.QApplication.setOverrideCursor(QtImport.QCursor(QtImport.Qt.ArrowCursor))
+        QtImport.QApplication.setOverrideCursor(
+            QtImport.QCursor(QtImport.Qt.ArrowCursor)
+        )
         self._progress_dialog.close()
 
     def show(self, *args):
@@ -1064,7 +1111,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         ret = QtImport.QWidget.show(self)
         self.isShownSignal.emit()
-        #self.emit(SIGNAL("isShown"), ())
+        # self.emit(SIGNAL("isShown"), ())
         return ret
 
     def closeEvent(self, event):
@@ -1077,7 +1124,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         ret = QtImport.QWidget.hide(self)
         self.isHiddenSignal.emit()
-        #self.emit(SIGNAL("isHidden"), ())
+        # self.emit(SIGNAL("isHidden"), ())
         return ret
 
     def set_caption(self, caption):
@@ -1089,8 +1136,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
     def update_instance_caption(self, instance_caption):
         """Update caption if instance mode (master,slave) changed"""
 
-        QtImport.QWidget.setWindowTitle(self, self.base_caption + \
-                                     instance_caption)
+        QtImport.QWidget.setWindowTitle(self, self.base_caption + instance_caption)
 
     def exitExpertMode(self, *args):
         """Exit expert mode"""
@@ -1112,47 +1158,52 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         except KeyError:
             new_item = item_cfg["brick"]
         else:
-            new_item = klass(parent, item_cfg["name"], execution_mode=self.execution_mode)
+            new_item = klass(
+                parent, item_cfg["name"], execution_mode=self.execution_mode
+            )
             if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox"):
                 if item_cfg["properties"]["color"] is not None:
                     qtcolor = QtImport.QColor(item_cfg["properties"]["color"])
-                    Colors.set_widget_color(new_item,
-                                                   qtcolor)
+                    Colors.set_widget_color(new_item, qtcolor)
 
                 if item_type.endswith("groupbox"):
                     new_item.setTitle(item_cfg["properties"]["label"])
-                    if item_cfg["properties"]["checkable"]: 
+                    if item_cfg["properties"]["checkable"]:
                         new_item.setCheckable(True)
-                        new_item.set_checked(item_cfg["properties"]["setCheckable"])                     
+                        new_item.set_checked(item_cfg["properties"]["setCheckable"])
 
                 new_item.layout().setSpacing(item_cfg["properties"]["spacing"])
                 if hasattr(new_item.layout(), "setContentsMargins"):
-                    new_item.layout().setContentsMargins(item_cfg["properties"]["margin"],
-                                                         item_cfg["properties"]["margin"],
-                                                         item_cfg["properties"]["margin"],
-                                                         item_cfg["properties"]["margin"])
+                    new_item.layout().setContentsMargins(
+                        item_cfg["properties"]["margin"],
+                        item_cfg["properties"]["margin"],
+                        item_cfg["properties"]["margin"],
+                        item_cfg["properties"]["margin"],
+                    )
                 elif hasattr(new_item.layout(), "setMargins"):
                     new_item.layout().setMargin(item_cfg["properties"]["margin"])
                 frame_style = QtImport.QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"] != "default":
-                    frame_style = getattr(QtImport.QFrame,
-                        item_cfg["properties"]["frameshape"])
+                    frame_style = getattr(
+                        QtImport.QFrame, item_cfg["properties"]["frameshape"]
+                    )
                 if item_cfg["properties"]["shadowstyle"] != "default":
-                    frame_style = frame_style | getattr(QtImport.QFrame,
-                        item_cfg["properties"]["shadowstyle"].capitalize())
+                    frame_style = frame_style | getattr(
+                        QtImport.QFrame,
+                        item_cfg["properties"]["shadowstyle"].capitalize(),
+                    )
                 if frame_style != QtImport.QFrame.NoFrame:
                     try:
                         new_item.setFrameStyle(frame_style)
-                    except:
-                        logging.getLogger().exception(\
-                             "Could not set frame style on " + \
-                             "item %s", item_cfg["name"])
+                    except BaseException:
+                        logging.getLogger().exception(
+                            "Could not set frame style on " + "item %s",
+                            item_cfg["name"],
+                        )
                 if item_cfg["properties"]["fixedwidth"] > -1:
-                    new_item.setFixedWidth(\
-                        item_cfg["properties"]["fixedwidth"])
+                    new_item.setFixedWidth(item_cfg["properties"]["fixedwidth"])
                 if item_cfg["properties"]["fixedheight"] > -1:
-                    new_item.setFixedHeight(\
-                        item_cfg["properties"]["fixedheight"])
+                    new_item.setFixedHeight(item_cfg["properties"]["fixedheight"])
             elif item_type == "icon":
                 img = QtImport.QPixmap()
                 if img.load(item_cfg["properties"]["filename"]):
@@ -1164,13 +1215,11 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 button_widget = QtImport.QWidget(new_item)
 
                 new_item.open_in_dialog_button = QtImport.QToolButton(button_widget)
-                new_item.open_in_dialog_button.setIcon(\
-                     Icons.load_icon('Frames2'))
+                new_item.open_in_dialog_button.setIcon(Icons.load_icon("Frames2"))
                 new_item.open_in_dialog_button.setFixedSize(22, 22)
 
                 new_item.close_tab_button = QtImport.QToolButton(button_widget)
-                new_item.close_tab_button.setIcon(\
-                     Icons.load_icon('delete_small'))
+                new_item.close_tab_button.setIcon(Icons.load_icon("delete_small"))
                 new_item.close_tab_button.setFixedSize(22, 22)
 
                 __button_widget_vlayout = QtImport.QHBoxLayout(button_widget)
@@ -1199,11 +1248,12 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         new_item.dialog.show()
                     else:
                         new_item.pinned = True
-                        new_item.open_in_dialog_button.setIcon(Icons.load_icon("UnLock"))
-                        ##self.dialog_layout.removeWidget(self)
-                        #self.origin_parent.layout().insertWidget(self.origin_index, self)
+                        new_item.open_in_dialog_button.setIcon(
+                            Icons.load_icon("UnLock")
+                        )
+                        # self.dialog_layout.removeWidget(self)
+                        # self.origin_parent.layout().insertWidget(self.origin_index, self)
                         new_item.dialog.close()
-                    
 
                 def current_page_changed(index):
                     item_cfg.notebook_page_changed(new_item.tabText(index))
@@ -1212,7 +1262,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 new_item.currentChanged.connect(current_page_changed)
                 new_item.close_tab_button.clicked.connect(close_current_page)
                 new_item.open_in_dialog_button.clicked.connect(open_in_dialog)
-                
+
             elif item_type == "vsplitter" or type == "hsplitter":
                 pass
 
@@ -1228,28 +1278,32 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         for child in item_cfg["children"]:
             try:
                 new_item = self.add_item(child, parent)
-            except:
-                logging.getLogger().exception("Cannot add item %s" % \
-                                              child["name"])
+            except BaseException:
+                logging.getLogger().exception("Cannot add item %s" % child["name"])
             else:
                 if not self.execution_mode:
                     new_item.installEventFilter(self)
             if parent.__class__ == WindowDisplayWidget.items["tab"]:
-                new_tab = parent.add_tab(new_item, child["properties"]["label"],
-                     child["properties"]["icon"])
+                new_tab = parent.add_tab(
+                    new_item, child["properties"]["label"], child["properties"]["icon"]
+                )
                 new_tab.item_cfg = child
                 self.preview_items.append(new_item)
             else:
                 if isinstance(child, ContainerCfg):
-                    new_item.setSizePolicy(self.getSizePolicy(\
-                        child["properties"]["hsizepolicy"],
-                        child["properties"]["vsizepolicy"]))
+                    new_item.setSizePolicy(
+                        self.getSizePolicy(
+                            child["properties"]["hsizepolicy"],
+                            child["properties"]["vsizepolicy"],
+                        )
+                    )
                 if not isinstance(child, BrickCfg):
                     if child["properties"].has_property("fontSize"):
                         font = new_item.font()
                         if int(child["properties"]["fontSize"]) <= 0:
-                            child["properties"].get_property("fontSize").\
-                               set_value(font.pointSize())
+                            child["properties"].get_property("fontSize").set_value(
+                                font.pointSize()
+                            )
                         else:
                             font.setPointSize(int(child["properties"]["fontSize"]))
                             new_item.setFont(font)
@@ -1262,8 +1316,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 if layout is not None:
                     # layout can be none if parent is a Splitter for example
                     if not isinstance(child, BrickCfg):
-                        alignment_flags = self.getAlignmentFlags(\
-                           child["properties"]["alignment"])
+                        alignment_flags = self.getAlignmentFlags(
+                            child["properties"]["alignment"]
+                        )
                     else:
                         alignment_flags = 0
                     if isinstance(child, SpacerCfg):
@@ -1275,14 +1330,16 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         stretch = 0
                     self.preview_items.append(new_item)
                     if alignment_flags is not None:
-                        layout.addWidget(new_item, stretch,
-                             QtImport.Qt.Alignment(alignment_flags))
+                        layout.addWidget(
+                            new_item, stretch, QtImport.Qt.Alignment(alignment_flags)
+                        )
                     else:
                         layout.addWidget(new_item, stretch)
             self.make_item(child, new_item)
 
-    def draw_preview(self, container_cfg, window_id,
-                     container_ids=[], selected_item=""):
+    def draw_preview(
+        self, container_cfg, window_id, container_ids=[], selected_item=""
+    ):
         """Draw preview"""
 
         for (window, m) in self.additional_windows.values():
@@ -1293,8 +1350,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.__put_back_colors()
             self.__put_back_colors = None
 
-        if self.current_window is not None and \
-           self.current_window != window_id:
+        if self.current_window is not None and self.current_window != window_id:
             # remove all bricks and destroy all other items
             self.central_widget.close()
             self.central_widget = QtImport.QWidget(self.viewport())
@@ -1312,13 +1368,15 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         if isinstance(container_cfg, WindowCfg):
             self.setObjectName(container_cfg["name"])
             if container_cfg.properties["menubar"]:
-                self.set_menu_bar(container_cfg.properties["menudata"],
-                                  container_cfg.properties["expertPwd"],
-                                  self.execution_mode)
+                self.set_menu_bar(
+                    container_cfg.properties["menudata"],
+                    container_cfg.properties["expertPwd"],
+                    self.execution_mode,
+                )
             else:
                 try:
                     self.additional_windows[window_id][1].hide()
-                except:
+                except BaseException:
                     pass
 
         self.make_item(container_cfg, parent)
@@ -1343,7 +1401,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     # widget we do not delet it. Hidding is enough
                     # Anyway the widget config is deleted before and
                     # deleted widget is not created at the load
-                    #item_widget.deleteLater()
+                    # item_widget.deleteLater()
 
     def add_widget(self, child, parent):
         """Add widget"""
@@ -1356,9 +1414,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     parent_item = item
             new_item = self.add_item(child, parent_item)
             if isinstance(parent, TabCfg):
-                new_tab = parent_item.add_tab(new_item,
-                                              child["properties"]["label"],
-                                              child["properties"]["icon"])
+                new_tab = parent_item.add_tab(
+                    new_item, child["properties"]["label"], child["properties"]["icon"]
+                )
                 new_tab.item_cfg = child
             else:
                 parent_item.layout().addWidget(new_item)
@@ -1379,21 +1437,23 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             else:
                 new_index = current_index + 1
 
-            if (new_index != current_index and \
-               new_index > -1 and \
-               new_index < parent_layout.count()):
+            if (
+                new_index != current_index
+                and new_index > -1
+                and new_index < parent_layout.count()
+            ):
                 parent_layout.removeWidget(item)
                 parent_layout.insertWidget(new_index, item)
 
-    def update_preview(self, container_cfg, window_id,
-                       container_ids=[], selected_item=""):
+    def update_preview(
+        self, container_cfg, window_id, container_ids=[], selected_item=""
+    ):
         """Method selects a widget in the gui"""
 
         if isinstance(self.__put_back_colors, collections.Callable):
             self.__put_back_colors()
             self.__put_back_colors = None
-        if (len(selected_item) and \
-            len(self.preview_items) > 0):
+        if len(selected_item) and len(self.preview_items) > 0:
             for item in self.preview_items:
                 if item.objectName() == selected_item:
                     self.select_widget(item)
@@ -1406,25 +1466,25 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.__put_back_colors()
         original_color = widget.palette().color(QtImport.QPalette.Window)
         selected_color = QtImport.QColor(150, 150, 200)
-        Colors.set_widget_color(widget,
-                                       selected_color,
-                                       QtImport.QPalette.Background)
+        Colors.set_widget_color(widget, selected_color, QtImport.QPalette.Background)
 
-        def put_back_colors(wref=weakref.ref(widget),
-                            bkgd_color=original_color):
+        def put_back_colors(wref=weakref.ref(widget), bkgd_color=original_color):
             widget = wref()
             if widget is not None:
-                Colors.set_widget_color(widget,
-                                               bkgd_color,
-                                               QtImport.QPalette.Background)
+                Colors.set_widget_color(
+                    widget, bkgd_color, QtImport.QPalette.Background
+                )
+
         self.__put_back_colors = put_back_colors
 
     def eventFilter(self, widget, event):
         """Even filter"""
 
         if widget is not None and event is not None:
-            if event.type() == QtImport.QEvent.MouseButtonRelease and \
-               event.button() == QtImport.Qt.LeftButton:
+            if (
+                event.type() == QtImport.QEvent.MouseButtonRelease
+                and event.button() == QtImport.Qt.LeftButton
+            ):
                 self.itemClickedSignal.emit(widget.objectName())
                 return True
 
@@ -1434,7 +1494,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         """Returns alignment flags"""
 
         if alignment_directives_string is None:
-            alignment_directives = ['none']
+            alignment_directives = ["none"]
         else:
             alignment_directives = alignment_directives_string.split()
         alignment_flags = 0
@@ -1477,8 +1537,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             else:
                 return QtImport.QSizePolicy.Preferred
 
-        return QtImport.QSizePolicy(_get_size_policy_flag(hsizepolicy),
-                           _get_size_policy_flag(vsizepolicy))
+        return QtImport.QSizePolicy(
+            _get_size_policy_flag(hsizepolicy), _get_size_policy_flag(vsizepolicy)
+        )
 
     def append_windows_links(self, window_list):
         self._menubar.append_windows_links(window_list)
@@ -1489,6 +1550,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 font = widget.font()
                 font.setPointSize(font_size)
                 widget.setFont(font)
+
 
 class BricksPropertiesEditor(QtImport.QWidget):
 
@@ -1509,37 +1571,36 @@ class BricksPropertiesEditor(QtImport.QWidget):
         _main_vlayout = QtImport.QHBoxLayout(self)
         _main_vlayout.addWidget(self.bricks_listwidget)
         _main_vlayout.addWidget(self.properties_table)
-        #_main_vlayout.setSpacing(2)
-        #_main_vlayout.setContentsMargins(2, 2, 6, 6)
+        # _main_vlayout.setSpacing(2)
+        # _main_vlayout.setContentsMargins(2, 2, 6, 6)
 
-        self.bricks_listwidget.itemClicked.connect(\
-             self.bricks_listwidget_item_clicked)
+        self.bricks_listwidget.itemClicked.connect(self.bricks_listwidget_item_clicked)
 
-        self.properties_table.propertyChangedSignal.\
-             connect(self.property_changed)
-        #QtCore.QObject.connect(self.properties_table,
-                               #QtCore.SIGNAL("propertyChanged"),
-                               #self.property_changed)
+        self.properties_table.propertyChangedSignal.connect(self.property_changed)
+        # QtCore.QObject.connect(self.properties_table,
+        # QtCore.SIGNAL("propertyChanged"),
+        # self.property_changed)
 
-        self.bricks_listwidget.setSizePolicy(QtImport.QSizePolicy.Fixed,
-                                             QtImport.QSizePolicy.MinimumExpanding) 
-        #self.properties_table.setSizePolicy(QSizePolicy.Expanding,
+        self.bricks_listwidget.setSizePolicy(
+            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.MinimumExpanding
+        )
+        # self.properties_table.setSizePolicy(QSizePolicy.Expanding,
         #                                    QSizePolicy.MinimumExpanding)
-        #self.properties_table.horizontalHeader().setStretchLastSection(True)
+        # self.properties_table.horizontalHeader().setStretchLastSection(True)
 
         self.setWindowTitle("Bricks properties")
-
 
     def add_brick(self, name, brick):
         if name != "":
             self.bricks_dict[name] = brick
-            self.bricks_listwidget.addItem(name) 
+            self.bricks_listwidget.addItem(name)
 
     def bricks_listwidget_item_clicked(self, listwidget_item):
         brick_name = listwidget_item.text()
         self.selected_brick = self.bricks_dict[brick_name]
-        self.properties_table.set_property_bag(\
-             self.bricks_dict[brick_name].property_bag)
+        self.properties_table.set_property_bag(
+            self.bricks_dict[brick_name].property_bag
+        )
 
     def property_changed(self, property_name, old_value, new_value):
         self.selected_brick._propertyChanged(property_name, old_value, new_value)

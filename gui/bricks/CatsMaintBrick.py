@@ -38,52 +38,54 @@ __category__ = "Sample changer"
 
 
 class Qt4_CatsMaintBrick(BlissWidget):
-
     def __init__(self, *args):
         BlissWidget.__init__(self, *args)
-        
+
         self.addProperty("mnemonic", "string", "")
-        self.defineSlot('setExpertMode',())
+        self.defineSlot("setExpertMode", ())
 
         self.expert_mode = False
-      
-        self.widget = loadUi(os.path.join(os.path.dirname(__file__),
-             'widgets/ui_files/Qt4_catsmaint_widget.ui'))
+
+        self.widget = loadUi(
+            os.path.join(
+                os.path.dirname(__file__), "widgets/ui_files/Qt4_catsmaint_widget.ui"
+            )
+        )
 
         QHBoxLayout(self)
         self.layout().addWidget(self.widget)
-        
-        self.widget.btPowerOn.clicked.connect(self.power_on)        
-        self.widget.btPowerOff.clicked.connect(self.power_off)       
+
+        self.widget.btPowerOn.clicked.connect(self.power_on)
+        self.widget.btPowerOff.clicked.connect(self.power_off)
         self.widget.btLid1Open.clicked.connect(self.lid1_open)
         self.widget.btLid1Close.clicked.connect(self.lid1_close)
         self.widget.btLid2Open.clicked.connect(self.lid2_open)
         self.widget.btLid2Close.clicked.connect(self.lid2_close)
         self.widget.btLid3Open.clicked.connect(self.lid3_open)
         self.widget.btLid3Close.clicked.connect(self.lid3_close)
-        self.widget.btRegulationOn.clicked.connect(self.regulation_set_on)                     
+        self.widget.btRegulationOn.clicked.connect(self.regulation_set_on)
 
-        self.widget.btOpenTool.clicked.connect(self.tool_open)                     
-        self.widget.btCloseTool.clicked.connect(self.tool_close)                     
-        self.widget.btToolCalib.clicked.connect(self.tool_calibrate)                     
-        self.widget.btMagnetOn.clicked.connect(self.magnet_on)                     
-        self.widget.btMagnetOff.clicked.connect(self.magnet_off)                     
-                
-        # self.widget.btSoak.clicked.connect(self.soak)                     
-        self.widget.btBack.clicked.connect(self.back_traj)                     
-        self.widget.btSafe.clicked.connect(self.safe_traj)                     
-        self.widget.btDry.clicked.connect(self.dry)                     
-        self.widget.btHome.clicked.connect(self.home)                     
+        self.widget.btOpenTool.clicked.connect(self.tool_open)
+        self.widget.btCloseTool.clicked.connect(self.tool_close)
+        self.widget.btToolCalib.clicked.connect(self.tool_calibrate)
+        self.widget.btMagnetOn.clicked.connect(self.magnet_on)
+        self.widget.btMagnetOff.clicked.connect(self.magnet_off)
 
-        #self.widget.btRestart.clicked.connect(self.restart)                     
-        self.widget.btResetPutGet.clicked.connect(self.reset_put_get)                     
-        self.widget.btResetMotion.clicked.connect(self.reset_motion)                     
-        self.widget.btMemClear.clicked.connect(self.clear_memory)                     
-        self.widget.btClear.clicked.connect(self.clear_memory)                     
+        # self.widget.btSoak.clicked.connect(self.soak)
+        self.widget.btBack.clicked.connect(self.back_traj)
+        self.widget.btSafe.clicked.connect(self.safe_traj)
+        self.widget.btDry.clicked.connect(self.dry)
+        self.widget.btHome.clicked.connect(self.home)
+
+        # self.widget.btRestart.clicked.connect(self.restart)
+        self.widget.btResetPutGet.clicked.connect(self.reset_put_get)
+        self.widget.btResetMotion.clicked.connect(self.reset_motion)
+        self.widget.btMemClear.clicked.connect(self.clear_memory)
+        self.widget.btClear.clicked.connect(self.clear_memory)
         self.widget.btMore.clicked.connect(self.command_prompt)
 
-        self.widget.btAbort.clicked.connect(self.abort)                     
-        # self.widget.btPanic.clicked.connect(self.panic)                     
+        self.widget.btAbort.clicked.connect(self.abort)
+        # self.widget.btPanic.clicked.connect(self.panic)
 
         self.device = None
         self.state = None
@@ -104,70 +106,81 @@ class Qt4_CatsMaintBrick(BlissWidget):
 
     def propertyChanged(self, property, oldValue, newValue):
 
-        if property == 'mnemonic':
+        if property == "mnemonic":
             if self.device is not None:
-                self.disconnect(self.device, 'lid1StateChanged', self.update_lid1_state)
-                self.disconnect(self.device, 'lid2StateChanged', self.update_lid2_state)
-                self.disconnect(self.device, 'lid3StateChanged', self.update_lid3_state)
-                self.disconnect(self.device, 'runningStateChanged', self.update_path_running)
-                self.disconnect(self.device, 'powerStateChanged', self.update_powered)
-                self.disconnect(self.device, 'messageChanged', self.update_message)
-                self.disconnect(self.device, 'regulationStateChanged', self.update_regulation)
-                self.disconnect(self.device, 'barcodeChanged', self.update_barcode)
-                self.disconnect(self.device, 'toolStateChanged', self.update_tool_state)
-                self.disconnect(self.device,
-                             SampleChanger.STATUS_CHANGED_EVENT,
-                             self.update_status)
-                self.disconnect(self.device,
-                             SampleChanger.STATE_CHANGED_EVENT,
-                             self.update_state)
+                self.disconnect(self.device, "lid1StateChanged", self.update_lid1_state)
+                self.disconnect(self.device, "lid2StateChanged", self.update_lid2_state)
+                self.disconnect(self.device, "lid3StateChanged", self.update_lid3_state)
+                self.disconnect(
+                    self.device, "runningStateChanged", self.update_path_running
+                )
+                self.disconnect(self.device, "powerStateChanged", self.update_powered)
+                self.disconnect(self.device, "messageChanged", self.update_message)
+                self.disconnect(
+                    self.device, "regulationStateChanged", self.update_regulation
+                )
+                self.disconnect(self.device, "barcodeChanged", self.update_barcode)
+                self.disconnect(self.device, "toolStateChanged", self.update_tool_state)
+                self.disconnect(
+                    self.device, SampleChanger.STATUS_CHANGED_EVENT, self.update_status
+                )
+                self.disconnect(
+                    self.device, SampleChanger.STATE_CHANGED_EVENT, self.update_state
+                )
 
             # load the new hardware object
-            self.device = self.getHardwareObject(newValue)                                    
+            self.device = self.getHardwareObject(newValue)
             if self.device is not None:
-                self.connect(self.device, 'regulationStateChanged', self.update_regulation)
-                self.connect(self.device, 'messageChanged', self.update_message)
-                self.connect(self.device, 'powerStateChanged', self.update_powered)
-                self.connect(self.device, 'runningStateChanged', self.update_path_running)
-                self.connect(self.device, 'lid1StateChanged', self.update_lid1_state)
-                self.connect(self.device, 'lid2StateChanged', self.update_lid2_state)
-                self.connect(self.device, 'lid3StateChanged', self.update_lid3_state)
-                self.connect(self.device, 'toolStateChanged', self.update_tool_state)
-                self.connect(self.device,
-                             SampleChanger.STATUS_CHANGED_EVENT,
-                             self.update_status)
-                self.connect(self.device,
-                             SampleChanger.STATE_CHANGED_EVENT,
-                             self.update_state)
-
+                self.connect(
+                    self.device, "regulationStateChanged", self.update_regulation
+                )
+                self.connect(self.device, "messageChanged", self.update_message)
+                self.connect(self.device, "powerStateChanged", self.update_powered)
+                self.connect(
+                    self.device, "runningStateChanged", self.update_path_running
+                )
+                self.connect(self.device, "lid1StateChanged", self.update_lid1_state)
+                self.connect(self.device, "lid2StateChanged", self.update_lid2_state)
+                self.connect(self.device, "lid3StateChanged", self.update_lid3_state)
+                self.connect(self.device, "toolStateChanged", self.update_tool_state)
+                self.connect(
+                    self.device, SampleChanger.STATUS_CHANGED_EVENT, self.update_status
+                )
+                self.connect(
+                    self.device, SampleChanger.STATE_CHANGED_EVENT, self.update_state
+                )
 
     def setExpertMode(self, mode):
         if mode:
-             self.expert_mode = True
+            self.expert_mode = True
         else:
-             self.expert_mode = False
+            self.expert_mode = False
 
         self.update_buttons()
 
     def update_state(self, state):
         logging.getLogger().debug("CATS update state : " + str(state))
         if state != self.state:
-            self.state  = state
+            self.state = state
             self.update_buttons()
 
     def update_status(self, status):
         logging.getLogger().debug("CATS update status : " + str(status))
         if status != self.status:
-            self.status  = status
+            self.status = status
 
     def update_regulation(self, value):
         self.regulation_on = value
         if value:
             light_green = str(Qt4_widget_colors.LIGHT_GREEN.name())
-            self.widget.lblRegulationState.setStyleSheet("background-color: %s;" % light_green)
+            self.widget.lblRegulationState.setStyleSheet(
+                "background-color: %s;" % light_green
+            )
         else:
             light_red = str(Qt4_widget_colors.LIGHT_RED.name())
-            self.widget.lblRegulationState.setStyleSheet("background-color: %s;" % light_red)
+            self.widget.lblRegulationState.setStyleSheet(
+                "background-color: %s;" % light_red
+            )
         self.update_buttons()
 
     def update_powered(self, value):
@@ -175,7 +188,9 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.powered = value
         if value:
             light_green = str(Qt4_widget_colors.LIGHT_GREEN.name())
-            self.widget.lblPowerState.setStyleSheet("background-color: %s;" % light_green)
+            self.widget.lblPowerState.setStyleSheet(
+                "background-color: %s;" % light_green
+            )
         else:
             light_red = str(Qt4_widget_colors.LIGHT_RED.name())
             self.widget.lblPowerState.setStyleSheet("background-color: %s;" % light_red)
@@ -188,7 +203,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
     def update_barcode(self, value):
         if value is not None and value != "":
             barcode = value
-        else: 
+        else:
             barcode = "----"
         logging.getLogger().debug("CATS update barcode : " + str(barcode))
         self.widget.lblMessage.setText(str(value))
@@ -242,14 +257,14 @@ class Qt4_CatsMaintBrick(BlissWidget):
             self.widget.boxLid1.setEnabled(False)
             self.widget.boxLid2.setEnabled(False)
             self.widget.boxLid3.setEnabled(False)
-            self.widget.lblMessage.setText('')
+            self.widget.lblMessage.setText("")
             self.widget.btAbort.setEnabled(False)
         else:
             self.widget.boxPower.setEnabled(True)
             self.widget.boxRegulation.setEnabled(True)
 
             ready = not self.path_running
-            powered = self.powered and True or False # handles init state None as False
+            powered = self.powered and True or False  # handles init state None as False
             state = self.state
 
             if not self.expert_mode:
@@ -273,7 +288,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
             self.widget.btPowerOn.setEnabled(ready and not powered)
             self.widget.btPowerOff.setEnabled(ready and powered)
 
-            if ready: 
+            if ready:
                 color = str(Qt4_widget_colors.LIGHT_GRAY.name())
                 self.widget.btAbort.setEnabled(False)
             else:
@@ -301,245 +316,259 @@ class Qt4_CatsMaintBrick(BlissWidget):
         try:
             if self.device is not None:
                 self.device._doEnableRegulation()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def regulation_set_off(self):
         try:
             if self.device is not None:
                 self.device._doDisableRegulation()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def power_on(self):
         try:
             if self.device is not None:
                 self.device._doPowerState(True)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def power_off(self):
         try:
             if self.device is not None:
                 self.device._doPowerState(False)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid1_open(self):
         try:
             if self.device is not None:
                 self.device._doLid1State(True)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid1_close(self):
         try:
             if self.device is not None:
                 self.device._doLid1State(False)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid2_open(self):
         try:
             if self.device is not None:
                 self.device._doLid2State(True)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid2_close(self):
         try:
             if self.device is not None:
                 self.device._doLid2State(False)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid3_open(self):
         try:
             if self.device is not None:
                 self.device._doLid3State(True)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid3_close(self):
         try:
             if self.device is not None:
                 self.device._doLid3State(False)
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def tool_open(self):
         try:
             if self.device is not None:
                 self.device._doToolOpen()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def tool_close(self):
         try:
             if self.device is not None:
                 self.device._doToolClose()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def tool_calibrate(self):
         try:
             if self.device is not None:
-                self.device._doCalibration()   # adds a parameter 2 (for tool) in device
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+                self.device._doCalibration()  # adds a parameter 2 (for tool) in device
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def magnet_on(self):
         try:
             if self.device is not None:
                 self.device._doMagnetOn()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def magnet_off(self):
         try:
             if self.device is not None:
                 self.device._doMagnetOff()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def home(self):
         try:
             if self.device is not None:
                 self.device._doHome()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def resetError(self):
         try:
             if self.device is not None:
                 self.device._doReset()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def home(self):
         try:
             if self.device is not None:
                 self.device._doHome()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def dry(self):
         try:
             if self.device is not None:
                 self.device._doDryGripper()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def soak(self):
         try:
             if self.device is not None:
                 self.device._doSoak()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def back_traj(self):
         try:
             if self.device is not None:
-                #self.device._doBack()
+                # self.device._doBack()
                 self.device.backTraj()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def safe_traj(self):
         try:
             if self.device is not None:
-                #self.device._doSafe()
+                # self.device._doSafe()
                 self.device.safeTraj()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def abort(self):
         try:
             if self.device is not None:
                 self.device._doAbort()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def panic(self):
         try:
             if self.device is not None:
                 self.device._doPanic()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def restart(self):
         try:
             if self.device is not None:
                 self.device._doRestart()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def reset_motion(self):
         try:
             if self.device is not None:
                 self.device._doResetMotion()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def reset_put_get(self):
         try:
             if self.device is not None:
                 self.device._doResetPutGet()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def clear(self):
         try:
             if self.device is not None:
                 self.device._doClear()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def clear_memory(self):
         try:
             if self.device is not None:
                 self.device._doResetMemory()
-        except:
-            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+        except BaseException:
+            QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def command_prompt(self, index):
         self.command_dialog = CatsCommandDialog(self)
         self.command_dialog.set_cats_device(self.device)
         self.command_dialog.show()
 
+
 class CatsCommandDialog(QDialog):
 
-    cmds = ["put(mount)", "get(un-mount)", "getput",
-            "get_brcd", "getput_brcd", "barcode", 
-            "gotodif", "get HT", "put HT",
-            "getput HT", ]
+    cmds = [
+        "put(mount)",
+        "get(un-mount)",
+        "getput",
+        "get_brcd",
+        "getput_brcd",
+        "barcode",
+        "gotodif",
+        "get HT",
+        "put HT",
+        "getput HT",
+    ]
 
-    args = { 
-        "put(mount)": ["tool", "from_cassette", "from_puck"], 
-        "get(un-mount)": ["tool", ], 
+    args = {
+        "put(mount)": ["tool", "from_cassette", "from_puck"],
+        "get(un-mount)": ["tool"],
         "getput": ["tool", "from_cassette", "from_puck"],
-        "get_brcd": ["tool", ],
+        "get_brcd": ["tool"],
         "getput_brcd": ["tool", "from_cassette", "from_puck"],
-        "barcode": [], 
-        "gotodif": [], 
-        "get HT": [], 
+        "barcode": [],
+        "gotodif": [],
+        "get HT": [],
         "put HT": [],
-        "getput HT": [], }
+        "getput HT": [],
+    }
 
     def __init__(self, *args):
 
-
-        QDialog.__init__(self,*args)
+        QDialog.__init__(self, *args)
         layout = QHBoxLayout()
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(layout)
-        self.widget = loadUi(os.path.join(os.path.dirname(__file__),
-             'widgets/ui_files/Qt4_catscommand_dialog.ui'))
+        self.widget = loadUi(
+            os.path.join(
+                os.path.dirname(__file__), "widgets/ui_files/Qt4_catscommand_dialog.ui"
+            )
+        )
 
         layout.addWidget(self.widget)
 
-        self.btSend = self.widget.buttonBox.addButton("Send", QDialogButtonBox.ApplyRole)
+        self.btSend = self.widget.buttonBox.addButton(
+            "Send", QDialogButtonBox.ApplyRole
+        )
         self.btSend.clicked.connect(self.send_command)
 
         self.widget.cbCommand.clear()
@@ -551,12 +580,12 @@ class CatsCommandDialog(QDialog):
         self.widget.cbCommand.setCurrentIndex(2)
         QDialog.show(self)
 
-    def set_cats_device(self,device):
-        self.device = device 
+    def set_cats_device(self, device):
+        self.device = device
 
     def command_selected(self, cb_idx):
         logging.getLogger("GUI").info("command selected %s" % cb_idx)
-         
+
     def build_command(self):
         cmd_str = ""
 
@@ -567,11 +596,12 @@ class CatsCommandDialog(QDialog):
     def rejected(self):
         logging.getLogger("GUI").info("button rejected")
         self.close()
-  
+
     def accepted(self):
         logging.getLogger("GUI").info("button accepted")
 
     def close_me(self):
-        pass 
+        pass
+
     def run_cmd(self):
-        pass 
+        pass
