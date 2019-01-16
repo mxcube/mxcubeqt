@@ -3,7 +3,7 @@
     - children:
       - children:
         - children:
-          - brick: {class: Qt4_ProposalBrick2, name: proposal_brick}
+          - brick: {class: ProposalBrick, name: proposal_brick}
             children: []
             connections:
             - {receiver: tree_brick, receiverWindow: mxCuBE, signal: loggedIn, slot: logged_in}
@@ -55,8 +55,8 @@
               oldValue: /session, type: string, value: /session}
             - {comment: '', defaultValue: '', hidden: false, name: titlePrefix, oldValue: '',
               type: string, value: MXCuBE}
-            type: Qt4_ProposalBrick2
-          - brick: {class: Qt4_TreeBrick, name: tree_brick}
+            type: ProposalBrick
+          - brick: {class: TreeBrick, name: tree_brick}
             children: []
             connections:
             - {receiver: task_tollbox_brick, receiverWindow: mxCuBE, signal: selection_changed,
@@ -181,8 +181,8 @@
               oldValue: 1, type: boolean, value: 1}
             - {comment: '', defaultValue: /xml_rpc_server, hidden: false, name: xml_rpc_server,
               oldValue: /xml_rpc_server, type: string, value: /xml-rpc-server}
-            type: Qt4_TreeBrick
-          - brick: {class: Qt4_ProgressBarBrick, name: progress_bar_brick}
+            type: TreeBrick
+          - brick: {class: ProgressBarBrick, name: progress_bar_brick}
             children: []
             connections: []
             name: progress_bar_brick
@@ -203,7 +203,7 @@
               name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
             - {comment: '', defaultValue: '', hidden: false, name: mnemonicList, oldValue: '',
               type: string, value: /mxcollect /sc-mockup}
-            type: Qt4_ProgressBarBrick
+            type: ProgressBarBrick
           connections: []
           name: login_vbox
           properties:
@@ -268,7 +268,7 @@
             - children:
               - children:
                 - children:
-                  - brick: {class: Qt4_MotorSpinBoxBrick, name: omega_brick}
+                  - brick: {class: MotorSpinBoxBrick, name: omega_brick}
                     children: []
                     connections: []
                     name: omega_brick
@@ -329,8 +329,8 @@
                       oldValue: 0, type: boolean, value: 1}
                     - {comment: '', defaultValue: 1, hidden: false, name: showStop,
                       oldValue: 1, type: boolean, value: 1}
-                    type: Qt4_MotorSpinBoxBrick
-                  - brick: {class: Qt4_MotorSpinBoxBrick, name: kappa_phi_brick}
+                    type: MotorSpinBoxBrick
+                  - brick: {class: MotorSpinBoxBrick, name: kappa_phi_brick}
                     children: []
                     connections: []
                     name: kappa_phi_brick
@@ -391,7 +391,7 @@
                       oldValue: 0, type: boolean, value: 1}
                     - {comment: '', defaultValue: 1, hidden: false, name: showStop,
                       oldValue: 1, type: boolean, value: 1}
-                    type: Qt4_MotorSpinBoxBrick
+                    type: MotorSpinBoxBrick
                   - children: []
                     connections: []
                     name: hspacer3
@@ -471,7 +471,7 @@
                     value: default
                   type: hbox
                 - children:
-                  - brick: {class: Qt4_MotorSpinBoxBrick, name: kappa_brick}
+                  - brick: {class: MotorSpinBoxBrick, name: kappa_brick}
                     children: []
                     connections: []
                     name: kappa_brick
@@ -532,8 +532,8 @@
                       oldValue: 0, type: boolean, value: 1}
                     - {comment: '', defaultValue: 1, hidden: false, name: showStop,
                       oldValue: 1, type: boolean, value: 1}
-                    type: Qt4_MotorSpinBoxBrick
-                  - brick: {class: Qt4_MotorPredefPosBrick, name: zoom_brick}
+                    type: MotorSpinBoxBrick
+                  - brick: {class: MotorPredefPosBrick, name: zoom_brick}
                     children: []
                     connections: []
                     name: zoom_brick
@@ -562,7 +562,7 @@
                       oldValue: '', type: string, value: /diff-zoom}
                     - {comment: '', defaultValue: 1, hidden: false, name: showMoveButtons,
                       oldValue: 1, type: boolean, value: 1}
-                    type: Qt4_MotorPredefPosBrick
+                    type: MotorPredefPosBrick
                   - children: []
                     connections: []
                     name: hspacer0
@@ -643,7 +643,7 @@
                   type: hbox
                 - children:
                   - children:
-                    - brick: {class: Qt4_CameraBrick, name: camera_brick}
+                    - brick: {class: CameraBrick, name: camera_brick}
                       children: []
                       connections: []
                       name: camera_brick
@@ -679,7 +679,7 @@
                       - {comment: '', defaultValue: /Qt4_graphics-manager, hidden: false,
                         name: mnemonic, oldValue: /Qt4_graphics-manager, type: string,
                         value: /Qt4_graphics-manager}
-                      type: Qt4_CameraBrick
+                      type: CameraBrick
                     - children: []
                       connections: []
                       name: vspacer3
@@ -699,7 +699,7 @@
                       - {comment: '', defaultValue: 100, hidden: false, name: size,
                         oldValue: null, type: integer, value: 100}
                       type: vspacer
-                    - brick: {class: Qt4_GraphicsManagerBrick, name: graphics_manager_brick}
+                    - brick: {class: GraphicsManagerBrick, name: graphics_manager_brick}
                       children: []
                       connections: []
                       name: graphics_manager_brick
@@ -722,7 +722,7 @@
                         type: boolean, value: 0}
                       - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
                         oldValue: '', type: string, value: /Qt4_graphics-manager}
-                      type: Qt4_GraphicsManagerBrick
+                      type: GraphicsManagerBrick
                     connections: []
                     name: vbox1
                     properties:
@@ -783,7 +783,7 @@
                       type: combo
                       value: default
                     type: vbox
-                  - brick: {class: Qt4_HutchMenuBrick, name: hutchmenu_brick}
+                  - brick: {class: HutchMenuBrick, name: hutchmenu_brick}
                     children: []
                     connections: []
                     name: hutchmenu_brick
@@ -816,7 +816,7 @@
                     - {comment: Allow to control brick in slave mode, defaultValue: 0,
                       hidden: false, name: instanceAllowConnected, oldValue: 0, type: boolean,
                       value: 0}
-                    type: Qt4_HutchMenuBrick
+                    type: HutchMenuBrick
                   connections: []
                   name: sample_video_groupbox
                   properties:
@@ -895,7 +895,7 @@
                     type: integer, value: 100}
                   type: vspacer
                 - children:
-                  - brick: {class: Qt4_BeamSizeBrick, name: beam_size_brick}
+                  - brick: {class: BeamSizeBrick, name: beam_size_brick}
                     children: []
                     connections: []
                     name: beam_size_brick
@@ -921,8 +921,8 @@
                       value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
                       oldValue: '', type: string, value: /beam-info}
-                    type: Qt4_BeamSizeBrick
-                  - brick: {class: Qt4_SlitsBrick, name: slits_brick}
+                    type: BeamSizeBrick
+                  - brick: {class: SlitsBrick, name: slits_brick}
                     children: []
                     connections: []
                     name: slits_brick
@@ -948,8 +948,8 @@
                       value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
                       oldValue: '', type: string, value: /slits-mockup}
-                    type: Qt4_SlitsBrick
-                  - brick: {class: Qt4_MDApertureBrick, name: aperture_brick}
+                    type: SlitsBrick
+                  - brick: {class: ApertureBrick, name: aperture_brick}
                     children: []
                     connections: []
                     name: aperture_brick
@@ -972,7 +972,7 @@
                       value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
                       oldValue: '', type: string, value: /diff-aperture-mockup}
-                    type: Qt4_MDApertureBrick
+                    type: ApertureBrick
                   - children: []
                     connections: []
                     name: hspacer1
@@ -992,7 +992,7 @@
                     - {comment: '', defaultValue: 100, hidden: false, name: size,
                       oldValue: null, type: integer, value: 100}
                     type: hspacer
-                  - brick: {class: Qt4_MDPhaseBrick, name: phase_brick}
+                  - brick: {class: PhaseBrick, name: phase_brick}
                     children: []
                     connections: []
                     name: phase_brick
@@ -1015,7 +1015,7 @@
                       value: 0}
                     - {comment: '', defaultValue: '', hidden: false, name: mnemonic,
                       oldValue: '', type: string, value: /mini-diff-mockup}
-                    type: Qt4_MDPhaseBrick
+                    type: PhaseBrick
                   connections: []
                   name: beam_def_hbox
                   properties:
@@ -1134,7 +1134,7 @@
                   type: combo
                   value: default
                 type: vbox
-              - brick: {class: Qt4_TaskToolBoxBrick, name: task_tollbox_brick}
+              - brick: {class: TaskToolBoxBrick, name: task_tollbox_brick}
                 children: []
                 connections:
                 - {receiver: tree_brick, receiverWindow: mxCuBE, signal: request_tree_brick,
@@ -1167,7 +1167,7 @@
                   oldValue: null, type: boolean, value: 0}
                 - {comment: '', defaultValue: 0, hidden: false, name: useOscStartCbox,
                   oldValue: 0, type: boolean, value: 0}
-                type: Qt4_TaskToolBoxBrick
+                type: TaskToolBoxBrick
               connections: []
               name: hbox0
               properties:
@@ -1287,7 +1287,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_DCParametersBrick, name: dc_parameters_brick}
+            - brick: {class: DCParametersBrick, name: dc_parameters_brick}
               children: []
               connections: []
               name: dc_parameters_brick
@@ -1312,7 +1312,7 @@
                 oldValue: /queue-model, type: string, value: /queue-model}
               - {comment: '', defaultValue: 1, hidden: false, name: useImageTracking,
                 oldValue: 1, type: boolean, value: 1}
-              type: Qt4_DCParametersBrick
+              type: DCParametersBrick
             connections: []
             name: data_collection_tab
             properties:
@@ -1373,7 +1373,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_DCGBrick, name: dcgroup_brick}
+            - brick: {class: DCGBrick, name: dcgroup_brick}
               children: []
               connections: []
               name: dcgroup_brick
@@ -1392,7 +1392,7 @@
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
                 name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
-              type: Qt4_DCGBrick
+              type: DCGBrick
             connections: []
             name: dcg_tab
             properties:
@@ -1454,7 +1454,7 @@
             type: vbox
           - children:
             - children:
-              - brick: {class: Qt4_SampleChangerBrick3, name: sample_changer_brick}
+              - brick: {class: SampleChangerBrick, name: sample_changer_brick}
                 children: []
                 connections: []
                 name: sample_changer_brick
@@ -1491,7 +1491,7 @@
                   oldValue: 0, type: boolean, value: 0}
                 - {comment: '', defaultValue: 0, hidden: false, name: singleClickSelection,
                   oldValue: 0, type: boolean, value: 0}
-                type: Qt4_SampleChangerBrick3
+                type: SampleChangerBrick
               - children: []
                 connections: []
                 name: hspacer2
@@ -1629,7 +1629,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_CharParametersBrick, name: char_parameters_brick}
+            - brick: {class: CharParametersBrick, name: char_parameters_brick}
               children: []
               connections: []
               name: char_parameters_brick
@@ -1654,7 +1654,7 @@
                 oldValue: /session, type: string, value: /session}
               - {comment: '', defaultValue: 1, hidden: false, name: tunable-energy,
                 oldValue: 1, type: boolean, value: 1}
-              type: Qt4_CharParametersBrick
+              type: CharParametersBrick
             connections: []
             name: characterisation_tab
             properties:
@@ -1715,7 +1715,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_SampleDetailsBrick, name: sample_details_brick}
+            - brick: {class: SampleDetailsBrick, name: sample_details_brick}
               children: []
               connections: []
               name: sample_details_brick
@@ -1734,7 +1734,7 @@
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
                 name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
-              type: Qt4_SampleDetailsBrick
+              type: SampleDetailsBrick
             connections: []
             name: sample_details_tab
             properties:
@@ -1795,7 +1795,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_EnergyScanParametersBrick, name: energy_scan_brick}
+            - brick: {class: EnergyScanParametersBrick, name: energy_scan_brick}
               children: []
               connections: []
               name: energy_scan_brick
@@ -1818,7 +1818,7 @@
                 name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
               - {comment: '', defaultValue: /session, hidden: false, name: session,
                 oldValue: /session, type: string, value: /session}
-              type: Qt4_EnergyScanParametersBrick
+              type: EnergyScanParametersBrick
             connections: []
             name: energy_scan_tab
             properties:
@@ -1879,7 +1879,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_XRFSpectrumParametersBrick, name: xrf_spectrum_parameters}
+            - brick: {class: XRFSpectrumParametersBrick, name: xrf_spectrum_parameters}
               children: []
               connections: []
               name: xrf_spectrum_parameters
@@ -1902,7 +1902,7 @@
                 oldValue: /session, type: string, value: /session}
               - {comment: '', defaultValue: '', hidden: false, name: xrf-spectrum,
                 oldValue: '', type: string, value: /xrf-spectrum-mockup}
-              type: Qt4_XRFSpectrumParametersBrick
+              type: XRFSpectrumParametersBrick
             connections: []
             name: xrf_spectrum_tab
             properties:
@@ -1963,7 +1963,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_AdvancedBrick, name: advanced_brick}
+            - brick: {class: AdvancedBrick, name: advanced_brick}
               children: []
               connections: []
               name: advanced_brick
@@ -1984,7 +1984,7 @@
                 name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
               - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
                 name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
-              type: Qt4_AdvancedBrick
+              type: AdvancedBrick
             connections: []
             name: advanced_tab
             properties:
@@ -2045,7 +2045,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: Qt4_PlateBrick, name: plate_brick}
+            - brick: {class: PlateManipulatorBrick, name: plate_brick}
               children: []
               connections: []
               name: plate_brick
@@ -2068,7 +2068,7 @@
                 name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
               - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
                 type: string, value: /plate-manipulator}
-              type: Qt4_PlateBrick
+              type: PlateManipulatorBrick
             connections: []
             name: plate_manipulator_tab
             properties:
@@ -2289,7 +2289,7 @@
           value: default
         type: hbox
       - children:
-        - brick: {class: Qt4_LogViewBrick, name: log_view_brick}
+        - brick: {class: LogViewBrick, name: log_view_brick}
           children: []
           connections: []
           name: log_view_brick
@@ -2338,7 +2338,7 @@
             type: string, value: ''}
           - {comment: '', defaultValue: 1, hidden: false, name: showDebug, oldValue: 1,
             type: boolean, value: 1}
-          type: Qt4_LogViewBrick
+          type: LogViewBrick
         connections: []
         name: log_tab
         properties:
@@ -2399,7 +2399,7 @@
           value: default
         type: hbox
       - children:
-        - brick: {class: Qt4_BeamlineTestBrick, name: beamline_test_brick}
+        - brick: {class: BeamlineTestBrick, name: beamline_test_brick}
           children: []
           connections: []
           name: beamline_test_brick
@@ -2422,7 +2422,7 @@
             name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
           - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
             type: string, value: /beamline-test}
-          type: Qt4_BeamlineTestBrick
+          type: BeamlineTestBrick
         connections: []
         name: test_tab
         properties:
@@ -2556,7 +2556,7 @@
         value: default
       type: tab
     - children:
-      - brick: {class: Qt4_MachineInfoBrick, name: mach_info_brick}
+      - brick: {class: MachineInfoBrick, name: mach_info_brick}
         children: []
         connections: []
         name: mach_info_brick
@@ -2583,8 +2583,8 @@
           name: maxPlotPoints, oldValue: 100, type: integer, value: 100}
         - {comment: Display information about disk size, defaultValue: 1, hidden: false,
           name: showDiskSize, oldValue: 1, type: boolean, value: 1}
-        type: Qt4_MachineInfoBrick
-      - brick: {class: Qt4_EnergyBrick, name: energy_brick}
+        type: MachineInfoBrick
+      - brick: {class: EnergyBrick, name: energy_brick}
         children: []
         connections: []
         name: energy_brick
@@ -2623,8 +2623,8 @@
           value: '###.####'}
         - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
           type: string, value: /energy-mockup}
-        type: Qt4_EnergyBrick
-      - brick: {class: Qt4_AttenuatorsBrick, name: attenuators_brick}
+        type: EnergyBrick
+      - brick: {class: AttenuatorsBrick, name: attenuators_brick}
         children: []
         connections: []
         name: attenuators_brick
@@ -2650,8 +2650,8 @@
           type: string, value: /attenuators-mockup}
         - {comment: '', defaultValue: '', hidden: false, name: mockup_mnemonic, oldValue: '',
           type: string, value: ''}
-        type: Qt4_AttenuatorsBrick
-      - brick: {class: Qt4_ResolutionBrick, name: resolution_brick}
+        type: AttenuatorsBrick
+      - brick: {class: ResolutionBrick, name: resolution_brick}
         children: []
         connections: []
         name: resolution_brick
@@ -2692,7 +2692,7 @@
           value: '###.##'}
         - {comment: '', defaultValue: '', hidden: false, name: resolution, oldValue: '',
           type: string, value: /resolution-mockup}
-        type: Qt4_ResolutionBrick
+        type: ResolutionBrick
       - children: []
         connections: []
         name: vspacer1
@@ -2711,7 +2711,7 @@
         - {comment: '', defaultValue: 100, hidden: false, name: size, oldValue: null,
           type: integer, value: 100}
         type: vspacer
-      - brick: {class: Qt4_DoorInterlockBrick, name: door_interlock_brick}
+      - brick: {class: DoorInterlockBrick, name: door_interlock_brick}
         children: []
         connections: []
         name: door_interlock_brick
@@ -2732,8 +2732,8 @@
           name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
         - {comment: '', defaultValue: '', hidden: false, name: mnemonic, oldValue: '',
           type: string, value: /door-interlock-mockup}
-        type: Qt4_DoorInterlockBrick
-      - brick: {class: Qt4_DuoStateBrick, name: shutter_brick}
+        type: DoorInterlockBrick
+      - brick: {class: DuoStateBrick, name: shutter_brick}
         children: []
         connections: []
         name: shutter_brick
@@ -2770,8 +2770,8 @@
             out, type: string, value: Set out}
         - {comment: '', defaultValue: '', hidden: false, name: username, oldValue: '',
           type: string, value: Safety shutter}
-        type: Qt4_DuoStateBrick
-      - brick: {class: Qt4_InstanceListBrick, name: instance_list_brick}
+        type: DuoStateBrick
+      - brick: {class: InstanceListBrick, name: instance_list_brick}
         children: []
         connections: []
         name: instance_list_brick
@@ -2802,7 +2802,7 @@
           name: instanceAllowAlways, oldValue: 0, type: boolean, value: 1}
         - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
           name: instanceAllowConnected, oldValue: 0, type: boolean, value: 1}
-        type: Qt4_InstanceListBrick
+        type: InstanceListBrick
       connections: []
       name: right_info_hbox
       properties:
@@ -2921,7 +2921,7 @@
       type: combo
       value: default
     type: hbox
-  - brick: {class: Qt4_GraphicsToolsBrick, name: graphics_tools_brick}
+  - brick: {class: GraphicsToolsBrick, name: graphics_tools_brick}
     children: []
     connections: []
     name: graphics_tools_brick
@@ -2942,8 +2942,8 @@
       name: instanceAllowAlways, oldValue: 0, type: boolean, value: 0}
     - {comment: Allow to control brick in slave mode, defaultValue: 0, hidden: false,
       name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
-    - {comment: '', defaultValue: /Qt4_graphics-manager, hidden: false, name: mnemonic,
-      oldValue: /Qt4_graphics-manager, type: string, value: /Qt4_graphics-manager}
+    - {comment: '', defaultValue: /graphics-manager, hidden: false, name: mnemonic,
+      oldValue: /graphics-manager, type: string, value: /Qt4_graphics-manager}
     - choices: [menuBar, toolBar, both]
       comment: ''
       defaultValue: menuBar
@@ -2952,9 +2952,9 @@
       oldValue: menuBar
       type: combo
       value: both
-    type: Qt4_GraphicsToolsBrick
+    type: GraphicsToolsBrick
   - children:
-    - brick: {class: Qt4_ChatBrick, name: chat_brick}
+    - brick: {class: ChatBrick, name: chat_brick}
       children: []
       connections: []
       name: chat_brick
@@ -2979,8 +2979,8 @@
         type: string, value: /instanceconnection}
       - {comment: '', defaultValue: '', hidden: false, name: myTabLabel, oldValue: '',
         type: string, value: ''}
-      type: Qt4_ChatBrick
-    - brick: {class: Qt4_LogBarBrick, name: log_bar_brick}
+      type: ChatBrick
+    - brick: {class: LogBarBrick, name: log_bar_brick}
       children: []
       connections: []
       name: log_bar_brick
@@ -3001,7 +3001,7 @@
         name: instanceAllowConnected, oldValue: 0, type: boolean, value: 0}
       - {comment: '', defaultValue: -1, hidden: false, name: maxLogLines, oldValue: -1,
         type: integer, value: -1}
-      type: Qt4_LogBarBrick
+      type: LogBarBrick
     connections: []
     name: hbox4
     properties:
@@ -3102,7 +3102,7 @@
   type: window
 - children:
   - children:
-    - brick: {class: Qt4_SampleChangerBrick3, name: sc_brick_two}
+    - brick: {class: SampleChangerBrick, name: sc_brick_two}
       children: []
       connections: []
       name: sc_brick_two
@@ -3137,7 +3137,7 @@
         type: boolean, value: 0}
       - {comment: '', defaultValue: 0, hidden: false, name: singleClickSelection,
         oldValue: 0, type: boolean, value: 0}
-      type: Qt4_SampleChangerBrick3
+      type: SampleChangerBrick
     connections: []
     name: hbox5
     properties:

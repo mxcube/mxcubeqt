@@ -71,7 +71,7 @@ class AdvancedResultsWidget(QtImport.QWidget):
         self.heat_map_widget.set_beamline_setup(bl_setup)
 
     def populate_widget(self, item, data_collection):
-        # if isinstance(item, Qt4_queue_item.XrayCenteringQueueItem):
+        # if isinstance(item, queue_item.XrayCenteringQueueItem):
         #    data_collection = item.get_model().reference_image_collection
         # else:
         #    data_collection = item.get_model()

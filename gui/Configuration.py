@@ -164,7 +164,7 @@ class Configuration:
                 item_name = "%s%d" % (item_type, i)
 
             cfg_class = Configuration.classes[item_type]
-            error = parent.addChild(cfg_class(item_name, item_type))
+            error = parent.add_child(cfg_class(item_name, item_type))
             if len(error) == 0:
                 self.items[item_name] = parent["children"][-1]
                 self.has_changed = True
@@ -191,7 +191,7 @@ class Configuration:
             brick_name = "%s%d" % (brick_type, i)
 
         brick = load_brick(brick_type, brick_name)
-        error = parent.addChild(BaseLayoutItems.BrickCfg(brick_name, brick_type, brick))
+        error = parent.add_child(BaseLayoutItems.BrickCfg(brick_name, brick_type, brick))
 
         if len(error) == 0:
             self.bricks[brick_name] = parent["children"][-1]
@@ -329,7 +329,7 @@ class Configuration:
             except KeyError:
                 del self.bricks[item_name]
 
-            parent.removeChild(index)
+            parent.remove_child(index)
             self.has_changed = True
 
             return True

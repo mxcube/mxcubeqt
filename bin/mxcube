@@ -6,14 +6,14 @@ MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__fi
 
 sys.path.insert(0, MXCUBE_ROOT)
 
-# Qt4/5, PySide
 MXCUBE_GUI_FILE = os.environ.get('MXCUBE_GUI_FILE')
 if not MXCUBE_GUI_FILE:
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT,
-                                   "configuration/example_mxcube_qt4.yml")
+                                   "configuration/example_mxcube_gui.yml")
 if not os.environ.get('HARDWARE_REPOSITORY_SERVER'):
     hr_server = os.path.join(MXCUBE_ROOT,
                              "HardwareRepository/configuration/xml-qt")
     os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
-from BlissFramework import Qt4_startGUI
-Qt4_startGUI.run(MXCUBE_GUI_FILE)
+
+from gui import startGUI
+startGUI.run(MXCUBE_GUI_FILE)

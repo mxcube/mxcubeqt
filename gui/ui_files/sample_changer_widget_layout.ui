@@ -133,7 +133,7 @@
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>../../../Icons/Refresh2.png</normaloff>../../../Icons/Refresh2.png</iconset>
+            <normaloff>../icons/Refresh2.png</normaloff>../icons/Refresh2.png</iconset>
           </property>
          </widget>
         </item>

@@ -123,19 +123,19 @@ class InstanceListBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
-        self.addProperty("giveControlTimeout", "integer", 30)
-        self.addProperty("initializeServer", "boolean", False)
-        self.addProperty("controlEmails", "string", "")
+        self.add_property("giveControlTimeout", "integer", 30)
+        self.add_property("initializeServer", "boolean", False)
+        self.add_property("controlEmails", "string", "")
 
         # Properties to link hwobj --------------------------------------------
-        self.addProperty("hwobj_instance_connection", "string", "/instanceconnection")
-        self.addProperty("hwobj_xmlrpc_server", "string", "/xml-rpc-server")
-        self.addProperty("hwobj_hutch_trigger", "string", "")
+        self.add_property("hwobj_instance_connection", "string", "/instanceconnection")
+        self.add_property("hwobj_xmlrpc_server", "string", "/xml-rpc-server")
+        self.add_property("hwobj_hutch_trigger", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot("setSession", ())
+        self.define_slot("setSession", ())
 
         # Hardware objects ----------------------------------------------------
         self.instance_server_hwobj = None
@@ -237,7 +237,7 @@ class InstanceListBrick(BaseWidget):
         self.timeout_timer.timeout.connect(self.timeout_approaching)
         _main_gbox.setChecked(False)
 
-    def propertyChanged(self, property_name, old_value, new_value):
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_instance_connection":
             if self.instance_server_hwobj is not None:
                 self.disconnect(
@@ -283,7 +283,7 @@ class InstanceListBrick(BaseWidget):
                     self.instance_server_hwobj, "widgetCall", self.widget_call
                 )
 
-            self.instance_server_hwobj = self.getHardwareObject(new_value)
+            self.instance_server_hwobj = self.get_hardware_object(new_value)
 
             if self.instance_server_hwobj is not None:
                 self.connect(
@@ -325,13 +325,13 @@ class InstanceListBrick(BaseWidget):
                 )
                 self.connect(self.instance_server_hwobj, "widgetCall", self.widget_call)
         elif property_name == "hwobj_xmlrpc_server":
-            self.xmlrpc_server = self.getHardwareObject(new_value)
+            self.xmlrpc_server = self.get_hardware_object(new_value)
         elif property_name == "hwobj_hutch_trigger":
             if self.hutch_trigger_hwobj is not None:
                 self.disconnect(
                     self.hutch_trigger_hwobj, "hutchTrigger", self.hutch_trigger_changed
                 )
-            self.hutch_trigger_hwobj = self.getHardwareObject(new_value)
+            self.hutch_trigger_hwobj = self.get_hardware_object(new_value)
             if self.hutch_trigger_hwobj is not None:
                 self.connect(
                     self.hutch_trigger_hwobj, "hutchTrigger", self.hutch_trigger_changed
@@ -340,11 +340,11 @@ class InstanceListBrick(BaseWidget):
                     not self.hutch_trigger_hwobj.door_is_interlocked()
                 )
         else:
-            BaseWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def hutch_trigger_changed(self, hutch_opened):
         if hutch_opened:
-            if not BaseWidget.isInstanceRoleServer():
+            if not BaseWidget.is_instance_role_server():
                 logging.getLogger().info("HUTCH IS OPENED, YOU LOSE CONTROL")
                 self.take_control_button.setEnabled(False)
             else:
@@ -353,7 +353,7 @@ class InstanceListBrick(BaseWidget):
                 )
                 self.instance_server_hwobj.takeControl()
         else:
-            if not BaseWidget.isInstanceRoleServer():
+            if not BaseWidget.is_instance_role_server():
                 logging.getLogger().info(
                     "HUTCH IS CLOSED, YOU ARE " + "ALLOWED TO TAKE CONTROL AGAIN"
                 )
@@ -437,7 +437,7 @@ class InstanceListBrick(BaseWidget):
             local = BaseWidget.INSTANCE_LOCATION_LOCAL
         else:
             local = BaseWidget.INSTANCE_LOCATION_EXTERNAL
-        BaseWidget.setInstanceLocation(local)
+        BaseWidget.set_instance_location(local)
 
         for widget in QtImport.QApplication.allWidgets():
             if hasattr(widget, "configuration"):
@@ -909,7 +909,7 @@ class InstanceListBrick(BaseWidget):
                 )
 
     def event(self, event):
-        if self.isRunning():
+        if self.is_running():
             if event.type() == WANTS_CONTROL_EVENT:
                 try:
                     client_id = event.client_id
@@ -1064,7 +1064,7 @@ class LineEditInput(QtImport.QLineEdit):
 
     PARAMETER_STATE = {"INVALID": QtImport.Qt.red, "OK": QtImport.Qt.white, "WARNING": QtImport.Qt.yellow}
 
-    inputValidSignal = pyqtSignal(bool)
+    inputValidSignal = QtImport.pyqtSignal(bool)
 
     def __init__(self, parent):
         QtImport.QLineEdit.__init__(self, parent)

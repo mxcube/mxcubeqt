@@ -169,7 +169,7 @@ class ConfirmDialog(QtImport.QDialog):
                 info_str_list.append(item_type_name)
                 info_str_list.append("")
                 info_str_list.append(path_template.directory)
-                # This part is also in Qt4_data_path_widget. Mote to PathTemplate
+                # This part is also in data_path_widget. Mote to PathTemplate
                 file_name = path_template.get_image_file_name()
                 file_name = file_name.replace(
                     "%" + path_template.precision + "d",

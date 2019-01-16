@@ -45,17 +45,17 @@ class ChatBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
-        self.addProperty("mnemonic", "string", "")
-        self.addProperty("icons", "string", "")
-        self.addProperty("myTabLabel", "string", "")
+        self.add_property("mnemonic", "string", "")
+        self.add_property("icons", "string", "")
+        self.add_property("myTabLabel", "string", "")
 
         # Signals ------------------------------------------------------------
-        self.defineSignal("incoming_unread_messages", ())
-        self.defineSignal("reset_unread_message", ())
+        self.define_signal("incoming_unread_messages", ())
+        self.define_signal("reset_unread_message", ())
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot("tabSelected", ())
-        self.defineSlot("sessionSelected", ())
+        self.define_slot("tabSelected", ())
+        self.define_slot("sessionSelected", ())
 
         # Hardware objects ----------------------------------------------------
         self.instance_server_hwobj = None

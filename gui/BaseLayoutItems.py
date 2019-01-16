@@ -216,9 +216,9 @@ class TabCfg(ContainerCfg):
                     closable_props[prop["name"]] = prop["value"]
 
         for prop_name in closable_props.keys():
-            self.properties.delProperty(prop_name)
+            self.properties.del_property(prop_name)
         for prop_name in new_dialog_props.keys():
-            self.properties.delProperty(prop_name)
+            self.properties.del_property(prop_name)
 
         self.slots = {}
         for child in self.children:

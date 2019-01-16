@@ -28,6 +28,10 @@ import QtImport
 from gui.utils import Icons, PropertyBag, Colors
 
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
 class ConfigurationTable(QtImport.QTableWidget):
 
     propertyChangedSignal = QtImport.pyqtSignal(str, object, object)
@@ -78,7 +82,7 @@ class ConfigurationTable(QtImport.QTableWidget):
             i = 0
             for prop in self.property_bag:
                 prop._editor = weakref.ref(self)
-                prop_name = prop.getName()
+                prop_name = prop.get_name()
 
                 if not show_hidden and prop.hidden:
                     continue
@@ -126,33 +130,33 @@ class ConfigurationTable(QtImport.QTableWidget):
         :param prop: property
         :type prop: dict
         """
-        if prop.getType() == "boolean":
+        if prop.get_type() == "boolean":
             new_property_item = QtImport.QTableWidgetItem("")
             self.setItem(row, 1, new_property_item)
-            if prop.getUserValue():
+            if prop.get_user_value():
                 self.item(row, 1).setCheckState(QtImport.Qt.Checked)
             else:
                 self.item(row, 1).setCheckState(QtImport.Qt.Unchecked)
-        elif prop.getType() == "combo":
-            choicesList = []
+        elif prop.get_type() == "combo":
+            choices_list = []
             choices = prop.get_choices()
             for choice in choices:
-                choicesList.append(choice)
-            new_property_item = ComboBoxTableItem(self, row, 1, choicesList)
+                choices_list.append(choice)
+            new_property_item = ComboBoxTableItem(self, row, 1, choices_list)
             new_property_item.setCurrentIndex(
                 new_property_item.findText(prop.get_user_value())
             )
             self.setCellWidget(row, 1, new_property_item)
-        elif prop.getType() == "file":
+        elif prop.get_type() == "file":
             new_property_item = FileTableItem(
-                self, row, 1, prop.getUserValue(), prop.getFilter()
+                self, row, 1, prop.get_user_value(), prop.getFilter()
             )
             self.setCellWidget(row, 1, new_property_item)
-        elif prop.getType() == "color":
-            new_property_item = ColorTableItem(self, row, 1, prop.getUserValue())
+        elif prop.get_type() == "color":
+            new_property_item = ColorTableItem(self, row, 1, prop.get_user_value())
             self.setCellWidget(row, 1, new_property_item)
         else:
-            if prop.getUserValue() is None:
+            if prop.get_user_value() is None:
                 temp_table_item = QtImport.QTableWidgetItem("")
             else:
                 temp_table_item = QtImport.QTableWidgetItem(str(prop.get_user_value()))
@@ -169,34 +173,34 @@ class ConfigurationTable(QtImport.QTableWidget):
         if self.display_hwobj:
             prop_name = "hwobj_" + prop_name
 
-        item_property = self.property_bag.getProperty(prop_name)
-        old_value = item_property.getUserValue()
+        item_property = self.property_bag.get_property(prop_name)
+        old_value = item_property.get_user_value()
 
-        if item_property.getType() == "boolean":
+        if item_property.get_type() == "boolean":
             item_property.setValue(self.item(row, 1).checkState())
-        elif item_property.getType() == "combo":
+        elif item_property.get_type() == "combo":
             item_property.setValue(self.cellWidget(row, 1).currentText())
-        elif item_property.getType() == "file":
+        elif item_property.get_type() == "file":
             item_property.setValue(self.cellWidget(row, 1).get_filename())
-        elif item_property.getType() == "color":
+        elif item_property.get_type() == "color":
             item_property.setValue(self.cellWidget(row, 1).color)
         else:
             try:
-                item_property.setValue(str(self.item(row, 1).text()))
+                item_property.set_value(str(self.item(row, 1).text()))
             except BaseException:
                 logging.getLogger().error(
                     "Cannot assign value %s to property %s"
                     % (str(self.item(row, 1).text()), prop_name)
                 )
 
-            if item_property.getUserValue() is None:
+            if item_property.get_user_value() is None:
                 self.item(row, 1).setText("")
             else:
-                self.item(row, 1).setText(str(item_property.getUserValue()))
+                self.item(row, 1).setText(str(item_property.get_user_value()))
 
-        if not old_value == item_property.getUserValue():
+        if not old_value == item_property.get_user_value():
             self.propertyChangedSignal.emit(
-                prop_name, old_value, item_property.getUserValue()
+                prop_name, old_value, item_property.get_user_value()
             )
 
     def on_validate_click(self):
@@ -214,7 +218,7 @@ class ConfigurationTable(QtImport.QTableWidget):
         if self.display_hwobj:
             prop_name = "hwobj_" + prop_name
 
-        prop = self.property_bag.getProperty(prop_name)
+        prop = self.property_bag.get_property(prop_name)
 
         default_value = prop.getDefaultValue()
         if not default_value is None:
@@ -236,13 +240,13 @@ class ConfigurationTable(QtImport.QTableWidget):
                 prop_name = str(self.item(row, 0).text())
                 if self.display_hwobj:
                     prop_name = "hwobj_" + prop_name
-                prop = self.property_bag.getProperty(prop_name)
+                prop = self.property_bag.get_property(prop_name)
 
-                old_value = prop.getUserValue()
+                old_value = prop.get_user_value()
 
-                if prop.getType() == "boolean":
+                if prop.get_type() == "boolean":
                     prop.setValue(self.item(row, 1).isChecked())
-                elif prop.getType() == "combo":
+                elif prop.get_type() == "combo":
                     prop.setValue(self.item(row, 1).currentText())
                 else:
                     try:
@@ -252,17 +256,17 @@ class ConfigurationTable(QtImport.QTableWidget):
                             "Cannot assign value to property %s" % prop_name
                         )
 
-                    if prop.getUserValue() is None:
+                    if prop.get_user_value() is None:
                         self.setText(row, 1, "")
                     else:
-                        self.setText(row, 1, str(prop.getUserValue()))
+                        self.setText(row, 1, str(prop.get_user_value()))
 
-                if not old_value == prop.getUserValue():
+                if not old_value == prop.get_user_value():
                     self.propertyChangedSignal.emit(
-                        prop_name, old_value, prop.getUserValue()
+                        prop_name, old_value, prop.get_user_value()
                     )
                     # self.emit(QtCore.SIGNAL('propertyChanged'),
-                    # (prop_name, old_value, prop.getUserValue(), ))
+                    # (prop_name, old_value, prop.get_user_value(), ))
 
         return QtImport.QTable.endEdit(self, row, col, accept, replace)
 

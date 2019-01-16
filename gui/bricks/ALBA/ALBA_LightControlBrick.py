@@ -58,9 +58,9 @@ class ALBA_LightControlBrick(BaseWidget):
         self.logger = logging.getLogger("GUI Alba Actuator")
         self.logger.info("__init__()")
 
-        self.on_color = Colors.color_to_hexa(Qt4_widget_colors.LIGHT_GREEN)
-        self.off_color = Colors.color_to_hexa(Qt4_widget_colors.LIGHT_GRAY)
-        self.fault_color = Colors.color_to_hexa(Qt4_widget_colors.LIGHT_RED)
+        self.on_color = Colors.color_to_hexa(Colors.LIGHT_GREEN)
+        self.off_color = Colors.color_to_hexa(Colors.LIGHT_GRAY)
+        self.fault_color = Colors.color_to_hexa(Colors.LIGHT_RED)
         self.unknown_color = Colors.color_to_hexa(
             Colors.DARK_GRAY
         )

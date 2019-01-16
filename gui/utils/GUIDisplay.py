@@ -977,7 +977,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         BaseWidget._menuBar = self._menubar
         BaseWidget._toolBar = self._toolbar
 
-    def set_status_bar(self):
+    def set_statusbar(self):
         """Sets statusbar"""
 
         self._statusbar_user_label = QtImport.QLabel("-")
@@ -1008,10 +1008,10 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._statusbar.addPermanentWidget(self._ispyb_status_label)
 
         self._statusbar.show()
-        BaseWidget._statusBar = self._statusbar
+        BaseWidget._statusbar = self._statusbar
 
     def set_progress_dialog(self):
-        BaseWidget._progressDialog = self._progress_dialog
+        BaseWidget._progress_dialog = self._progress_dialog
 
     def update_status_info(self, info_type, info_message, info_state="ready"):
         """Updates status info"""
@@ -1378,7 +1378,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         if isinstance(container_cfg, WindowCfg):
             if container_cfg.properties["statusbar"]:
-                self.set_status_bar()
+                self.set_statusbar()
 
         self.set_progress_dialog()
 

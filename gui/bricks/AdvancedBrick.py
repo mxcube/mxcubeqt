@@ -28,7 +28,7 @@ from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from api import beamline_setup
+import api
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -41,7 +41,6 @@ class AdvancedBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.session_hwobj = None
 
         # Internal values -----------------------------------------------------
 
@@ -81,17 +80,17 @@ class AdvancedBrick(BaseWidget):
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = (
-            self.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget._base_process_dir = (
-            self.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
 
         self.line_parameters_widget._data_path_widget._base_image_dir = (
-            self.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.line_parameters_widget._data_path_widget._base_process_dir = (
-            self.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
 
         # self.parameters_widget.populate_widget(item)
@@ -128,9 +127,8 @@ class AdvancedBrick(BaseWidget):
         self.tool_box.setCurrentWidget(self.results_widget)
 
     def init_api(self):
-        self.session_hwobj = beamline_setup.session_hwobj
-        self.parameters_widget.set_beamline_setup(beamline_setup)
-        self.results_widget.set_beamline_setup(beamline_setup)
+        self.parameters_widget.set_beamline_setup(api.beamline_setup)
+        self.results_widget.set_beamline_setup(api.beamline_setup)
 
-        self.line_parameters_widget.set_beamline_setup(beamline_setup)
-        self.line_results_widget.set_beamline_setup(beamline_setup)
+        self.line_parameters_widget.set_beamline_setup(api.beamline_setup)
+        self.line_results_widget.set_beamline_setup(api.beamline_setup)

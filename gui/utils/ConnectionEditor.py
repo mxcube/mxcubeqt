@@ -194,7 +194,7 @@ class ConnectionEditor(QtImport.QDialog):
             except KeyError:
                 # item is a brick
                 if hasattr(child, "brick"):
-                    n_signals = len(child["brick"].getSignals())
+                    n_signals = len(child["brick"].get_signals())
 
             if n_signals > 0:
                 children.append(child)
@@ -214,7 +214,7 @@ class ConnectionEditor(QtImport.QDialog):
             except KeyError:
                 # item is a brick
                 if hasattr(child, "brick"):
-                    n_slots = len(child["brick"].getSlots())
+                    n_slots = len(child["brick"].get_slots())
 
             if n_slots > 0:
                 children.append(child)
@@ -382,7 +382,7 @@ class ConnectionEditor(QtImport.QDialog):
         except KeyError:
             signals = self.configuration.items[object_name]["signals"]
         else:
-            signals = object_item["brick"].getSignals()
+            signals = object_item["brick"].get_signals()
 
         self.emitter_signals_listwidget.clear()
         for signal_name in signals:
@@ -417,8 +417,9 @@ class ConnectionEditor(QtImport.QDialog):
                 self.receiver_objects_listwidget.font()
             )
 
-            for slot_name in window["slots"]:
-                self.receiver_slots_listwidget.addItem(slot_name)
+            if hasattr(window, "slots"):
+                for slot_name in window["slots"]:
+                    self.receiver_slots_listwidget.addItem(slot_name)
             self.receiver_slots_listwidget.setFont(
                 self.receiver_slots_listwidget.font()
             )
@@ -437,7 +438,7 @@ class ConnectionEditor(QtImport.QDialog):
         except KeyError:
             slots = self.configuration.items[object_name]["slots"]
         else:
-            slots = object_item["brick"].getSlots()
+            slots = object_item["brick"].get_slots()
 
         self.receiver_slots_listwidget.clear()
         for slot_name in slots:

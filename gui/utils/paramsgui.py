@@ -1,134 +1,46 @@
-"""Qt4 port of paramsgui - rhfogh Jan 2018
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-Incorporates additions for GPhL workflow code"""
-
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-
-# from lxml import etree
 import os.path
 import logging
 import sys
 
-# To be replaced with DoubleSpinbox
-# # copied from the motor brick
-# # can display decimal places
-# class SpinBox(QtGui.QSpinBox):
-#     CHANGED_COLOR = QtGui.QColor(255,165,0)
-#     def __init__(self, parent, options):
-#         QtGui.QSpinBox.__init__(self,parent)
-#         self.decimalPlaces=1
-#         self.colorGroupDict={}
-#         self.setValidator(QtGui.QDoubleValidator(self))
-#         self.editor().setAlignment(QtGui.QWidget.AlignLeft)
-#         qt.QObject.connect(self.editor(),qt.SIGNAL('textChanged(const QString &)'),self.inputFieldChanged)
-#         self.__name = options['variableName']
-#         if options.has_key('unit'):
-#             QtGui.QSpinBox.setSuffix(self, ' ' + options['unit'])
-#         if options.has_key('defaultValue'):
-#             val = float(options['defaultValue'])
-#             self.setValue(int(val * float(10**self.decimalPlaces)))
-#         if options.has_key('upperBound'):
-#             self.setMaxValue(float(options['upperBound']))
-#         else:
-#             QtGui.QSpinBox.setMaxValue(self, sys.maxint)
-#         if options.has_key('lowerBound'):
-#             self.setMinimum(float(options['lowerBound']))
-#         if options.has_key('tooltip'):
-#             QtGui.QToolTip.add(self, options['tooltip'])
-#
-#     def inputFieldChanged(self,text):
-#         self.setEditorBackgroundColor(SpinBox.CHANGED_COLOR)
-#     def setDecimalPlaces(self,places):
-#         current_val=float(self.value())/float(10**self.decimalPlaces)
-#         current_step=self.lineStep()
-#         current_min=float(self.minValue())/float(10**self.decimalPlaces)
-#         current_max=float(self.maxValue())/float(10**self.decimalPlaces)
-#         self.decimalPlaces=places
-#         self.blockSignals(True)
-#         self.setMinValue(current_min)
-#         self.setMaxValue(current_max)
-#         self.setValue(current_val)
-#         self.blockSignals(False)
-#         self.setLineStep(current_step)
-#     def decimalPlaces(self):
-#         return self.decimalPlaces
-#     def setMinValue(self,value):
-#         try:
-#             QtGui.QSpinBox.setMinValue(self,int(value*(10**self.decimalPlaces)))
-#         except (TypeError,ValueError):
-#             logging.getLogger().error("MotorSpinBoxBrick: error setting minimum value (%d)" % value)
-#     def setMaxValue(self,value):
-#         try:
-#             QtGui.QSpinBox.setMaxValue(self,int(value*(10**self.decimalPlaces)))
-#         except (TypeError,ValueError):
-#             logging.getLogger().error("MotorSpinBoxBrick: error setting maximum value (%d)" % value)
-#     def mapValueToText(self,value):
-#         f=float(value)/float(10**self.decimalPlaces)
-#         return QtGui.QString(str(f))
-#     def mapTextToValue(self):
-#         t = str(self.text())
-#         try:
-#             ret = int(float(t)*(10**self.decimalPlaces))
-#         except:
-#             return (0, False)
-#         else:
-#             return (ret, True)
-#     def setValue(self,value):
-#         if type(value)==type(0.0):
-#             value=int(value*(10**self.decimalPlaces))
-#         self.editor().blockSignals(True)
-#         QtGui.QSpinBox.setValue(self,value)
-#         self.editor().blockSignals(False)
-#     def lineStep(self):
-#         step=float(QtGui.QSpinBox.lineStep(self))/(10**self.decimalPlaces)
-#         return step
-#     def setLineStep(self,step):
-#         if type(step)==type(0.0):
-#             s=int(step*(10**self.decimalPlaces))
-#         else:
-#             s=step
-#         try:
-#             QtGui.QSpinBox.setLineStep(self,s)
-#         except (TypeError,ValueError):
-#             logging.getLogger().error("MotorSpinBoxBrick: error setting step value (%d)" % step)
-#     def eventFilter(self,obj,ev):
-#         if isinstance(ev,QtGui.QContextMenuEvent):
-#             self.emit(qt.PYSIGNAL("contextMenu"),())
-#             return True
-#         else:
-#             return QtGui.QSpinBox.eventFilter(self,obj,ev)
-#     def setEditorBackgroundColor(self,color):
-#         #print "SpinBox.setEditorBackgroundColor",color
-#         editor=self.editor()
-#         editor.setPaletteBackgroundColor(color)
-#         spinbox_palette=editor.palette()
-#         try:
-#             cg=self.colorGroupDict[color.rgb()]
-#         except KeyError:
-#             cg=QtGui.QColorGroup(spinbox_palette.disabled())
-#             cg.setColor(cg.Background,color)
-#             self.colorGroupDict[color.rgb()]=cg
-#         spinbox_palette.setDisabled(cg)
-#
-#     def set_value(self, value):
-#         val = float(value)
-#         self.setValue(val)
-#     def get_value(self):
-#         val=float(self.value())/float(10**self.decimalPlaces)
-#         return str(val)
-#     def get_name(self):
-#         return self.__name
+import QtImport
 
 
-class LineEdit(QtGui.QLineEdit):
+"""port of paramsgui - rhfogh Jan 2018
+
+Incorporates additions for GPhL workflow code"""
+
+
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+class LineEdit(QtImport.QLineEdit):
     def __init__(self, parent, options):
-        QtGui.QLineEdit.__init__(self, parent)
-        self.setAlignment(QtCore.Qt.AlignLeft)
+        QtImport.QLineEdit.__init__(self, parent)
+        self.setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
         if "defaultValue" in options:
             self.setText(options["defaultValue"])
-        self.setAlignment(QtCore.Qt.AlignRight)
+        self.setAlignment(QtImport.Qt.AlignRight)
         if options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
@@ -143,18 +55,18 @@ class LineEdit(QtGui.QLineEdit):
         return str(self.text())
 
 
-class TextEdit(QtGui.QTextEdit):
+class TextEdit(QtImport.QTextEdit):
     def __init__(self, parent, options):
-        QtGui.QTextEdit.__init__(self, parent)
-        self.setAlignment(QtCore.Qt.AlignLeft)
+        QtImport.QTextEdit.__init__(self, parent)
+        self.setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
         if "defaultValue" in options:
             self.setText(options["defaultValue"])
-        self.setAlignment(QtCore.Qt.AlignRight)
+        self.setAlignment(QtImport.Qt.AlignRight)
         if options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
 
     def set_value(self, value):
         self.setText(value)
@@ -166,9 +78,9 @@ class TextEdit(QtGui.QTextEdit):
         return str(self.text())
 
 
-class Combo(QtGui.QComboBox):
+class Combo(QtImport.QComboBox):
     def __init__(self, parent, options):
-        QtGui.QComboBox.__init__(self, parent)
+        QtImport.QComboBox.__init__(self, parent)
         self.__name = options["variableName"]
         if "textChoices" in options:
             for val in options["textChoices"]:
@@ -186,24 +98,24 @@ class Combo(QtGui.QComboBox):
         return self.__name
 
 
-class File(QtGui.QWidget):
+class File(QtImport.QWidget):
     def __init__(self, parent, options):
-        QtGui.QWidget.__init__(self, parent)
+        QtImport.QWidget.__init__(self, parent)
 
         # do not allow qt to stretch us vertically
         sp = self.sizePolicy()
-        sp.setVerData(QtGui.QSizePolicy.Fixed)
+        sp.setVerData(QtImport.QSizePolicy.Fixed)
         self.setSizePolicy(sp)
 
-        QtGui.QHBoxLayout(self)
+        QtImport.QHBoxLayout(self)
         self.__name = options["variableName"]
-        self.filepath = QtGui.QLineEdit(self)
-        self.filepath.setAlignment(QtCore.Qt.AlignLeft)
+        self.filepath = QtImport.QLineEdit(self)
+        self.filepath.setAlignment(QtImport.Qt.AlignLeft)
         if "defaultValue" in options:
             self.filepath.setText(options["defaultValue"])
-        self.open_dialog_btn = QtGui.QPushButton("...", self)
-        QtCore.QObject.connect(
-            self.open_dialog_btn, QtCore.SIGNAL("clicked()"), self.open_file_dialog
+        self.open_dialog_btn = QtImport.QPushButton("...", self)
+        QtImport.QObject.connect(
+            self.open_dialog_btn, QtImport.SIGNAL("clicked()"), self.open_file_dialog
         )
 
         self.layout().addWidget(self.filepath)
@@ -222,17 +134,17 @@ class File(QtGui.QWidget):
         start_path = os.path.dirname(str(self.filepath.text()))
         if not os.path.exists(start_path):
             start_path = ""
-        path = QtGui.QFileDialog(self).getOpenFileName(directory=start_path)
+        path = QtImport.QFileDialog(self).getOpenFileName(directory=start_path)
         if not path.isNull():
             self.filepath.setText(path)
 
 
-class IntSpinBox(QtGui.QSpinBox):
-    CHANGED_COLOR = QtGui.QColor(255, 165, 0)
+class IntSpinBox(QtImport.QSpinBox):
+    CHANGED_COLOR = QtImport.QColor(255, 165, 0)
 
     def __init__(self, parent, options):
-        QtGui.QSpinBox.__init__(self, parent)
-        self.lineEdit().setAlignment(QtCore.Qt.AlignLeft)
+        QtImport.QSpinBox.__init__(self, parent)
+        self.lineEdit().setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
         if "unit" in options:
             self.setSuffix(" " + options["unit"])
@@ -259,12 +171,12 @@ class IntSpinBox(QtGui.QSpinBox):
         return self.__name
 
 
-class DoubleSpinBox(QtGui.QDoubleSpinBox):
-    CHANGED_COLOR = QtGui.QColor(255, 165, 0)
+class DoubleSpinBox(QtImport.QDoubleSpinBox):
+    CHANGED_COLOR = QtImport.QColor(255, 165, 0)
 
     def __init__(self, parent, options):
-        QtGui.QDoubleSpinBox.__init__(self, parent)
-        self.lineEdit().setAlignment(QtGui.QWidget.AlignLeft)
+        QtImport.QDoubleSpinBox.__init__(self, parent)
+        self.lineEdit().setAlignment(QtImport.QWidget.AlignLeft)
         self.__name = options["variableName"]
         if "unit" in options:
             self.setSuffix(" " + options["unit"])
@@ -291,26 +203,26 @@ class DoubleSpinBox(QtGui.QDoubleSpinBox):
         return self.__name
 
 
-class Message(QtGui.QWidget):
+class Message(QtImport.QWidget):
     def __init__(self, parent, options):
-        QtGui.QWidget.__init__(self, parent)
+        QtImport.QWidget.__init__(self, parent)
         logging.debug("making message with options %r", options)
-        QtGui.QHBoxLayout(self)
-        icon = QtGui.QLabel(self)
-        icon.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        QtImport.QHBoxLayout(self)
+        icon = QtImport.QLabel(self)
+        icon.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
 
         # all the following stuff is there to get the standard icon
         # for our level directly from qt
         mapping = {
-            "warning": QtGui.QMessageBox.Warning,
-            "info": QtGui.QMessageBox.Information,
-            "error": QtGui.QMessageBox.Critical,
+            "warning": QtImport.QMessageBox.Warning,
+            "info": QtImport.QMessageBox.Information,
+            "error": QtImport.QMessageBox.Critical,
         }
         level = mapping.get(options["level"])
         if level is not None:
-            icon.setPixmap(QtGui.QMessageBox.standardIcon(level))
+            icon.setPixmap(QtImport.QMessageBox.standardIcon(level))
 
-        text = QtGui.QLabel(options["text"], self)
+        text = QtImport.QLabel(options["text"], self)
 
         self.layout().addWidget(icon)
         self.layout().addWidget(text)
@@ -342,19 +254,19 @@ def make_widget(parent, options):
     return WIDGET_CLASSES[options["type"]](parent, options)
 
 
-class FieldsWidget(QtGui.QWidget):
+class FieldsWidget(QtImport.QWidget):
     def __init__(self, fields, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QtImport.QWidget.__init__(self, parent)
         self.field_widgets = list()
 
         #        qt.QVBoxLayout(self)
         #        grid = qt.QGridLayout()
-        QtGui.QGridLayout(self)
+        QtImport.QGridLayout(self)
         #        button_box = qt.QHBoxLayout()
         #         # We're trying to pack everything together on the lower left corner
-        #         self.setSizePolicy(QtGui.QSizePolicy.Fixed,
-        #                            QtGui.QSizePolicy.Fixed)
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        #         self.setSizePolicy(QtImport.QSizePolicy.Fixed,
+        #                            QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
 
         current_row = 0
         for field in fields:
@@ -371,19 +283,19 @@ class FieldsWidget(QtGui.QWidget):
                 # so that will not fsck up the layout
                 self.layout().addWidget(w, current_row, current_row, 0, 1)
             else:
-                label = QtGui.QLabel(field["uiLabel"], self)
+                label = QtImport.QLabel(field["uiLabel"], self)
                 logging.debug("creating widget with options: %s", field)
                 w = make_widget(self, field)
                 # Temporary (like this brick ...) hack to get a nicer UI
                 if isinstance(w, TextEdit):
                     w.setSizePolicy(
-                        QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum
+                        QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Minimum
                     )
                 else:
-                    w.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+                    w.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
                 self.field_widgets.append(w)
-                self.layout().addWidget(label, current_row, 0, QtCore.Qt.AlignLeft)
-                self.layout().addWidget(w, current_row, 1, QtCore.Qt.AlignLeft)
+                self.layout().addWidget(label, current_row, 0, QtImport.Qt.AlignLeft)
+                self.layout().addWidget(w, current_row, 1, QtImport.Qt.AlignLeft)
 
             current_row += 1
 

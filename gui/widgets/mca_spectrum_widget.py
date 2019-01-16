@@ -52,7 +52,7 @@ import QtImport
 
 pymca_imported = False
 try:
-    if qt_variant == "PyQt5":
+    if QtImport.qt_variant == "PyQt5":
         from PyMca5.PyMca import McaAdvancedFit
         from PyMca5.PyMca import ConfigDict
     else:

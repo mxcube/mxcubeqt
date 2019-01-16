@@ -437,7 +437,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
                 # try:
-                widget.instanceRoleChanged(role)
+                widget.instance_role_changed(role)
                 # except:
                 #    pass
 
@@ -449,7 +449,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
                 # try:
-                widget.instanceLocationChanged(location)
+                widget.instance_location_changed(location)
                 # except:
                 #    pass
 
@@ -478,7 +478,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
-                widget.instanceMirrorChanged(mirror)
+                widget.instance_mirror_changed(mirror)
 
     def instance_mirror_changed(self, mirror):
         pass
@@ -814,22 +814,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                                         QtImport.SIGNAL(signal),
                                         signal_slot_filter)
 
-    def get_signals(self):
-        signals = []
-        for name in dir(self):
-            if isinstance(getattr(self, name), QtImport.pyqtSignal):
-                signals.append(name)
-        return signals
-
-    def get_slots(self):
-        slots = []
-        cls = self if isinstance(self, type) else type(self)
-        slot = type(QtImport.pyqtSignal())
-        for name in dir(self):
-            if isinstance(getattr(cls, name), slot):
-                slots.append(name)
-        return slots
-
     def reparent(self, widget_to):
         saved_enabled_state = self.isEnabled()
         if self.parent() is not None:
@@ -917,7 +901,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 hardware_object_name)
 
         if not hardware_object_name in self.__loaded_hardware_objects:
-            splash_screen.inc_progress_value()
+            if splash_screen:
+                splash_screen.inc_progress_value()
             self.__loaded_hardware_objects.append(hardware_object_name)
 
         hwobj = HardwareRepository.getHardwareRepository().\
