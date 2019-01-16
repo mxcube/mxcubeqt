@@ -1,11 +1,11 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
@@ -14,49 +14,38 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import logging
+import numpy.oldnumeric as Numeric
 
-from QtImport import *
-
-# from PyQt4 import QtGui
-# from PyQt4 import QtCore
-# from PyQt4 import uic
+import QtImport
 
 from PyMca import McaAdvancedFit
 from PyMca import ConfigDict
 
-import numpy.oldnumeric as Numeric
-
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.BaseComponents import BaseWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
 __category__ = "General"
 
 
-class Qt4_McaSpectrumBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class McaSpectrumBrick(BaseWidget):
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+        BaseWidget.__init__(self, *args)
 
         self.defineSlot("setData", ())
 
         self.mcafit = McaAdvancedFit.McaAdvancedFit(self)
         self.mcafit.dismissButton.hide()
 
-        # self.scan_plot_widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-        #                        "widgets/ui_files/Qt4_scan_plot_widget.ui"))
-
         # Layout --------------------------------------------------------------
-        main_layout = QVBoxLayout(self)
+        main_layout = QtImport.QVBoxLayout(self)
         main_layout.addWidget(self.mcafit)
         # main_layout.addWidget(self.scan_plot_widget)
         main_layout.setSpacing(0)
@@ -64,9 +53,6 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         self.setLayout(main_layout)
 
     def setData(self, data, calib, config):
-        """
-        Descript. :
-        """
         try:
             configured = False
             if config.get("file", None):
@@ -117,15 +103,9 @@ class Qt4_McaSpectrumBrick(BlissWidget):
             )
 
     def _fit(self):
-        """
-        Descript. :
-        """
         return self.mcafit.fit()
 
     def _configure(self, config):
-        """
-        Descript. :
-        """
         d = ConfigDict.ConfigDict()
         d.read(config["file"])
         if "concentrations" not in d:
@@ -140,10 +120,6 @@ class Qt4_McaSpectrumBrick(BlissWidget):
         self.mcafit.mcafit.configure(d)
 
     def clear(self):
-        """
-        Descript. :
-        """
-        # TODO make with clear
         x = Numeric.array([0]).astype(Numeric.Float)
         y = Numeric.array([0]).astype(Numeric.Float)
         self.mcafit.setdata(x, y)

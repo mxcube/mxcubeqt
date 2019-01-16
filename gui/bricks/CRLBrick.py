@@ -18,30 +18,24 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Qt4_CRLBrick
+CRLBrick
 """
 
-from QtImport import *
+import QtImport 
 
-from BlissFramework import Qt4_Icons
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.utils import Colors, Icons
+from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
+__license__ = "LGPLv3+"
 __category__ = "Beam definition"
 
 
-class Qt4_CRLBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class CRLBrick(BaseWidget):
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
         self.crl_hwobj = None
@@ -50,27 +44,27 @@ class Qt4_CRLBrick(BlissWidget):
         self.crl_value = []
 
         # Properties ----------------------------------------------------------
-        self.addProperty("lenseCount", "integer", 6)
-        self.addProperty("mnemonic", "string", "")
-        self.addProperty("formatString", "formatString", "#.#")
-        self.addProperty("caption", "string", "")
+        self.add_property("lenseCount", "integer", 6)
+        self.add_property("mnemonic", "string", "")
+        self.add_property("formatString", "formatString", "#.#")
+        self.add_property("caption", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_gbox = QGroupBox("CRL", self)
-        self.mode_combo = QComboBox(self.main_gbox)
-        self.set_according_to_energy_button = QPushButton("Set", self.main_gbox)
-        self.set_out_button = QPushButton("Out", self.main_gbox)
-        # self.align_beam_button = QtGui.QPushButton("Align", self.main_gbox)
-        self.crl_value_table = QTableWidget(self.main_gbox)
-        self.move_up_button = QPushButton("", self.main_gbox)
-        self.move_down_button = QPushButton("", self.main_gbox)
+        self.main_gbox = QtImport.QGroupBox("CRL", self)
+        self.mode_combo = QtImport.QComboBox(self.main_gbox)
+        self.set_according_to_energy_button = QtImport.QPushButton("Set", self.main_gbox)
+        self.set_out_button = QtImport.QPushButton("Out", self.main_gbox)
+        # self.align_beam_button = QtImport.QtGui.QPushButton("Align", self.main_gbox)
+        self.crl_value_table = QtImport.QTableWidget(self.main_gbox)
+        self.move_up_button = QtImport.QPushButton("", self.main_gbox)
+        self.move_down_button = QtImport.QPushButton("", self.main_gbox)
 
         # Layout --------------------------------------------------------------
-        _main_gbox_gridlayout = QGridLayout(self.main_gbox)
+        _main_gbox_gridlayout = QtImport.QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(self.mode_combo, 0, 0)
         _main_gbox_gridlayout.addWidget(self.set_according_to_energy_button, 0, 1)
         _main_gbox_gridlayout.addWidget(self.set_out_button, 1, 1)
@@ -81,7 +75,7 @@ class Qt4_CRLBrick(BlissWidget):
         _main_gbox_gridlayout.setSpacing(2)
         _main_gbox_gridlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -109,24 +103,23 @@ class Qt4_CRLBrick(BlissWidget):
         self.crl_value_table.setFixedHeight(24)
         self.crl_value_table.setShowGrid(True)
 
-        # self.set_according_to_energy_button.setIcon(Qt4_Icons.load_icon("Up2"))
-        # self.set_out_button.setIcon(Qt4_Icons.load_icon("Up2"))
-        self.move_up_button.setIcon(Qt4_Icons.load_icon("Up2"))
+        # self.set_according_to_energy_button.setIcon(Icons.load_icon("Up2"))
+        # self.set_out_button.setIcon(Icons.load_icon("Up2"))
+        self.move_up_button.setIcon(Icons.load_icon("Up2"))
         self.move_up_button.setFixedWidth(25)
-        self.move_down_button.setIcon(Qt4_Icons.load_icon("Down2"))
+        self.move_down_button.setIcon(Icons.load_icon("Down2"))
         self.move_down_button.setFixedWidth(25)
 
-    def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        """
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.crl_hwobj:
                 self.disconnect(self.crl_hwobj, "crlModeChanged", self.crl_mode_changed)
                 self.disconnect(
                     self.crl_hwobj, "crlValueChanged", self.crl_value_changed
                 )
-            self.crl_hwobj = self.getHardwareObject(new_value)
+
+            self.crl_hwobj = self.get_hardware_object(new_value)
+
             if self.crl_hwobj:
                 crl_modes = self.crl_hwobj.get_modes()
                 for crl_mode in crl_modes:
@@ -137,9 +130,9 @@ class Qt4_CRLBrick(BlissWidget):
         elif property_name == "lenseCount":
             self.crl_value_table.setColumnCount(new_value)
             for col_index in range(new_value):
-                temp_item = QTableWidgetItem("")
-                temp_item.setFlags(Qt.ItemIsEnabled)
-                temp_item.setBackground(Qt4_widget_colors.LIGHT_GRAY)
+                temp_item = QtImport.QTableWidgetItem("")
+                temp_item.setFlags(QtImport.Qt.ItemIsEnabled)
+                temp_item.setBackground(Colors.LIGHT_GRAY)
                 self.crl_value_table.setItem(0, col_index, temp_item)
                 self.crl_value_table.setColumnWidth(col_index, 20)
                 self.crl_value.append(0)
@@ -148,7 +141,7 @@ class Qt4_CRLBrick(BlissWidget):
             if new_value:
                 self.main_gbox.setTitle(new_value)
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     # def set_expert_mode(self, is_expert_mode):
     #    """In the expert mode crl position table is enabled"""
@@ -178,12 +171,12 @@ class Qt4_CRLBrick(BlissWidget):
             for col_index in range(self.crl_value_table.columnCount()):
                 if value[col_index]:
                     self.crl_value_table.item(0, col_index).setBackground(
-                        Qt4_widget_colors.LIGHT_GREEN
+                        Colors.LIGHT_GREEN
                     )
                     self.crl_value[col_index] = 1
                 else:
                     self.crl_value_table.item(0, col_index).setBackground(
-                        Qt4_widget_colors.LIGHT_GRAY
+                        Colors.LIGHT_GRAY
                     )
                     self.crl_value[col_index] = 0
         else:

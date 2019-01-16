@@ -1,53 +1,48 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import time
 import InstanceServer
 
-from QtImport import *
+import QtImport
 
-from BlissFramework import Qt4_Icons
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.utils import Icons
+from gui.BaseComponents import BaseWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
 __category__ = "General"
 
 
-class Qt4_ChatBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class ChatBrick(BaseWidget):
 
     PRIORITY_COLORS = ("darkblue", "black", "red")
     MY_COLOR = "darkgrey"
 
-    incoming_unread_messages = pyqtSignal(int, bool)
-    reset_unread_messages = pyqtSignal(bool)
+    incoming_unread_messages = QtImport.pyqtSignal(int, bool)
+    reset_unread_messages = QtImport.pyqtSignal(bool)
 
     def __init__(self, *args):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
         self.addProperty("mnemonic", "string", "")
@@ -68,26 +63,26 @@ class Qt4_ChatBrick(BlissWidget):
         # Internal values -----------------------------------------------------
         self.session_id = None
         self.nickname = ""
-        self.role = BlissWidget.INSTANCE_ROLE_UNKNOWN
+        self.role = BaseWidget.INSTANCE_ROLE_UNKNOWN
 
         # Graphic elements ----------------------------------------------------
-        self.conversation_textedit = QTextEdit(self)
+        self.conversation_textedit = QtImport.QTextEdit(self)
         self.conversation_textedit.setReadOnly(True)
-        _controls_widget = QWidget(self)
-        _say_label = QLabel("Say:", _controls_widget)
-        self.message_ledit = QLineEdit(_controls_widget)
-        self.send_button = QPushButton("Send", _controls_widget)
+        _controls_widget = QtImport.QWidget(self)
+        _say_label = QtImport.QLabel("Say:", _controls_widget)
+        self.message_ledit = QtImport.QLineEdit(_controls_widget)
+        self.send_button = QtImport.QPushButton("Send", _controls_widget)
         self.send_button.setEnabled(False)
 
         # Layout --------------------------------------------------------------
-        _controls_widget_hlayout = QHBoxLayout(_controls_widget)
+        _controls_widget_hlayout = QtImport.QHBoxLayout(_controls_widget)
         _controls_widget_hlayout.addWidget(_say_label)
         _controls_widget_hlayout.addWidget(self.message_ledit)
         _controls_widget_hlayout.addWidget(self.send_button)
         _controls_widget_hlayout.setSpacing(2)
         _controls_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.conversation_textedit)
         _main_vlayout.addWidget(_controls_widget)
         _main_vlayout.setSpacing(2)
@@ -102,19 +97,9 @@ class Qt4_ChatBrick(BlissWidget):
         # self.setFixedWidth(790)
 
     def run(self):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         self.set_role(self.role)
 
     def session_selected(self, *args):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         session_id = args[0]
         is_inhouse = args[-1]
         self.conversation_textedit.clear()
@@ -125,11 +110,6 @@ class Qt4_ChatBrick(BlissWidget):
             self.load_chat_history()
 
     def load_chat_history(self):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         if self.instance_server_hwobj is not None:
             chat_history_filename = "/tmp/mxCuBE_chat_%s.%s" % (
                 self.session_id,
@@ -147,39 +127,19 @@ class Qt4_ChatBrick(BlissWidget):
                 self.conversation_textedit.append(msg)
 
     def instance_role_changed(self, role):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         self.set_role(role)
 
     def set_role(self, role):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         self.role = role
-        if role != BlissWidget.INSTANCE_ROLE_UNKNOWN and not self.isEnabled():
+        if role != BaseWidget.INSTANCE_ROLE_UNKNOWN and not self.isEnabled():
             self.setEnabled(True)
             self.load_chat_history()
 
     def message_changed(self, text):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         self.send_button.setEnabled(len(str(text)) > 0)
 
     def message_arrived(self, priority, user_id, message):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
-        color = Qt4_ChatBrick.PRIORITY_COLORS[priority]
+        color = ChatBrick.PRIORITY_COLORS[priority]
         msg_prefix = ""
         msg_suffix = ""
         if priority == InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL:
@@ -188,7 +148,7 @@ class Qt4_ChatBrick(BlissWidget):
             else:
                 header = " %s:" % self.instance_server_hwobj.idPrettyPrint(user_id)
                 if user_id[0] == self.nickname:
-                    color = Qt4_ChatBrick.MY_COLOR
+                    color = ChatBrick.MY_COLOR
         else:
             header = ""
             msg_prefix = "<i>"
@@ -224,11 +184,6 @@ class Qt4_ChatBrick(BlissWidget):
         self.incoming_unread_messages.emit(1, True)
 
     def new_client(self, client_id):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         msg = (
             "%s has joined the conversation."
             % self.instance_server_hwobj.idPrettyPrint(client_id)
@@ -236,11 +191,6 @@ class Qt4_ChatBrick(BlissWidget):
         self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
     def wants_control(self, client_id):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         msg = "%s wants to have control!" % self.instance_server_hwobj.idPrettyPrint(
             client_id
         )
@@ -249,22 +199,12 @@ class Qt4_ChatBrick(BlissWidget):
         )
 
     def server_initialized(self, started, server_id=None):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         if started:
             # sg="I'm moderating the chat as %s." % server_id[0]
             # self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW,None,msg)
             self.nickname = server_id[0]
 
     def client_closed(self, client_id):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         msg = (
             "%s has left the conversation..."
             % self.instance_server_hwobj.idPrettyPrint(client_id)
@@ -274,11 +214,6 @@ class Qt4_ChatBrick(BlissWidget):
     def client_initialized(
         self, connected, server_id=None, my_nickname=None, quiet=False
     ):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         if connected:
             server_print = self.instance_server_hwobj.idPrettyPrint(server_id)
             msg = "I've joined the conversation as %s (moderator is %s)." % (
@@ -291,11 +226,6 @@ class Qt4_ChatBrick(BlissWidget):
             self.nickname = my_nickname
 
     def client_changed(self, old_client_id, new_client_id):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         # print "CHAT CLIENT CHANGED",old_client_id,new_client_id
         if old_client_id[0] == self.nickname:
             self.nickname = new_client_id[0]
@@ -308,11 +238,6 @@ class Qt4_ChatBrick(BlissWidget):
             )
 
     def send_current_message(self):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         txt = str(self.message_ledit.text())
         if len(txt):
             self.instance_server_hwobj.sendChatMessage(
@@ -320,12 +245,7 @@ class Qt4_ChatBrick(BlissWidget):
             )
             self.message_ledit.setText("")
 
-    def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.instance_server_hwobj is not None:
                 self.disconnect(
@@ -365,7 +285,8 @@ class Qt4_ChatBrick(BlissWidget):
                     self.instance_server_hwobj, "clientChanged", self.client_changed
                 )
 
-            self.instance_server_hwobj = self.getHardwareObject(new_value)
+            self.instance_server_hwobj = self.get_hardware_object(new_value)
+
             if self.instance_server_hwobj is not None:
                 self.connect(
                     self.instance_server_hwobj,
@@ -405,18 +326,13 @@ class Qt4_ChatBrick(BlissWidget):
         elif property_name == "icons":
             icons_list = new_value.split()
             try:
-                self.send_button.setIcon(Qt4_Icons.load_icon(icons_list[0]))
+                self.send_button.setIcon(Icons.load_icon(icons_list[0]))
             except IndexError:
                 pass
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def have_control(self, have_control, gui_only=False):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         if not gui_only:
             if have_control:
                 p = InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
@@ -427,21 +343,11 @@ class Qt4_ChatBrick(BlissWidget):
             self.message_arrived(p, None, msg)
 
     def pass_control(self, has_control_id):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         has_control_print = self.instance_server_hwobj.idPrettyPrint(has_control_id)
         msg = "%s has control." % has_control_print
         self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
     def tabSelected(self, tab_name):
-        """
-        Descript. :
-        Args.     :
-        Return    :
-        """
         if tab_name == self["myTabLabel"]:
             # self.emit(QtCore.SIGNAL("resetUnreadMessages"), True)
             self.reset_unread_messages.emit(True)

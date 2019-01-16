@@ -1,38 +1,39 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 
-from QtImport import *
+import QtImport
 
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.BaseComponents import BaseWidget
 
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
+__license__ = "LGPLv3+"
 __category__ = "General"
 
 
-class Qt4_ExporterClientBrick(BlissWidget):
+class ExporterClientBrick(BaseWidget):
+
     def __init__(self, *args):
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
         self.exporter_client_hwobj = None
@@ -40,25 +41,25 @@ class Qt4_ExporterClientBrick(BlissWidget):
         # Internal variables --------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty("mnemonic", "string", "")
+        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.info_widget = QWidget(self)
-        self.info_address_ledit = QLineEdit(self.info_widget)
-        self.info_refresh_button = QPushButton("Refresh", self.info_widget)
-        self.method_table = QTableWidget(self)
-        self.property_table = QTableWidget(self)
+        self.info_widget = QtImport.QWidget(self)
+        self.info_address_ledit = QtImport.QLineEdit(self.info_widget)
+        self.info_refresh_button = QtImport.QPushButton("Refresh", self.info_widget)
+        self.method_table = QtImport.QTableWidget(self)
+        self.property_table = QtImport.QTableWidget(self)
 
         # Layout --------------------------------------------------------------
-        _info_widget_hlayout = QHBoxLayout(self.info_widget)
+        _info_widget_hlayout = QtImport.QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.info_address_ledit)
         _info_widget_hlayout.addWidget(self.info_refresh_button)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.info_widget)
         _main_vlayout.addWidget(self.method_table)
         _main_vlayout.addWidget(self.property_table)
@@ -79,13 +80,13 @@ class Qt4_ExporterClientBrick(BlissWidget):
     def set_expert_mode(self, expert):
         self.setEnabled(expert)
 
-    def propertyChanged(self, property_name, old_value, new_value):
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
-            self.exporter_client_hwobj = self.getHardwareObject(new_value)
+            self.exporter_client_hwobj = self.get_hardware_object(new_value)
             if self.exporter_client_hwobj is not None:
                 self.init_tables()
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def init_tables(self):
         client_info = self.exporter_client_hwobj.get_client_info()
@@ -96,9 +97,9 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
         for index, method in enumerate(method_list):
             string_list = method.split(" ")
-            temp_item = QTableWidgetItem(string_list[0])
+            temp_item = QtImport.QTableWidgetItem(string_list[0])
             self.method_table.setItem(index, 0, temp_item)
-            temp_item = QTableWidgetItem(string_list[1])
+            temp_item = QtImport.QTableWidgetItem(string_list[1])
             self.method_table.setItem(index, 1, temp_item)
 
         property_list = self.exporter_client_hwobj.get_property_list()
@@ -106,13 +107,13 @@ class Qt4_ExporterClientBrick(BlissWidget):
 
         for index, prop in enumerate(property_list):
             string_list = prop.split(" ")
-            temp_item = QTableWidgetItem(string_list[0])
+            temp_item = QtImport.QTableWidgetItem(string_list[0])
             self.property_table.setItem(index, 0, temp_item)
-            temp_item = QTableWidgetItem(string_list[1])
+            temp_item = QtImport.QTableWidgetItem(string_list[1])
             self.property_table.setItem(index, 1, temp_item)
-            temp_item = QTableWidgetItem(string_list[2])
+            temp_item = QtImport.QTableWidgetItem(string_list[2])
             self.property_table.setItem(index, 2, temp_item)
-            temp_item = QTableWidgetItem()
+            temp_item = QtImport.QTableWidgetItem()
             self.property_table.setItem(index, 3, temp_item)
         self.refresh_property_values()
 

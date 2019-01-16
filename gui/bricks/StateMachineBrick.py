@@ -1,37 +1,36 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+import QtImport
 
-from BlissFramework import Qt4_Icons
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.utils import Colors, Icons
+from gui.BaseComponents import BaseWidget
 
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
+__license__ = "LGPLv3+"
 __category__ = "General"
 
 
-class Qt4_StateMachineBrick(BlissWidget):
+class StateMachineBrick(BaseWidget):
     def __init__(self, *args):
-        BlissWidget.__init__(self, *args)
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
         self.state_machine_hwobj = None
@@ -46,30 +45,30 @@ class Qt4_StateMachineBrick(BlissWidget):
         self.condition_value_dict = {}
 
         # Properties ----------------------------------------------------------
-        self.addProperty("hwobj_state_machine", "string", "")
+        self.add_property("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _cond_states_gbox = QGroupBox(r"States \ conditions", self)
-        self.splitter = QSplitter(Qt.Vertical, self)
-        self.cond_states_table = QTableWidget(self.splitter)
-        self.log_treewidget = QTreeWidget(self.splitter)
-        self.graph_graphics_view = QGraphicsView(self)
-        self.graph_graphics_scene = QGraphicsScene(self)
+        _cond_states_gbox = QtImport.QGroupBox(r"States \ conditions", self)
+        self.splitter = QtImport.QSplitter(QtImport.Qt.Vertical, self)
+        self.cond_states_table = QtImport.QTableWidget(self.splitter)
+        self.log_treewidget = QtImport.QTreeWidget(self.splitter)
+        self.graph_graphics_view = QtImport.QGraphicsView(self)
+        self.graph_graphics_scene = QtImport.QGraphicsScene(self)
 
-        self.check_icon = Qt4_Icons.load_icon("Check")
-        self.reject_icon = Qt4_Icons.load_icon("Delete")
+        self.check_icon = Icons.load_icon("Check")
+        self.reject_icon = Icons.load_icon("Delete")
 
         # Layout --------------------------------------------------------------
-        _cond_states_gbox_vlayout = QVBoxLayout(_cond_states_gbox)
+        _cond_states_gbox_vlayout = QtImport.QVBoxLayout(_cond_states_gbox)
         _cond_states_gbox_vlayout.addWidget(self.splitter)
         _cond_states_gbox_vlayout.setSpacing(2)
         _cond_states_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QHBoxLayout(self)
+        _main_vlayout = QtImport.QHBoxLayout(self)
         _main_vlayout.addWidget(_cond_states_gbox)
         _main_vlayout.addWidget(self.graph_graphics_view)
         _main_vlayout.setSpacing(2)
@@ -78,7 +77,7 @@ class Qt4_StateMachineBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.cond_states_table.verticalHeader().setDefaultSectionSize(20)
         self.cond_states_table.horizontalHeader().setDefaultSectionSize(20)
-        # setSelectionMode(QAbstractItemView::SingleSelection);
+        # setSelectionMode(QtImport.QAbstractItemView::SingleSelection);
         font = self.cond_states_table.font()
         font.setPointSize(8)
         self.cond_states_table.setFont(font)
@@ -91,11 +90,11 @@ class Qt4_StateMachineBrick(BlissWidget):
         self.graph_graphics_view.setFixedSize(900, 600)
         self.graph_graphics_scene.setSceneRect(0, 0, 900, 600)
         self.graph_graphics_view.setScene(self.graph_graphics_scene)
-        self.graph_graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.graph_graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.graph_graphics_view.setDragMode(QGraphicsView.RubberBandDrag)
-        self.graph_graphics_view.setRenderHint(QPainter.Antialiasing)
-        self.graph_graphics_view.setRenderHint(QPainter.TextAntialiasing)
+        self.graph_graphics_view.setHorizontalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
+        self.graph_graphics_view.setVerticalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
+        self.graph_graphics_view.setDragMode(QtImport.QGraphicsView.RubberBandDrag)
+        self.graph_graphics_view.setRenderHint(QtImport.QPainter.Antialiasing)
+        self.graph_graphics_view.setRenderHint(QtImport.QPainter.TextAntialiasing)
 
     def propertyChanged(self, property_name, old_value, new_value):
         if property_name == "hwobj_state_machine":
@@ -114,10 +113,9 @@ class Qt4_StateMachineBrick(BlissWidget):
                 self.init_state_graph()
                 self.state_machine_hwobj.update_values()
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def init_state_machine(self):
-        """Initiates GUI"""
         self.cond_list = self.state_machine_hwobj.get_condition_list()
         self.states_list = self.state_machine_hwobj.get_state_list()
         self.trans_list = self.state_machine_hwobj.get_transition_list()
@@ -146,7 +144,7 @@ class Qt4_StateMachineBrick(BlissWidget):
 
         for col in range(self.cond_states_table.columnCount()):
             for row in range(self.cond_states_table.rowCount()):
-                temp_item = QTableWidgetItem()
+                temp_item = QtImport.QTableWidgetItem()
                 self.cond_states_table.setItem(row, col, temp_item)
 
     def init_state_graph(self):
@@ -164,13 +162,11 @@ class Qt4_StateMachineBrick(BlissWidget):
         self.graph_graphics_scene.update()
 
     def state_changed(self, state_list):
-        """State changed event"""
-
         self.log_treewidget.clear()
         # state_list = [state_list]
 
         for state in state_list:
-            temp_item = QTreeWidgetItem()
+            temp_item = QtImport.QTreeWidgetItem()
             temp_item.setText(0, self.get_state_by_name(state["current_state"])["desc"])
             temp_item.setText(1, state["start_time"])
             temp_item.setText(2, state["end_time"])
@@ -187,15 +183,15 @@ class Qt4_StateMachineBrick(BlissWidget):
 
         for col, state in enumerate(self.states_list):
             for row, condition in enumerate(self.cond_list):
-                color = Qt4_widget_colors.WHITE
+                color = Colors.WHITE
                 # if row % 5:
-                #    color = Qt4_widget_colors.WHITE
+                #    color = Colors.WHITE
                 if not col % 5 or not row % 5:
-                    color = Qt4_widget_colors.LIGHT_2_GRAY
+                    color = Colors.LIGHT_2_GRAY
 
                 self.cond_states_table.item(row, col).setBackground(color)
                 self.cond_states_table.item(row, col).setText("")
-                self.cond_states_table.item(row, col).setIcon(QIcon())
+                self.cond_states_table.item(row, col).setIcon(QtImport.QIcon())
 
                 for index, translation in enumerate(self.trans_list):
                     if (
@@ -204,12 +200,12 @@ class Qt4_StateMachineBrick(BlissWidget):
                     ):
                         if condition["name"] in translation["conditions_true"]:
                             self.cond_states_table.item(row, col).setBackground(
-                                Qt4_widget_colors.LIGHT_GREEN
+                                Colors.LIGHT_GREEN
                             )
                             # self.cond_states_table.item(row, col).setText(str(index))
                         elif condition["name"] in translation["conditions_false"]:
                             self.cond_states_table.item(row, col).setBackground(
-                                Qt4_widget_colors.LIGHT_RED
+                                Colors.LIGHT_RED
                             )
                             # self.cond_states_table.item(row, col).setText(str(index))
                         if (
@@ -227,9 +223,9 @@ class Qt4_StateMachineBrick(BlissWidget):
 
                 if state["name"] == new_state["current_state"]:
                     if "error" in state.get("type", []):
-                        color = Qt4_widget_colors.LIGHT_RED
+                        color = Colors.LIGHT_RED
                     else:
-                        color = Qt4_widget_colors.LIGHT_GREEN
+                        color = Colors.LIGHT_GREEN
                     self.cond_states_table.item(row, col).setBackground(color)
 
         for graph_node in self.state_graph_node_list:
@@ -265,47 +261,44 @@ class Qt4_StateMachineBrick(BlissWidget):
                 return index
 
 
-class GraphStateNode(QGraphicsItem):
+class GraphStateNode(QtImport.QGraphicsItem):
     def __init__(self, parent, index, state_dict):
-        QGraphicsItem.__init__(self)
-        self.setFlags(QGraphicsItem.ItemIsSelectable)
-        #              QGraphicsItem.ItemIsMovable)
+        QtImport.QGraphicsItem.__init__(self)
+        self.setFlags(QtImport.QGraphicsItem.ItemIsSelectable)
+        #              QtImport.QGraphicsItem.ItemIsMovable)
         self.setAcceptDrops(True)
         self.parent = parent
-        self.rect = QRectF(0, 0, 0, 0)
+        self.rect = QtImport.QRectF(0, 0, 0, 0)
         self.setPos(state_dict["coord"][0], state_dict["coord"][1])
 
         self.index = index
         self.state_dict = state_dict
-        self.custom_brush = QBrush(Qt.SolidPattern)
+        self.custom_brush = QtImport.QBrush(QtImport.Qt.SolidPattern)
 
     def boundingRect(self):
         return self.rect.adjusted(0, 0, 40, 40)
 
     def paint(self, painter, option, widget):
-        """
-        Descript. :
-        """
-        pen = QPen(Qt.SolidLine)
+        pen = QtImport.QPen(QtImport.Qt.SolidLine)
         pen.setWidth(1)
-        pen.setColor(Qt.black)
+        pen.setColor(QtImport.Qt.black)
         painter.setPen(pen)
         if self.isSelected():
-            brush_color = QColor(204, 255, 204)
+            brush_color = QtImport.QColor(204, 255, 204)
         else:
-            brush_color = QColor(203, 212, 246)
+            brush_color = QtImport.QColor(203, 212, 246)
         self.custom_brush.setColor(brush_color)
         painter.setBrush(self.custom_brush)
         painter.drawEllipse(-20, -20, 40, 40)
-        paint_rect = QRect(-20, -20, 40, 40)
-        painter.drawText(paint_rect, Qt.AlignCenter, str(self.index + 1))
+        paint_rect = QtImport.QRect(-20, -20, 40, 40)
+        painter.drawText(paint_rect, QtImport.Qt.AlignCenter, str(self.index + 1))
 
 
-class GraphTransition(QGraphicsItem):
+class GraphTransition(QtImport.QGraphicsItem):
     def __init__(self, parent, index, start_pos, end_pos, trans_dict):
-        QGraphicsItem.__init__(self)
+        QtImport.QGraphicsItem.__init__(self)
         self.parent = parent
-        self.rect = QRectF(0, 0, 0, 0)
+        self.rect = QtImport.QRectF(0, 0, 0, 0)
         self.index = index
         self.start_pos = start_pos
         self.end_pos = end_pos
@@ -314,12 +307,9 @@ class GraphTransition(QGraphicsItem):
         return self.rect.adjusted(0, 0, 40, 40)
 
     def paint(self, painter, option, widget):
-        """
-        Descript. :
-        """
-        pen = QPen(Qt.SolidLine)
+        pen = QtImport.QPen(QtImport.Qt.SolidLine)
         pen.setWidth(1)
-        pen.setColor(Qt.black)
+        pen.setColor(QtImport.Qt.black)
         painter.setPen(pen)
         painter.drawLine(
             self.start_pos[0], self.start_pos[1], self.end_pos[0], self.end_pos[1]

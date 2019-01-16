@@ -1,31 +1,26 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-"""
-import os
+import QtImport
 
-from QtImport import *
-
-from BlissFramework import Qt4_Icons
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.utils import Icons
+from gui.BaseComponents import BaseWidget
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -33,16 +28,11 @@ __version__ = "2.3"
 __category__ = "Graphics"
 
 
-class Qt4_GraphicsManagerBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class GraphicsManagerBrick(BaseWidget):
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
         self.graphics_manager_hwobj = None
@@ -55,29 +45,26 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.__original_height = 300
 
         # Properties ----------------------------------------------------------
-        self.addProperty("mnemonic", "string", "")
+        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_groupbox = QGroupBox("Graphics items", self)
-        self.manager_widget = loadUi(
-            os.path.join(
-                os.path.dirname(__file__),
-                "widgets/ui_files/Qt4_graphics_manager_layout.ui",
-            )
+        self.main_groupbox = QtImport.QGroupBox("Graphics items", self)
+        self.manager_widget = QtImport.load_ui_file(
+            "graphics_manager_layout.ui"
         )
 
         # Layout --------------------------------------------------------------
-        _groupbox_vlayout = QVBoxLayout(self)
+        _groupbox_vlayout = QtImport.QVBoxLayout(self)
         _groupbox_vlayout.addWidget(self.manager_widget)
         _groupbox_vlayout.setSpacing(0)
         _groupbox_vlayout.setContentsMargins(0, 0, 0, 0)
         self.main_groupbox.setLayout(_groupbox_vlayout)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_groupbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -146,11 +133,8 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.main_groupbox_toggled(False)
         self.main_groupbox.setToolTip("Click to open/close item manager")
 
-    def propertyChanged(self, property, oldValue, newValue):
-        """
-        Descript. :
-        """
-        if property == "mnemonic":
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "mnemonic":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(
                     self.graphics_manager_hwobj, "shapeCreated", self.shape_created
@@ -166,7 +150,9 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
                     "centringInProgress",
                     self.centring_in_progress_changed,
                 )
-            self.graphics_manager_hwobj = self.getHardwareObject(newValue)
+
+            self.graphics_manager_hwobj = self.get_hardware_object(new_value)
+
             if self.graphics_manager_hwobj is not None:
                 self.connect(
                     self.graphics_manager_hwobj, "shapeCreated", self.shape_created
@@ -185,7 +171,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             else:
                 self.setEnabled(False)
         else:
-            BlissWidget.propertyChanged(self, property, oldValue, newValue)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def shape_created(self, shape, shape_type):
         """
@@ -200,7 +186,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             str(True),
             str(shape.used_count),
         )
-        self.__shape_map[shape] = QTreeWidgetItem(
+        self.__shape_map[shape] = QtImport.QTreeWidgetItem(
             self.manager_widget.shapes_treewidget, info_str_list
         )
         self.toggle_buttons_enabled()
@@ -212,7 +198,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         if shape_type == "Point":
             info_str_list.append(str(shape.get_start_position()))
             self.manager_widget.point_treewidget.clearSelection()
-            point_treewidget_item = QTreeWidgetItem(
+            point_treewidget_item = QtImport.QTreeWidgetItem(
                 self.manager_widget.point_treewidget, info_str_list
             )
             point_treewidget_item.setSelected(True)
@@ -222,14 +208,14 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             info_str_list.append("Point %d" % start_index)
             info_str_list.append("Point %d" % end_index)
             self.manager_widget.line_treewidget.clearSelection()
-            line_treewidget_item = QTreeWidgetItem(
+            line_treewidget_item = QtImport.QTreeWidgetItem(
                 self.manager_widget.line_treewidget, info_str_list
             )
             line_treewidget_item.setSelected(True)
             self.__line_map[shape] = line_treewidget_item
         elif shape_type == "Grid":
             self.manager_widget.grid_treewidget.clearSelection()
-            grid_treewidget_item = QTreeWidgetItem(
+            grid_treewidget_item = QtImport.QTreeWidgetItem(
                 self.manager_widget.grid_treewidget, info_str_list
             )
             grid_treewidget_item.setSelected(True)
@@ -264,7 +250,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
 
     def shape_selected(self, shape, selected_state):
         if shape in self.__shape_map:
-            self.__shape_map[shape].setData(4, Qt.DisplayRole, str(selected_state))
+            self.__shape_map[shape].setData(4, QtImport.Qt.DisplayRole, str(selected_state))
             self.__shape_map[shape].setSelected(selected_state)
             if self.__point_map.get(shape):
                 self.__point_map[shape].setSelected(selected_state)
@@ -279,11 +265,11 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
     def centring_in_progress_changed(self, centring_in_progress):
         if centring_in_progress:
             self.manager_widget.create_point_start_button.setIcon(
-                Qt4_Icons.load_icon("Delete")
+                Icons.load_icon("Delete")
             )
         else:
             self.manager_widget.create_point_start_button.setIcon(
-                Qt4_Icons.load_icon("VCRPlay2")
+                Icons.load_icon("VCRPlay2")
             )
 
     def main_groupbox_toggled(self, is_on):
@@ -293,7 +279,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
             self.setFixedHeight(20)
 
     def change_color_clicked(self):
-        color = QColorDialog.getColor()
+        color = QtImport.QColorDialog.getColor()
         if color.isValid():
             for item in self.graphics_manager_hwobj.get_selected_shapes():
                 item.set_base_color(color)
@@ -301,12 +287,12 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
     def display_all_button_clicked(self):
         for shape, treewidget_item in self.__shape_map.iteritems():
             shape.show()
-            treewidget_item.setData(3, Qt.DisplayRole, "True")
+            treewidget_item.setData(3, QtImport.Qt.DisplayRole, "True")
 
     def hide_all_button_clicked(self):
         for shape, treewidget_item in self.__shape_map.iteritems():
             shape.hide()
-            treewidget_item.setData(3, Qt.DisplayRole, "False")
+            treewidget_item.setData(3, QtImport.Qt.DisplayRole, "False")
 
     def clear_all_button_clicked(self):
         self.graphics_manager_hwobj.clear_all()
@@ -324,7 +310,7 @@ class Qt4_GraphicsManagerBrick(BlissWidget):
         self.graphics_manager_hwobj.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
-        menu = QMenu(self.manager_widget.shapes_treewidget)
+        menu = QtImport.QMenu(self.manager_widget.shapes_treewidget)
 
     def get_spacing(self):
         spacing = [0, 0]

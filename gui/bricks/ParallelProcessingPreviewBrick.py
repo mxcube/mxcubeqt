@@ -92,10 +92,6 @@ class ParallelProcessingPreviewBrick(BaseWidget):
                 self.line_results_widget.populate_widget(item, data_collection)
 
     def property_changed(self, property_name, old_value, new_value):
-        """
-        Overriding BaseComponents.BlissWidget (propertyChanged object)
-        run method.
-        """
         if property_name == "beamline_setup":
             bl_setup = self.get_hardware_object(new_value)
             self.mesh_results_widget.set_beamline_setup(bl_setup)

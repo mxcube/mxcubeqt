@@ -1,29 +1,29 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU LesserGeneral Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from BlissFramework.Qt4_BaseComponents import BlissWidget
-from BlissFramework.Bricks import Qt4_MotorSpinBoxBrick
-from BlissFramework import Qt4_Icons
+import loggging
 
-import logging
+import QtImport
 
-from QtImport import *
+from gui.utils import Icons
+from gui.BaseComponents import BaseWidget
+from gui.bricks import MotorSpinBoxBrick
 
 """
 Controls both the light on/off (light_actuator) and intensity (motor)
@@ -40,24 +40,25 @@ STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
 )
 
 
-class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
+class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
+
     def __init__(self, *args):
 
-        Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick.__init__(self, *args)
+        MotorSpinBoxBrick.MotorSpinBoxBrick.__init__(self, *args)
 
         self.light_actuator_hwo = None
         self.light_saved_pos = None
 
-        self.light_off_button = QPushButton(self.main_gbox)
-        self.light_off_button.setIcon(Qt4_Icons.load_icon("BulbDelete"))
+        self.light_off_button = QtImport.QPushButton(self.main_gbox)
+        self.light_off_button.setIcon(Icons.load_icon("BulbDelete"))
         self.light_off_button.setFixedSize(27, 27)
 
-        self.light_on_button = QPushButton(self.main_gbox)
-        self.light_on_button.setIcon(Qt4_Icons.load_icon("BulbCheck"))
+        self.light_on_button = QtImport.QPushButton(self.main_gbox)
+        self.light_on_button.setIcon(Icons.load_icon("BulbCheck"))
         self.light_on_button.setFixedSize(27, 27)
 
-        self.light_off_button.clicked.connect(self.lightButtonOffClicked)
-        self.light_on_button.clicked.connect(self.lightButtonOnClicked)
+        self.light_off_button.clicked.connect(self.light_button_off_clicked)
+        self.light_on_button.clicked.connect(self.light_button_on_clicked)
 
         self._gbox_hbox_layout.addWidget(self.light_off_button)
         self._gbox_hbox_layout.addWidget(self.light_on_button)
@@ -69,12 +70,12 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
             "Switches on the light and sets the intensity back to the previous setting"
         )
 
-        self.light_off_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-        self.light_on_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.light_off_button.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum)
+        self.light_on_button.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum)
 
     # Light off pressed: switch off lamp and set out the wago
 
-    def lightButtonOffClicked(self):
+    def light_button_off_clicked(self):
         if self.motor_hwobj is not None and hasattr(self.motor_hwobj, "move_in"):
             self.motor_hwobj.move_in()
             return
@@ -96,19 +97,19 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
                     light_limits = self.motor_hwobj.getLimits()
                     self.motor_hwobj.move(light_limits[0] + delta)
 
-                self.lightStateChanged(STATE_UNKNOWN)
+                self.light_state_changed(STATE_UNKNOWN)
                 self.light_actuator_hwo.cmdOut()
             else:
                 self.light_off_button.setDown(True)
 
     # Light on pressed: set in the wago and set lamp to previous position
-    def lightButtonOnClicked(self):
+    def light_button_on_clicked(self):
         if self.motor_hwobj is not None and hasattr(self.motor_hwobj, "move_out"):
             self.motor_hwobj.move_out()
             return
         if self.light_actuator_hwo is not None:
             if self.light_actuator_hwo.getState() != STATE_IN:
-                self.lightStateChanged(STATE_UNKNOWN)
+                self.light_state_changed(STATE_UNKNOWN)
                 self.light_actuator_hwo.cmdIn()
                 if self.light_saved_pos is not None and self.motor_hwobj is not None:
                     self.motor_hwobj.move(self.light_saved_pos)
@@ -116,7 +117,7 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
                 self.light_on_button.setDown(True)
 
     # Wago light events
-    def lightStateChanged(self, state):
+    def light_state_changed(self, state):
         # print "LightControlBrick.wagoLightStateChanged",state
         if state == STATE_IN:
             self.light_on_button.setDown(True)
@@ -132,10 +133,10 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
             self.light_on_button.setDown(False)
             self.light_off_button.setDown(False)
 
-    def propertyChanged(self, property, oldValue, newValue):
-        if property == "mnemonic":
-            Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick.propertyChanged(
-                self, property, oldValue, newValue
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "mnemonic":
+            MotorSpinBoxBrick.MotorSpinBoxBrick.property_changed(
+                self, property_name, old_value, new_value
             )
             if self.motor_hwobj is not None:
                 if self.motor_hwobj.isReady():
@@ -145,6 +146,6 @@ class Qt4_LightControlBrick(Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick):
                 else:
                     self["delta"] = 1.0
         else:
-            Qt4_MotorSpinBoxBrick.Qt4_MotorSpinBoxBrick.propertyChanged(
-                self, property, oldValue, newValue
+            MotorSpinBoxBrick.MotorSpinBoxBrick.property_changed(
+                self, property_name, old_value, new_value
             )

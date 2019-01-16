@@ -1,80 +1,66 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU LEsser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import smtplib
 import gevent
 import logging
+import collections
 
 import InstanceServer
 
-# import email.Utils
+import QtImport 
 
-from QtImport import *
-
-from BlissFramework import Qt4_Icons
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
-import collections
+from gui.utils import Colors, Icons
+from gui.BaseComponents import BaseWidget
 
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
 __category__ = "General"
 
 
-WANTS_CONTROL_EVENT = QEvent.User
+WANTS_CONTROL_EVENT = QtImport.QEvent.User
 
 
-class WantsControlEvent(QEvent):
-    """Descript. :
-    """
+class WantsControlEvent(QtImport.QEvent):
 
     def __init__(self, client_id):
-        """Descr
-        """
-        QEvent.__init__(self, WANTS_CONTROL_EVENT)
+        QtImport.QEvent.__init__(self, WANTS_CONTROL_EVENT)
         self.client_id = client_id
 
 
-START_SERVER_EVENT = QEvent.User + 1
+START_SERVER_EVENT = QtImport.QEvent.User + 1
 
 
-class StartServerEvent(QEvent):
-    """Descript. :
-    """
+class StartServerEvent(QtImport.QEvent):
 
     def __init__(self):
-        QEvent.__init__(self, START_SERVER_EVENT)
-        """Descr.
-        """
+        QtImport.QEvent.__init__(self, START_SERVER_EVENT)
+
+APP_BRICK_EVENT = QtImport.QEvent.User + 2
 
 
-APP_BRICK_EVENT = QEvent.User + 2
-
-
-class AppBrickEvent(QEvent):
-    """Descr.
-    """
+class AppBrickEvent(QtImport.QEvent):
 
     def __init__(self, brick_name, widget_name, method_name, method_args, master_sync):
-        """Descr.
-        """
-        QEvent.__init__(self, APP_BRICK_EVENT)
+        QtImport.QEvent.__init__(self, APP_BRICK_EVENT)
         self.brick_name = brick_name
         self.widget_name = widget_name
         self.method_name = method_name
@@ -82,43 +68,35 @@ class AppBrickEvent(QEvent):
         self.master_sync = master_sync
 
 
-APP_TAB_EVENT = QEvent.User + 3
+APP_TAB_EVENT = QtImport.QEvent.User + 3
 
 
-class AppTabEvent(QEvent):
-    """Descr."""
-
+class AppTabEvent(QtImport.QEvent):
     def __init__(self, tab_name, tab_index):
-        """Descr."""
-        QEvent.__init__(self, APP_TAB_EVENT)
+        QtImport.QEvent.__init__(self, APP_TAB_EVENT)
         self.tab_name = tab_name
         self.tab_index = tab_index
 
 
-MSG_DIALOG_EVENT = QEvent.User + 4
+MSG_DIALOG_EVENT = QtImport.QEvent.User + 4
 
 
-class MsgDialogEvent(QEvent):
-    """Descript. :"""
-
+class MsgDialogEvent(QtImport.QEvent):
     def __init__(self, icon_type, msg, font_size, callback=None):
-        """Descr."""
-        QEvent.__init__(self, MSG_DIALOG_EVENT)
+        QtImport.QEvent.__init__(self, MSG_DIALOG_EVENT)
         self.icon_type = icon_type
         self.msg = msg
         self.font_size = font_size
         self.callback = callback
 
 
-USER_INFO_DIALOG_EVENT = QEvent.User + 5
+USER_INFO_DIALOG_EVENT = QtImport.QEvent.User + 5
 
 
-class UserInfoDialogEvent(QEvent):
-    """Descript. :    """
+class UserInfoDialogEvent(QtImport.QEvent):
 
     def __init__(self, msg, fromaddrs, toaddrs, subject, is_local, font_size):
-        """Descript."""
-        QEvent.__init__(self, USER_INFO_DIALOG_EVENT)
+        QtImport.QEvent.__init__(self, USER_INFO_DIALOG_EVENT)
         self.msg = msg
         self.fromaddrs = fromaddrs
         self.toaddrs = toaddrs
@@ -127,10 +105,7 @@ class UserInfoDialogEvent(QEvent):
         self.font_size = font_size
 
 
-class Qt4_InstanceListBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class InstanceListBrick(BaseWidget):
 
     LOCATIONS = ("UNKNOWN", "LOCAL", "INHOUSE", "INSITE", "EXTERNAL")
     MODES = ("UNKNOWN", "MASTER", "SLAVE")
@@ -145,10 +120,7 @@ class Qt4_InstanceListBrick(BlissWidget):
     RECONNECT_TIME = 5000
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+        BaseWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
         self.addProperty("giveControlTimeout", "integer", 30)
@@ -176,61 +148,61 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.my_proposal = None
         self.in_control = None
         self.connections = {}
-        self.server_icon = Qt4_Icons.load_icon("Home2")
-        self.client_icon = Qt4_Icons.load_icon("User2")
+        self.server_icon = Icons.load_icon("Home2")
+        self.client_icon = Icons.load_icon("User2")
 
         # Graphic elements ----------------------------------------------------
-        _main_widget = QWidget(self)
-        _main_gbox = QGroupBox("Current users", self)
+        _main_widget = QtImport.QWidget(self)
+        _main_gbox = QtImport.QGroupBox("Current users", self)
 
-        self.users_listwidget = QListWidget(_main_gbox)
+        self.users_listwidget = QtImport.QListWidget(_main_gbox)
         self.users_listwidget.setFixedHeight(50)
 
-        self.give_control_chbox = QCheckBox("Selecting gives control", _main_gbox)
+        self.give_control_chbox = QtImport.QCheckBox("Selecting gives control", _main_gbox)
         self.give_control_chbox.setChecked(False)
-        self.allow_timeout_control_chbox = QCheckBox(
+        self.allow_timeout_control_chbox = QtImport.QCheckBox(
             "Allow timeout control", _main_gbox
         )
         self.allow_timeout_control_chbox.setChecked(False)
 
-        # self.take_control_button = QToolButton(_main_gbox)
+        # self.take_control_button = QtImport.QToolButton(_main_gbox)
         # self.take_control_button.setUsesTextLabel(True)
-        self.take_control_button = QToolButton(_main_gbox)
-        self.take_control_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.take_control_button = QtImport.QToolButton(_main_gbox)
+        self.take_control_button.setToolButtonStyle(QtImport.Qt.ToolButtonTextBesideIcon)
         # self.take_control_button.setUsesTextLabel(True)
         self.take_control_button.setText("Take control")
         self.take_control_button.setEnabled(True)
-        self.take_control_button.setIcon(Qt4_Icons.load_icon("FingerRight"))
+        self.take_control_button.setIcon(Icons.load_icon("FingerRight"))
         self.take_control_button.hide()
 
-        self.ask_control_button = QToolButton(_main_gbox)
+        self.ask_control_button = QtImport.QToolButton(_main_gbox)
         # self.ask_control_button.setUsesTextLabel(True)
-        # self.ask_control_button = QtGui.QToolButton(_main_gbox)
-        self.ask_control_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        # self.ask_control_button = QtImport.QtGui.QtImport.QToolButton(_main_gbox)
+        self.ask_control_button.setToolButtonStyle(QtImport.Qt.ToolButtonTextBesideIcon)
         # self.ask_control_button.setUsesTextLabel(True)
         self.ask_control_button.setText("Ask for control")
         self.ask_control_button.setEnabled(False)
-        self.ask_control_button.setIcon(Qt4_Icons.load_icon("FingerUp"))
+        self.ask_control_button.setIcon(Icons.load_icon("FingerUp"))
 
-        _my_name_widget = QWidget(_main_gbox)
-        _my_name_label = QLabel("My name:", _my_name_widget)
+        _my_name_widget = QtImport.QWidget(_main_gbox)
+        _my_name_label = QtImport.QLabel("My name:", _my_name_widget)
         self.nickname_ledit = NickEditInput(_my_name_widget)
 
-        reg_exp = QRegExp(".+")
-        nick_validator = QRegExpValidator(reg_exp, self.nickname_ledit)
+        reg_exp = QtImport.QRegExp(".+")
+        nick_validator = QtImport.QRegExpValidator(reg_exp, self.nickname_ledit)
         self.nickname_ledit.setValidator(nick_validator)
 
         self.external_user_info_dialog = ExternalUserInfoDialog()
 
         # Layout --------------------------------------------------------------
-        _my_name_widget_layout = QHBoxLayout(_my_name_widget)
+        _my_name_widget_layout = QtImport.QHBoxLayout(_my_name_widget)
         _my_name_widget_layout.addWidget(_my_name_label)
         _my_name_widget_layout.addWidget(self.nickname_ledit)
         # _my_name_widget_layout.addStretch(0)
         _my_name_widget_layout.setSpacing(2)
         _my_name_widget_layout.setContentsMargins(2, 2, 2, 2)
 
-        _main_widget_vlayout = QVBoxLayout(_main_widget)
+        _main_widget_vlayout = QtImport.QVBoxLayout(_main_widget)
         _main_widget_vlayout.addWidget(self.users_listwidget)
         _main_widget_vlayout.addWidget(self.give_control_chbox)
         _main_widget_vlayout.addWidget(self.allow_timeout_control_chbox)
@@ -240,18 +212,18 @@ class Qt4_InstanceListBrick(BlissWidget):
         _main_widget_vlayout.setSpacing(2)
         _main_widget_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_gbox_vlayout = QVBoxLayout(_main_gbox)
+        _main_gbox_vlayout = QtImport.QVBoxLayout(_main_gbox)
         _main_gbox_vlayout.addWidget(_main_widget)
         _main_gbox_vlayout.setSpacing(2)
         _main_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        self.ask_control_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.ask_control_button.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         _main_gbox.toggled.connect(_main_widget.setVisible)
@@ -261,14 +233,11 @@ class Qt4_InstanceListBrick(BlissWidget):
         self.nickname_ledit.returnPressed.connect(self.change_my_name)
 
         # Other ---------------------------------------------------------------
-        self.timeout_timer = QTimer(self)
+        self.timeout_timer = QtImport.QTimer(self)
         self.timeout_timer.timeout.connect(self.timeout_approaching)
         _main_gbox.setChecked(False)
 
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        """
         if property_name == "hwobj_instance_connection":
             if self.instance_server_hwobj is not None:
                 self.disconnect(
@@ -371,14 +340,11 @@ class Qt4_InstanceListBrick(BlissWidget):
                     not self.hutch_trigger_hwobj.door_is_interlocked()
                 )
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def hutch_trigger_changed(self, hutch_opened):
-        """
-        Descript. :
-        """
         if hutch_opened:
-            if not BlissWidget.isInstanceRoleServer():
+            if not BaseWidget.isInstanceRoleServer():
                 logging.getLogger().info("HUTCH IS OPENED, YOU LOSE CONTROL")
                 self.take_control_button.setEnabled(False)
             else:
@@ -387,7 +353,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                 )
                 self.instance_server_hwobj.takeControl()
         else:
-            if not BlissWidget.isInstanceRoleServer():
+            if not BaseWidget.isInstanceRoleServer():
                 logging.getLogger().info(
                     "HUTCH IS CLOSED, YOU ARE " + "ALLOWED TO TAKE CONTROL AGAIN"
                 )
@@ -403,9 +369,6 @@ class Qt4_InstanceListBrick(BlissWidget):
         orig_prop_code=None,
         is_inhouse=None,
     ):
-        """
-        Descript. :
-        """
         self.external_user_info_dialog.clear_user_info()
         if (
             prop_code is not None
@@ -432,13 +395,13 @@ class Qt4_InstanceListBrick(BlissWidget):
                     self.instance_server_hwobj.setProposal(proposal_dict)
 
             if is_inhouse:
-                BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_INHOUSE)
+                BaseWidget.setInstanceUserId(BaseWidget.INSTANCE_USERID_INHOUSE)
                 self.ask_control_button.hide()
                 self.take_control_button.show()
-                self.take_control_button.setEnabled(BlissWidget.isInstanceRoleServer())
+                self.take_control_button.setEnabled(BaseWidget.isInstanceRoleServer())
                 if (
                     self.hutch_trigger_hwobj is not None
-                    and not BlissWidget.isInstanceModeMaster()
+                    and not BaseWidget.isInstanceModeMaster()
                 ):
                     hutch_opened = 1 - int(
                         self.hutch_trigger_hwobj.door_is_interlocked()
@@ -450,39 +413,33 @@ class Qt4_InstanceListBrick(BlissWidget):
                     )
                     self.take_control_button.setEnabled(1 - hutch_opened)
             else:
-                BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_LOGGED)
+                BaseWidget.setInstanceUserId(BaseWidget.INSTANCE_USERID_LOGGED)
                 self.take_control_button.hide()
                 self.ask_control_button.show()
                 self.ask_control_button.setEnabled(
-                    not BlissWidget.isInstanceModeMaster()
+                    not BaseWidget.isInstanceModeMaster()
                 )
         else:
             if self.instance_server_hwobj is not None:
                 self.my_proposal = None
                 self.instance_server_hwobj.setProposal(None)
 
-            BlissWidget.setInstanceUserId(BlissWidget.INSTANCE_USERID_UNKNOWN)
+            BaseWidget.setInstanceUserId(BaseWidget.INSTANCE_USERID_UNKNOWN)
             self.take_control_button.hide()
             self.ask_control_button.show()
             self.ask_control_button.setEnabled(False)
 
     def reconnect_to_server(self):
-        """
-        Descript. :
-        """
         self.instance_server_hwobj.reconnect(quiet=True)
 
     def instance_initializing(self):
-        """
-        Descript. :
-        """
         if self.instance_server_hwobj.isLocal():
-            local = BlissWidget.INSTANCE_LOCATION_LOCAL
+            local = BaseWidget.INSTANCE_LOCATION_LOCAL
         else:
-            local = BlissWidget.INSTANCE_LOCATION_EXTERNAL
-        BlissWidget.setInstanceLocation(local)
+            local = BaseWidget.INSTANCE_LOCATION_EXTERNAL
+        BaseWidget.setInstanceLocation(local)
 
-        for widget in QApplication.allWidgets():
+        for widget in QtImport.QApplication.allWidgets():
             if hasattr(widget, "configuration"):
                 active_window = widget
                 break
@@ -493,66 +450,60 @@ class Qt4_InstanceListBrick(BlissWidget):
     def client_initialized(
         self, connected, server_id=None, my_nickname=None, quiet=False
     ):
-        """
-        Descript. :
-        """
         if connected is None:
-            BlissWidget.set_instance_role(BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING)
-            BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_SLAVE)
+            BaseWidget.set_instance_role(BaseWidget.INSTANCE_ROLE_CLIENTCONNECTING)
+            BaseWidget.set_instance_mode(BaseWidget.INSTANCE_MODE_SLAVE)
         elif not connected:
             if not quiet:
                 msg_event = MsgDialogEvent(
-                    QMessageBox.Warning,
+                    QtImport.QMessageBox.Warning,
                     "Couldn't connect to the server application!",
                     self.font().pointSize(),
                 )
-                QApplication.postEvent(self, msg_event)
+                QtImport.QApplication.postEvent(self, msg_event)
 
-            QTimer.singleShot(
-                Qt4_InstanceListBrick.RECONNECT_TIME, self.reconnect_to_server
+            QtImport.QTimer.singleShot(
+                InstanceListBrick.RECONNECT_TIME, self.reconnect_to_server
             )
         else:
-            BlissWidget.set_instance_role(BlissWidget.INSTANCE_ROLE_CLIENT)
-            BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_SLAVE)
+            BaseWidget.set_instance_role(BaseWidget.INSTANCE_ROLE_CLIENT)
+            BaseWidget.set_instance_mode(BaseWidget.INSTANCE_MODE_SLAVE)
 
             server_print = self.instance_server_hwobj.idPrettyPrint(server_id)
-            item = QListWidgetItem(
+            item = QtImport.QListWidgetItem(
                 self.server_icon, server_print, self.users_listwidget
             )
             item.setSelected(False)
             self.nickname_ledit.setText(my_nickname)
             self.connections[server_id[0]] = (item, server_id[1])
-            item.setFlags(Qt.ItemIsEnabled)
+            item.setFlags(QtImport.Qt.ItemIsEnabled)
             self.have_control(False, gui_only=True)
             self.init_name(my_nickname)
 
             msg_event = MsgDialogEvent(
-                QMessageBox.Information,
+                QtImport.QMessageBox.Information,
                 "Successfully connected to the server application.",
                 self.font().pointSize(),
             )
-            QApplication.postEvent(self, msg_event)
+            QtImport.QApplication.postEvent(self, msg_event)
 
     def server_initialized(self, started, server_id=None):
-        """
-        Descript. :
-        """
         if started:
-            BlissWidget.set_instance_role(BlissWidget.INSTANCE_ROLE_SERVER)
-            BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_MASTER)
+            BaseWidget.set_instance_role(BaseWidget.INSTANCE_ROLE_SERVER)
+            BaseWidget.set_instance_mode(BaseWidget.INSTANCE_MODE_MASTER)
             self.init_name(server_id[0])
             self.have_control(True, gui_only=True)
         else:
-            msg_dialog = QMessageBox(
+            msg_dialog = QtImport.QMessageBox(
                 "mxCuBE",
                 "Couldn't start the multiple instances server!",
-                QMessageBox.Critical,
-                QMessageBox.Ok,
-                QMessageBox.NoButton,
-                QMessageBox.NoButton,
+                QtImport.QMessageBox.Critical,
+                QtImport.QMessageBox.Ok,
+                QtImport.QMessageBox.NoButton,
+                QtImport.QMessageBox.NoButton,
                 self,
             )
-            msg_dialog.setButtonText(QMessageBox.Ok, "Quit")
+            msg_dialog.setButtonText(QtImport.QMessageBox.Ok, "QtImport.Quit")
             # s=self.font().pointSize()
             # f=msg_dialog.font()
             # f.setPointSize(s)
@@ -562,31 +513,25 @@ class Qt4_InstanceListBrick(BlissWidget):
             os._exit(1)
 
     def server_closed(self, server_id):
-        """
-        Descript. :
-        """
         self.users_listwidget.clear()
         self.connections = {}
-        BlissWidget.set_instance_role(BlissWidget.INSTANCE_ROLE_CLIENTCONNECTING)
-        BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_SLAVE)
+        BaseWidget.set_instance_role(BaseWidget.INSTANCE_ROLE_CLIENTCONNECTING)
+        BaseWidget.set_instance_mode(BaseWidget.INSTANCE_MODE_SLAVE)
 
         msg_event = MsgDialogEvent(
-            QMessageBox.Warning,
+            QtImport.QMessageBox.Warning,
             "The server application closed the connection!",
             self.font().pointSize(),
         )
-        QApplication.postEvent(self, msg_event)
-        QTimer.singleShot(
-            Qt4_InstanceListBrick.RECONNECT_TIME, self.reconnect_to_server
+        QtImport.QApplication.postEvent(self, msg_event)
+        QtImport.QTimer.singleShot(
+            InstanceListBrick.RECONNECT_TIME, self.reconnect_to_server
         )
 
     def widget_update(self, timestamp, method, method_args, master_sync=True):
-        """
-        Descript. :
-        """
         if self.instance_server_hwobj.isServer():
-            BlissWidget.addEventToCache(timestamp, method, *method_args)
-            if not master_sync or BlissWidget.shouldRunEvent():
+            BaseWidget.addEventToCache(timestamp, method, *method_args)
+            if not master_sync or BaseWidget.shouldRunEvent():
                 try:
                     try:
                         if not master_sync:
@@ -610,7 +555,7 @@ class Qt4_InstanceListBrick(BlissWidget):
             method.__self__.blockSignals(False)
             return
 
-            if not master_sync or BlissWidget.shouldRunEvent():
+            if not master_sync or BaseWidget.shouldRunEvent():
                 try:
                     try:
                         if not master_sync:
@@ -627,145 +572,103 @@ class Qt4_InstanceListBrick(BlissWidget):
                     except AttributeError:
                         pass
             else:
-                BlissWidget.addEventToCache(timestamp, method, *method_args)
+                BaseWidget.addEventToCache(timestamp, method, *method_args)
 
     def widget_call(self, timestamp, method, method_args):
-        """
-        Descript. :
-        """
         try:
             method(*method_args)
         except BaseException:
             logging.getLogger().debug("Problem executing an external call")
 
     def instance_location_changed(self, loc):
-        """
-        Descript. :
-        """
         logging.getLogger().info(
-            "Instance running in %s" % Qt4_InstanceListBrick.LOCATIONS[loc].lower()
+            "Instance running in %s" % InstanceListBrick.LOCATIONS[loc].lower()
         )
 
     def instance_mode_changed(self, mode):
-        """
-        Descript. :
-        """
         logging.getLogger().info(
-            "Instance mode set to %s" % Qt4_InstanceListBrick.MODES[mode].lower()
+            "Instance mode set to %s" % InstanceListBrick.MODES[mode].lower()
         )
         self.update_mirroring()
 
     def application_tab_changed(self, tab_name, tab_index):
-        """
-        Descript. :
-        """
         if self.instance_server_hwobj is not None:
             tab_event = AppTabEvent(tab_name, tab_index)
-            QApplication.postEvent(self, tab_event)
+            QtImport.QApplication.postEvent(self, tab_event)
 
     def application_brick_changed(
         self, brick_name, widget_name, method_name, method_args, master_sync
     ):
-        """
-        Descript. :
-        """
         if not master_sync or self.instance_server_hwobj is not None:
             brick_event = AppBrickEvent(
                 brick_name, widget_name, method_name, method_args, master_sync
             )
-            QApplication.postEvent(self, brick_event)
+            QtImport.QApplication.postEvent(self, brick_event)
 
     def init_name(self, new_name):
-        """
-        Descript. :
-        """
         self.nickname_ledit.blockSignals(True)
         self.nickname_ledit.setText(new_name)
         self.nickname_ledit.acceptInput()
         self.nickname_ledit.blockSignals(False)
 
     def change_my_name(self):
-        """
-        Descript. :
-        """
         self.nickname_ledit.setEnabled(False)
         name = str(self.nickname_ledit.text())
         self.instance_server_hwobj.requestIdChange(name)
 
     def ask_for_control_clicked(self):
-        """
-        Descript. :
-        """
         self.instance_server_hwobj.askForControl()
 
     def take_control_clicked(self):
-        """
-        Descript. :
-        """
         current_user = self.instance_server_hwobj.inControl()
         user_id = current_user[0]
         user_prop = current_user[1]
         control_user_print = self.instance_server_hwobj.idPrettyPrint(current_user)
-        take_control_dialog = QMessageBox(
+        take_control_dialog = QtImport.QMessageBox(
             "mxCuBE",
             "You're about to take control of the application, "
             + "taking over %s!" % control_user_print,
-            QMessageBox.Question,
-            QMessageBox.Ok,
-            QMessageBox.Cancel,
-            QMessageBox.NoButton,
+            QtImport.QMessageBox.QtImport.Question,
+            QtImport.QMessageBox.Ok,
+            QtImport.QMessageBox.Cancel,
+            QtImport.QMessageBox.NoButton,
             self,
         )
-        take_control_dialog.setButtonText(QMessageBox.Ok, "Take control")
+        take_control_dialog.setButtonText(QtImport.QMessageBox.Ok, "Take control")
         # s=self.font().pointSize()
         # f=take_control_dialog.font()
         # f.setPointSize(s)
         # take_control_dialog.setFont(f)
         # take_control_dialog.updateGeometry()
-        if take_control_dialog.exec_() == QMessageBox.Ok:
+        if take_control_dialog.exec_() == QtImport.QMessageBox.Ok:
             self.instance_server_hwobj.takeControl()
 
     def run(self):
-        """
-        Descript. :
-        """
         if self["initializeServer"]:
-            QApplication.postEvent(self, StartServerEvent())
+            QtImport.QApplication.postEvent(self, StartServerEvent())
 
     def instance_user_id_changed(self, user_id):
-        """
-        Descript. :
-        """
         logging.getLogger().info(
             "Instance user identification is %s"
-            % Qt4_InstanceListBrick.IDS[user_id].replace("_", " ").lower()
+            % InstanceListBrick.IDS[user_id].replace("_", " ").lower()
         )
         self.update_mirroring()
 
     def instance_role_changed(self, role):
-        """
-        Descript. :
-        """
         logging.getLogger().info(
             "Instance role is %s"
-            % Qt4_InstanceListBrick.ROLES[role].replace("_", " ").lower()
+            % InstanceListBrick.ROLES[role].replace("_", " ").lower()
         )
-        if role != BlissWidget.INSTANCE_ROLE_UNKNOWN and not self.isVisible():
+        if role != BaseWidget.INSTANCE_ROLE_UNKNOWN and not self.isVisible():
             self.show()
 
     def new_client(self, client_id):
-        """
-        Descript. :
-        """
         client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-        item = QListWidgetItem(self.client_icon, client_print, self.users_listwidget)
-        item.setFlags(Qt.ItemIsEnabled)
+        item = QtImport.QListWidgetItem(self.client_icon, client_print, self.users_listwidget)
+        item.setFlags(QtImport.Qt.ItemIsEnabled)
         self.connections[client_id[0]] = (item, client_id[1])
 
     def client_closed(self, client_id):
-        """
-        Descript. :
-        """
         try:
             item = self.connections[client_id[0]][0]
         except KeyError:
@@ -777,9 +680,6 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.users_listwidget.takeItem(self.users_listwidget.row(item))
 
     def client_changed(self, old_client_id, new_client_id):
-        """
-        Descript. :
-        """
         try:
             item = self.connections[old_client_id[0]][0]
         except KeyError:
@@ -807,13 +707,10 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.users_listwidget.updateGeometries()
 
     def user_selected(self, item):
-        """
-        Descript. :
-        """
         if item is None:
             return
 
-        if BlissWidget.isInstanceModeMaster() and self.give_control_chbox.isChecked():
+        if BaseWidget.isInstanceModeMaster() and self.give_control_chbox.isChecked():
             for user_id in self.connections:
                 if self.connections[user_id][0] == item:
                     self.instance_server_hwobj.giveControl(
@@ -822,20 +719,17 @@ class Qt4_InstanceListBrick(BlissWidget):
                     break
 
     def have_control(self, have_control, gui_only=False):
-        """
-        Descript. :
-        """
         camera_brick = None
-        for widget in QApplication.allWidgets():
-            if isinstance(widget, BlissWidget):
+        for widget in QtImport.QApplication.allWidgets():
+            if isinstance(widget, BaseWidget):
                 if "CameraBrick" in str(widget.__class__):
                     widget.set_control_mode(have_control)
 
         if not gui_only:
             if have_control:
-                BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_MASTER)
+                BaseWidget.set_instance_mode(BaseWidget.INSTANCE_MODE_MASTER)
             else:
-                BlissWidget.set_instance_mode(BlissWidget.INSTANCE_MODE_SLAVE)
+                BaseWidget.set_instance_mode(BaseWidget.INSTANCE_MODE_SLAVE)
 
         if have_control:
             if self.xmlrpc_server:
@@ -845,20 +739,20 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.take_control_button.setEnabled(False)
             self.ask_control_button.setEnabled(False)
 
-            self.users_listwidget.setSelectionMode(QAbstractItemView.SingleSelection)
+            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.SingleSelection)
             # self.users_listwidget.setSelectionModel()
             self.users_listwidget.clearSelection()
             for item_index in range(self.users_listwidget.count()):
-                self.users_listwidget.item(item_index).setFlags(Qt.ItemIsEnabled)
-                # tem.setFlags(QtCore.Qt.NoItemFlags)
-            self.users_listwidget.setSelectionMode(QAbstractItemView.NoSelection)
+                self.users_listwidget.item(item_index).setFlags(QtImport.Qt.ItemIsEnabled)
+                # tem.setFlags(QtImport.QtCore.QtImport.Qt.NoItemFlags)
+            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.NoSelection)
         else:
             if self.xmlrpc_server:
                 self.xmlrpc_server.close()
 
-            if BlissWidget.isInstanceUserIdLogged():
+            if BaseWidget.isInstanceUserIdLogged():
                 self.ask_control_button.setEnabled(True)
-            elif BlissWidget.isInstanceUserIdInhouse():
+            elif BaseWidget.isInstanceUserIdInhouse():
                 if self.hutch_trigger_hwobj is not None:
                     hutch_opened = 1 - int(
                         self.hutch_trigger_hwobj.door_is_interlocked()
@@ -871,7 +765,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                         or "enabling"
                     )
                     self.take_control_button.setEnabled(1 - hutch_opened)
-            if BlissWidget.isInstanceRoleServer():
+            if BaseWidget.isInstanceRoleServer():
                 self.take_control_button.setEnabled(True)
 
         if not gui_only:
@@ -890,7 +784,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                 except BaseException:
                     proposal = "unknown"
 
-                is_local = BlissWidget.isInstanceLocationLocal()
+                is_local = BaseWidget.isInstanceLocationLocal()
 
                 if is_local:
                     control_place = "LOCAL"
@@ -917,7 +811,7 @@ class Qt4_InstanceListBrick(BlissWidget):
                 )
             else:
                 msg_event = MsgDialogEvent(
-                    QMessageBox.Warning,
+                    QtImport.QMessageBox.Warning,
                     "I've lost control of the application!",
                     self.font().pointSize(),
                 )
@@ -926,9 +820,6 @@ class Qt4_InstanceListBrick(BlissWidget):
                 )
 
     def pass_control(self, has_control_id):
-        """
-        Descript. :
-        """
         try:
             control_item = self.connections[has_control_id[0]][0]
         except KeyError:
@@ -937,37 +828,34 @@ class Qt4_InstanceListBrick(BlissWidget):
             self.users_listwidget.clearSelection()
             # item = self.users_listwidget.item(0)
             for item_index in range(self.users_listwidget.count()):
-                self.users_listwidget.item(item_index).setFlags(Qt.ItemIsEnabled)
-            self.users_listwidget.setSelectionMode(QAbstractItemView.SingleSelection)
-            control_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.users_listwidget.item(item_index).setFlags(QtImport.Qt.ItemIsEnabled)
+            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.SingleSelection)
+            control_item.setFlags(QtImport.Qt.ItemIsEnabled | QtImport.Qt.ItemIsSelectable)
             control_item.setSelected(True)
-            self.users_listwidget.setSelectionMode(QAbstractItemView.NoSelection)
+            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.NoSelection)
             self.in_control = list(has_control_id)
             self.update_mirroring()
 
     def update_mirroring(self):
-        """
-        Descript. :
-        """
-        if BlissWidget.isInstanceModeSlave():
-            if BlissWidget.isInstanceUserIdUnknown():
+        if BaseWidget.isInstanceModeSlave():
+            if BaseWidget.isInstanceUserIdUnknown():
                 if (
-                    BlissWidget.isInstanceRoleServer()
+                    BaseWidget.isInstanceRoleServer()
                     and self.in_control is not None
                     and self.in_control[1] is None
                 ):
-                    BlissWidget.set_instance_mirror(BlissWidget.INSTANCE_MIRROR_ALLOW)
+                    BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_ALLOW)
                 else:
-                    BlissWidget.set_instance_mirror(BlissWidget.INSTANCE_MIRROR_PREVENT)
-            elif BlissWidget.isInstanceUserIdInhouse():
-                BlissWidget.set_instance_mirror(BlissWidget.INSTANCE_MIRROR_ALLOW)
+                    BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_PREVENT)
+            elif BaseWidget.isInstanceUserIdInhouse():
+                BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_ALLOW)
             else:
                 try:
                     control_is_inhouse = self.in_control[1]["inhouse"]
                 except BaseException:
                     control_is_inhouse = False
                 if control_is_inhouse or self.in_control[1] is None:
-                    BlissWidget.set_instance_mirror(BlissWidget.INSTANCE_MIRROR_ALLOW)
+                    BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_ALLOW)
                 else:
                     try:
                         my_prop_codes = [
@@ -983,14 +871,14 @@ class Qt4_InstanceListBrick(BlissWidget):
                         ]
                     except BaseException:
                         control_prop_codes = []
-                    mirror = BlissWidget.INSTANCE_MIRROR_PREVENT
+                    mirror = BaseWidget.INSTANCE_MIRROR_PREVENT
                     for code in my_prop_codes:
                         try:
                             control_prop_codes.index(code)
                         except BaseException:
                             pass
                         else:
-                            mirror = BlissWidget.INSTANCE_MIRROR_ALLOW
+                            mirror = BaseWidget.INSTANCE_MIRROR_ALLOW
                             break
                     for code in control_prop_codes:
                         try:
@@ -998,16 +886,13 @@ class Qt4_InstanceListBrick(BlissWidget):
                         except BaseException:
                             pass
                         else:
-                            mirror = BlissWidget.INSTANCE_MIRROR_ALLOW
+                            mirror = BaseWidget.INSTANCE_MIRROR_ALLOW
                             break
-                    BlissWidget.set_instance_mirror(mirror)
+                    BaseWidget.set_instance_mirror(mirror)
         else:
-            BlissWidget.set_instance_mirror(BlissWidget.INSTANCE_MIRROR_PREVENT)
+            BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_PREVENT)
 
     def timeout_approaching(self):
-        """
-        Descript. :
-        """
         if self.give_control_msgbox is not None:
             if self.timeout_left in (30, 20, 10):
                 self.instance_server_hwobj.sendChatMessage(
@@ -1017,16 +902,13 @@ class Qt4_InstanceListBrick(BlissWidget):
                 )
             self.timeout_left -= 1
             if self.timeout_left == 0:
-                self.give_control_msgbox.done(QMessageBox.Yes)
+                self.give_control_msgbox.done(QtImport.QMessageBox.Yes)
             else:
                 self.give_control_msgbox.setButtonText(
-                    QMessageBox.Yes, "Allow (%d secs)" % self.timeout_left
+                    QtImport.QMessageBox.Yes, "Allow (%d secs)" % self.timeout_left
                 )
 
     def event(self, event):
-        """
-        Descript. :
-        """
         if self.isRunning():
             if event.type() == WANTS_CONTROL_EVENT:
                 try:
@@ -1037,14 +919,14 @@ class Qt4_InstanceListBrick(BlissWidget):
                     client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
                     self.give_control_msgbox.nickname = client_print
                     self.give_control_msgbox.setButtonText(
-                        QMessageBox.Yes, "Allow (%d secs)" % self.timeout_left
+                        QtImport.QMessageBox.Yes, "Allow (%d secs)" % self.timeout_left
                     )
-                    self.give_control_msgbox.setButtonText(QMessageBox.No, "Deny")
+                    self.give_control_msgbox.setButtonText(QtImport.QMessageBox.No, "Deny")
                     self.timeout_timer.start(1000)
                     res = self.give_control_msgbox.exec_()
                     self.timeout_timer.stop()
 
-                    if res == QMessageBox.Yes:
+                    if res == QtImport.QMessageBox.Yes:
                         self.instance_server_hwobj.giveControl(client_id)
                     else:
                         self.instance_server_hwobj.sendChatMessage(
@@ -1072,13 +954,13 @@ class Qt4_InstanceListBrick(BlissWidget):
                 )
 
             elif event.type() == MSG_DIALOG_EVENT:
-                msg_dialog = QMessageBox(
+                msg_dialog = QtImport.QMessageBox(
                     "mxCuBE",
                     event.msg,
                     event.icon_type,
-                    QMessageBox.Ok,
-                    QMessageBox.NoButton,
-                    QMessageBox.NoButton,
+                    QtImport.QMessageBox.Ok,
+                    QtImport.QMessageBox.NoButton,
+                    QtImport.QMessageBox.NoButton,
                     self,
                 )
                 msg_dialog.exec_()
@@ -1087,13 +969,13 @@ class Qt4_InstanceListBrick(BlissWidget):
 
             elif event.type() == USER_INFO_DIALOG_EVENT:
                 if event.is_local or event.toaddrs == "":
-                    msg_dialog = QMessageBox(
+                    msg_dialog = QtImport.QMessageBox(
                         "mxCuBE",
                         event.msg,
-                        QMessageBox.Information,
-                        QMessageBox.Ok,
-                        QMessageBox.NoButton,
-                        QMessageBox.NoButton,
+                        QtImport.QMessageBox.Information,
+                        QtImport.QMessageBox.Ok,
+                        QtImport.QMessageBox.NoButton,
+                        QtImport.QMessageBox.NoButton,
                         None,
                     )
                 else:
@@ -1140,34 +1022,31 @@ class Qt4_InstanceListBrick(BlissWidget):
                         smtp.quit()
                     else:
                         smtp.quit()
-        return QWidget.event(self, event)
+        return QtImport.QWidget.event(self, event)
 
     def wants_control(self, client_id):
-        """
-        Descript. :
-        """
         if (
-            BlissWidget.isInstanceModeMaster()
+            BaseWidget.isInstanceModeMaster()
             and self.give_control_msgbox is None
             and self.allow_timeout_control_chbox.isChecked()
         ):
             self.timeout_left = self["giveControlTimeout"]
             client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-            self.give_control_msgbox = QMessageBox(
+            self.give_control_msgbox = QtImport.QMessageBox(
                 "Pass control",
                 "The user %s wants to have control " % client_print
                 + "of the application!",
-                QMessageBox.Question,
-                QMessageBox.Yes,
-                QMessageBox.No,
-                QMessageBox.NoButton,
+                QtImport.QMessageBox.QtImport.Question,
+                QtImport.QMessageBox.Yes,
+                QtImport.QMessageBox.No,
+                QtImport.QMessageBox.NoButton,
                 self,
             )
             custom_event = WantsControlEvent(client_id)
-            QApplication.postEvent(self, custom_event)
+            QtImport.QApplication.postEvent(self, custom_event)
 
 
-class LineEditInput(QLineEdit):
+class LineEditInput(QtImport.QLineEdit):
     """
     Descript: Single-line input field. Changes color depending on the validity
               of the input: red for invalid (or whatever DataCollectBrick2.
@@ -1183,40 +1062,34 @@ class LineEditInput(QLineEdit):
     Notes      : Returns 1/3 of the width in the sizeHint from QtGui.QLineEdit
     """
 
-    PARAMETER_STATE = {"INVALID": Qt.red, "OK": Qt.white, "WARNING": Qt.yellow}
+    PARAMETER_STATE = {"INVALID": QtImport.Qt.red, "OK": QtImport.Qt.white, "WARNING": QtImport.Qt.yellow}
 
     inputValidSignal = pyqtSignal(bool)
 
     def __init__(self, parent):
-        """
-        Descript. :
-        """
-        QLineEdit.__init__(self, parent)
+        QtImport.QLineEdit.__init__(self, parent)
         self.textChanged.connect(self.text_changed)
         self.returnPressed.connect(self.return_pressed)
         self.colorDefault = None
-        self.origPalette = QPalette(self.palette())
-        self.palette2 = QPalette(self.origPalette)
+        self.origPalette = QtImport.QPalette(self.palette())
+        self.palette2 = QtImport.QPalette(self.origPalette)
         self.palette2.setColor(
-            QPalette.Active,
-            QPalette.Base,
-            self.origPalette.brush(QPalette.Disabled, QPalette.Background).color(),
+            QtImport.QPalette.Active,
+            QtImport.QPalette.Base,
+            self.origPalette.brush(QtImport.QPalette.Disabled, QtImport.QPalette.Background).color(),
         )
         self.palette2.setColor(
-            QPalette.Inactive,
-            QPalette.Base,
-            self.origPalette.brush(QPalette.Disabled, QPalette.Background).color(),
+            QtImport.QPalette.Inactive,
+            QtImport.QPalette.Base,
+            self.origPalette.brush(QtImport.QPalette.Disabled, QtImport.QPalette.Background).color(),
         )
         self.palette2.setColor(
-            QPalette.Disabled,
-            QPalette.Base,
-            self.origPalette.brush(QPalette.Disabled, QPalette.Background).color(),
+            QtImport.QPalette.Disabled,
+            QtImport.QPalette.Base,
+            self.origPalette.brush(QtImport.QPalette.Disabled, QtImport.QPalette.Background).color(),
         )
 
     def return_pressed(self):
-        """
-        Descript. :
-        """
         if self.validator() is not None:
             if self.hasAcceptableInput():
                 self.returnPressed.emit()
@@ -1224,15 +1097,9 @@ class LineEditInput(QLineEdit):
             self.returnPressed.emit()
 
     def text(self):
-        """
-        Descript. :
-        """
-        return str(QLineEdit.text(self))
+        return str(QtImport.QLineEdit.text(self))
 
     def text_changed(self, txt):
-        """
-        Descript. :
-        """
         txt = str(txt)
         valid = None
         if self.validator() is not None:
@@ -1255,7 +1122,7 @@ class LineEditInput(QLineEdit):
                 else:
                     valid = False
                     color = LineEditInput.PARAMETER_STATE["INVALID"]
-            Qt4_widget_colors.set_widget_color(self, color)
+            Colors.set_widget_color(self, color)
         else:
             if txt == "":
                 if self.colorDefault is None:
@@ -1276,79 +1143,55 @@ class LineEditInput(QLineEdit):
             self.inputValidSignal.emit(valid)
 
     def sizeHint(self):
-        """
-        Descript. :
-        """
-        size_hint = QLineEdit.sizeHint(self)
+        size_hint = QtImport.QLineEdit.sizeHint(self)
         size_hint.setWidth(size_hint.width() / 3)
         return size_hint
 
     def setReadOnly(self, readonly):
-        """
-        Descript. :
-        """
         if readonly:
             self.setPalette(self.palette2)
         else:
             self.setPalette(self.origPalette)
-        QLineEdit.setReadOnly(self, readonly)
+        QtImport.QLineEdit.setReadOnly(self, readonly)
 
     def origBackgroundColor(self):
-        """
-        Descript. :
-        """
         return self.origPalette.disabled().background()
 
     def setDefaultColor(self, color=None):
-        """
-        Descript. :
-        """
         self.colorDefault = color
         self.txtChanged(self.text())
 
 
 class NickEditInput(LineEditInput):
-    """
-    """
 
     def txtChanged(self, txt):
-        """
-        Descript. :
-        """
         txt = str(txt)
         valid = None
         if self.validator() is not None:
             if self.hasAcceptableInput():
                 valid = True
-                Qt4_widget_colors.set_widget_color(
-                    self, LineEditInput.PARAMETER_STATE["WARNING"], QPalette.Base
+                Colors.set_widget_color(
+                    self, LineEditInput.PARAMETER_STATE["WARNING"], QtImport.QPalette.Base
                 )
             else:
                 valid = False
-                Qt4_widget_colors.set_widget_color(
-                    self, LineEditInput.PARAMETER_STATE["INVALID"], QPalette.Base
+                Colors.set_widget_color(
+                    self, LineEditInput.PARAMETER_STATE["INVALID"], QtImport.QPalette.Base
                 )
         self.textChanged.emit(txt)
         if valid is not None:
             self.inputValidSignal.emit(valid)
 
     def acceptInput(self):
-        """
-        Descript. :
-        """
-        Qt4_widget_colors.set_widget_color(
-            self, LineEditInput.PARAMETER_STATE["OK"], QPalette.Base
+        Colors.set_widget_color(
+            self, LineEditInput.PARAMETER_STATE["OK"], QtImport.QPalette.Base
         )
 
 
-class ExternalUserInfoDialog(QDialog):
-    """
-    """
+class ExternalUserInfoDialog(QtImport.QDialog):
 
     def __init__(self):
-        """
-        """
-        QDialog.__init__(self, None)
+        QtImport.QDialog.__init__(self, None)
         self.setWindowTitle("mxCuBE")
 
         # Hardware objects ----------------------------------------------------
@@ -1362,33 +1205,33 @@ class ExternalUserInfoDialog(QDialog):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.message_box = QGroupBox("Your info", self)  # v
-        self.message1 = QLabel(self.message_box)
-        self.message2 = QLabel(
+        self.message_box = QtImport.QGroupBox("Your info", self)  # v
+        self.message1 = QtImport.QLabel(self.message_box)
+        self.message2 = QtImport.QLabel(
             "<nobr>Please enter the following "
             + "information, <u>required</u> for "
             + "the experimental hall operator:",
             self.message_box,
         )
-        my_name_widget = QWidget(self.message_box)
-        name_label = QLabel("Your name:", my_name_widget)
-        self.name_input = QLineEdit(my_name_widget)
-        institute_label = QLabel("Your institute:", my_name_widget)
-        self.institute_input = QLineEdit(my_name_widget)
-        phone_label = QLabel("Your telephone:", my_name_widget)
-        self.phone_input = QLineEdit(my_name_widget)
-        email_label = QLabel("Your email:", my_name_widget)
-        self.email_input = QLineEdit(my_name_widget)
+        my_name_widget = QtImport.QWidget(self.message_box)
+        name_label = QtImport.QLabel("Your name:", my_name_widget)
+        self.name_input = QtImport.QLineEdit(my_name_widget)
+        institute_label = QtImport.QLabel("Your institute:", my_name_widget)
+        self.institute_input = QtImport.QLineEdit(my_name_widget)
+        phone_label = QtImport.QLabel("Your telephone:", my_name_widget)
+        self.phone_input = QtImport.QLineEdit(my_name_widget)
+        email_label = QtImport.QLabel("Your email:", my_name_widget)
+        self.email_input = QtImport.QLineEdit(my_name_widget)
 
         # Layout --------------------------------------------------------------
 
         # SizePolicies --------------------------------------------------------
-        self.message_box.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        self.message_box.setSizePolicy(QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        _my_name_widget_vlayout = QVBoxLayout(my_name_widget)
+        _my_name_widget_vlayout = QtImport.QVBoxLayout(my_name_widget)
         _my_name_widget_vlayout.addWidget(name_label)
         _my_name_widget_vlayout.addWidget(self.name_input)
         _my_name_widget_vlayout.addWidget(institute_label)
@@ -1398,12 +1241,12 @@ class ExternalUserInfoDialog(QDialog):
         _my_name_widget_vlayout.addWidget(email_label)
         _my_name_widget_vlayout.addWidget(self.email_input)
 
-        _message_gbox_vlayout = QVBoxLayout(self.message_box)
+        _message_gbox_vlayout = QtImport.QVBoxLayout(self.message_box)
         _message_gbox_vlayout.addWidget(self.message1)
         _message_gbox_vlayout.addWidget(self.message2)
         _message_gbox_vlayout.addWidget(my_name_widget)
 
-        main_layout = QVBoxLayout(self)
+        main_layout = QtImport.QVBoxLayout(self)
         main_layout.addWidget(self.message_box)
         main_layout.setSpacing(0)
         # main_layout.addWidget(self.buttons_box)
@@ -1416,7 +1259,7 @@ class ExternalUserInfoDialog(QDialog):
 
     def show(self):
         self.validate_parameters()
-        return QDialog.exec_(self)
+        return QtImport.QDialog.exec_(self)
 
     def validate_parameters(self):
         if (
