@@ -18,15 +18,6 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from HardwareRepository import HardwareRepository
-from gui.utils import GUILogHandler
-from gui.utils import ErrorHandler
-from gui import GUISupervisor
-import gui
-from QtImport import *
-from optparse import OptionParser
-
-"""MXCuBE main application"""
 
 import gevent
 import fcntl
@@ -37,16 +28,17 @@ import logging
 import platform
 
 import gevent.monkey
-
 gevent.monkey.patch_all(thread=False)
+from optparse import OptionParser
 
 
-# from gui.Utils import terminal_server
+import QtImport
 
-
-_logger = logging.getLogger()
-_GUIhdlr = GUILogHandler.GUILogHandler()
-_logger.addHandler(_GUIhdlr)
+import gui
+from gui import GUISupervisor
+from gui.utils import GUILogHandler, ErrorHandler
+from gui import GUISupervisor
+from HardwareRepository import HardwareRepository
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -54,11 +46,16 @@ __license__ = "LGPLv3+"
 __version__ = 2
 
 
+_logger = logging.getLogger()
+_GUIhdlr = GUILogHandler.GUILogHandler()
+_logger.addHandler(_GUIhdlr)
+
+
 def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)
     """
 
-    if QEventLoop():
+    if QtImport.QEventLoop():
         try:
             gevent.wait(timeout=0.01)
         except AssertionError:
@@ -68,13 +65,13 @@ def do_gevent():
         pass
 
 
-class MyCustomEvent(QEvent):
+class MyCustomEvent(QtImport.QEvent):
     """Custom event"""
 
     def __init__(self, event_type, data):
         """init"""
 
-        QEvent.__init__(self, event_type)
+        QtImport.QEvent.__init__(self, event_type)
         self.data = data
 
 
@@ -202,7 +199,7 @@ def run(gui_config_file=None):
     (opts, args) = parser.parse_args()
 
     # get config from arguments
-    logFile = opts.logFile
+    log_file = opts.logFile
     log_template = opts.logTemplate
     hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
@@ -249,10 +246,9 @@ def run(gui_config_file=None):
     ]
     hwobj_directories = [_directory for _directory in hwobj_directories if _directory]
 
-    main_application = QApplication([])
+    main_application = QtImport.QApplication([])
     if app_style:
         main_application.setStyle(app_style)
-    lockfile = None
 
     if len(args) >= 1:
         if len(args) == 1:
@@ -272,12 +268,12 @@ def run(gui_config_file=None):
         )
         > 1
     ):
-        QMessageBox.warning(
+        QtImport.QMessageBox.warning(
             None,
             "Warning",
             "Another instance of MXCuBE is running.\n"
             + "Please close it and start MXCuBE again.",
-            QMessageBox.Ok,
+            QtImport.QMessageBox.Ok,
         )
         sys.exit(1)
 
@@ -287,16 +283,16 @@ def run(gui_config_file=None):
     if hwobj_directories:
         HardwareRepository.addHardwareObjectsDirs(hwobj_directories)
     if custom_bricks_directories:
-        gui.addCustomBricksDirs(custom_bricks_directories)
+        gui.add_custom_bricks_dirs(custom_bricks_directories)
 
     # set log name and log file
     if gui_config_file:
         gui.set_logging_name(os.path.basename(gui_config_file), log_template)
 
     log_lockfile = None
-    if len(logFile) > 0:
+    if len(log_file) > 0:
         log_lock_filename = os.path.join(
-            tempfile.gettempdir(), ".%s.lock" % os.path.basename(logFile)
+            tempfile.gettempdir(), ".%s.lock" % os.path.basename(log_file)
         )
 
         log_ok = True
@@ -320,12 +316,12 @@ def run(gui_config_file=None):
 
         if not log_ok:
             index = 1
-            logfile_details = os.path.splitext(logFile)
-            logFile = ""
+            logfile_details = os.path.splitext(log_file)
+            log_file = ""
             while index < 10:
-                logFile2 = "%s.%d%s" % (logfile_details[0], index, logfile_details[1])
+                log_file2 = "%s.%d%s" % (logfile_details[0], index, logfile_details[1])
                 log_lock_filename2 = os.path.join(
-                    tempfile.gettempdir(), ".%s.lock" % os.path.basename(logFile2)
+                    tempfile.gettempdir(), ".%s.lock" % os.path.basename(log_file2)
                 )
                 try:
                     log_lockfile = open(log_lock_filename2, "w")
@@ -345,49 +341,49 @@ def run(gui_config_file=None):
                     else:
                         log_ok = True
                 if log_ok:
-                    logFile = logFile2
+                    log_file = logFile2
                     break
             index += 1
 
-        if len(logFile) > 0:
-            gui.setLogFile(logFile)
+        if len(log_file) > 0:
+            gui.set_log_file(log_file)
 
     # log startup details
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
     # logging.getLogger().info("\n\n\n\n")
-    logging.getLogger().info(
+    logging.getLogger("HWR").info(
         "================================================================================="
     )
-    logging.getLogger().info("Starting MXCuBE v%s" % str(__version__))
-    logging.getLogger().info("GUI file: %s" % (gui_config_file or "unnamed"))
-    logging.getLogger().info("Hardware repository: %s" % hwr_server)
-    logging.getLogger().info("User file directory: %s" % user_file_dir)
-    if len(logFile) > 0:
-        logging.getLogger().info("Log file: %s" % logFile)
-    logging.getLogger().info("System info:")
-    logging.getLogger().info(
+    logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
+    logging.getLogger("HWR").info("GUI file: %s" % (gui_config_file or "unnamed"))
+    logging.getLogger("HWR").info("Hardware repository: %s" % hwr_server)
+    logging.getLogger("HWR").info("User file directory: %s" % user_file_dir)
+    if len(log_file) > 0:
+        logging.getLogger("HWR").info("Log file: %s" % log_file)
+    logging.getLogger("HWR").info("System info:")
+    logging.getLogger("HWR").info(
         "    - Python %s on %s" % (platform.python_version(), platform.system())
     )
-    logging.getLogger().info(
+    logging.getLogger("HWR").info(
         "    - Qt %s - %s %s"
         % (
-            "%d.%d.%d" % tuple(qt_version_no),
-            qt_variant,
-            "%d.%d.%d" % tuple(pyqt_version_no),
+            "%d.%d.%d" % tuple(QtImport.qt_version_no),
+            QtImport.qt_variant,
+            "%d.%d.%d" % tuple(QtImport.pyqt_version_no),
         )
     )
-    if mpl_imported:
-        logging.getLogger().info(
-            "    - Matplotlib %s" % "%d.%d.%d" % tuple(mpl_version_no)
+    if QtImport.mpl_imported:
+        logging.getLogger("HWR").info(
+            "    - Matplotlib %s" % "%d.%d.%d" % tuple(QtImport.mpl_version_no)
         )
     else:
-        logging.getLogger().info("    - Matplotlib not available")
-    logging.getLogger().info(
+        logging.getLogger("HWR").info("    - Matplotlib not available")
+    logging.getLogger("HWR").info(
         "---------------------------------------------------------------------------------"
     )
 
-    QApplication.setDesktopSettingsAware(False)
+    QtImport.QApplication.setDesktopSettingsAware(False)
 
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = GUISupervisor.GUISupervisor(
@@ -402,21 +398,21 @@ def run(gui_config_file=None):
     )
 
     # redirect errors to logger
-    ErrorHandler.enableStdErrRedirection()
+    ErrorHandler.enable_std_err_redirection()
 
-    gevent_timer = QTimer()
+    gevent_timer = QtImport.QTimer()
     gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 
     palette = main_application.palette()
-    palette.setColor(QPalette.ToolTipBase, QColor(255, 241, 204))
-    palette.setColor(QPalette.ToolTipText, Qt.black)
+    palette.setColor(QtImport.QPalette.ToolTipBase, QtImport.QColor(255, 241, 204))
+    palette.setColor(QtImport.QPalette.ToolTipText, QtImport.Qt.black)
     main_application.setPalette(palette)
 
     main_application.setOrganizationName("MXCuBE")
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
-    # app.setWindowIcon(QIcon("images/icon.png"))
+    # app.setWindowIcon(QtImport.QIcon("images/icon.png"))
     main_application.exec_()
 
     supervisor.finalize()

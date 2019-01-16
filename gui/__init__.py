@@ -25,14 +25,16 @@ import logging
 
 import gevent.monkey
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
 if not hasattr(gevent, "wait"):
 
     def mywait(timeout=None):
         return gevent.run(timeout)
 
     gevent.wait = mywait
-
-__license__ = "LGPLv3+"
 
 
 # Relative location of
@@ -81,36 +83,35 @@ sys.path.insert(0, gui_path)
 
 
 def get_base_bricks_path():
-    stdbrickspkg = __import__(STD_BRICKS_LOCATION, globals(), locals(), [""])
-    return os.path.dirname(stdbrickspkg.__file__)
+    std_bricks_pkg = __import__(STD_BRICKS_LOCATION, globals(), locals(), [""])
+    return os.path.dirname(std_bricks_pkg.__file__)
 
 
-_bricksDirs = []
+_bricks_dirs = []
 
 
-def addCustomBricksDirs(bricksDirs):
-    import sys
+def add_custom_bricks_dirs(bricks_dirs):
 
-    global _bricksDirs
+    global _bricks_dirs
 
-    if isinstance(bricksDirs, list):
-        newBricksDirs = list(
-            filter(os.path.isdir, list(map(os.path.abspath, bricksDirs)))
+    if isinstance(bricks_dirs, list):
+        new_bricks_dirs = list(
+            filter(os.path.isdir, list(map(os.path.abspath, bricks_dirs)))
         )
 
-        for newBrickDir in reversed(newBricksDirs):
-            if not newBrickDir in sys.path:
-                # print 'inserted in sys.path = %s' % newBrickDir
-                sys.path.insert(0, newBrickDir)
+        for new_brick_dir in reversed(new_bricks_dirs):
+            if not new_brick_dir in sys.path:
+                # print 'inserted in sys.path = %s' % new_brick_dir
+                sys.path.insert(0, new_brick_dir)
 
-        _bricksDirs += newBricksDirs
+        _bricks_dirs += new_bricks_dirs
 
 
 sys.path.insert(0, get_base_bricks_path())
 
 
 def get_custom_bricks_dirs():
-    return _bricksDirs
+    return _bricks_dirs
 
 
 def _framework_trace_function(frame, event, arg):

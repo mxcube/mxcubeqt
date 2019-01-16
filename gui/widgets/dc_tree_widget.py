@@ -1304,7 +1304,6 @@ class DataCollectTree(QtImport.QWidget):
             sample = queue_model_objects.Sample()
             sample.set_name('manually-mounted')
         sample.free_pin_mode = True
-        print self.queue_model_hwobj.get_model_root(), sample
         self.queue_model_hwobj.add_child(self.queue_model_hwobj.get_model_root(),
                                          sample)
         self.set_sample_pin_icon()
