@@ -915,9 +915,9 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             splash_screen.set_message(
                 "Loading hardware object defined in %s.xml" %
                 hardware_object_name)
-            splash_screen.inc_progress_value()
 
         if not hardware_object_name in self.__loaded_hardware_objects:
+            splash_screen.inc_progress_value()
             self.__loaded_hardware_objects.append(hardware_object_name)
 
         hwobj = HardwareRepository.getHardwareRepository().\
