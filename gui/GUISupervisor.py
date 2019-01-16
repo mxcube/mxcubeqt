@@ -39,6 +39,12 @@ from HardwareRepository import HardwareRepository
 LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
 
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+__category__ = "General"
+
+
+
 class SplashScreen(QtImport.QSplashScreen):
     """Splash screen when mxcube is loading"""
 
@@ -49,6 +55,17 @@ class SplashScreen(QtImport.QSplashScreen):
 
         self._message = ""
         self.gui_name = None
+
+        self.top_x = 10
+        self.top_y = 430
+        self.right_x = 390
+        self.pxsize = 11
+       
+        self.progress_bar = QtImport.QProgressBar(self)
+
+        _vlayout = QtImport.QVBoxLayout(self)
+        _vlayout.addWidget(self.progress_bar)        
+
         self.repaint()
 
     def set_gui_name(self, name):
@@ -63,37 +80,39 @@ class SplashScreen(QtImport.QSplashScreen):
         self._message = message
         self.repaint()
 
+    def set_progress_value(self, value):
+        self.progress_bar.setValue(value)
+
+    def inc_progress_value(self):
+        self.progress_bar.setValue(self.progress_bar.value() + 1)
+
     def drawContents(self, painter):
         """draws splash screen"""
 
-        top_x = 10
-        top_y = 334
-        right_x = 390
-        bot_y = 334 + painter.fontMetrics().height()
-        pxsize = 11
+        bot_y = self.top_y + painter.fontMetrics().height()
 
-        painter.font().setPixelSize(pxsize)
+        painter.font().setPixelSize(self.pxsize)
         painter.setPen(QtImport.QPen(QtImport.Qt.black))
         painter.drawText(
             QtImport.QRect(
-                QtImport.QPoint(top_x, top_y), QtImport.QPoint(right_x, bot_y)
+                QtImport.QPoint(self.top_x, self.top_y), QtImport.QPoint(self.right_x, bot_y)
             ),
             QtImport.Qt.AlignLeft | QtImport.Qt.AlignTop,
             "Starting MXCuBE. Please wait...",
         )
-        painter.font().setPixelSize(pxsize * 2.5)
-        painter.font().setPixelSize(pxsize)
+        painter.font().setPixelSize(self.pxsize * 2.5)
+        painter.font().setPixelSize(self.pxsize)
 
         top_y = bot_y
         bot_y += 2 + painter.fontMetrics().height()
         painter.drawText(
             QtImport.QRect(
-                QtImport.QPoint(top_x, top_y), QtImport.QPoint(right_x, bot_y)
+                QtImport.QPoint(self.top_x, top_y), QtImport.QPoint(self.right_x, bot_y)
             ),
             QtImport.Qt.AlignLeft | QtImport.Qt.AlignBottom,
             self._message,
         )
-
+        self.progress_bar.setGeometry(10, self.top_y + 50, self.right_x, 20)
 
 class GUISupervisor(QtImport.QWidget):
     """GUI supervisor"""
@@ -117,12 +136,13 @@ class GUISupervisor(QtImport.QWidget):
         self.show_maximized = show_maximized
         self.no_border = no_border
         self.windows = []
+
         self.splash_screen = SplashScreen(Icons.load_pixmap("splash"))
 
         set_splash_screen(self.splash_screen)
         self.splash_screen.show()
 
-        self.timestamp = 0
+        self.time_stamp = 0
 
     def set_user_file_directory(self, user_file_directory):
         self.user_file_dir = user_file_directory
@@ -144,7 +164,7 @@ class GUISupervisor(QtImport.QWidget):
 
             if os.path.exists(gui_config_file):
                 filestat = os.stat(gui_config_file)
-                self.timestamp = filestat[stat.ST_MTIME]
+                self.time_stamp = filestat[stat.ST_MTIME]
 
                 if filestat[stat.ST_SIZE] == 0:
                     return self.new_gui()
@@ -224,12 +244,14 @@ class GUISupervisor(QtImport.QWidget):
                         logging.getLogger().exception(failed_msg)
 
                     self.splash_screen.set_message("Gathering H/O info...")
+                    self.splash_screen.set_progress_value(10)
                     mnemonics = __get_mnemonics(raw_config)
                     self.hardware_repository.require(mnemonics)
                     gui_file.close()
 
                     try:
                         self.splash_screen.set_message("Building GUI configuration...")
+                        self.splash_screen.set_progress_value(20)
                         config = Configuration.Configuration(raw_config, load_from_dict)
                     except BaseException:
                         logging.getLogger("GUI").exception(failed_msg)
@@ -283,7 +305,7 @@ class GUISupervisor(QtImport.QWidget):
     def new_gui(self):
         """Starts new gui"""
 
-        self.timestamp = 0
+        self.time_stamp = 0
         self.launch_in_design_mode = True
 
         self.framework = GUIBuilder.GUIBuilder()
@@ -323,6 +345,7 @@ class GUISupervisor(QtImport.QWidget):
     def execute(self, config):
         """Start in execution mode"""
         self.splash_screen.set_message("Executing configuration...")
+        self.splash_screen.set_progress_value(80)
         self.display()
 
         main_window = None
@@ -387,10 +410,12 @@ class GUISupervisor(QtImport.QWidget):
                                     #    slot)
                     make_connections(item["children"])
 
+            self.splash_screen.set_progress_value(90)
             self.splash_screen.set_message("Connecting bricks...")
             make_connections(config.windows_list)
 
             # set run mode for every brick
+            self.splash_screen.set_progress_value(100)
             self.splash_screen.set_message("Setting run mode...")
             BaseWidget.set_run_mode(True)
 

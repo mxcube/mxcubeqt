@@ -1,6 +1,6 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
@@ -17,17 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-__credits__ = ["MXCuBE colaboration"]
-__license__ = "LGPLv3+"
-__status__ = "Production"
-
-
 import os
-
-# LNLS
-# python2.7
-# import new
-# python3.4
 import sys
 import time
 import types
@@ -46,6 +36,11 @@ from gui.BaseComponents import BaseWidget
 from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
 from HardwareRepository import HardwareRepository
+
+
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+__status__ = "Production"
 
 
 class CustomMenuBar(QtImport.QMenuBar):

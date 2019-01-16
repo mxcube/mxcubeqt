@@ -22,13 +22,14 @@ from collections import namedtuple
 
 import QtImport
 
-from api import beamline_setup
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import queue_item
 from gui.utils import Icons, Colors
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from gui.widgets.dc_tree_widget import DataCollectTree
+
+from api import beamline_setup
 
 from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
 

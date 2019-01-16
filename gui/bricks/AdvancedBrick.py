@@ -21,11 +21,14 @@ import os
 
 import QtImport
 
+
 from gui.utils import queue_item
 from gui.BaseComponents import BaseWidget
 from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
+
+from api import beamline_setup
 
 
 __credits__ = ["MXCuBE colaboration"]
@@ -43,7 +46,6 @@ class AdvancedBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
 
@@ -74,6 +76,8 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
+
+        self.init_api()
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = (
@@ -123,16 +127,10 @@ class AdvancedBrick(BaseWidget):
 
         self.tool_box.setCurrentWidget(self.results_widget)
 
-    def property_changed(self, property_name, old_value, new_value):
-        """
-        Overriding BaseComponents.BaseWidget (propertyChanged object)
-        run method.
-        """
-        if property_name == "beamline_setup":
-            bl_setup = self.get_hardware_object(new_value)
-            self.session_hwobj = bl_setup.session_hwobj
-            self.parameters_widget.set_beamline_setup(bl_setup)
-            self.results_widget.set_beamline_setup(bl_setup)
+    def init_api(self):
+        self.session_hwobj = beamline_setup.session_hwobj
+        self.parameters_widget.set_beamline_setup(beamline_setup)
+        self.results_widget.set_beamline_setup(beamline_setup)
 
-            self.line_parameters_widget.set_beamline_setup(bl_setup)
-            self.line_results_widget.set_beamline_setup(bl_setup)
+        self.line_parameters_widget.set_beamline_setup(beamline_setup)
+        self.line_results_widget.set_beamline_setup(beamline_setup)
