@@ -1,50 +1,50 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from QtImport import *
+import QtImport
 
 
-class SnapshotWidget(QWidget):
-    """
-    """
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+class SnapshotWidget(QtImport.QWidget):
 
     def __init__(self, parent, realtime_plot=False):
-        """
-        """
-        QWidget.__init__(self, parent)
 
-        self.snapshot_gbox = QGroupBox("Snapshot", self)
-        self.animation_gbox = QGroupBox("Animation", self)
-        self.snapshot_label = QLabel(self.snapshot_gbox)
-        self.animation_label = QLabel(self.animation_gbox)
+        QtImport.QWidget.__init__(self, parent)
+
+        self.snapshot_gbox = QtImport.QGroupBox("Snapshot", self)
+        self.animation_gbox = QtImport.QGroupBox("Animation", self)
+        self.snapshot_label = QtImport.QLabel(self.snapshot_gbox)
+        self.animation_label = QtImport.QLabel(self.animation_gbox)
 
         # Layout --------------------------------------------------------------
-        _snaphot_gbox_hlayout = QHBoxLayout(self.snapshot_gbox)
+        _snaphot_gbox_hlayout = QtImport.QHBoxLayout(self.snapshot_gbox)
         _snaphot_gbox_hlayout.addWidget(self.snapshot_label)
         _snaphot_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _animation_gbox_hlayout = QHBoxLayout(self.animation_gbox)
+        _animation_gbox_hlayout = QtImport.QHBoxLayout(self.animation_gbox)
         _animation_gbox_hlayout.addWidget(self.animation_label)
         _animation_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.snapshot_gbox)
         _main_vlayout.addWidget(self.animation_gbox)
         _main_vlayout.setSpacing(2)
@@ -57,14 +57,14 @@ class SnapshotWidget(QWidget):
         if width is not None:
             ration = image.height() / float(image.width())
             image = image.scaled(
-                width, width * ration, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                width, width * ration, QtImport.Qt.KeepAspectRatio, QtImport.Qt.SmoothTransformation
             )
 
-        self.snapshot_label.setPixmap(QPixmap(image))
+        self.snapshot_label.setPixmap(QtImport.QPixmap(image))
         self.setFixedWidth(width)
 
     def display_animation(self, animation_filename):
         self.animation_gbox.setVisible(True)
-        movie = QMovie("/tmp/test.gif")
+        movie = QtImport.QMovie(animation_filename)
         self.animation_label.setMovie(movie)
         movie.start()

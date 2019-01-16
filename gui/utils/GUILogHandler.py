@@ -1,20 +1,20 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
@@ -22,29 +22,24 @@ import time
 import weakref
 import gevent
 
-from QtImport import *
+import QtImport
+
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
 
 _logHandler = None
 _timer = None
 
 
-class LogEvent(QEvent):
-    """
-    Descript. :
-    """
+class LogEvent(QtImport.QEvent):
 
     def __init__(self, record):
-        """
-        Descript. :
-        """
-        QEvent.__init__(self, QEvent.User)
+
+        QtImport.QEvent.__init__(self, QtImport.QEvent.User)
         self.record = record
 
-
 def processLogMessages():
-    """
-    Descript. :
-    """
     i = 0
     while i < 10:
         if len(_logHandler.buffer) <= i:
@@ -53,7 +48,7 @@ def processLogMessages():
         record = _logHandler.buffer[i]
 
         for viewer in _logHandler.registeredViewers:
-            QApplication.postEvent(viewer, LogEvent(record))
+            QtImport.QApplication.postEvent(viewer, LogEvent(record))
 
         i += 1
 
@@ -61,18 +56,13 @@ def processLogMessages():
 
 
 def do_process_log_messages(sleep_time):
-    """
-    Descript. :
-    """
     while True:
         processLogMessages()
         time.sleep(sleep_time)
 
 
 def GUILogHandler():
-    """
-    Descript. :
-    """
+
     global _logHandler
     global _timer
 
@@ -80,7 +70,7 @@ def GUILogHandler():
         _logHandler = __GUILogHandler()
 
         _timer = gevent.spawn(do_process_log_messages, 0.2)
-        # _timer = QtCore.QTimer()
+        # _timer = QtImport.QtCore.QTimer()
         # QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
         # _timer.start(10)
 

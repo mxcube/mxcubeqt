@@ -1,34 +1,33 @@
-#  https://github.com/mxcube.
+#
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+import QtImport
 
 
-class SADWidgetLayout(QWidget):
-    """
-    Descript. :
-    """
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+class SADWidgetLayout(QtImport.QWidget):
 
     def __init__(self, parent=None, name=None, flags=0):
-        """
-        Descript. :
-        """
 
-        QWidget.__init__(self, parent, Qt.WindowFlags(flags))
+        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("SADWidgetLayout")
@@ -38,27 +37,27 @@ class SADWidgetLayout(QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.optimised_sad_cbx = QCheckBox("Optimised SAD", self)
-        self.automatic_resolution_radio = QRadioButton(self)
-        _optimal_sad_widget = QWidget(self)
-        self.optimal_sad_radio = QRadioButton(
+        self.optimised_sad_cbx = QtImport.QCheckBox("Optimised SAD", self)
+        self.automatic_resolution_radio = QtImport.QRadioButton(self)
+        _optimal_sad_widget = QtImport.QWidget(self)
+        self.optimal_sad_radio = QtImport.QRadioButton(
             "Optimal SAD for given resolution:", _optimal_sad_widget
         )
-        self.sad_bgroup = QButtonGroup(self)
+        self.sad_bgroup = QtImport.QButtonGroup(self)
         self.sad_bgroup.addButton(self.automatic_resolution_radio)
         self.sad_bgroup.addButton(self.optimal_sad_radio)
-        self.sad_resolution_ledit = QLineEdit(_optimal_sad_widget)
+        self.sad_resolution_ledit = QtImport.QLineEdit(_optimal_sad_widget)
         self.sad_resolution_ledit.setMinimumSize(50, 0)
         self.sad_resolution_ledit.setMaximumSize(50, 32767)
 
         # Layout --------------------------------------------------------------
-        _optimal_sad_widget_hlayout = QHBoxLayout(_optimal_sad_widget)
+        _optimal_sad_widget_hlayout = QtImport.QHBoxLayout(_optimal_sad_widget)
         _optimal_sad_widget_hlayout.addWidget(self.optimal_sad_radio)
         _optimal_sad_widget_hlayout.addWidget(self.sad_resolution_ledit)
         _optimal_sad_widget_hlayout.setSpacing(0)
         _optimal_sad_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.optimised_sad_cbx)
         _main_vlayout.addWidget(self.automatic_resolution_radio)
         _main_vlayout.addWidget(_optimal_sad_widget)
@@ -73,4 +72,4 @@ class SADWidgetLayout(QWidget):
         )
 
     def trUtf8(self, s, c=None):
-        return QApplication.translate("SADWidgetLayout", s, c, QApplication.UnicodeUTF8)
+        return QtImport.QApplication.translate("SADWidgetLayout", s, c, QtImport.QApplication.UnicodeUTF8)

@@ -1,59 +1,64 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
+#
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
-
 import logging
+import QtImport
 
+from gui.utils import Icons
 from HardwareRepository import HardwareRepository
-from gui import Icons
 
 
-class ProcedureBoxLayout(QBoxLayout):
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+
+class ProcedureBoxLayout(QtImport.QBoxLayout):
     def addItem(self, item):
-        item.setAlignment(Qt.AlignLeft)
-        QBoxLayout.addItem(self, item)
+        item.setAlignment(QtImport.Qt.AlignLeft)
+        QtImport.QBoxLayout.addItem(self, item)
 
 
-class HorizontalSpacer(QWidget):
+class HorizontalSpacer(QtImport.QWidget):
     def __init__(self, *args):
-        QWidget.__init__(self, *args)
+        QtImport.QWidget.__init__(self, *args)
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
 
 
-class VerticalSpacer(QWidget):
+class VerticalSpacer(QtImport.QWidget):
     def __init__(self, *args):
-        QWidget.__init__(self, *args)
+        QtImport.QWidget.__init__(self, *args)
 
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Expanding)
 
 
-class ProcedurePanel(QWidget):
+class ProcedurePanel(QtImport.QWidget):
     """Container for Procedure widgets"""
 
-    def __init__(self, parent, orientation=Qt.Vertical):
+    def __init__(self, parent, orientation=QtImport.Qt.Vertical):
         """Constructor
 
-        parent -- the parent QObject
+        parent -- the parent QtImport.QObject
         procedure -- the Procedure this panel belongs to (default: None)"""
-        QWidget.__init__(self, parent)
+        QtImport.QWidget.__init__(self, parent)
 
         self.currentWidget = None
         self.lastCommandID = None
@@ -65,10 +70,10 @@ class ProcedurePanel(QWidget):
             #
             self.setProcedure(parent.getProcedure())
 
-        if orientation == Qt.Vertical:
-            ProcedureBoxLayout(self, QBoxLayout.Down, 10, 5)
+        if orientation == QtImport.Qt.Vertical:
+            ProcedureBoxLayout(self, QtImport.QBoxLayout.Down, 10, 5)
         else:
-            ProcedureBoxLayout(self, QBoxLayout.LeftToRight, 10, 5)
+            ProcedureBoxLayout(self, QtImport.QBoxLayout.LeftToRight, 10, 5)
 
         self.layout().setAutoAdd(True)
 
@@ -125,15 +130,15 @@ class ProcedurePanel(QWidget):
 
             if isinstance(reply, bytes) and reply.startswith("error:"):
                 error = reply.split(":")[1]
-                QMessageBox.warning(
-                    None, "Invalid value", "%s" % str(error), QMessageBox.Ok
+                QtImport.QMessageBox.warning(
+                    None, "Invalid value", "%s" % str(error), QtImport.QMessageBox.Ok
                 )
                 self.currentWidget.validationFailed(error)
             else:
                 self.currentWidget.validationPassed(reply)
 
 
-class ProcedureEntryField(QGroupBox):
+class ProcedureEntryField(QtImport.QGroupBox):
     """Base class for entry widgets in Procedure panels"""
 
     def __init__(self, parent, caption=""):
@@ -141,7 +146,7 @@ class ProcedureEntryField(QGroupBox):
 
         parent -- the parent ProcedurePanel
         caption -- caption (default: no caption)"""
-        QGroupBox.__init__(self, parent)
+        QtImport.QGroupBox.__init__(self, parent)
 
         self.isValidating = False
         self.command = ""
@@ -149,9 +154,9 @@ class ProcedureEntryField(QGroupBox):
 
         self.setSpacing(5)
         self.setMargin(10)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
 
-        QLabel(str(caption), self)
+        QtImport.QLabel(str(caption), self)
 
         #
         # search for a Procedure Panel in its ancestors hierarchy
@@ -159,7 +164,7 @@ class ProcedureEntryField(QGroupBox):
         p = parent
         while p is not None:
             if isinstance(p, ProcedurePanel):
-                QObject.connect(
+                QtImport.QObject.connect(
                     self, PYSIGNAL("rawValueChanged"), p.childWidgetValueChanged
                 )
             p = p.parent()
@@ -224,30 +229,30 @@ class IntegerEntryField(ProcedureEntryField):
         unit -- unit string is appended to the end of the displayed value (default: no string)"""
         ProcedureEntryField.__init__(self, parent, caption)
 
-        box = QWidget(self)
-        self.spinbox = QSpinBox(minValue, maxValue, step, box)
+        box = QtImport.QWidget(self)
+        self.spinbox = QtImport.QSpinBox(minValue, maxValue, step, box)
         self.spinbox.setSuffix(" " + str(unit))
-        okCancelBox = QHBox(box)
+        okCancelBox = QtImport.QHBox(box)
         okCancelBox.setSpacing(0)
         okCancelBox.setMargin(0)
-        self.cmdOK = QPushButton(okCancelBox)
-        self.cmdCancel = QPushButton(okCancelBox)
+        self.cmdOK = QtImport.QPushButton(okCancelBox)
+        self.cmdCancel = QtImport.QPushButton(okCancelBox)
         self.cmdOK.setPixmap(Icons.load("button_ok_small"))  # QPixmap(Icons.okXPM))
         self.cmdOK.setFixedSize(20, 20)
         # QPixmap(Icons.cancelXPM))
         self.cmdCancel.setPixmap(Icons.load("button_cancel_small"))
         self.cmdCancel.setFixedSize(20, 20)
 
-        QObject.connect(self.cmdOK, SIGNAL("clicked()"), self.valueChanged)
-        QObject.connect(self.cmdCancel, SIGNAL("clicked()"), self.cancelClicked)
-        QObject.connect(self.spinbox, SIGNAL("valueChanged(int)"), self.valueChanging)
+        QtImport.QObject.connect(self.cmdOK, SIGNAL("clicked()"), self.valueChanged)
+        QtImport.QObject.connect(self.cmdCancel, SIGNAL("clicked()"), self.cancelClicked)
+        QtImport.QObject.connect(self.spinbox, SIGNAL("valueChanged(int)"), self.valueChanging)
 
-        QHBoxLayout(box, 0, 5)
-        box.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        box.layout().addWidget(self.spinbox, 0, Qt.AlignLeft)
-        box.layout().addWidget(okCancelBox, 0, Qt.AlignLeft)
+        QtImport.QHBoxLayout(box, 0, 5)
+        box.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.MinimumExpanding)
+        box.layout().addWidget(self.spinbox, 0, QtImport.Qt.AlignLeft)
+        box.layout().addWidget(okCancelBox, 0, QtImport.Qt.AlignLeft)
         box.layout().addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Fixed)
+            QtImport.QSpacerItem(0, 0, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
         )
 
         self.setIsOk(False)
@@ -266,7 +271,7 @@ class IntegerEntryField(ProcedureEntryField):
         if invalid:
             self.cmdOK.setEnabled(False)
             self.cmdCancel.setEnabled(True)
-            self.setPaletteForegroundColor(QColor(255, 0, 0))  # red
+            self.setPaletteForegroundColor(QtImport.QColor(255, 0, 0))  # red
         else:
             self.unsetPalette()
 
@@ -309,11 +314,11 @@ class IntegerEntryField(ProcedureEntryField):
         try:
             v = int(newValue)
         except BaseException:
-            QMessageBox.warning(
+            QtImport.QMessageBox.warning(
                 None,
                 "Invalid value",
                 "%s is not a valid integer value" % str(newValue),
-                QMessageBox.Ok,
+                QtImport.QMessageBox.Ok,
             )
         else:
             self.spinbox.setValue(v)
@@ -328,21 +333,21 @@ class FloatEntryField(ProcedureEntryField):
     def __init__(self, parent, caption="", unit=""):
         """Constructor
 
-        parent -- the parent QObject
+        parent -- the parent QtImport.QObject
         caption -- a caption string (default: no caption)
         unit -- unit string is appended to the end of the displayed value (default: no string)"""
         ProcedureEntryField.__init__(self, parent, caption)
 
-        box = QWidget(self)
+        box = QtImport.QWidget(self)
 
         self.savedValue = None
-        self.textbox = QLineEdit("", box)
-        self.unitLabel = QLabel(str(unit), box)
-        okCancelBox = QHBox(box)
+        self.textbox = QtImport.QLineEdit("", box)
+        self.unitLabel = QtImport.QLabel(str(unit), box)
+        okCancelBox = QtImport.QHBox(box)
         okCancelBox.setSpacing(0)
         okCancelBox.setMargin(0)
-        self.cmdOK = QPushButton(okCancelBox)
-        self.cmdCancel = QPushButton(okCancelBox)
+        self.cmdOK = QtImport.QPushButton(okCancelBox)
+        self.cmdCancel = QtImport.QPushButton(okCancelBox)
         self.cmdOK.setFixedSize(20, 20)
         self.cmdCancel.setFixedSize(20, 20)
         self.cmdOK.setPixmap(Icons.load("button_ok_small"))  # QPixmap(Icons.okXPM))
@@ -353,21 +358,21 @@ class FloatEntryField(ProcedureEntryField):
         self.textbox.textChanged.connect(self.valueChanging)
         self.cmdOK.clicked.connect(self.valueChanged)
         self.cmdCancel.clicked.connect(self.cancelClicked)
-        # QObject.connect(self.textbox, SIGNAL('returnPressed()'), self.valueChanged)
-        # QObject.connect(self.textbox, SIGNAL('textChanged( const QString & )'), self.valueChanging)
-        # QObject.connect(self.cmdOK, SIGNAL('clicked()'), self.valueChanged)
-        # QObject.connect(self.cmdCancel, SIGNAL('clicked()'), self.cancelClicked)
+        # QtImport.QObject.connect(self.textbox, SIGNAL('returnPressed()'), self.valueChanged)
+        # QObject.connect(self.textbox, SIGNAL('textChanged( const QtImport.QString & )'), self.valueChanging)
+        # QtImport.QObject.connect(self.cmdOK, SIGNAL('clicked()'), self.valueChanged)
+        # QtImport.QObject.connect(self.cmdCancel, SIGNAL('clicked()'), self.cancelClicked)
 
         self.cmdCancel.setEnabled(False)
         self.cmdOK.setEnabled(True)
 
-        QHBoxLayout(box, 0, 5)
-        box.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        box.layout().addWidget(self.textbox, 0, Qt.AlignLeft)
-        box.layout().addWidget(self.unitLabel, 0, Qt.AlignLeft)
-        box.layout().addWidget(okCancelBox, 0, Qt.AlignLeft)
+        QtImport.QHBoxLayout(box, 0, 5)
+        box.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.MinimumExpanding)
+        box.layout().addWidget(self.textbox, 0, QtImport.Qt.AlignLeft)
+        box.layout().addWidget(self.unitLabel, 0, QtImport.Qt.AlignLeft)
+        box.layout().addWidget(okCancelBox, 0, QtImport.Qt.AlignLeft)
         box.layout().addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Fixed)
+            QtImport.QSpacerItem(0, 0, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
         )
 
     def setIsOk(self, ok):
@@ -384,7 +389,7 @@ class FloatEntryField(ProcedureEntryField):
         if invalid:
             self.cmdOK.setEnabled(False)
             self.cmdCancel.setEnabled(True)
-            self.setPaletteForegroundColor(QColor(255, 0, 0))  # red
+            self.setPaletteForegroundColor(QtImport.QColor(255, 0, 0))  # red
             self.textbox.selectAll()
         else:
             self.unsetPalette()
@@ -409,11 +414,11 @@ class FloatEntryField(ProcedureEntryField):
         try:
             v = float(str(self.textbox.text()))
         except BaseException:
-            QMessageBox.warning(
+            QtImport.QMessageBox.warning(
                 None,
                 "Invalid value",
                 "%s is not a valid float value" % str(self.textbox.text()),
-                QMessageBox.Ok,
+                QtImport.QMessageBox.Ok,
             )
         else:
             ProcedureEntryField.valueChanged(self, v)
@@ -449,16 +454,16 @@ class TextEntryField(ProcedureEntryField):
         caption -- a caption string (default: no caption)"""
         ProcedureEntryField.__init__(self, parent, caption)
 
-        box = QWidget(self)
+        box = QtImport.QWidget(self)
 
         self.savedValue = None
-        self.textbox = QLineEdit("", box)
-        okCancelBox = QHBox(box)
+        self.textbox = QtImport.QLineEdit("", box)
+        okCancelBox = QtImport.QHBox(box)
         okCancelBox.setSpacing(0)
         okCancelBox.setMargin(0)
-        self.cmdOK = QPushButton(okCancelBox)
+        self.cmdOK = QtImport.QPushButton(okCancelBox)
         self.cmdOK.setFixedSize(20, 20)
-        self.cmdCancel = QPushButton(okCancelBox)
+        self.cmdCancel = QtImport.QPushButton(okCancelBox)
         self.cmdCancel.setFixedSize(20, 20)
         self.cmdOK.setPixmap(Icons.load("button_ok_small"))  # QPixmap(Icons.okXPM))
         # QPixmap(Icons.cancelXPM))
@@ -476,12 +481,12 @@ class TextEntryField(ProcedureEntryField):
         self.cmdCancel.setEnabled(False)
         self.cmdOK.setEnabled(True)
 
-        QHBoxLayout(box, 0, 5)
-        box.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        box.layout().addWidget(self.textbox, 0, Qt.AlignLeft)
-        box.layout().addWidget(okCancelBox, 0, Qt.AlignLeft)
+        QtImport.QHBoxLayout(box, 0, 5)
+        box.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.MinimumExpanding)
+        box.layout().addWidget(self.textbox, 0, QtImport.Qt.AlignLeft)
+        box.layout().addWidget(okCancelBox, 0, QtImport.Qt.AlignLeft)
         box.layout().addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Fixed)
+            QtImport.QSpacerItem(0, 0, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
         )
 
     def setIsOk(self, ok):
@@ -498,7 +503,7 @@ class TextEntryField(ProcedureEntryField):
         if invalid:
             self.cmdOK.setEnabled(False)
             self.cmdCancel.setEnabled(True)
-            self.setPaletteForegroundColor(QColor(255, 0, 0))
+            self.setPaletteForegroundColor(QtImport.QColor(255, 0, 0))
             self.textbox.selectAll()
         else:
             self.unsetPalette()
@@ -543,18 +548,18 @@ class TextEntryField(ProcedureEntryField):
         return self.cmdOK.isEnabled() == False and self.cmdCancel.setEnabled() == False
 
 
-class Label(QGroupBox):
+class Label(QtImport.QGroupBox):
     def __init__(self, parent, caption, value="-"):
-        QGroupBox.__init__(self, parent)
+        QtImport.QGroupBox.__init__(self, parent)
 
         self.setSpacing(5)
         self.setMargin(0)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
 
-        QLabel("<nobr><i>%s</i></nobr>" % str(caption), self)
+        QtImport.QLabel("<nobr><i>%s</i></nobr>" % str(caption), self)
 
         self.value = str(value)
-        self.label = QLabel(self)
+        self.label = QtImport.QLabel(self)
         self.setValue(self.value)
 
     def setValue(self, value):
@@ -565,27 +570,27 @@ class Label(QGroupBox):
         return self.value
 
 
-class MotorPositionReminder(QTableWidgetItem):
+class MotorPositionReminder(QtImport.QTableWidgetItem):
     NOPOSITION = 13 * "-"
 
     def __init__(self, parent):
-        QTableWidgetItem.__init__(self, parent, QTableWidgetItem.Always, "")
+        QtImport.QTableWidgetItem.__init__(self, parent, QtImport.QTableWidgetItem.Always, "")
 
         self.motor = None
         self.controlDialog = None
         self.cmdMotorPosition = None
 
     def createEditor(self):
-        self.cmdMotorPosition = QPushButton(
+        self.cmdMotorPosition = QtImport.QPushButton(
             MotorPositionReminder.NOPOSITION, self.table().viewport()
         )
         f = self.cmdMotorPosition.font()
         f.setFamily("courier")
         self.cmdMotorPosition.setFont(f)
-        QToolTip.add(self.cmdMotorPosition, "Click to edit motor")
+        QtImport.QToolTip.add(self.cmdMotorPosition, "Click to edit motor")
         self.cmdMotorPosition.setEnabled(False)
 
-        QObject.connect(
+        QtImport.QObject.connect(
             self.cmdMotorPosition, SIGNAL("clicked()"), self.editMotorClicked
         )
 
@@ -593,7 +598,7 @@ class MotorPositionReminder(QTableWidgetItem):
 
     def setMotor(self, motor_mne):
         if self.motor is not None:
-            QObject.disconnect(
+            QtImport.QObject.disconnect(
                 self.motor, PYSIGNAL("positionChanged"), self.motorPositionChanged
             )
 
@@ -603,7 +608,7 @@ class MotorPositionReminder(QTableWidgetItem):
 
         if self.motor is not None:
             self.cmdMotorPosition.setEnabled(True)
-            QObject.connect(
+            QtImport.QObject.connect(
                 self.motor, PYSIGNAL("positionChanged"), self.motorPositionChanged
             )
             if self.motor.isReady():
@@ -635,7 +640,7 @@ class MotorPositionReminder(QTableWidgetItem):
             self.controlDialog = MotorBrick.MotorControlDialog(
                 self.cmdMotorPosition, ""
             )
-            QObject.connect(
+            QtImport.QObject.connect(
                 self.controlDialog,
                 PYSIGNAL("motorControlDialogClosed"),
                 self.controlDialogClosed,
@@ -650,19 +655,19 @@ class MotorPositionReminder(QTableWidgetItem):
         self.controlDialog = None
 
 
-class ScanConfigurationTable(QTableWidget):
+class ScanConfigurationTable(QtImport.QTableWidget):
     def __init__(self, parent):
-        QTableWidget.__init__(self, parent)
+        QtImport.QTableWidget.__init__(self, parent)
 
         self.motorsList = []
         self.motors = {}
         self.customColumns = {}
 
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
         self.setLeftMargin(0)  # no vertical header
         self.setNumCols(5)
         self.setNumRows(1)
-        self.setVScrollBarMode(QScrollView.AlwaysOff)
+        self.setVScrollBarMode(QtImport.QScrollView.AlwaysOff)
 
         self.horizontalHeader().setLabel(0, "Motor")
         self.horizontalHeader().setLabel(1, "Motor pos.")
@@ -675,10 +680,10 @@ class ScanConfigurationTable(QTableWidget):
         self.adjustColumn(4)
         self.horizontalHeader().setResizeEnabled(False)
 
-        QObject.connect(self, SIGNAL("valueChanged(int, int)"), self.valueChanged)
+        QtImport.QObject.connect(self, SIGNAL("valueChanged(int, int)"), self.valueChanged)
 
     def sizeHint(self):
-        return QSize(
+        return QtImport.QSize(
             self.contentsWidth() + self.leftMargin() + 2 * self.frameWidth(),
             self.contentsHeight() + self.topMargin() + 2 * self.frameWidth(),
         )
@@ -712,7 +717,7 @@ class ScanConfigurationTable(QTableWidget):
                 pass
 
             for i in range(self.numRows()):
-                self.setItem(i, c, QComboTableItem(self, optList))
+                self.setItem(i, c, QtImport.QComboTableItem(self, optList))
 
         self.adjustColumn(c)
 
@@ -722,10 +727,10 @@ class ScanConfigurationTable(QTableWidget):
     def addRows(self, rows=1):
         row = self.numRows()
 
-        QTable.setNumRows(self, row + rows)
+        QtImport.QTable.setNumRows(self, row + rows)
 
         for i in range(rows):
-            self.setItem(row + i, 0, QComboTableItem(self, self.motorsList))
+            self.setItem(row + i, 0, QtImport.QComboTableItem(self, self.motorsList))
             self.setItem(row + i, 1, MotorPositionReminder(self))
 
             for col in self.customColumns:
@@ -738,13 +743,13 @@ class ScanConfigurationTable(QTableWidget):
                     except BaseException:
                         pass
 
-                    self.setItem(row + i, col, QComboTableItem(self, optList))
+                    self.setItem(row + i, col, QtImport.QComboTableItem(self, optList))
 
         self.adjustColumn(1)
         self.updateGeometry()
 
     def removeRows(self, fromRow):
-        QTable.setNumRows(self, fromRow)
+        QtImport.QTable.setNumRows(self, fromRow)
 
         self.updateGeometry()
 
@@ -770,7 +775,7 @@ class ScanConfigurationTable(QTableWidget):
         self.motorsList.sort()
 
         for i in range(self.numRows()):
-            self.setItem(i, 0, QComboTableItem(self, self.motorsList))
+            self.setItem(i, 0, QtImport.QComboTableItem(self, self.motorsList))
 
         self.updateGeometry()
 
@@ -805,11 +810,11 @@ class ScanConfigurationTable(QTableWidget):
                     if float(self.text(row, col)) < lowlimit:
                         raise
                 except BaseException:
-                    QMessageBox.warning(
+                    QtImport.QMessageBox.warning(
                         None,
                         "Invalid value",
                         "Cannot set start pos. below low limit %f" % lowlimit,
-                        QMessageBox.Ok,
+                        QtImport.QMessageBox.Ok,
                     )
                     accept = False
         elif col == 3:
@@ -821,11 +826,11 @@ class ScanConfigurationTable(QTableWidget):
                     if float(self.text(row, col)) > highlimit:
                         raise
                 except BaseException:
-                    QMessageBox.warning(
+                    QtImport.QMessageBox.warning(
                         None,
                         "Invalid value",
                         "Cannot set end pos. beyond high limit %f" % highlimit,
-                        QMessageBox.Ok,
+                        QtImport.QMessageBox.Ok,
                     )
                     accept = False
         elif col in self.customColumns:
@@ -836,44 +841,44 @@ class ScanConfigurationTable(QTableWidget):
                 try:
                     v = int(value)
                 except BaseException:
-                    QMessageBox.warning(
+                    QtImport.QMessageBox.warning(
                         None,
                         "Invalid value",
                         "%s is not a valid integer value" % value,
-                        QMessageBox.Ok,
+                        QtImport.QMessageBox.Ok,
                     )
                     accept = False
             elif type == "float":
                 try:
                     v = float(value)
                 except BaseException:
-                    QMessageBox.warning(
+                    QtImport.QMessageBox.warning(
                         None,
                         "Invalid value",
                         "%s is not a valid float value" % value,
-                        QMessageBox.Ok,
+                        QtImport.QMessageBox.Ok,
                     )
                     accept = False
 
-        return QTable.endEdit(self, row, col, accept, replace)
+        return QtImport.QTable.endEdit(self, row, col, accept, replace)
 
 
-class Table(QTableWidget):
+class Table(QtImport.QTableWidget):
     def __init__(self, parent):
-        QTableWidget.__init__(self, parent)
+        QtImport.QTableWidget.__init__(self, parent)
 
         self.customColumns = {}
 
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
         self.setLeftMargin(0)  # no vertical header
-        QTable.setNumCols(self, 0)
-        QTable.setNumRows(self, 0)
-        self.setVScrollBarMode(QScrollView.AlwaysOff)
+        QtImport.QTable.setNumCols(self, 0)
+        QtImport.QTable.setNumRows(self, 0)
+        self.setVScrollBarMode(QtImport.QScrollView.AlwaysOff)
 
         self.horizontalHeader().setResizeEnabled(False)
 
     def sizeHint(self):
-        return QSize(
+        return QtImport.QSize(
             self.contentsWidth() + self.leftMargin() + 2 * self.frameWidth(),
             self.contentsHeight() + self.topMargin() + 2 * self.frameWidth(),
         )
@@ -907,14 +912,14 @@ class Table(QTableWidget):
                 raise
 
             for i in range(self.numRows()):
-                self.setItem(i, c, QComboTableItem(self, optList))
+                self.setItem(i, c, QtImport.QComboTableItem(self, optList))
 
         self.adjustColumn(c)
 
     def addRows(self, rows=1):
         row = self.numRows()
 
-        QTable.setNumRows(self, row + rows)
+        QtImport.QTable.setNumRows(self, row + rows)
 
         for i in range(rows):
             for col in self.customColumns:
@@ -927,13 +932,13 @@ class Table(QTableWidget):
                     except BaseException:
                         raise
 
-                    self.setItem(row + i, col, QComboTableItem(self, optList))
+                    self.setItem(row + i, col, QtImport.QComboTableItem(self, optList))
 
                 self.adjustColumn(col)
         self.updateGeometry()
 
     def removeRows(self, fromRow):
-        QTable.setNumRows(self, fromRow)
+        QtImport.QTable.setNumRows(self, fromRow)
 
         self.updateGeometry()
 
@@ -954,23 +959,23 @@ class Table(QTableWidget):
                 try:
                     v = int(value)
                 except BaseException:
-                    QMessageBox.warning(
+                    QtImport.QMessageBox.warning(
                         None,
                         "Invalid value",
                         "%s is not a valid integer value" % value,
-                        QMessageBox.Ok,
+                        QtImport.QMessageBox.Ok,
                     )
                     accept = False
             elif type == "float":
                 try:
                     v = float(value)
                 except BaseException:
-                    QMessageBox.warning(
+                    QtImport.QMessageBox.warning(
                         None,
                         "Invalid value",
                         "%s is not a valid float value" % value,
-                        QMessageBox.Ok,
+                        QtImport.QMessageBox.Ok,
                     )
                     accept = False
 
-        return QTable.endEdit(self, row, col, accept, replace)
+        return QtImport.QTable.endEdit(self, row, col, accept, replace)

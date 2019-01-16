@@ -1,30 +1,36 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+import QtImport
 
 from PyMca.QtBlissGraph import QtBlissGraph
 
 
-class ScanPlotWidget(QWidget):
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+class ScanPlotWidget(QtImport.QWidget):
+
     def __init__(self, parent=None, name="scan_plot_widget"):
-        QWidget.__init__(self, parent)
+
+        QtImport.QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -36,35 +42,14 @@ class ScanPlotWidget(QWidget):
         self.isConnected = None
         self.isScanning = None
 
-        self.lblTitle = QLabel(self)
-        # self.graphPanel = qt.QFrame(self)
-        # buttonBox = qt.QHBox(self)
-        self.lblPosition = QLabel(self)
+        self.lblTitle = QtImport.QLabel(self)
+        self.lblPosition = QtImport.QLabel(self)
         self.graph = QtBlissGraph(self)
-
-        # QtCore.QObject.connect(self.graph, QtCore.SIGNAL('QtBlissGraphSignal'), self.handleBlissGraphSignal)
-        # QtCore.QObject.disconnect(self.graph, QtCore.SIGNAL('plotMousePressed(const QMouseEvent&)'), self.graph.onMousePressed)
-        # QtCore.QObject.disconnect(self.graph, QtCore.SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.graph.onMouseReleased)
 
         self.graph.canvas().setMouseTracking(True)
         self.graph.enableLegend(False)
         self.graph.enableZoom(False)
-        # self.graph.setAutoLegend(False)
-        """self.lblPosition.setAlignment(qt.Qt.AlignRight)
-        self.lblTitle.setAlignment(qt.Qt.AlignHCenter)
-        self.lblTitle.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        self.lblPosition.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        buttonBox.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-
-        qt.QVBoxLayout(self.graphPanel)
-        self.graphPanel.layout().addWidget(self.graph)
-
-        qt.QVBoxLayout(self)
-        self.layout().addWidget(self.lblTitle)
-        self.layout().addWidget(buttonBox)
-        self.layout().addWidget(self.graphPanel)
-        self.setPaletteBackgroundColor(qt.Qt.white)"""
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.lblTitle)
         _main_vlayout.addWidget(self.lblPosition)
         _main_vlayout.addWidget(self.graph)

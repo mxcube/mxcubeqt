@@ -156,6 +156,10 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self._results_widget.play_button.setIcon(Icons.load_icon("VCRPlay"))
         self._results_widget.stop_button.setIcon(Icons.load_icon("Stop2"))
 
+        self._results_widget.data_path_ledit.setText("/home/karpics/Downloads/data/data00000.tif")
+        self._results_widget.ff_path_ledit.setText("/home/karpics/Downloads/flatfield/flat00000.tif")
+ 
+
     def populate_widget(self, item):
         data_model = item.get_model()
         acq_params = data_model.acquisition.acquisition_parameters
@@ -185,8 +189,8 @@ class XrayImagingResultsWidget(QtImport.QWidget):
 
             self.graphics_view = self.xray_imaging_hwobj.get_graphics_view()
             self._graphics_view_widget_vlayout.addWidget(self.graphics_view)
-            self.graphics_view_widget.setFixedSize(
-                self.graphics_view.scene().width(), self.graphics_view.scene().height()
+            self.graphics_view_widget.setFixedSize(400, 400
+            #    self.graphics_view.scene().width(), self.graphics_view.scene().height()
             )
 
             self.setDisabled(False)

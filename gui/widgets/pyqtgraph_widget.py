@@ -1,39 +1,41 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+import QtImport
 
 import numpy as np
 import pyqtgraph as pg
 
 
-class TwoDimenisonalPlotWidget(QWidget):
-    """
-    Descript. :
-    """
-    mouseMovedSignal = pyqtSignal(float, float)
-    mouseClickedSignal = pyqtSignal(float, float)
-    mouseDoubleClickedSignal = pyqtSignal(float, float)
-    mouseLeftSignal = pyqtSignal()
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+class TwoDimenisonalPlotWidget(QtImport.QWidget):
+
+    mouseMovedSignal = QtImport.pyqtSignal(float, float)
+    mouseClickedSignal = QtImport.pyqtSignal(float, float)
+    mouseDoubleClickedSignal = QtImport.pyqtSignal(float, float)
+    mouseLeftSignal = QtImport.pyqtSignal()
 
     def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+        QtImport.QWidget.__init__(self, parent)
 
         self.plot_widget = pg.PlotWidget()
         self.image_view = pg.ImageView()
@@ -41,7 +43,7 @@ class TwoDimenisonalPlotWidget(QWidget):
         self.plot_widget.showGrid(x=True, y=True)
         self.curves_dict = {}
 
-        self.vlayout = QVBoxLayout(self)
+        self.vlayout = QtImport.QVBoxLayout(self)
         # self.vlayout.addWidget(self.plot_widget)
         self.vlayout.addWidget(self.image_view)
 
@@ -86,4 +88,4 @@ class TwoDimenisonalPlotWidget(QWidget):
         self.mouseMovedSignal.emit(mouse_event.x(), mouse_event.y())
 
     def mouse_double_clicked(self, press_event, double):
-        print press_event, double
+        print(press_event, double)

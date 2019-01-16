@@ -1,37 +1,35 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from QtImport import *
+import QtImport
 
 
-class RadiationDamageWidgetLayout(QWidget):
-    """
-    Descript. :
-    """
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
+
+class RadiationDamageWidgetLayout(QtImport.QWidget):
 
     def __init__(self, parent=None, name=None, flags=0):
-        """
-        Descript. :
-        """
 
-        QWidget.__init__(self, parent, Qt.WindowFlags(flags))
+        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("RadiationDamageWidgetLayout")
@@ -41,21 +39,21 @@ class RadiationDamageWidgetLayout(QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.rad_damage_cbx = QCheckBox(self)
-        _label_widget = QWidget(self)
-        self.burn_osc_start_label = QLabel(_label_widget)
-        self.burn_osc_start_ledit = QLineEdit(_label_widget)
+        self.rad_damage_cbx = QtImport.QCheckBox(self)
+        _label_widget = QtImport.QWidget(self)
+        self.burn_osc_start_label = QtImport.QLabel(_label_widget)
+        self.burn_osc_start_ledit = QtImport.QLineEdit(_label_widget)
         self.burn_osc_start_ledit.setMinimumSize(50, 0)
         self.burn_osc_start_ledit.setMaximumSize(50, 32767)
 
-        _value_widget = QWidget(self)
-        self.burn_osc_interval_label = QLabel(_value_widget)
-        self.burn_osc_interval_ledit = QLineEdit(_value_widget)
+        _value_widget = QtImport.QWidget(self)
+        self.burn_osc_interval_label = QtImport.QLabel(_value_widget)
+        self.burn_osc_interval_ledit = QtImport.QLineEdit(_value_widget)
         self.burn_osc_interval_ledit.setMinimumSize(50, 0)
         self.burn_osc_interval_ledit.setMaximumSize(50, 32767)
 
         # Layout --------------------------------------------------------------
-        _label_widget_hlayout = QHBoxLayout(self)
+        _label_widget_hlayout = QtImport.QHBoxLayout(self)
         _label_widget_hlayout.addWidget(self.burn_osc_start_label)
         _label_widget_hlayout.addWidget(self.burn_osc_start_ledit)
         _label_widget_hlayout.addStretch(0)
@@ -63,7 +61,7 @@ class RadiationDamageWidgetLayout(QWidget):
         _label_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         _label_widget.setLayout(_label_widget_hlayout)
 
-        _value_hlayout = QHBoxLayout(self)
+        _value_hlayout = QtImport.QHBoxLayout(self)
         _value_hlayout.addWidget(self.burn_osc_interval_label)
         _value_hlayout.addWidget(self.burn_osc_interval_ledit)
         _value_hlayout.addStretch(0)
@@ -71,7 +69,7 @@ class RadiationDamageWidgetLayout(QWidget):
         _value_hlayout.setContentsMargins(0, 0, 0, 0)
         _value_widget.setLayout(_value_hlayout)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.rad_damage_cbx)
         _main_vlayout.addWidget(_label_widget)
         _main_vlayout.addWidget(_value_widget)
@@ -88,9 +86,6 @@ class RadiationDamageWidgetLayout(QWidget):
         self.languageChange()
 
     def languageChange(self):
-        """
-        Descript. :
-        """
         self.setWindowTitle(self.__tr("RadiationDamageWidget"))
         self.rad_damage_cbx.setText(self.__tr("Determine radiation damage parameters"))
         self.burn_osc_start_label.setText(
@@ -101,7 +96,4 @@ class RadiationDamageWidgetLayout(QWidget):
         )
 
     def __tr(self, s, c=None):
-        """
-        Descript. :
-        """
-        return QApplication.translate("RadiationDamageWidgetLayout", s, c)
+        return QtImport.QApplication.translate("RadiationDamageWidgetLayout", s, c)

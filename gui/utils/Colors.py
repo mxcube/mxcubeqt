@@ -1,26 +1,31 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from QtImport import Qt, QColor, QPalette
 
 from random import randint
 import numpy as np
+
+
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
+
 
 # Basic core colors
 WHITE = QColor(Qt.white)
@@ -56,9 +61,6 @@ TASK_GROUP = [QColor("#B0DBFF"), QColor("#E57935"), QColor("#B1FF52")]
 
 
 def set_widget_color(widget, color, color_role=None):
-    """
-    Descript. :
-    """
     if color_role is None:
         color_role = QPalette.Window
     widget_palette = widget.palette()
