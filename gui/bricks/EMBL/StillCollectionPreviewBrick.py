@@ -35,7 +35,9 @@ __category__ = "EMBL"
 
 
 class StillCollectionPreviewBrick(BaseWidget):
+
     def __init__(self, *args):
+
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------

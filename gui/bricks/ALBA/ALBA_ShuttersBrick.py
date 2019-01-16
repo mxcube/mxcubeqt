@@ -1,36 +1,35 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+import QtImport
 
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework import Qt4_Icons
-from BlissFramework.Qt4_BaseComponents import BlissWidget
-
+from gui.utils import Colors, Icons
 from gui.utils.QLed import QLed
+from gui.BaseComponents import BaseWidget
 
+
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
 __category__ = "ALBA"
+
 
 #
 # These state list is as in ALBAEpsActuator.py
@@ -45,25 +44,20 @@ STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
 )
 
 STATES = {
-    STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
-    STATE_OUT: Qt4_widget_colors.LIGHT_GRAY,
-    STATE_MOVING: Qt4_widget_colors.LIGHT_YELLOW,
-    STATE_FAULT: Qt4_widget_colors.LIGHT_RED,
-    STATE_ALARM: Qt4_widget_colors.LIGHT_RED,
-    STATE_UNKNOWN: Qt4_widget_colors.LIGHT_GRAY,
+    STATE_IN: Colors.LIGHT_GREEN,
+    STATE_OUT: Colors.LIGHT_GRAY,
+    STATE_MOVING: Colors.LIGHT_YELLOW,
+    STATE_FAULT: Colors.LIGHT_RED,
+    STATE_ALARM: Colors.LIGHT_RED,
+    STATE_UNKNOWN: Colors.LIGHT_GRAY,
 }
 
 
-class Qt4_ALBA_ShuttersBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class ALBA_ShuttersBrick(BaseWidget):
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
         self.logger = logging.getLogger("HWR").info("Creating GUI Alba Shutters State")
 
         # Hardware objects ----------------------------------------------------
@@ -75,16 +69,16 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.default_led_size = 30
 
         # Properties ----------------------------------------------------------
-        self.addProperty("fast_shutter", "string", "")
-        self.addProperty("slow_shutter", "string", "")
-        self.addProperty("photon_shutter", "string", "")
-        self.addProperty("frontend", "string", "")
-        self.addProperty("led_size", "string", "")
+        self.add_property("fast_shutter", "string", "")
+        self.add_property("slow_shutter", "string", "")
+        self.add_property("photon_shutter", "string", "")
+        self.add_property("frontend", "string", "")
+        self.add_property("led_size", "string", "")
 
         # Graphic elements ----------------------------------------------------
-        self.shutter_box = QtGui.QGroupBox()
+        self.shutter_box = QtImport.QGroupBox()
         self.shutter_box.setTitle("Beam on Sample")
-        self.leds_layout = QtGui.QHBoxLayout(self.shutter_box)
+        self.leds_layout = QtImport.QHBoxLayout(self.shutter_box)
 
         self.fast_led = QLed.QLed()
         self.fast_led.setUserName("Fast Shutter")
@@ -103,7 +97,7 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.leds_layout.addWidget(self.photon_led)
         self.leds_layout.addWidget(self.fe_led)
 
-        QtGui.QHBoxLayout(self)
+        QtImport.QHBoxLayout(self)
 
         self.layout().addWidget(self.shutter_box)
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -112,7 +106,7 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.set_led_size(self.default_led_size)
         # SizePolicies --------------------------------------------------------
         self.setSizePolicy(
-            QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.MinimumExpanding
         )
 
         # Other ---------------------------------------------------------------
@@ -126,12 +120,7 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         #        self.fast_led.setMessage("in down position. X-Ray will go through")
         self.setEnabled(True)
 
-    def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        Args.     :
-        Return.   :
-        """
+    def property_changed(self, property_name, old_value, new_value):
         self.fast_shut_ho = None
         self.slow_shut_ho = None
         self.photon_shut_ho = None
@@ -143,16 +132,16 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
             if self.fast_shut_ho is not None:
                 self.disconnect(
                     self.fast_shut_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.fast_state_changed,
                 )
 
-            self.fast_shut_ho = self.getHardwareObject(new_value)
+            self.fast_shut_ho = self.get_hardware_object(new_value)
 
             if self.fast_shut_ho is not None:
                 self.connect(
                     self.fast_shut_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.fast_state_changed,
                 )
 
@@ -160,16 +149,16 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
             if self.slow_shut_ho is not None:
                 self.disconnect(
                     self.slow_shut_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.slow_state_changed,
                 )
 
-            self.slow_shut_ho = self.getHardwareObject(new_value)
+            self.slow_shut_ho = self.get_hardware_object(new_value)
 
             if self.slow_shut_ho is not None:
                 self.connect(
                     self.slow_shut_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.slow_state_changed,
                 )
 
@@ -177,16 +166,16 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
             if self.photon_shut_ho is not None:
                 self.disconnect(
                     self.photon_shut_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.photon_state_changed,
                 )
 
-            self.photon_shut_ho = self.getHardwareObject(new_value)
+            self.photon_shut_ho = self.get_hardware_object(new_value)
 
             if self.photon_shut_ho is not None:
                 self.connect(
                     self.photon_shut_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.photon_state_changed,
                 )
 
@@ -194,16 +183,16 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
             if self.fe_ho is not None:
                 self.disconnect(
                     self.fe_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.frontend_state_changed,
                 )
 
-            self.fe_ho = self.getHardwareObject(new_value)
+            self.fe_ho = self.get_hardware_object(new_value)
 
             if self.fe_ho is not None:
                 self.connect(
                     self.fe_ho,
-                    QtCore.SIGNAL("stateChanged"),
+                    QtImport.SIGNAL("stateChanged"),
                     self.frontend_state_changed,
                 )
 
@@ -211,7 +200,7 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
             if new_value != "":
                 self.set_led_size(int(new_value))
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def set_led_size(self, newsize):
         self.led_size = newsize

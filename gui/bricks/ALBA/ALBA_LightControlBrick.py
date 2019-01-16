@@ -1,34 +1,32 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import logging
+import QtImport
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from gui.utils import Colors, Icons
+from gui.BaseComponents import BaseWidget
 
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework import Qt4_Icons
-from BlissFramework.Qt4_BaseComponents import BlissWidget
 
+__credits__ = ["MXCuBE colaboration"]
+__license__ = "LGPLv3+"
 __category__ = "ALBA"
+
 
 #
 # These state list is as in ALBAEpsActuator.py
@@ -43,33 +41,28 @@ STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
 )
 
 STATES = {
-    STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
-    STATE_OUT: Qt4_widget_colors.LIGHT_GRAY,
-    STATE_MOVING: Qt4_widget_colors.LIGHT_YELLOW,
-    STATE_FAULT: Qt4_widget_colors.LIGHT_RED,
-    STATE_ALARM: Qt4_widget_colors.LIGHT_RED,
-    STATE_UNKNOWN: Qt4_widget_colors.LIGHT_GRAY,
+    STATE_IN: Colors.LIGHT_GREEN,
+    STATE_OUT: Colors.LIGHT_GRAY,
+    STATE_MOVING: Colors.LIGHT_YELLOW,
+    STATE_FAULT: Colors.LIGHT_RED,
+    STATE_ALARM: Colors.LIGHT_RED,
+    STATE_UNKNOWN: Colors.LIGHT_GRAY,
 }
 
 
-class Qt4_ALBA_LightControlBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class ALBA_LightControlBrick(BaseWidget):
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
         self.logger = logging.getLogger("GUI Alba Actuator")
         self.logger.info("__init__()")
 
-        self.on_color = Qt4_widget_colors.color_to_hexa(Qt4_widget_colors.LIGHT_GREEN)
-        self.off_color = Qt4_widget_colors.color_to_hexa(Qt4_widget_colors.LIGHT_GRAY)
-        self.fault_color = Qt4_widget_colors.color_to_hexa(Qt4_widget_colors.LIGHT_RED)
-        self.unknown_color = Qt4_widget_colors.color_to_hexa(
-            Qt4_widget_colors.DARK_GRAY
+        self.on_color = Colors.color_to_hexa(Qt4_widget_colors.LIGHT_GREEN)
+        self.off_color = Colors.color_to_hexa(Qt4_widget_colors.LIGHT_GRAY)
+        self.fault_color = Colors.color_to_hexa(Qt4_widget_colors.LIGHT_RED)
+        self.unknown_color = Colors.color_to_hexa(
+            Colors.DARK_GRAY
         )
 
         # Hardware objects ----------------------------------------------------
@@ -81,17 +74,13 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         self.level_limits = [None, None]
 
         # Properties ----------------------------------------------------------
-        self.addProperty("mnemonic", "string", "")
-        self.addProperty("icons", "string", "")
+        self.add_property("mnemonic", "string", "")
+        self.add_property("icons", "string", "")
 
         # Graphic elements ----------------------------------------------------
-        self.widget = uic.loadUi(
-            os.path.join(
-                os.path.dirname(__file__), "widgets/ui_files/alba_lightcontrol.ui"
-            )
-        )
+        self.widget = QtImport.load_ui_file("alba_lightcontrol.ui")
 
-        QtGui.QHBoxLayout(self)
+        QtImport.QHBoxLayout(self)
 
         self.layout().addWidget(self.widget)
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -103,7 +92,7 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
 
         # SizePolicies --------------------------------------------------------
         self.setSizePolicy(
-            QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.MinimumExpanding
         )
 
         # Defaults
@@ -114,30 +103,25 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
 
         self.update()
 
-    def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        Args.     :
-        Return.   :
-        """
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.light_ho is not None:
                 self.disconnect(
-                    self.light_ho, QtCore.SIGNAL("levelChanged"), self.level_changed
+                    self.light_ho, QtImport.SIGNAL("levelChanged"), self.level_changed
                 )
                 self.disconnect(
-                    self.light_ho, QtCore.SIGNAL("stateChanged"), self.state_changed
+                    self.light_ho, QtImport.SIGNAL("stateChanged"), self.state_changed
                 )
 
-            self.light_ho = self.getHardwareObject(new_value)
+            self.light_ho = self.get_hardware_object(new_value)
 
             if self.light_ho is not None:
                 self.setEnabled(True)
                 self.connect(
-                    self.light_ho, QtCore.SIGNAL("levelChanged"), self.level_changed
+                    self.light_ho, QtImport.SIGNAL("levelChanged"), self.level_changed
                 )
                 self.connect(
-                    self.light_ho, QtCore.SIGNAL("stateChanged"), self.state_changed
+                    self.light_ho, QtImport.SIGNAL("stateChanged"), self.state_changed
                 )
                 self.light_ho.update_values()
                 self.setToolTip(
@@ -151,14 +135,9 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         elif property_name == "icons":
             self.set_icons(new_value)
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def update(self, state=None):
-        """
-        Descript. :
-        Args.     :
-        Return.   :
-        """
         if self.light_ho is not None:
             self.setEnabled(True)
             if self.state is "on":
@@ -193,8 +172,8 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         icons = icons.split(",")
         if len(icons) == 2:
             self.icons = {
-                "on": Qt4_Icons.load_icon(icons[0]),
-                "off": Qt4_Icons.load_icon(icons[1]),
+                "on": Icons.load_icon(icons[0]),
+                "off": Icons.load_icon(icons[1]),
             }
             self.widget.button.setIcon(self.icons["on"])
 

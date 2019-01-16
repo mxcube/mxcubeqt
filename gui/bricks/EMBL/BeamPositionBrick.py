@@ -1,39 +1,39 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#   You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import *
+import QtImport
 
-from Qt4_MotorSpinBoxBrick import Qt4_MotorSpinBoxBrick
-
-from BlissFramework import Qt4_Icons
-from BlissFramework.Qt4_BaseComponents import BlissWidget
-from BlissFramework.Utils import Qt4_widget_colors
+from gui.utils import Icons
+from gui.BaseComponents import BaseWidget
+from gui.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
 
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
+__license__ = "LGPLv3+"
 __category__ = "EMBL"
 
 
-class Qt4_BeamPositionBrick(BlissWidget):
+class BeamPositionBrick(BaseWidget):
+
     def __init__(self, *args):
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
 
@@ -50,41 +50,41 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.is_beam_location_phase = False
 
         # Properties ----------------------------------------------------------
-        self.addProperty("hwobj_beam_focusing", "string", "")
-        self.addProperty("hwobj_beamline_test", "string", "/beamline-test")
-        self.addProperty("hwobj_diffractometer", "string", "/mini-diff")
-        self.addProperty("hwobj_motors_list", "string", "")
-        self.addProperty("icon_list", "string", "")
-        self.addProperty("defaultSteps", "string", "")
-        self.addProperty("defaultDeltas", "string", "")
-        self.addProperty("defaultDecimals", "string", "")
-        self.addProperty("enableCenterBeam", "boolean", True)
-        self.addProperty("enableMeasureFlux", "boolean", True)
-        self.addProperty("compactView", "boolean", False)
+        self.add_property("hwobj_beam_focusing", "string", "")
+        self.add_property("hwobj_beamline_test", "string", "/beamline-test")
+        self.add_property("hwobj_diffractometer", "string", "/mini-diff")
+        self.add_property("hwobj_motors_list", "string", "")
+        self.add_property("icon_list", "string", "")
+        self.add_property("defaultSteps", "string", "")
+        self.add_property("defaultDeltas", "string", "")
+        self.add_property("defaultDecimals", "string", "")
+        self.add_property("enableCenterBeam", "boolean", True)
+        self.add_property("enableMeasureFlux", "boolean", True)
+        self.add_property("compactView", "boolean", False)
 
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.main_group_box = QGroupBox(self)
-        self.unf_hor_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
-        self.unf_ver_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
-        self.double_hor_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
-        self.double_ver_motor_brick = Qt4_MotorSpinBoxBrick(self.main_group_box)
+        self.main_group_box = QtImport.QGroupBox(self)
+        self.unf_hor_motor_brick = MotorSpinBoxBrick(self.main_group_box)
+        self.unf_ver_motor_brick = MotorSpinBoxBrick(self.main_group_box)
+        self.double_hor_motor_brick = MotorSpinBoxBrick(self.main_group_box)
+        self.double_ver_motor_brick = MotorSpinBoxBrick(self.main_group_box)
         self.motor_widget_list = (
             self.unf_hor_motor_brick,
             self.unf_ver_motor_brick,
             self.double_hor_motor_brick,
             self.double_ver_motor_brick,
         )
-        self.center_beam_button = QPushButton(self.main_group_box)
+        self.center_beam_button = QtImport.QPushButton(self.main_group_box)
         self.center_beam_button.setFixedSize(27, 27)
-        self.measure_flux_button = QPushButton(self.main_group_box)
+        self.measure_flux_button = QtImport.QPushButton(self.main_group_box)
         self.measure_flux_button.setFixedSize(27, 27)
 
         # Layout --------------------------------------------------------------
-        _gbox_grid_layout = QGridLayout(self.main_group_box)
+        _gbox_grid_layout = QtImport.QGridLayout(self.main_group_box)
         _gbox_grid_layout.addWidget(self.unf_hor_motor_brick, 0, 0)
         _gbox_grid_layout.addWidget(self.unf_ver_motor_brick, 1, 0)
         _gbox_grid_layout.addWidget(self.double_hor_motor_brick, 0, 1)
@@ -94,7 +94,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
         _gbox_grid_layout.setSpacing(2)
         _gbox_grid_layout.setContentsMargins(2, 2, 2, 2)
 
-        _main_hlayout = QHBoxLayout(self)
+        _main_hlayout = QtImport.QHBoxLayout(self)
         _main_hlayout.addWidget(self.main_group_box)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
@@ -120,9 +120,9 @@ class Qt4_BeamPositionBrick(BlissWidget):
         self.double_ver_motor_brick.setVisible(False)
 
         self.center_beam_button.setToolTip("Start center beam procedure")
-        self.center_beam_button.setIcon(Qt4_Icons.load_icon("QuickRealign"))
+        self.center_beam_button.setIcon(Icons.load_icon("QuickRealign"))
         self.measure_flux_button.setToolTip("Measure flux")
-        self.measure_flux_button.setIcon(Qt4_Icons.load_icon("Sun"))
+        self.measure_flux_button.setIcon(Icons.load_icon("Sun"))
 
     def enable_widget(self, state):
         pass
@@ -130,7 +130,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
     def disable_widget(self, state):
         pass
 
-    def propertyChanged(self, property_name, old_value, new_value):
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_motors_list":
             hwobj_names_list = new_value.split()
 
@@ -140,7 +140,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
             icon_list = self["icon_list"].split()
 
             for index, hwobj_name in enumerate(hwobj_names_list):
-                temp_motor_hwobj = self.getHardwareObject(hwobj_name)
+                temp_motor_hwobj = self.get_hardware_object(hwobj_name)
                 if temp_motor_hwobj is not None:
                     temp_motor_widget = self.motor_widget_list[index]
                     temp_motor_widget.set_motor(temp_motor_hwobj, hwobj_name)
@@ -171,17 +171,17 @@ class Qt4_BeamPositionBrick(BlissWidget):
 
                     try:
                         temp_motor_widget.move_left_button.setIcon(
-                            Qt4_Icons.load_icon(icon_list[index * 2])
+                            Icons.load_icon(icon_list[index * 2])
                         )
                         temp_motor_widget.move_right_button.setIcon(
-                            Qt4_Icons.load_icon(icon_list[index * 2 + 1])
+                            Icons.load_icon(icon_list[index * 2 + 1])
                         )
                     except BaseException:
                         temp_motor_widget.move_left_button.setIcon(
-                            Qt4_Icons.load_icon("Right2")
+                            Icons.load_icon("Right2")
                         )
                         temp_motor_widget.move_right_button.setIcon(
-                            Qt4_Icons.load_icon("Left2")
+                            Icons.load_icon("Left2")
                         )
 
                     temp_motor_widget.step_changed(None)
@@ -194,7 +194,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
                     "focusingModeChanged",
                     self.focus_mode_changed,
                 )
-            self.beam_focusing_hwobj = self.getHardwareObject(new_value, optional=True)
+            self.beam_focusing_hwobj = self.get_hardware_object(new_value, optional=True)
             if self.beam_focusing_hwobj is not None:
                 self.connect(
                     self.beam_focusing_hwobj,
@@ -204,7 +204,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
                 mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
                 self.focus_mode_changed(mode, beam_size)
         elif property_name == "hwobj_beamline_test":
-            self.beamline_test_hwobj = self.getHardwareObject(new_value, optional=True)
+            self.beamline_test_hwobj = self.get_hardware_object(new_value, optional=True)
         elif property_name == "hwobj_diffractometer":
             if self.diffractometer_hwobj is not None:
                 self.disconnect(
@@ -212,7 +212,9 @@ class Qt4_BeamPositionBrick(BlissWidget):
                     "minidiffPhaseChanged",
                     self.phase_changed,
                 )
-            self.diffractometer_hwobj = self.getHardwareObject(new_value)
+
+            self.diffractometer_hwobj = self.get_hardware_object(new_value)
+
             if self.diffractometer_hwobj is not None:
                 self.connect(
                     self.diffractometer_hwobj,
@@ -231,7 +233,7 @@ class Qt4_BeamPositionBrick(BlissWidget):
                 widget.position_slider.setHidden(new_value)
                 widget.step_button.setHidden(new_value)
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def run(self):
         self.update_gui()
@@ -262,10 +264,10 @@ class Qt4_BeamPositionBrick(BlissWidget):
     def center_beam_clicked(self):
         conf_msg = "This will start automatic beam centering. Continue?"
         if (
-            QMessageBox.warning(
-                None, "Question", conf_msg, QMessageBox.Ok, QMessageBox.Cancel
+            QtImport.QMessageBox.warning(
+                None, "Question", conf_msg, QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
             )
-            == QMessageBox.Ok
+            == QtImport.QMessageBox.Ok
         ):
             self.beamline_test_hwobj.center_beam_report()
 
@@ -279,9 +281,9 @@ class Qt4_BeamPositionBrick(BlissWidget):
             + "If necessary move the sample out of beam. Continue?"
         )
         if (
-            QMessageBox.warning(
-                None, "Question", conf_msg, QMessageBox.Ok, QMessageBox.Cancel
+            QtImport.QMessageBox.warning(
+                None, "Question", conf_msg, QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
             )
-            == QMessageBox.Ok
+            == QtImport.QMessageBox.Ok
         ):
             self.beamline_test_hwobj.measure_flux()

@@ -1,44 +1,38 @@
 #
 #  Project: MXCuBE
-#  https://github.com/mxcube.
+#  https://github.com/mxcube
 #
 #  This file is part of MXCuBE software.
 #
 #  MXCuBE is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
+#  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from QtImport import *
+import QtImport
 
-from BlissFramework import Qt4_Icons
-from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework.Qt4_BaseComponents import BlissWidget
+from gui.utils import Colors, Icons
+from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]
 __version__ = "2.3"
 __category__ = "EMBL"
 
 
-class Qt4_MarvinBrick(BlissWidget):
-    """
-    Descript. :
-    """
+class MarvinBrick(BaseWidget):
 
     def __init__(self, *args):
-        """
-        Descript. :
-        """
-        BlissWidget.__init__(self, *args)
+
+        BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
         self.sample_changer_hwobj = None
@@ -46,43 +40,43 @@ class Qt4_MarvinBrick(BlissWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty("formatString", "formatString", "#.#")
-        self.addProperty("hwobj_sample_changer", "", "/sc-generic")
+        self.add_property("formatString", "formatString", "#.#")
+        self.add_property("hwobj_sample_changer", "", "/sc-generic")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.status_gbox = QGroupBox("Status", self)
-        self.mounted_sample_ledit = QLineEdit("", self)
-        self.sample_detected_ledit = QLineEdit("", self)
-        self.focus_mode_ledit = QLineEdit("", self)
+        self.status_gbox = QtImport.QGroupBox("Status", self)
+        self.mounted_sample_ledit = QtImport.QLineEdit("", self)
+        self.sample_detected_ledit = QtImport.QLineEdit("", self)
+        self.focus_mode_ledit = QtImport.QLineEdit("", self)
 
-        self.puck_switches_gbox = QGroupBox("Puck switches", self)
-        self.puck_switches_table = QTableWidget(self.puck_switches_gbox)
-        self.central_puck_ledit = QLineEdit("No center puck", self.puck_switches_gbox)
+        self.puck_switches_gbox = QtImport.QGroupBox("Puck switches", self)
+        self.puck_switches_table = QtImport.QTableWidget(self.puck_switches_gbox)
+        self.central_puck_ledit = QtImport.QLineEdit("No center puck", self.puck_switches_gbox)
 
-        self.control_gbox = QGroupBox("Control", self)
-        self.open_lid_button = QPushButton("Open lid", self.control_gbox)
-        self.close_lid_button = QPushButton("Close lid", self.control_gbox)
-        self.base_to_center_button = QPushButton("Base to center", self.control_gbox)
-        self.center_to_base_button = QPushButton("Center to base", self.control_gbox)
-        self.dry_gripper_button = QPushButton("Dry gripper", self.control_gbox)
+        self.control_gbox = QtImport.QGroupBox("Control", self)
+        self.open_lid_button = QtImport.QPushButton("Open lid", self.control_gbox)
+        self.close_lid_button = QtImport.QPushButton("Close lid", self.control_gbox)
+        self.base_to_center_button = QtImport.QPushButton("Base to center", self.control_gbox)
+        self.center_to_base_button = QtImport.QPushButton("Center to base", self.control_gbox)
+        self.dry_gripper_button = QtImport.QPushButton("Dry gripper", self.control_gbox)
 
-        self.status_list_gbox = QGroupBox("Status list", self)
-        self.status_table = QTableWidget(self)
+        self.status_list_gbox = QtImport.QGroupBox("Status list", self)
+        self.status_table = QtImport.QTableWidget(self)
 
         # Layout --------------------------------------------------------------
-        _status_gbox_gridlayout = QGridLayout(self.status_gbox)
+        _status_gbox_gridlayout = QtImport.QGridLayout(self.status_gbox)
         _status_gbox_gridlayout.addWidget(
-            QLabel("Mounted sample", self.status_list_gbox), 0, 0
+            QtImport.QLabel("Mounted sample", self.status_list_gbox), 0, 0
         )
         _status_gbox_gridlayout.addWidget(
-            QLabel("Sample detected", self.status_list_gbox), 1, 0
+            QtImport.QLabel("Sample detected", self.status_list_gbox), 1, 0
         )
         _status_gbox_gridlayout.addWidget(
-            QLabel("Focus mode", self.status_list_gbox), 2, 0
+            QtImport.QLabel("Focus mode", self.status_list_gbox), 2, 0
         )
         _status_gbox_gridlayout.addWidget(self.mounted_sample_ledit, 0, 1)
         _status_gbox_gridlayout.addWidget(self.sample_detected_ledit, 1, 1)
@@ -91,18 +85,18 @@ class Qt4_MarvinBrick(BlissWidget):
         _status_gbox_gridlayout.setContentsMargins(0, 0, 0, 0)
         _status_gbox_gridlayout.setColumnStretch(2, 10)
 
-        _puck_switches_gbox_vlayout = QHBoxLayout(self.puck_switches_gbox)
+        _puck_switches_gbox_vlayout = QtImport.QHBoxLayout(self.puck_switches_gbox)
         _puck_switches_gbox_vlayout.addWidget(self.puck_switches_table)
         _puck_switches_gbox_vlayout.addWidget(self.central_puck_ledit)
         _puck_switches_gbox_vlayout.setSpacing(2)
         _puck_switches_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _status_vbox_layout = QVBoxLayout(self.status_list_gbox)
+        _status_vbox_layout = QtImport.QVBoxLayout(self.status_list_gbox)
         _status_vbox_layout.addWidget(self.status_table)
         _status_vbox_layout.setSpacing(2)
         _status_vbox_layout.setContentsMargins(0, 0, 0, 0)
 
-        _control_gbox_hlayout = QHBoxLayout(self.control_gbox)
+        _control_gbox_hlayout = QtImport.QHBoxLayout(self.control_gbox)
         _control_gbox_hlayout.addWidget(self.open_lid_button)
         _control_gbox_hlayout.addWidget(self.close_lid_button)
         _control_gbox_hlayout.addWidget(self.base_to_center_button)
@@ -111,7 +105,7 @@ class Qt4_MarvinBrick(BlissWidget):
         _control_gbox_hlayout.setSpacing(2)
         _control_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self.status_gbox)
         _main_vlayout.addWidget(self.puck_switches_gbox)
         _main_vlayout.addWidget(self.control_gbox)
@@ -148,9 +142,9 @@ class Qt4_MarvinBrick(BlissWidget):
         self.puck_switches_table.setFixedWidth(33 * 17 + 4)
 
         for col_index in range(17):
-            temp_item = QTableWidgetItem(str(col_index + 1))
-            temp_item.setFlags(Qt.ItemIsEnabled)
-            temp_item.setBackground(Qt4_widget_colors.WHITE)
+            temp_item = QtImport.QTableWidgetItem(str(col_index + 1))
+            temp_item.setFlags(QtImport.Qt.ItemIsEnabled)
+            temp_item.setBackground(Colors.WHITE)
             self.puck_switches_table.setItem(0, col_index, temp_item)
             self.puck_switches_table.setColumnWidth(col_index, 33)
 
@@ -159,13 +153,10 @@ class Qt4_MarvinBrick(BlissWidget):
             ["Property", "Description", "Value"]
         )
 
-        self.puck_switches_gbox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        # self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        self.puck_switches_gbox.setSizePolicy(QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed)
+        # self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Preferred)
 
-    def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        """
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_sample_changer":
             if self.sample_changer_hwobj:
                 self.disconnect(
@@ -176,7 +167,7 @@ class Qt4_MarvinBrick(BlissWidget):
                 self.disconnect(
                     self.sample_changer_hwobj, "infoDictChanged", self.info_dict_changed
                 )
-            self.sample_changer_hwobj = self.getHardwareObject(new_value)
+            self.sample_changer_hwobj = self.get_hardware_object(new_value)
             if self.sample_changer_hwobj:
                 self.init_tables()
                 self.connect(
@@ -189,18 +180,18 @@ class Qt4_MarvinBrick(BlissWidget):
                 )
                 self.sample_changer_hwobj.update_values()
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def init_tables(self):
         self.status_str_desc = self.sample_changer_hwobj.get_status_str_desc()
         self.index_dict = {}
         self.status_table.setRowCount(len(self.status_str_desc))
         for row, key in enumerate(self.status_str_desc.keys()):
-            temp_item = QTableWidgetItem(key)
+            temp_item = QtImport.QTableWidgetItem(key)
             self.status_table.setItem(row, 0, temp_item)
-            temp_item = QTableWidgetItem(self.status_str_desc[key])
+            temp_item = QtImport.QTableWidgetItem(self.status_str_desc[key])
             self.status_table.setItem(row, 1, temp_item)
-            temp_item = QTableWidgetItem("")
+            temp_item = QtImport.QTableWidgetItem("")
             self.status_table.setItem(row, 2, temp_item)
             self.index_dict[key] = row
 
@@ -230,16 +221,16 @@ class Qt4_MarvinBrick(BlissWidget):
 
         for index in range(self.puck_switches_table.columnCount()):
             self.puck_switches_table.item(0, index).setBackground(
-                Qt4_widget_colors.LIGHT_GRAY
+                Colors.LIGHT_GRAY
             )
             if info_dict.get("puck_switches", 0) & pow(2, index) > 0:
                 self.puck_switches_table.item(0, index).setBackground(
-                    Qt4_widget_colors.LIGHT_GREEN
+                    Colors.LIGHT_GREEN
                 )
 
         if info_dict.get("centre_puck"):
-            Qt4_widget_colors.set_widget_color(
-                self.central_puck_ledit, Qt4_widget_colors.LIGHT_GREEN, QPalette.Base
+            Colors.set_widget_color(
+                self.central_puck_ledit, Colors.LIGHT_GREEN, QtImport.QPalette.Base
             )
             if info_dict.get("mounted_puck"):
                 self.central_puck_ledit.setText(
@@ -250,22 +241,22 @@ class Qt4_MarvinBrick(BlissWidget):
             if info_dict.get("mounted_puck", 0) - 1 >= 0:
                 self.puck_switches_table.item(
                     0, info_dict.get("mounted_puck", 0) - 1
-                ).setBackground(Qt4_widget_colors.LIGHT_GREEN)
+                ).setBackground(Colors.LIGHT_GREEN)
 
         else:
-            Qt4_widget_colors.set_widget_color(
-                self.central_puck_ledit, Qt4_widget_colors.LIGHT_GRAY, QPalette.Base
+            Colors.set_widget_color(
+                self.central_puck_ledit, Colors.LIGHT_GRAY, QtImport.QPalette.Base
             )
 
         if info_dict.get("sample_detected"):
             self.sample_detected_ledit.setText("True")
-            Qt4_widget_colors.set_widget_color(
-                self.sample_detected_ledit, Qt4_widget_colors.LIGHT_GREEN, QPalette.Base
+            Colors.set_widget_color(
+                self.sample_detected_ledit, Colors.LIGHT_GREEN, QtImport.QPalette.Base
             )
         else:
             self.sample_detected_ledit.setText("False")
-            Qt4_widget_colors.set_widget_color(
-                self.sample_detected_ledit, Qt4_widget_colors.LIGHT_GRAY, QPalette.Base
+            Colors.set_widget_color(
+                self.sample_detected_ledit, Colors.LIGHT_GRAY, QtImport.QPalette.Base
             )
 
         self.base_to_center_button.setDisabled(info_dict.get("centre_puck", True))
@@ -273,9 +264,9 @@ class Qt4_MarvinBrick(BlissWidget):
         self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
         self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
-        # self.sample_detected_ledit = QLineEdit('', self)
-        # self.last_command_ledit = QLineEdit('', self)
-        # self.current_command_ledit = QLineEdit('', self)
+        # self.sample_detected_ledit = QtImport.QLineEdit('', self)
+        # self.last_command_ledit = QtImport.QLineEdit('', self)
+        # self.current_command_ledit = QtImport.QLineEdit('', self)
 
     def open_lid_clicked(self):
         self.sample_changer_hwobj.open_lid()
