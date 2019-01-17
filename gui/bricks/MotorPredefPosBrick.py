@@ -231,6 +231,7 @@ class MotorPredefPosBrick(BaseWidget):
             pos_list = str(p).split()
             pos_name = pos_list[1]
             self.positions_combo.addItem(str(pos_name))
+        print(self.positions)    
         self.positions = positions
         if self.motor_hwobj is not None:
             if self.motor_hwobj.is_ready():
@@ -259,14 +260,14 @@ class MotorPredefPosBrick(BaseWidget):
 
     def predefined_position_changed(self, position_name, offset):
         if self.positions:
-            index = 0
-            for index in range(len(self.positions)):
-                if self.positions[index] == position_name:
-                    break
+            #index = 0
+            #for index in range(len(self.positions)):
+            #    if self.positions[index] == position_name:
+            #        break
 
-            self.positions_combo.setCurrentIndex(index)
-            self.next_position_button.setEnabled(index < (len(self.positions) - 1))
-            self.previous_position_button.setEnabled(index > 0)
+            self.positions_combo.setCurrentIndex(self.positions_combo.findText(position_name))
+            #self.next_position_button.setEnabled(index < (len(self.positions) - 1))
+            #self.previous_position_button.setEnabled(index > 0)
 
     def select_previous_position(self):
         self.position_selected(self.positions_combo.currentIndex() - 1)

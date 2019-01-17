@@ -52,6 +52,11 @@ Depending of the beam focusing mode user can enter gap sizes by using spinboxes.
 
 import QtImport
 
+try:
+    uni_chr = unichr
+except:
+    uni_chr = chr
+
 from gui.utils import Colors, Icons
 from gui.BaseComponents import BaseWidget
 
@@ -287,7 +292,7 @@ class SlitsBrick(BaseWidget):
         #     self.current_hor_pos_ledit.setText("-")
         else:
             self.current_hor_pos_ledit.setText(
-                "%d %sm" % (newGap[0] * 1000, unichr(956))
+                "%d %sm" % (newGap[0] * 1000, uni_chr(956))
             )
 
         if newGap[1] is None:
@@ -297,7 +302,7 @@ class SlitsBrick(BaseWidget):
         else:
             gap_str = str(newGap[1] * 1000)
             self.current_ver_pos_ledit.setText(
-                "%d %sm" % (newGap[1] * 1000, unichr(956))
+                "%d %sm" % (newGap[1] * 1000, uni_chr(956))
             )
 
         Colors.set_widget_color(

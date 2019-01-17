@@ -576,7 +576,6 @@ class TreeBrick(BaseWidget):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
         self.enable_widgets.emit(True)
 
-        print 1111, "collect", "%s : %s" % (queue_entry.get_type_str(), status)
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
             BaseWidget.set_status_info(
                 "collect", "%s : %s" % (queue_entry.get_type_str(), status)

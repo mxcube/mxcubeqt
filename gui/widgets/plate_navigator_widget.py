@@ -156,7 +156,6 @@ class PlateNavigatorWidget(QtImport.QWidget):
         """
         # TODO replace this with pos_x, pos_y
         drop = int(pos_y * self.num_drops) + 1
-        print pos_x, pos_y
         self.plate_manipulator_hwobj.load_sample(
             (int(self.__current_location[0] + 1),
              int((self.__current_location[1]) * self.num_drops + drop)),
