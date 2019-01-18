@@ -184,8 +184,6 @@ class CameraBrick(BaseWidget):
         )
         self.camera_control_action.setEnabled(False)
 
-        self.popup_menu.popup(QtImport.QCursor.pos())
-
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtImport.QHBoxLayout(self.info_widget)
         _info_widget_hlayout.addWidget(self.display_beam_size_cbox)
