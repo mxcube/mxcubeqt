@@ -258,7 +258,7 @@
       </property>
       <attribute name="icon">
        <iconset>
-        <normaloff>../../../BlissFramework/Icons/Point.png</normaloff>../../../BlissFramework/Icons/Point.png</iconset>
+        <normaloff>../icons/Point.png</normaloff>../icons/Point.png</iconset>
       </attribute>
       <attribute name="label">
        <string>Points</string>
@@ -298,7 +298,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../../BlissFramework/Icons/VCRPlay2.png</normaloff>../../../BlissFramework/Icons/VCRPlay2.png</iconset>
+             <normaloff>../icons/VCRPlay2.png</normaloff>../icons/VCRPlay2.png</iconset>
            </property>
           </widget>
          </item>
@@ -309,7 +309,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../../BlissFramework/Icons/ThumbUp.png</normaloff>../../../BlissFramework/Icons/ThumbUp.png</iconset>
+             <normaloff>../icons/ThumbUp.png</normaloff>../icons/ThumbUp.png</iconset>
            </property>
           </widget>
          </item>
@@ -341,7 +341,7 @@
       </property>
       <attribute name="icon">
        <iconset>
-        <normaloff>../../../BlissFramework/Icons/Line.png</normaloff>../../../BlissFramework/Icons/Line.png</iconset>
+        <normaloff>../icons/Line.png</normaloff>../icons/Line.png</iconset>
       </attribute>
       <attribute name="label">
        <string>Lines</string>
@@ -392,7 +392,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../../BlissFramework/Icons/Line.png</normaloff>../../../BlissFramework/Icons/Line.png</iconset>
+             <normaloff>../icons/Line.png</normaloff>../icons/Line.png</iconset>
            </property>
           </widget>
          </item>
@@ -424,7 +424,7 @@
       </property>
       <attribute name="icon">
        <iconset>
-        <normaloff>../../../BlissFramework/Icons/Grid.png</normaloff>../../../BlissFramework/Icons/Grid.png</iconset>
+        <normaloff>../icons/Grid.png</normaloff>../icons/Grid.png</iconset>
       </attribute>
       <attribute name="label">
        <string>Grids</string>
@@ -561,7 +561,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>../../../BlissFramework/Icons/Left2.png</normaloff>../../../BlissFramework/Icons/Left2.png</iconset>
+               <normaloff>../icons/Left2.png</normaloff>../icons/Left2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -581,7 +581,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>../../../BlissFramework/Icons/Up2.png</normaloff>../../../BlissFramework/Icons/Up2.png</iconset>
+               <normaloff>../icons/Up2.png</normaloff>../icons/Up2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -608,7 +608,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>../../../BlissFramework/Icons/Right2.png</normaloff>../../../BlissFramework/Icons/Right2.png</iconset>
+               <normaloff>../icons/Right2.png</normaloff>../icons/Right2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -634,7 +634,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>../../../BlissFramework/Icons/Down2.png</normaloff>../../../BlissFramework/Icons/Down2.png</iconset>
+               <normaloff>../icons/Down2.png</normaloff>../icons/Down2.png</iconset>
              </property>
              <property name="autoRepeat">
               <bool>true</bool>
@@ -756,7 +756,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../../BlissFramework/Icons/Grid.png</normaloff>../../../BlissFramework/Icons/Grid.png</iconset>
+             <normaloff>../icons/Grid.png</normaloff>../icons/Grid.png</iconset>
            </property>
           </widget>
          </item>

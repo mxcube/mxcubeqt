@@ -1217,7 +1217,7 @@ class TreeBrick(BaseWidget):
         else:
             msg = ""
             logging.getLogger("GUI").warning("Data collect is disabled")
-            for key, value in self.enable_collect_conditions.iteritems():
+            for key, value in self.enable_collect_conditions.items():
                 if value == False:
                     if key == "diffractometer":
                         logging.getLogger("GUI").warning(
