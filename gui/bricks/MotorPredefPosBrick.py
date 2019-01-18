@@ -113,11 +113,7 @@ class MotorPredefPosBrick(BaseWidget):
             tip = "Status: unknown motor " + name
         else:
             if state is None:
-                # TODO remove this check
-                if hasattr(self.motor_hwobj, "getState"):
-                    state = self.motor_hwobj.getState()
-                else:
-                    state = self.motor_hwobj.get_state()
+                state = self.motor_hwobj.get_state()
             try:
                 state_str = states[state]
             except IndexError:
@@ -178,14 +174,9 @@ class MotorPredefPosBrick(BaseWidget):
                 )
                 self.fill_positions()
                 if self.motor_hwobj.is_ready():
-                    if hasattr(self.motor_hwobj, "getCurrentPositionName"):
-                        self.predefined_position_changed(
-                            self.motor_hwobj.getCurrentPositionName(), 0
-                        )
-                    else:
-                        self.predefined_position_changed(
-                            self.motor_hwobj.get_current_position_name(), 0
-                        )
+                    self.predefined_position_changed(
+                         self.motor_hwobj.get_current_position_name(), 0
+                    )
                 if self["label"] == "":
                     lbl = self.motor_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
@@ -194,11 +185,7 @@ class MotorPredefPosBrick(BaseWidget):
                     MotorPredefPosBrick.STATE_COLORS[0],
                     QtImport.QPalette.Button,
                 )
-                # TODO remove this check
-                if hasattr(self.motor_hwobj, "getState"):
-                    self.motor_state_changed(self.motor_hwobj.getState())
-                else:
-                    self.motor_state_changed(self.motor_hwobj.get_state())
+                self.motor_state_changed(self.motor_hwobj.get_state())
         elif property_name == "showMoveButtons":
             if new_value:
                 self.previous_position_button.show()
@@ -220,54 +207,33 @@ class MotorPredefPosBrick(BaseWidget):
         self.positions_combo.clear()
         if self.motor_hwobj is not None:
             if positions is None:
-                # TODO remove this check
-                if hasattr(self.motor_hwobj, "getPredefinedPositionsList"):
-                    positions = self.motor_hwobj.getPredefinedPositionsList()
-                else:
-                    positions = self.motor_hwobj.get_predefined_positions_list()
+                positions = self.motor_hwobj.get_predefined_positions_list()
         if positions is None:
             positions = []
         for p in positions:
             pos_list = str(p).split()
             pos_name = pos_list[1]
             self.positions_combo.addItem(str(pos_name))
-        print(self.positions)    
+
         self.positions = positions
         if self.motor_hwobj is not None:
             if self.motor_hwobj.is_ready():
-                # TODO remove this check
-                if hasattr(self.motor_hwobj, "getCurrentPositionName"):
-                    self.predefined_position_changed(
-                        self.motor_hwobj.getCurrentPositionName(), 0
-                    )
-                else:
-                    self.predefined_position_changed(
-                        self.motor_hwobj.get_current_position_name(), 0
-                    )
+                self.predefined_position_changed(
+                    self.motor_hwobj.get_current_position_name(), 0
+                )
 
     def position_selected(self, index):
         if index >= 0:
-            if True:
-                # TODO remove this check
-                if hasattr(self.motor_hwobj, "moveToPosition"):
-                    self.motor_hwobj.moveToPosition(self.positions[index])
-                else:
-                    self.motor_hwobj.move_to_position(self.positions[index])
-            else:
-                self.positions_combo.setCurrentIndex(0)
+            self.motor_hwobj.move_to_position(self.positions[index])
+        self.positions_combo.setCurrentIndex(-1)
         self.next_position_button.setEnabled(index < (len(self.positions) - 1))
         self.previous_position_button.setEnabled(index >= 0)
 
     def predefined_position_changed(self, position_name, offset):
         if self.positions:
-            #index = 0
-            #for index in range(len(self.positions)):
-            #    if self.positions[index] == position_name:
-            #        break
-
-            self.positions_combo.setCurrentIndex(self.positions_combo.findText(position_name))
-            #self.next_position_button.setEnabled(index < (len(self.positions) - 1))
-            #self.previous_position_button.setEnabled(index > 0)
+            for index, item in enumerate(self.positions):
+                if position_name == item:
+                    self.positions_combo.setCurrentIndex(index)
 
     def select_previous_position(self):
         self.position_selected(self.positions_combo.currentIndex() - 1)

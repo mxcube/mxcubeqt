@@ -937,6 +937,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._progress_dialog.setWindowTitle("Please wait...")
         self._progress_dialog.setCancelButton(None)
         self._progress_dialog.setModal(True)
+        self._progress_dialog.close()
 
         # _statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
         # _statusbar_hlayout.setSpacing(2)
