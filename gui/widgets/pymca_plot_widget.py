@@ -24,16 +24,11 @@ from gui.utils import Colors
 
 PYMCA_EXISTS = False
 
-if not QtImport.qt_variant == "PyQt5":
-    try:
-        from PyMca.QtBlissGraph import QtBlissGraph as Graph
-
-        PYMCA_EXISTS = True
-    except BaseException:
-        pass
-
-if not PYMCA_EXISTS:
-    from gui.widgets.matplot_widget import TwoAxisPlotWidget as Graph
+try: 
+   from PyMca.QtBlissGraph import QtBlissGraph as Plot
+   PYMCA_EXISTS = True
+except BaseException:
+   from gui.widgets.matplot_widget import TwoAxisPlotWidget as Plot
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -51,7 +46,7 @@ class PymcaPlotWidget(QtImport.QWidget):
 
         self.realtime_plot = realtime_plot
 
-        self.pymca_graph = Graph(self)
+        self.pymca_graph = Plot(self)
         self.pymca_graph.showGrid()
         self.info_label = QtImport.QLabel("", self)
         self.info_label.setAlignment(QtImport.Qt.AlignRight)
@@ -66,9 +61,7 @@ class PymcaPlotWidget(QtImport.QWidget):
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
 
-        if QtImport.qt_variant == "PyQt5":
-            pass
-        else:
+        if PYMCA_EXISTS:
             QtImport.QObject.connect(
                 self.pymca_graph,
                 QtImport.SIGNAL("QtBlissGraphSignal"),

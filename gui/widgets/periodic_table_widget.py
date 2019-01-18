@@ -21,13 +21,15 @@ import QtImport
 
 PYMCA_IMPORTED = False
 try:
-    if QtImport.qt_variant == "PyQt5":
-        from PyMca5.PyMca import QPeriodicTable
-    else:
-        from PyMca import QPeriodicTable
-    PYMCA_IMPORTED = True
+    from PyMca5.PyMca import QPeriodicTable
+    PYMCA_IMPORTED = 5
 except BaseException:
-    pass
+    try:
+        from PyMca import QPeriodicTable
+        PYMCA_IMPORTED = 4
+    except BaseException:
+        pass
+
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -142,8 +144,8 @@ if PYMCA_IMPORTED:
             QPeriodicTable.QPeriodicTable.__init__(self, *args)
 
             self.elements_dict = {}
-            if QtImport.qt_variant == "PyQt5":
-                self.elementClicked.connect(self.table_element_clicked)
+            if PYMCA_IMPORTED == 5:
+                self.sigElementClicked.connect(self.table_element_clicked)
             else:
                 QtImport.QObject.connect(
                     self, QtImport.SIGNAL("elementClicked"), self.table_element_clicked
@@ -156,8 +158,8 @@ if PYMCA_IMPORTED:
                 symbol = el[0]
                 self.elements_dict[symbol] = el
 
-        def elementEnter(self, symbol, z, name):
-            b = self.eltButton[symbol]
+        def elementEnter(self, symbol, z=None, name=None):
+            b = self.eltButton[(symbol)[0]]
             if b.isEnabled():
                 b.setCurrent(True)
 
