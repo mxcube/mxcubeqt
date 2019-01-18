@@ -368,7 +368,8 @@ class PolarScaterWidget(QtImport.QWidget):
         )
 
     def draw_multiwedge_scater(self, sw_list):
-        self._polar_scater.draw_scater(sw_list)
+        #self._polar_scater.draw_scater(sw_list)
+        pass  
 
 
 class PolarScater(FigureCanvas):
