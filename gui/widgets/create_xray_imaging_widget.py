@@ -34,7 +34,7 @@ from HardwareRepository.HardwareObjects import (
 )
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

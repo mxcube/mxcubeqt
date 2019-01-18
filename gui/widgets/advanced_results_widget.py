@@ -25,7 +25,7 @@ from gui.widgets.heat_map_widget import HeatMapWidget
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

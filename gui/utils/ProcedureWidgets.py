@@ -25,7 +25,7 @@ from gui.utils import Icons
 from HardwareRepository import HardwareRepository
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

@@ -30,7 +30,7 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

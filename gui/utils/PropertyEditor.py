@@ -28,7 +28,7 @@ import QtImport
 from gui.utils import Icons, PropertyBag, Colors
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

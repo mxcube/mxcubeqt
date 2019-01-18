@@ -57,7 +57,7 @@ from gui.utils import Colors
 from gui.BaseComponents import BaseWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __category__ = "Beam definition"
 
 

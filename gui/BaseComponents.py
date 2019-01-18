@@ -42,7 +42,7 @@ except ImportError:
     saferef.safe_ref = saferef.safeRef
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

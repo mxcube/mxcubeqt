@@ -30,7 +30,7 @@ from gui.utils import Colors
 from gui.utils.paramsgui import FieldsWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

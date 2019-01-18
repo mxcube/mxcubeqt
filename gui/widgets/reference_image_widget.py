@@ -23,7 +23,7 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.data_path_widget import DataPathWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

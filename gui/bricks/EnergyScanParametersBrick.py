@@ -23,7 +23,7 @@ from gui.BaseComponents import BaseWidget
 from gui.widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Task"
 

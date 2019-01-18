@@ -38,7 +38,7 @@ from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, Ta
 from HardwareRepository import HardwareRepository
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __status__ = "Production"
 

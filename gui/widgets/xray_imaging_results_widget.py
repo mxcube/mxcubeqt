@@ -23,7 +23,7 @@ import QtImport
 from gui.utils import Icons
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

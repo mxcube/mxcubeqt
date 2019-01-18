@@ -34,7 +34,7 @@ from api import beamline_setup
 from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 

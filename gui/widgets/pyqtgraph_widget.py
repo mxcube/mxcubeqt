@@ -23,7 +23,7 @@ import numpy as np
 import pyqtgraph as pg
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

@@ -23,7 +23,7 @@ from gui.BaseComponents import BaseWidget
 from gui.widgets.dc_group_widget import DCGroupWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Task"
 

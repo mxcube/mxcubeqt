@@ -30,7 +30,7 @@ from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, sample_changer_helper
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Sample changer"
 

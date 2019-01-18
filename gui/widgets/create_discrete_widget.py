@@ -35,7 +35,7 @@ from HardwareRepository.HardwareObjects import (
 from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

@@ -36,7 +36,7 @@ if not PYMCA_EXISTS:
     from gui.widgets.matplot_widget import TwoAxisPlotWidget as Graph
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

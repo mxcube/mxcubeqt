@@ -41,7 +41,7 @@ from gui.utils import sample_changer_helper as sc_helper
 from gui.bricks.SampleChangerBrick import SampleChangerBrick, BasketView, VialView
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Sample changer"
 

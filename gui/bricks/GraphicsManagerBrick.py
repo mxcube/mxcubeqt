@@ -23,7 +23,7 @@ from gui.utils import Icons
 from gui.BaseComponents import BaseWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __version__ = "2.3"
 __category__ = "Graphics"
 

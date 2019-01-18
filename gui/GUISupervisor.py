@@ -39,7 +39,7 @@ from HardwareRepository import HardwareRepository
 LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 
