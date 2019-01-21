@@ -24,7 +24,7 @@ from gui.utils import Icons, Colors
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 PIN_ICON = Icons.load_icon("sample_axis")

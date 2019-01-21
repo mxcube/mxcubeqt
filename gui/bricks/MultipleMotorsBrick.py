@@ -24,7 +24,7 @@ from gui.BaseComponents import BaseWidget
 from gui.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Motor"
 

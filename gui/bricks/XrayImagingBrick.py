@@ -24,7 +24,7 @@ from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidg
 from gui.widgets.xray_imaging_results_widget import XrayImagingResultsWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Task"
 

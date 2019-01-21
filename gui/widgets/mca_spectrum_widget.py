@@ -66,7 +66,7 @@ if not pymca_imported:
     from gui.widgets.matplot_widget import TwoAxisPlotWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

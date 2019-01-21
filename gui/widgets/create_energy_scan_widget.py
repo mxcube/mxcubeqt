@@ -35,7 +35,7 @@ from HardwareRepository.HardwareObjects.queue_model_enumerables import (
 from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

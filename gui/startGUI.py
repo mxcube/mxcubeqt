@@ -41,7 +41,7 @@ from gui import GUISupervisor
 from HardwareRepository import HardwareRepository
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __version__ = 2
 

@@ -29,7 +29,7 @@ from gui.widgets.data_path_widget import DataPathWidget
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

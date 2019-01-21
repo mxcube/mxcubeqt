@@ -32,7 +32,7 @@ from HardwareRepository.HardwareObjects import (
 )
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -432,7 +432,10 @@ class CreateTaskBase(QtImport.QWidget):
         if isinstance(tree_item, queue_item.SampleQueueItem):
             sample_data_model = sample_item.get_model()
             self._path_template = deepcopy(self._path_template)
+
+            self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
+            self._acquisition_parameters.centred_position.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
 
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
@@ -853,7 +856,10 @@ class CreateTaskBase(QtImport.QWidget):
         bl_setup = self._beamline_setup_hwobj
 
         acq = queue_model_objects.Acquisition()
+
+        parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
+        self._acquisition_parameters.centred_position.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
         )

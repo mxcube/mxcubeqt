@@ -31,7 +31,7 @@ from gui.widgets.snapshot_widget import SnapshotWidget
 import api
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Task"
 
@@ -80,17 +80,17 @@ class AdvancedBrick(BaseWidget):
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = (
-            api.session.get_base_image_directory()
+            api.beamline_setup.session_hwobj.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget._base_process_dir = (
-            api.session.get_base_process_directory()
+            api.beamline_setup.session_hwobj.get_base_process_directory()
         )
 
         self.line_parameters_widget._data_path_widget._base_image_dir = (
-            api.session.get_base_image_directory()
+            api.beamline_setup.session_hwobj.get_base_image_directory()
         )
         self.line_parameters_widget._data_path_widget._base_process_dir = (
-            api.session.get_base_process_directory()
+            api.beamline_setup.session_hwobj.get_base_process_directory()
         )
 
         # self.parameters_widget.populate_widget(item)

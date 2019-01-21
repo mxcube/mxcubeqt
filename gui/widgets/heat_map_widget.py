@@ -30,7 +30,7 @@ from copy import deepcopy
 from widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

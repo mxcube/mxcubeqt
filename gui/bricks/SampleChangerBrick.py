@@ -26,7 +26,7 @@ from gui.BaseComponents import BaseWidget
 from HardwareRepository.HardwareObjects.abstract import AbstractSampleChanger
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Sample changer"
 
@@ -1408,7 +1408,7 @@ class SampleChangerBrick(BaseWidget):
             for (
                 basket,
                 samples,
-            ) in self.basketsSamplesSelectionDialog.result.iteritems():
+            ) in self.basketsSamplesSelectionDialog.result.items():
                 for index in range(self.vials_per_basket):
                     basket_input = [basket, index + 1, 0, 0, 0]
                 for sample in samples:

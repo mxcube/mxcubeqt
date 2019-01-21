@@ -27,7 +27,7 @@ from gui.widgets.processing_widget import ProcessingWidget
 from gui.utils.widget_utils import DataModelInputBinder
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

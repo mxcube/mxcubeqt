@@ -30,7 +30,7 @@ from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -445,7 +445,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         :returns: selected grid objects
         """
         shapes = []
-        for grid, grid_treewidget_item in self._grid_map.iteritems():
+        for grid, grid_treewidget_item in self._grid_map.items():
             if grid_treewidget_item.isSelected():
                 shapes.append(grid)
         return shapes
@@ -456,7 +456,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         :returns: dict with properties
         """
 
-        for grid, grid_treewidget_item in self._grid_map.iteritems():
+        for grid, grid_treewidget_item in self._grid_map.items():
             if grid_treewidget_item.isSelected():
                 return grid.get_properties()
 
@@ -500,7 +500,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         if 0 in self.spacing:
             return
 
-        for grid, treewidget_item in self._grid_map.iteritems():
+        for grid, treewidget_item in self._grid_map.items():
             if treewidget_item.isSelected():
                 grid.set_spacing(
                     self.spacing,

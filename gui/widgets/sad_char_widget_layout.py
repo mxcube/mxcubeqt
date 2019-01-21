@@ -19,7 +19,7 @@
 import QtImport
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -72,4 +72,4 @@ class SADWidgetLayout(QtImport.QWidget):
         )
 
     def trUtf8(self, s, c=None):
-        return QtImport.QApplication.translate("SADWidgetLayout", s, c, QtImport.QApplication.UnicodeUTF8)
+        return QtImport.QApplication.translate("SADWidgetLayout", s, c)

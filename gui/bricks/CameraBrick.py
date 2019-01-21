@@ -23,7 +23,7 @@ from gui.utils import Icons
 from gui.BaseComponents import BaseWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Graphics"
 
@@ -183,8 +183,6 @@ class CameraBrick(BaseWidget):
             "Camera control", self.open_camera_control_dialog
         )
         self.camera_control_action.setEnabled(False)
-
-        self.popup_menu.popup(QtImport.QCursor.pos())
 
         # Layout --------------------------------------------------------------
         _info_widget_hlayout = QtImport.QHBoxLayout(self.info_widget)

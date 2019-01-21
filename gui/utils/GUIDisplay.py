@@ -38,7 +38,7 @@ from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, Ta
 from HardwareRepository import HardwareRepository
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __status__ = "Production"
 
@@ -937,6 +937,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._progress_dialog.setWindowTitle("Please wait...")
         self._progress_dialog.setCancelButton(None)
         self._progress_dialog.setModal(True)
+        self._progress_dialog.close()
 
         # _statusbar_hlayout = QtGui.QHBoxLayout(self.statusbar)
         # _statusbar_hlayout.setSpacing(2)

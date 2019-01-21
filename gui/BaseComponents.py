@@ -42,7 +42,7 @@ except ImportError:
     saferef.safe_ref = saferef.safeRef
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -767,7 +767,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             #                       slot)
 
         # workaround for PyQt lapse
-        print "TODO workaround for PyQt lapse"
         # if hasattr(sender, "connectNotify"):
         #    sender.connectNotify(QtCore.pyqtSignal(signal))
 

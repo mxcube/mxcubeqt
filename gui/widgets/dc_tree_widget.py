@@ -41,7 +41,7 @@ from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
 
 
-__credits__ = ["MxCuBE colaboration"]
+__credits__ = ["MxCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

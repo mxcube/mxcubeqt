@@ -23,7 +23,7 @@ from gui.utils import Icons
 from gui.BaseComponents import BaseWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 

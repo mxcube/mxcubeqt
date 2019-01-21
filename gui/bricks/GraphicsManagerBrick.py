@@ -23,7 +23,7 @@ from gui.utils import Icons
 from gui.BaseComponents import BaseWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __version__ = "2.3"
 __category__ = "Graphics"
 
@@ -285,12 +285,12 @@ class GraphicsManagerBrick(BaseWidget):
                 item.set_base_color(color)
 
     def display_all_button_clicked(self):
-        for shape, treewidget_item in self.__shape_map.iteritems():
+        for shape, treewidget_item in self.__shape_map.items():
             shape.show()
             treewidget_item.setData(3, QtImport.Qt.DisplayRole, "True")
 
     def hide_all_button_clicked(self):
-        for shape, treewidget_item in self.__shape_map.iteritems():
+        for shape, treewidget_item in self.__shape_map.items():
             shape.hide()
             treewidget_item.setData(3, QtImport.Qt.DisplayRole, "False")
 
@@ -331,7 +331,7 @@ class GraphicsManagerBrick(BaseWidget):
         self.manager_widget.clear_all_button.setEnabled(len(self.__shape_map) > 0)
 
     def shape_treewiget_item_clicked(self, current_item, column):
-        for key, value in self.__shape_map.iteritems():
+        for key, value in self.__shape_map.items():
             if value == current_item:
                 key.toggle_selected()
         self.manager_widget.change_color_button.setEnabled(current_item is not None)

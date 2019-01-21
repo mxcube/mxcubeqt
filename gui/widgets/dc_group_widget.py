@@ -26,7 +26,7 @@ from gui.utils import Colors, Icons, queue_item
 from gui.widgets.matplot_widget import PolarScaterWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

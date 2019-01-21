@@ -64,11 +64,11 @@ class _CfgItem:
            Add new properties (if any) and remove odd ones (if any)
         """
         for item_property in properties:
-            if hasattr(item_property, "getName"):
-                prop_name = item_property.getName()
+            if hasattr(item_property, "get_name"):
+                prop_name = item_property.get_name()
                 if prop_name in self.properties.properties:
-                    self.properties.get_property(prop_name).setValue(
-                        item_property.getUserValue()
+                    self.properties.get_property(prop_name).set_value(
+                        item_property.get_user_value()
                     )
                 elif item_property.hidden or prop_name.startswith("closable_"):
                     self.properties[prop_name] = item_property
@@ -79,7 +79,7 @@ class _CfgItem:
                     arg1 = item_property["choices"]
                 else:
                     arg1 = item_property["value"]
-                arg2 = item_property["defaultValue"]
+                arg2 = item_property["default_value"]
                 self.properties.add_property(
                     property_name=item_property["name"],
                     property_type=item_property["type"],

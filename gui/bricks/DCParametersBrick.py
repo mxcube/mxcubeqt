@@ -27,7 +27,7 @@ from widgets.advanced_results_widget import AdvancedResultsWidget
 from widgets.snapshot_widget import SnapshotWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Task"
 

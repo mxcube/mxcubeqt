@@ -23,7 +23,7 @@ from gui.BaseComponents import BaseWidget
 from gui.widgets.char_parameters_widget import CharParametersWidget
 from gui.widgets.webview_widget import WebViewWidget
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Task"
 

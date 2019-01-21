@@ -27,7 +27,7 @@ from gui.utils.sample_changer_helper import SampleChanger
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "Sample changer"
 

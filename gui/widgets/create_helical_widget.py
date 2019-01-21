@@ -32,7 +32,7 @@ from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
 from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemLine
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -226,7 +226,7 @@ class CreateHelicalWidget(CreateTaskBase):
         # de-select previous selected list items and
         # select the current shape (Line).
         """
-        for (list_item, shape) in self._lines_map.iteritems():
+        for (list_item, shape) in self._lines_map.items():
             if selected_line == shape:
                 list_item.setSelected(True)
             else:
@@ -352,7 +352,7 @@ class CreateHelicalWidget(CreateTaskBase):
             len(self._lines_widget.lines_treewidget.selectedItems()) > 0
         )
 
-        for shape, list_item in self._lines_map.iteritems():
+        for shape, list_item in self._lines_map.items():
             self._graphics_manager_hwobj.select_shape(shape, list_item.isSelected())
         self._acq_widget.emit_acq_parameters_changed()
 
@@ -364,7 +364,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def remove_line_button_clicked(self):
         line_to_delete = None
-        for line, treewidget_item in self._lines_map.iteritems():
+        for line, treewidget_item in self._lines_map.items():
             if treewidget_item.isSelected():
                 line_to_delete = line
                 break
@@ -374,7 +374,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
     def get_selected_shapes(self):
         selected_lines = []
-        for line, treewidget_item in self._lines_map.iteritems():
+        for line, treewidget_item in self._lines_map.items():
             if treewidget_item.isSelected():
                 selected_lines.append(line)
         return selected_lines
@@ -383,11 +383,11 @@ class CreateHelicalWidget(CreateTaskBase):
         self._graphics_manager_hwobj.set_display_overlay(state)
 
     def overlay_alpha_changed(self, alpha_value):
-        for line, treewidget_item in self._lines_map.iteritems():
+        for line, treewidget_item in self._lines_map.items():
             if treewidget_item.isSelected():
                 line.set_fill_alpha(alpha_value)
 
     def swap_points_clicked(self):
-        for line, treewidget_item in self._lines_map.iteritems():
+        for line, treewidget_item in self._lines_map.items():
             if treewidget_item.isSelected():
                 self._graphics_manager_hwobj.swap_line_points(line)

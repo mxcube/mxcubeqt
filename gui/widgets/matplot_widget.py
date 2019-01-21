@@ -49,7 +49,7 @@ else:
         )
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -150,7 +150,7 @@ class TwoAxisPlotWidget(QtImport.QWidget):
         pass
 
     def newcurve(self, label, x_array, y_array):
-        self._two_axis_figure_canvas.add_curve(y_array, x_array, label=label)
+        self._two_axis_figure_canvas.plot_curve(y_array, x_array, label=label)
 
     def setx1axislimits(self, x_min, x_max):
         self._two_axis_figure_canvas.axes.set_xlim((x_min, x_max))
@@ -368,7 +368,8 @@ class PolarScaterWidget(QtImport.QWidget):
         )
 
     def draw_multiwedge_scater(self, sw_list):
-        self._polar_scater.draw_scater(sw_list)
+        #self._polar_scater.draw_scater(sw_list)
+        pass  
 
 
 class PolarScater(FigureCanvas):

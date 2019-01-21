@@ -24,7 +24,7 @@ from gui.widgets.sad_char_widget_layout import SADWidgetLayout
 from gui.widgets.radiation_damage_char_widget_layout import RadiationDamageWidgetLayout
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 

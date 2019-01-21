@@ -30,7 +30,7 @@ from gui.widgets.matplot_widget import TwoAxisPlotWidget
 STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 

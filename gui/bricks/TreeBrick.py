@@ -34,7 +34,7 @@ from api import beamline_setup
 from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 
@@ -576,7 +576,6 @@ class TreeBrick(BaseWidget):
         self.dc_tree_widget.queue_entry_execution_finished(queue_entry, status)
         self.enable_widgets.emit(True)
 
-        print 1111, "collect", "%s : %s" % (queue_entry.get_type_str(), status)
         if queue_entry.get_type_str() not in ["Sample", "Basket", ""]:
             BaseWidget.set_status_info(
                 "collect", "%s : %s" % (queue_entry.get_type_str(), status)
@@ -1218,7 +1217,7 @@ class TreeBrick(BaseWidget):
         else:
             msg = ""
             logging.getLogger("GUI").warning("Data collect is disabled")
-            for key, value in self.enable_collect_conditions.iteritems():
+            for key, value in self.enable_collect_conditions.items():
                 if value == False:
                     if key == "diffractometer":
                         logging.getLogger("GUI").warning(

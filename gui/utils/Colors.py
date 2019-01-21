@@ -23,7 +23,7 @@ from random import randint
 import numpy as np
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
