@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors
 
@@ -33,13 +34,9 @@ class PhaseBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.diffractometer_hwobj = None
-
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -71,32 +68,14 @@ class PhaseBrick(BaseWidget):
             self.phase_combobox, Colors.LIGHT_GREEN, QtImport.QPalette.Button
         )
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.diffractometer_hwobj is not None:
-                self.disconnect(
-                    self.diffractometer_hwobj,
-                    "minidiffPhaseChanged",
-                    self.phase_changed,
-                )
+        self.init_phase_list()
 
-            self.diffractometer_hwobj = self.get_hardware_object(new_value)
-
-            if self.diffractometer_hwobj is not None:
-                self.init_phase_list()
-
-                self.connect(
-                    self.diffractometer_hwobj,
-                    "minidiffPhaseChanged",
-                    self.phase_changed,
-                )
-                self.diffractometer_hwobj.update_values()
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        self.connect(api.diffractometer, "minidiffPhaseChanged", self.phase_changed)
+        api.diffractometer.update_values()
 
     def init_phase_list(self):
         self.phase_combobox.clear()
-        phase_list = self.diffractometer_hwobj.get_phase_list()
+        phase_list = api.diffractometer.get_phase_list()
         if len(phase_list) > 0:
             for phase in phase_list:
                 self.phase_combobox.addItem(phase)
@@ -105,8 +84,8 @@ class PhaseBrick(BaseWidget):
             self.setEnabled(False)
 
     def change_phase(self):
-        if self.diffractometer_hwobj is not None:
-            self.diffractometer_hwobj.set_phase(
+        if api.diffractometer is not None:
+            api.diffractometer.set_phase(
                 self.phase_combobox.currentText(), timeout=None
             )
 

@@ -27,8 +27,6 @@ import api
 from gui.BaseComponents import BaseWidget
 from widgets.task_toolbox_widget import TaskToolBoxWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects
-
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -42,15 +40,11 @@ class TaskToolBoxBrick(BaseWidget):
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.queue_model_hwobj = None
-
         # Internal values -----------------------------------------------------
         self.ispyb_logged_in = False
         self.tree_brick = None
 
         # Properties ----------------------------------------------------------
-        self.add_property("queue_model", "string", "/queue-model")
         self.add_property("useOscStartCbox", "boolean", False)
         self.add_property("useCompression", "boolean", False)
         self.add_property("showDiscreetTask", "boolean", True)

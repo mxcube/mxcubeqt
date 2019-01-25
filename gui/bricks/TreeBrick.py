@@ -75,7 +75,6 @@ class TreeBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.queue_hwobj = None
         self.state_machine_hwobj = None
         self.redis_client_hwobj = None
 
@@ -204,8 +203,6 @@ class TreeBrick(BaseWidget):
         # self.dc_tree_widget.set_centring_method(1)
 
     def run(self):
-        self.dc_tree_widget.beamline_setup_hwobj = api.beamline_setup
-
         if not api.sample_changer:
             logging.getLogger("GUI").debug(
                 "TreeBrick: sample changer hwobj not defined."
@@ -257,9 +254,46 @@ class TreeBrick(BaseWidget):
         self.connect(api.graphics, "shapeChanged", self.dc_tree_widget.shape_changed)
         self.connect(api.graphics, "shapeDeleted", self.dc_tree_widget.shape_deleted)
         self.connect(api.graphics, "diffractometerReady", self.diffractometer_ready_changed)
-        self.connect(api.beamline_setup.diffractometer_hwobj, "newAutomaticCentringPoint", self.diffractometer_automatic_centring_done)
-        self.connect(api.beamline_setup.diffractometer_hwobj, "minidiffPhaseChanged", self.diffractometer_phase_changed)
-        self.diffractometer_phase_changed(api.beamline_setup.diffractometer_hwobj.get_current_phase())
+        self.connect(api.diffractometer, "newAutomaticCentringPoint", self.diffractometer_automatic_centring_done)
+        self.connect(api.diffractometer, "minidiffPhaseChanged", self.diffractometer_phase_changed)
+        self.diffractometer_phase_changed(api.diffractometer.get_current_phase())
+
+
+        self.connect(
+            api.queue_manager,
+            "show_workflow_tab",
+            self.show_workflow_tab_from_model
+        )
+        self.connect(
+            api.queue_manager,
+            "queue_entry_execute_started",
+            self.queue_entry_execution_started,
+        )
+        self.connect(
+            api.queue_manager,
+            "queue_entry_execute_finished",
+            self.queue_entry_execution_finished,
+        )
+        self.connect(
+            api.queue_manager,
+            "queue_paused",
+            self.queue_paused_handler
+        )
+        self.connect(
+            api.queue_manager,
+            "queue_execution_finished",
+            self.queue_execution_finished,
+        )
+        self.connect(
+            api.queue_manager,
+            "queue_stopped",
+            self.queue_stop_handler)
+        self.connect(
+            api.queue_model,
+            "child_added",
+            self.dc_tree_widget.add_to_view
+        )
+
 
         if hasattr(api.beamline_setup, "ppu_control_hwobj"):
             self.connect(
@@ -343,43 +377,6 @@ class TreeBrick(BaseWidget):
         elif property_name == "useCentringMethods":
             self.sample_changer_widget.centring_cbox.setEnabled(new_value)
             self.sample_changer_widget.centring_mode_label.setEnabled(new_value)
-        elif property_name == "queue":
-            self.queue_hwobj = self.get_hardware_object(new_value)
-            self.dc_tree_widget.queue_hwobj = self.queue_hwobj
-            self.connect(
-                self.queue_hwobj, "show_workflow_tab", self.show_workflow_tab_from_model
-            )
-
-            self.connect(
-                self.queue_hwobj,
-                "queue_entry_execute_started",
-                self.queue_entry_execution_started,
-            )
-
-            self.connect(
-                self.queue_hwobj,
-                "queue_entry_execute_finished",
-                self.queue_entry_execution_finished,
-            )
-
-            self.connect(self.queue_hwobj, "queue_paused", self.queue_paused_handler)
-
-            self.connect(
-                self.queue_hwobj,
-                "queue_execution_finished",
-                self.queue_execution_finished,
-            )
-
-            self.connect(self.queue_hwobj, "queue_stopped", self.queue_stop_handler)
-        elif property_name == "queue_model":
-            self.queue_model_hwobj = self.get_hardware_object(new_value)
-            self.dc_tree_widget.queue_model_hwobj = self.queue_model_hwobj
-            self.dc_tree_widget.confirm_dialog.queue_model_hwobj = (
-                self.queue_model_hwobj
-            )
-            self.connect(
-                self.queue_model_hwobj, "child_added", self.dc_tree_widget.add_to_view
-            )
         elif property_name == "xml_rpc_server":
             xml_rpc_server_hwobj = self.get_hardware_object(new_value)
 
@@ -743,7 +740,7 @@ class TreeBrick(BaseWidget):
         Assigns lims sample to manually-mounted sample
         """
         self.dc_tree_widget.filter_sample_list(0)
-        root_model = self.queue_model_hwobj.get_model_root()
+        root_model = api.queue_model.get_model_root()
         sample_model = root_model.get_children()[0]
 
         sample_model.init_from_lims_object(self.filtered_lims_samples[index])
@@ -920,7 +917,7 @@ class TreeBrick(BaseWidget):
     def show_workflow_tab(self, item):
         self.show_tab("workflow")
 
-        running = self.queue_hwobj.is_executing()
+        running = api.queue_manager.is_executing()
         self.populate_workflow_tab(item, running=running)
 
     def populate_workflow_tab(self, item, running=False):

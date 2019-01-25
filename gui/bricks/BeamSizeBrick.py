@@ -53,6 +53,7 @@ try:
 except:
     uni_chr = chr
 
+import api
 from gui.utils import Colors
 from gui.BaseComponents import BaseWidget
 
@@ -71,7 +72,6 @@ class BeamSizeBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
         self.add_property("formatString", "formatString", "#.#")
 
         # Signals ------------------------------------------------------------
@@ -118,19 +118,7 @@ class BeamSizeBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.beam_info_hwobj is not None:
-                self.disconnect(
-                    self.beam_info_hwobj, "beamInfoChanged", self.beam_info_changed
-                )
-            self.beam_info_hwobj = self.get_hardware_object(new_value)
-            if self.beam_info_hwobj is not None:
-                self.connect(
-                    self.beam_info_hwobj, "beamInfoChanged", self.beam_info_changed
-                )
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        self.connect(api.beam_info, "beamInfoChanged", self.beam_info_changed)
 
     def beam_info_changed(self, beam_info):
         """

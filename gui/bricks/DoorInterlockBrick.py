@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.utils import Colors, Icons
 from gui.BaseComponents import BaseWidget
 
@@ -43,14 +44,12 @@ class DoorInterlockBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
 
         # Hardware objects ----------------------------------------------------
-        self.door_interlock_hwobj = None
 
         # Internal values -----------------------------------------------------
 
@@ -86,9 +85,12 @@ class DoorInterlockBrick(BaseWidget):
         self.state_label.setToolTip("Shows the current door state")
         self.unlock_door_button.setToolTip("Unlocks the doors")
 
+        self.connect(api.door_interlock, "doorInterlockStateChanged", self.state_changed)
+        api.door_interlock.update_values()
+
     def unlock_doors(self):
         self.unlock_door_button.setEnabled(False)
-        self.door_interlock_hwobj.unlock_door_interlock()
+        api.door_interlock.unlock_door_interlock()
 
     def updateLabel(self, label):
         self.main_groupbox.setTitle(label)
@@ -106,22 +108,3 @@ class DoorInterlockBrick(BaseWidget):
             self.state_label.setText("<b>%s</b>" % state)
 
         self.unlock_door_button.setEnabled(state == "locked_active")
-
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.door_interlock_hwobj is not None:
-                self.disconnect(
-                    self.door_interlock_hwobj,
-                    "doorInterlockStateChanged",
-                    self.state_changed,
-                )
-            self.door_interlock_hwobj = self.get_hardware_object(new_value)
-            if self.door_interlock_hwobj is not None:
-                self.connect(
-                    self.door_interlock_hwobj,
-                    "doorInterlockStateChanged",
-                    self.state_changed,
-                )
-                self.door_interlock_hwobj.update_values()
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)

@@ -44,7 +44,7 @@ class CameraBrick(BaseWidget):
         self.display_beam = None
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "/graphics-manager")
+        self.add_property("mnemonic", "string", "/graphics")
         self.add_property("fixedSize", "string", "")
         self.add_property("displayBeam", "boolean", True)
         self.add_property("displayScale", "boolean", True)

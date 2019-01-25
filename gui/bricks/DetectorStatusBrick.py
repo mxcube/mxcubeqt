@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.utils import Colors
 from gui.BaseComponents import BaseWidget
 
@@ -51,14 +52,9 @@ class DetectorStatusBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.detector_hwobj = None
-
         # Internal variables --------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
-        # self.defineSlot('collectStarted',())
 
         # Signals ------------------------------------------------------------
 
@@ -107,36 +103,10 @@ class DetectorStatusBrick(BaseWidget):
         self.humidity_label.setMinimumHeight(20)
         self.frame_rate_label.setMinimumHeight(20)
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.detector_hwobj is not None:
-                self.disconnect(
-                    self.detector_hwobj, "temperatureChanged", self.temperature_changed
-                )
-                self.disconnect(
-                    self.detector_hwobj, "humidityChanged", self.humidity_changed
-                )
-                self.disconnect(
-                    self.detector_hwobj, "statusChanged", self.status_changed
-                )
-                self.disconnect(
-                    self.detector_hwobj, "frameRateChanged", self.frame_rate_changed
-                )
-            self.detector_hwobj = self.get_hardware_object(new_value)
-            if self.detector_hwobj is not None:
-                self.connect(
-                    self.detector_hwobj, "temperatureChanged", self.temperature_changed
-                )
-                self.connect(
-                    self.detector_hwobj, "humidityChanged", self.humidity_changed
-                )
-                self.connect(self.detector_hwobj, "statusChanged", self.status_changed)
-                self.connect(
-                    self.detector_hwobj, "frameRateChanged", self.frame_rate_changed
-                )
-                self.detector_hwobj.update_values()
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        self.connect(api.detector, "temperatureChanged", self.temperature_changed)
+        self.connect(api.detector, "humidityChanged", self.humidity_changed)
+        self.connect(api.detector, "statusChanged", self.status_changed)
+        self.connect(api.detector, "frameRateChanged", self.frame_rate_changed)
 
     def status_changed(self, status, status_message):
         if status:

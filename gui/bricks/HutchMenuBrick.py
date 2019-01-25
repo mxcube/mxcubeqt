@@ -22,6 +22,7 @@ import logging
 
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons
 
@@ -41,9 +42,6 @@ class HutchMenuBrick(BaseWidget):
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.graphics_manager_hwobj = None
-
         # Internal values -----------------------------------------------------
         self.inside_data_collection = None
         self.directory = "/tmp"
@@ -51,7 +49,6 @@ class HutchMenuBrick(BaseWidget):
         self.file_index = 1
 
         # Properties ----------------------------------------------------------
-        self.add_property("graphicsManager", "string", "")
         self.add_property("enableAutoFocus", "boolean", True)
         self.add_property("enableRefreshCamera", "boolean", False)
         self.add_property("enableVisualAlign", "boolean", True)
@@ -131,50 +128,13 @@ class HutchMenuBrick(BaseWidget):
         self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
         # self.instanceSynchronize("")
 
+        self.connect(api.graphics, "centringStarted", self.centring_started)
+        self.connect(api.graphics, "centringFailed", self.centring_failed)
+        self.connect(api.graphics, "centringSuccessful", self.centring_successful)
+        self.connect(api.graphics, "diffractometerPhaseChanged", self.diffractometer_phase_changed)
+
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == "graphicsManager":
-            if self.graphics_manager_hwobj:
-                self.disconnect(
-                    self.graphics_manager_hwobj,
-                    "centringStarted",
-                    self.centring_started,
-                )
-                self.disconnect(
-                    self.graphics_manager_hwobj, "centringFailed", self.centring_failed
-                )
-                self.disconnect(
-                    self.graphics_manager_hwobj,
-                    "centringSuccessful",
-                    self.centring_successful,
-                )
-                self.disconnect(
-                    self.graphics_manager_hwobj,
-                    "diffractometerPhaseChanged",
-                    self.diffractometer_phase_changed,
-                )
-
-            self.graphics_manager_hwobj = self.get_hardware_object(new_value)
-
-            if self.graphics_manager_hwobj:
-                self.connect(
-                    self.graphics_manager_hwobj,
-                    "centringStarted",
-                    self.centring_started,
-                )
-                self.connect(
-                    self.graphics_manager_hwobj, "centringFailed", self.centring_failed
-                )
-                self.connect(
-                    self.graphics_manager_hwobj,
-                    "centringSuccessful",
-                    self.centring_successful,
-                )
-                self.connect(
-                    self.graphics_manager_hwobj,
-                    "diffractometerPhaseChanged",
-                    self.diffractometer_phase_changed,
-                )
-        elif property_name == "enableAutoFocus":
+        if property_name == "enableAutoFocus":
             self.auto_focus_button.setVisible(new_value)
         elif property_name == "enableRefreshCamera":
             self.refresh_camera_button.setVisible(new_value)
@@ -189,9 +149,9 @@ class HutchMenuBrick(BaseWidget):
 
     def centre_button_clicked(self, state):
         if state:
-            self.graphics_manager_hwobj.start_centring(tree_click=True)
+            api.graphics.start_centring(tree_click=True)
         else:
-            self.graphics_manager_hwobj.cancel_centring(reject=False)
+            api.graphics.cancel_centring(reject=False)
             self.accept_button.setEnabled(True)
 
     def save_snapshot_clicked(self):
@@ -217,38 +177,38 @@ class HutchMenuBrick(BaseWidget):
 
         if len(filename):
             try:
-                self.graphics_manager_hwobj.save_scene_snapshot(filename)
+                api.graphics.save_scene_snapshot(filename)
                 self.file_index += 1
             except BaseException:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
 
     def refresh_camera_clicked(self):
-        if self.graphics_manager_hwobj is not None:
-            self.graphics_manager_hwobj.refresh_camera()
+        if api.graphics is not None:
+            api.graphics.refresh_camera()
 
     def visual_align_clicked(self):
-        self.graphics_manager_hwobj.start_visual_align()
+        api.graphics.start_visual_align()
 
     def select_all_clicked(self):
-        self.graphics_manager_hwobj.select_all_points()
+        api.graphics.select_all_points()
 
     def clear_all_clicked(self):
         """
         Clears all shapes (points, lines and meshes)
         """
-        self.graphics_manager_hwobj.clear_all()
+        api.graphics.clear_all()
 
     def accept_clicked(self):
         Colors.set_widget_color(self.accept_button, self.standard_color)
         self.reject_button.setEnabled(False)
-        self.graphics_manager_hwobj.accept_centring()
+        api.graphics.accept_centring()
 
     def reject_clicked(self):
         Colors.set_widget_color(self.accept_button, self.standard_color)
         self.reject_button.setEnabled(False)
         self.centre_button.setEnabled(True)
         self.accept_button.setEnabled(True)
-        self.graphics_manager_hwobj.reject_centring()
+        api.graphics.reject_centring()
 
     def centring_snapshots(self, state):
         if state is None:
@@ -286,10 +246,10 @@ class HutchMenuBrick(BaseWidget):
         # self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
 
     def create_line_clicked(self):
-        self.graphics_manager_hwobj.create_line()
+        api.graphics.create_line()
 
     def draw_grid_clicked(self):
-        self.graphics_manager_hwobj.create_grid()
+        api.graphics.create_grid()
 
     def diffractometer_ready_changed(self, is_ready):
         self.setEnabled(is_ready)
@@ -310,10 +270,10 @@ class HutchMenuBrick(BaseWidget):
         self.auto_center_button.setEnabled(status)
 
     def auto_focus_clicked(self):
-        self.graphics_manager_hwobj.auto_focus()
+        api.graphics.auto_focus()
 
     def auto_center_clicked(self):
-        self.graphics_manager_hwobj.start_auto_centring()
+        api.graphics.start_auto_centring()
 
 
 class MonoStateButton(QtImport.QToolButton):
