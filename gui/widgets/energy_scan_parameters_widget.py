@@ -19,9 +19,9 @@
 
 import QtImport
 
+import api
 from widgets.data_path_widget import DataPathWidget
 from widgets.periodic_table_widget import PeriodicTableWidget
-
 # from widgets.matplot_widget import TwoAxisPlotWidget
 from widgets.pymca_plot_widget import PymcaPlotWidget
 from widgets.snapshot_widget import SnapshotWidget
@@ -39,9 +39,6 @@ class EnergyScanParametersWidget(QtImport.QWidget):
 
         if name is not None:
             self.setObjectName(name)
-
-        # Hardware objects ----------------------------------------------------
-        self.energy_scan_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.energy_scan_model = queue_model_objects.EnergyScan()
@@ -114,6 +111,13 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.scan_actual_plot_widget.hide()
         self.scan_result_plot_widget.hide()
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+
+        if api.energyscan is not None:
+            api.energyscan.connect(
+                "energyScanStarted", self.energy_scan_started
+            )
+            api.energyscan.connect("scanNewPoint", self.energy_scan_new_point)
+            api.energyscan.connect("choochFinished", self.chooch_finished)
 
     def _prefix_ledit_change(self, new_value):
         self.energy_scan_model.set_name(str(new_value))
@@ -190,15 +194,6 @@ class EnergyScanParametersWidget(QtImport.QWidget):
     def element_clicked(self, symbol, energy):
         self.energy_scan_model.element_symbol = symbol
         self.energy_scan_model.edge = energy
-
-    def set_enegy_scan_hwobj(self, energy_scan_hwobj):
-        if self.energy_scan_hwobj is None and energy_scan_hwobj:
-            self.energy_scan_hwobj = energy_scan_hwobj
-            self.energy_scan_hwobj.connect(
-                "energyScanStarted", self.energy_scan_started
-            )
-            self.energy_scan_hwobj.connect("scanNewPoint", self.energy_scan_new_point)
-            self.energy_scan_hwobj.connect("choochFinished", self.chooch_finished)
 
     def energy_scan_started(self, scan_info):
         self.scan_actual_plot_widget.clear()

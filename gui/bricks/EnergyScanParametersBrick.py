@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
 
@@ -32,10 +33,6 @@ class EnergyScanParametersBrick(BaseWidget):
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        self.add_property("energy-scan", "string", "/energy-scan")
-        self.add_property("session", "string", "/session")
-        self.session_hwobj = None
-
         # Layout
         self.energy_scan_widget = EnergyScanParametersWidget(self)
 
@@ -47,17 +44,9 @@ class EnergyScanParametersBrick(BaseWidget):
 
     def populate_parameter_widget(self, item):
         self.energy_scan_widget.data_path_widget._base_image_dir = (
-            self.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.energy_scan_widget.data_path_widget._base_process_dir = (
-            self.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
         self.energy_scan_widget.populate_widget(item)
-
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "energy-scan":
-            self.energy_scan_widget.set_enegy_scan_hwobj(
-                self.get_hardware_object(new_value)
-            )
-        elif property_name == "session":
-            self.session_hwobj = self.get_hardware_object(new_value)

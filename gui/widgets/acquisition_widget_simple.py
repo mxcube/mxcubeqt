@@ -346,9 +346,9 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
     def update_exp_time_limits(self):
         try:
             exp_time_limits = (
-                api.beamline_setup.detector_hwobj.get_exposure_time_limits()
+                api.detector.get_exposure_time_limits()
             )
-            max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
+            max_osc_speed = api.diffractometer.get_osc_max_speed()
             top_limit = (
                 float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
             )

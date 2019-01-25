@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.mca_spectrum_widget import McaSpectrumWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
@@ -37,8 +38,6 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         if name is not None:
             self.setObjectName(name)
 
-        # Hardware objects ----------------------------------------------------
-        self.xrf_spectrum_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.xrf_spectrum_model = queue_model_objects.XRFSpectrum()
@@ -114,6 +113,11 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
+        if api.xrf_spectrum is None:
+            api.xrf_spectrum.connect(
+                "xrfSpectrumFinished", self.spectrum_finished
+            )
+
     def _prefix_ledit_change(self, new_value):
         self.xrf_spectrum_model.set_name(str(new_value))
         self._tree_view_item.setText(0, self.xrf_spectrum_model.get_display_name())
@@ -153,13 +157,6 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
 
         image = self.xrf_spectrum_model.centred_position.snapshot_image
         self.snapshot_widget.display_snapshot(image, width=400)
-
-    def set_xrf_spectrum_hwobj(self, xrf_spectrum_hwobj):
-        if self.xrf_spectrum_hwobj is None:
-            self.xrf_spectrum_hwobj = xrf_spectrum_hwobj
-            self.xrf_spectrum_hwobj.connect(
-                "xrfSpectrumFinished", self.spectrum_finished
-            )
 
     def spectrum_finished(self, mca_data, mca_calib, mca_config):
         self.mca_spectrum_widget.set_data(mca_data, mca_calib, mca_config)

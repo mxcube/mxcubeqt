@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.widgets.xrf_spectrum_parameters_widget import XRFSpectrumParametersWidget
 
@@ -32,12 +33,7 @@ class XRFSpectrumParametersBrick(BaseWidget):
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        self.add_property("xrf-spectrum", "string", "")
-        self.add_property("session", "string", "/session")
-
         self.define_slot("populate_xrf_widget", ({}))
-
-        self.session_hwobj = None
 
         self.xrf_spectrum_widget = XRFSpectrumParametersWidget(self)
 
@@ -48,17 +44,9 @@ class XRFSpectrumParametersBrick(BaseWidget):
 
     def populate_xrf_widget(self, item):
         self.xrf_spectrum_widget.data_path_widget._base_image_dir = (
-            self.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.xrf_spectrum_widget.data_path_widget._base_process_dir = (
-            self.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
         self.xrf_spectrum_widget.populate_widget(item)
-
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "xrf-spectrum":
-            self.xrf_spectrum_widget.set_xrf_spectrum_hwobj(
-                self.get_hardware_object(new_value)
-            )
-        elif property_name == "session":
-            self.session_hwobj = self.get_hardware_object(new_value)

@@ -48,8 +48,8 @@ class DataPathWidget(QtImport.QWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self._base_image_dir = None
-        self._base_process_dir = None
+        self._base_image_dir = ""
+        self._base_process_dir = ""
         self.path_conflict_state = False
         self.enable_macros = False
 
