@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.widgets.char_parameters_widget import CharParametersWidget
 from gui.widgets.webview_widget import WebViewWidget
@@ -33,15 +34,10 @@ class CharParametersBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.session_hwobj = None
-
         # Internal variables --------------------------------------------------
 
         # Properties ----------------------------------------------------------
         self.add_property("tunable-energy", "boolean", "True")
-        self.add_property("session", "string", "/session")
-        self.add_property("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
 
@@ -77,12 +73,14 @@ class CharParametersBrick(BaseWidget):
         self.parameters_widget.collection_type = None
         self.toggle_page_button.setDisabled(True)
 
+        self.parameters_widget.init_api()
+
     def populate_char_parameter_widget(self, item):
         self.parameters_widget.path_widget._base_image_dir = (
-            self.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.parameters_widget.path_widget._base_process_dir = (
-            self.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
 
         char = item.get_model()
@@ -117,8 +115,3 @@ class CharParametersBrick(BaseWidget):
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "tunable-energy":
             self.parameters_widget.acq_widget.set_tunable_energy(new_value)
-        elif property_name == "session":
-            self.session_hwobj = self.get_hardware_object(new_value)
-        elif property_name == "beamline_setup":
-            beamline_setup = self.get_hardware_object(new_value)
-            self.parameters_widget.set_beamline_setup(beamline_setup)

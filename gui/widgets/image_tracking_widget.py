@@ -22,6 +22,8 @@
 
 import QtImport
 
+import api
+
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
@@ -33,9 +35,6 @@ class ImageTrackingWidget(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent)
 
         self.setObjectName(name)
-
-        # Hardware objects ----------------------------------------------------
-        self.image_tracking_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.image_path = None
@@ -74,6 +73,11 @@ class ImageTrackingWidget(QtImport.QWidget):
         )
 
         self.setEnabled(False)
+ 
+        if hasattr(api.beamline_setup, "image_tracking_hwobj"):
+            self.image_tracking_hwobj = api.beamline_setup.mage_tracking_hwobj
+        else:
+            self.image_tracking_hwobj = None
 
     def previous_button_clicked(self):
         value = self.image_tracking_widget_layout.image_num_spinbox.value() - 1
@@ -105,9 +109,6 @@ class ImageTrackingWidget(QtImport.QWidget):
         self.image_tracking_widget_layout.current_path_ledit.setText(
             self.image_path % value
         )
-
-    def set_image_tracking_hwobj(self, image_tracking_hwobj):
-        self.image_tracking_hwobj = image_tracking_hwobj
 
     def set_data_collection(self, data_collection):
         self.setEnabled(True)

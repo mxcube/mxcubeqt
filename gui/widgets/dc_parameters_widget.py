@@ -21,6 +21,7 @@ import logging
 
 import QtImport
 
+import api
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.processing_widget import ProcessingWidget
@@ -43,9 +44,6 @@ class DCParametersWidget(QtImport.QWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-
-        # Hardware objects ----------------------------------------------------
-        self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
         self._data_collection = None
@@ -87,9 +85,8 @@ class DCParametersWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-    def set_beamline_setup(self, bl_setup):
-        self._acq_widget.set_beamline_setup(bl_setup)
-        self._beamline_setup_hwobj = bl_setup
+    def init_api(self):
+        self._acq_widget.init_api()
 
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].path_template.get_prefix()
@@ -110,7 +107,7 @@ class DCParametersWidget(QtImport.QWidget):
         dc_tree_widget = self._tree_view_item.listView().parent().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
-        path_conflict = self.queue_model_hwobj.check_for_path_collisions(path_template)
+        path_conflict = api.queue_model.check_for_path_collisions(path_template)
 
     def __add_data_collection(self):
         return self.add_dc_cb(self._data_collection, self.collection_type)
@@ -123,7 +120,7 @@ class DCParametersWidget(QtImport.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+        run_number = api.queue_model.get_next_run_number(
             path_template
         )
 

@@ -19,6 +19,8 @@
 
 import QtImport
 
+import api
+
 from gui.utils import Icons, Colors
 from gui.BaseComponents import BaseWidget
 
@@ -29,11 +31,12 @@ __category__ = "General"
 
 
 class EnergyBrick(BaseWidget):
+
     def __init__(self, *args):
+
         BaseWidget.__init__(self, *args)
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
         self.add_property("defaultMode", "combo", ("keV", "Ang"), "keV")
         self.add_property("kevFormatString", "formatString", "##.####")
         self.add_property("angFormatString", "formatString", "##.####")
@@ -45,7 +48,6 @@ class EnergyBrick(BaseWidget):
         # Slots ---------------------------------------------------------------
 
         # Hardware objects ----------------------------------------------------
-        self.energy_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.energy_limits = None
@@ -127,37 +129,26 @@ class EnergyBrick(BaseWidget):
 
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.energy_hwobj is not None:
-                self.disconnect(self.energy_hwobj, "deviceReady", self.connected)
-                self.disconnect(self.energy_hwobj, "deviceNotReady", self.disconnected)
-                self.disconnect(self.energy_hwobj, "energyChanged", self.energy_changed)
-                self.disconnect(self.energy_hwobj, "stateChanged", self.state_changed)
-                self.disconnect(
-                    self.energy_hwobj, "statusInfoChanged", self.status_info_changed
-                )
+    def run(self):
+        if api.energy is not None:
+            self.set_new_value_limits()
+            self.connect(api.energy, "deviceReady", self.connected)
+            self.connect(api.energy, "deviceNotReady", self.disconnected)
+            self.connect(api.energy, "energyChanged", self.energy_changed)
+            self.connect(api.energy, "stateChanged", self.state_changed)
+            self.connect(api.energy, "statusInfoChanged", self.status_info_changed)
 
-            self.energy_hwobj = self.get_hardware_object(new_value)
-
-            if self.energy_hwobj is not None:
-                self.set_new_value_limits()
-                self.connect(self.energy_hwobj, "deviceReady", self.connected)
-                self.connect(self.energy_hwobj, "deviceNotReady", self.disconnected)
-                self.connect(self.energy_hwobj, "energyChanged", self.energy_changed)
-                self.connect(self.energy_hwobj, "stateChanged", self.state_changed)
-                self.connect(
-                    self.energy_hwobj, "statusInfoChanged", self.status_info_changed
-                )
-                self.energy_hwobj.update_values()
-                self.energy_hwobj.set_do_beam_alignment(self["doBeamAlignment"])
-                if self.energy_hwobj.isReady():
-                    self.connected()
-                else:
-                    self.disconnected()
+            api.energy.update_values()
+            api.energy.set_do_beam_alignment(self["doBeamAlignment"])
+            if api.energy.isReady():
+                self.connected()
             else:
                 self.disconnected()
-        elif property_name == "defaultMode":
+        else:
+            self.disconnected()
+ 
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "defaultMode":
             if new_value == "keV":
                 self.units_combobox.setCurrentIndex(0)
             else:
@@ -174,7 +165,7 @@ class EnergyBrick(BaseWidget):
 
     def connected(self):
         self.setEnabled(True)
-        tunable_energy = self.energy_hwobj.can_move_energy()
+        tunable_energy = api.energy.can_move_energy()
         if tunable_energy is None:
             tunable_energy = False
         self.set_to_label.setEnabled(tunable_energy)
@@ -193,8 +184,8 @@ class EnergyBrick(BaseWidget):
         self.setEnabled(False)
 
     def do_beam_align_changed(self, state):
-        if self.energy_hwobj is not None:
-            self.energy_hwobj.set_do_beam_alignment(self.beam_align_cbox.isChecked())
+        if api.energy is not None:
+            api.energy.set_do_beam_alignment(self.beam_align_cbox.isChecked())
 
     def energy_changed(self, energy_value, wavelength_value):
         energy_value_str = self["kevFormatString"] % energy_value
@@ -218,9 +209,9 @@ class EnergyBrick(BaseWidget):
         ):
             if self.units_combobox.currentIndex() == 0:
                 BaseWidget.set_status_info("status", "Setting energy...", "running")
-                self.energy_hwobj.move_energy(float(input_field_text))
+                api.energy.move_energy(float(input_field_text))
             else:
-                self.energy_hwobj.move_wavelength(float(input_field_text))
+                api.energy.move_wavelength(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
@@ -244,13 +235,13 @@ class EnergyBrick(BaseWidget):
 
     def set_new_value_limits(self):
         if self.units_combobox.currentIndex() == 0:
-            value_limits = self.energy_hwobj.get_energy_limits()
+            value_limits = api.energy.get_energy_limits()
             self.group_box.setTitle("Energy")
             self.new_value_ledit.setToolTip(
                 "Energy limits %.4f : %.4f keV" % (value_limits[0], value_limits[1])
             )
         else:
-            value_limits = self.energy_hwobj.get_wavelength_limits()
+            value_limits = api.energy.get_wavelength_limits()
             self.group_box.setTitle("Wavelength")
             self.new_value_ledit.setToolTip(
                 "Wavelength limits %.4f : %.4f %s"

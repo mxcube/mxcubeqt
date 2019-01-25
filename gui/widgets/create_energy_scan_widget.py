@@ -22,6 +22,8 @@ import logging
 
 import QtImport
 
+import api
+
 from gui.utils import queue_item
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -110,21 +112,21 @@ class CreateEnergyScanWidget(CreateTaskBase):
     def enable_compression(self, state):
         CreateTaskBase.enable_compression(self, False)
 
-    def set_beamline_setup(self, bl_setup_hwobj):
-        CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
+    def init_api(self):
+        CreateTaskBase.init_api(self)
 
         try:
             self._periodic_table_widget.set_elements(
-                self._beamline_setup_hwobj.energyscan_hwobj.getElements()
+                api.energyscan.getElements()
             )
 
             max_transmission_value = (
-                self._beamline_setup_hwobj.energyscan_hwobj.get_max_transmission_value()
+                api.energyscan.get_max_transmission_value()
             )
 
             self._adjust_transmission_cbox.setEnabled(True)
             self._adjust_transmission_cbox.setChecked(True)
-            self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(True)
+            api.energyscan.adjust_transmission(True)
 
             if max_transmission_value:
                 self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
@@ -183,7 +185,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if selected_element:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+                cpos.snapshot_image = api.graphics.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
@@ -219,12 +221,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
     def adjust_transmission_state_changed(self, state):
         self._max_transmission_ledit.setEnabled(state)
-        self._beamline_setup_hwobj.energyscan_hwobj.adjust_transmission(state)
+        api.energyscan.adjust_transmission(state)
 
     def max_transmission_value_changed(self, value):
         try:
             max_transmission = float(value)
-            self._beamline_setup_hwobj.energyscan_hwobj.set_max_transmission(
+            api.energyscan.set_max_transmission(
                 max_transmission
             )
         except BaseException:

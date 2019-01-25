@@ -21,6 +21,8 @@ import copy
 
 import QtImport
 
+import api
+
 from gui.utils import queue_item
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.create_task_base import CreateTaskBase
@@ -93,6 +95,9 @@ class CreateStillScanWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
+        self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
+                api.beamline_setup._get_run_processing_parallel()
+        )
 
     def use_osc_start(self, status):
         pass
@@ -104,18 +109,14 @@ class CreateStillScanWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
+        has_shutter_less = api.beamline_setup.detector_has_shutterless()
+        self._acquisition_parameters.shutterless = has_shutter_less
 
-            self._acquisition_parameters = self._beamline_setup_hwobj.get_default_acquisition_parameters(
-                "default_acquisition_values"
-            )
-            self._acquisition_parameters.num_triggers = 1
-            self._acquisition_parameters.num_images_per_trigger = 1
-            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-                self._beamline_setup_hwobj._get_run_processing_parallel()
-            )
+        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
+            "default_acquisition_values"
+        )
+        self._acquisition_parameters.num_triggers = 1
+        self._acquisition_parameters.num_images_per_trigger = 1
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -180,7 +181,7 @@ class CreateStillScanWidget(CreateTaskBase):
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
-        cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+        cpos.snapshot_image = api.graphics.get_scene_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1

@@ -24,8 +24,8 @@ from copy import deepcopy
 
 import QtImport
 
+import api
 from gui.utils import queue_item
-
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
@@ -70,9 +70,6 @@ class CreateTaskBase(QtImport.QWidget):
         self._data_path_widget = None
         self._current_selected_items = []
         self._path_template = None
-        self._session_hwobj = None
-        self._beamline_setup_hwobj = None
-        self._graphics_manager_hwobj = None
         self._in_plate_mode = None
         self._enable_compression = None
 
@@ -106,109 +103,99 @@ class CreateTaskBase(QtImport.QWidget):
         self.init_data_path_model()
 
     def init_acq_model(self):
-        bl_setup = self._beamline_setup_hwobj
-
-        if bl_setup is not None:
-            if self._acq_widget:
-                self._acq_widget.set_beamline_setup(bl_setup)
-                def_acq_parameters = bl_setup.get_default_acquisition_parameters()
-                self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
-                if bl_setup.diffractometer_hwobj.in_plate_mode():
-                    self._acq_widget.use_kappa(False)
-                    self._acq_widget.use_max_osc_range(True)
-                else:
-                    self._acq_widget.use_kappa(True)
-                    self._acq_widget.use_max_osc_range(False)
-                self._acq_widget.update_osc_total_range()
+        if self._acq_widget:
+            self._acq_widget.init_api()
+            def_acq_parameters = api.beamline_setup.get_default_acquisition_parameters()
+            self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
+            if api.diffractometer.in_plate_mode():
+                self._acq_widget.use_kappa(False)
+                self._acq_widget.use_max_osc_range(True)
+            else:
+                self._acq_widget.use_kappa(True)
+                self._acq_widget.use_max_osc_range(False)
+            self._acq_widget.update_osc_total_range()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
 
     def init_data_path_model(self):
-        bl_setup = self._beamline_setup_hwobj
-        if bl_setup is not None:
-            # Initialize the path_template of the widget to default
-            # values read from the beamline setup
-            if self._data_path_widget:
-                self._data_path_widget._base_image_dir = (
-                    self._session_hwobj.get_base_image_directory()
-                )
-                self._data_path_widget._base_process_dir = (
-                    self._session_hwobj.get_base_process_directory()
-                )
+        # Initialize the path_template of the widget to default
+        # values read from the beamline setup
+        if self._data_path_widget:
+            self._data_path_widget._base_image_dir = (
+                api.session.get_base_image_directory()
+            )
+            self._data_path_widget._base_process_dir = (
+                api.session.get_base_process_directory()
+            )
 
-                (data_directory, proc_directory) = self.get_default_directory()
-                self._path_template = bl_setup.get_default_path_template()
-                self._path_template.directory = data_directory
-                self._path_template.process_directory = proc_directory
-                self._path_template.base_prefix = self.get_default_prefix()
-                self._path_template.run_number = bl_setup.queue_model_hwobj.get_next_run_number(
-                    self._path_template
-                )
-                self._path_template.compression = self._enable_compression
+            (data_directory, proc_directory) = self.get_default_directory()
+            self._path_template = api.beamline_setup.get_default_path_template()
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix()
+            self._path_template.run_number = api.queue_model.get_next_run_number(
+                  self._path_template
+            )
+            self._path_template.compression = self._enable_compression
         else:
             self._path_template = queue_model_objects.PathTemplate()
 
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
         # ISPyB
-        if tab_index is 0 and self._session_hwobj.proposal_code:
+        if tab_index is 0 and api.session.proposal_code:
             self.update_selection()
 
-    def set_beamline_setup(self, bl_setup_hwobj):
-        self._beamline_setup_hwobj = bl_setup_hwobj
-        self._in_plate_mode = (
-            self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
-        )
+    def init_api(self):
+        self._in_plate_mode = api.diffractometer.in_plate_mode()
 
         try:
-            self.set_resolution_limits(bl_setup_hwobj.resolution_hwobj.getLimits())
+            self.set_resolution_limits(api.resolution.get_limits())
 
-            bl_setup_hwobj.energy_hwobj.connect("energyChanged", self.set_energy)
-            bl_setup_hwobj.energy_hwobj.connect(
+            api.energy.connect("energyChanged", self.set_energy)
+            api.energy.connect(
                 "energyLimitsChanged", self.set_energy_limits
             )
-            bl_setup_hwobj.transmission_hwobj.connect(
+            api.transmission.connect(
                 "valueChanged", self.set_transmission
             )
-            bl_setup_hwobj.transmission_hwobj.connect(
+            api.transmission.connect(
                 "limitsChanged", self.set_transmission_limits
             )
-            bl_setup_hwobj.resolution_hwobj.connect(
+            api.resolution.connect(
                 "positionChanged", self.set_resolution
             )
-            bl_setup_hwobj.resolution_hwobj.connect(
+            api.resolution.connect(
                 "limitsChanged", self.set_resolution_limits
             )
-            bl_setup_hwobj.omega_axis_hwobj.connect(
+            api.omega_axis.connect(
                 "positionChanged", self.set_osc_start
             )
-            bl_setup_hwobj.kappa_axis_hwobj.connect("positionChanged", self.set_kappa)
-            bl_setup_hwobj.kappa_phi_axis_hwobj.connect(
+            api.kappa_axis.connect("positionChanged", self.set_kappa)
+            api.kappa_phi_axis.connect(
                 "positionChanged", self.set_kappa_phi
             )
-            bl_setup_hwobj.detector_hwobj.connect(
+            api.detector.connect(
                 "detectorRoiModeChanged", self.set_detector_roi_mode
             )
-            bl_setup_hwobj.detector_hwobj.connect(
+            api.detector.connect(
                 "expTimeLimitsChanged", self.set_detector_exp_time_limits
             )
-            bl_setup_hwobj.beam_info_hwobj.connect(
+            api.beam_info.connect(
                 "beamInfoChanged", self.set_beam_info
             )
 
-            bl_setup_hwobj.resolution_hwobj.update_values()
-            bl_setup_hwobj.detector_hwobj.update_values()
+            api.resolution.update_values()
+            api.detector.update_values()
         except AttributeError as ex:
             msg = "Could not connect to one or more hardware objects" + str(ex)
             logging.getLogger("HWR").warning(msg)
 
-        self._graphics_manager_hwobj = bl_setup_hwobj.shape_history_hwobj
-        if self._graphics_manager_hwobj:
-            self._graphics_manager_hwobj.connect("shapeCreated", self.shape_created)
-            self._graphics_manager_hwobj.connect("shapeChanged", self.shape_changed)
-            self._graphics_manager_hwobj.connect("shapeDeleted", self.shape_deleted)
+        if api.graphics:
+            api.graphics.connect("shapeCreated", self.shape_created)
+            api.graphics.connect("shapeChanged", self.shape_changed)
+            api.graphics.connect("shapeDeleted", self.shape_deleted)
 
-        self._session_hwobj = bl_setup_hwobj.session_hwobj
         self.init_models()
 
     def set_osc_start(self, new_value):
@@ -234,7 +221,7 @@ class CreateTaskBase(QtImport.QWidget):
         self._data_path_widget.update_file_name()
         if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
-            path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.check_for_path_collisions(
+            path_conflict = api.queue_model.check_for_path_collisions(
                 self._path_template
             )
             self._data_path_widget.indicate_path_conflict(path_conflict)
@@ -370,11 +357,11 @@ class CreateTaskBase(QtImport.QWidget):
         pass
 
     def get_default_prefix(self, sample_data_node=None, generic_name=False):
-        prefix = self._session_hwobj.get_default_prefix(sample_data_node, generic_name)
+        prefix = api.session.get_default_prefix(sample_data_node, generic_name)
         return prefix
 
     def get_default_directory(self, tree_item=None, sub_dir=""):
-        group_name = self._session_hwobj.get_group_name()
+        group_name = api.session.get_group_name()
 
         if group_name:
             sub_dir = group_name + "/" + sub_dir
@@ -388,9 +375,9 @@ class CreateTaskBase(QtImport.QWidget):
                     if item.get_model().lims_id == -1:
                         sub_dir += ""
 
-        data_directory = self._session_hwobj.get_image_directory(sub_dir)
+        data_directory = api.session.get_image_directory(sub_dir)
 
-        proc_directory = self._session_hwobj.get_process_directory(sub_dir)
+        proc_directory = api.session.get_process_directory(sub_dir)
 
         return (data_directory, proc_directory)
 
@@ -399,7 +386,7 @@ class CreateTaskBase(QtImport.QWidget):
         self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        self._graphics_manager_hwobj.select_shape_with_cpos(cpos)
+        api.graphics.select_shape_with_cpos(cpos)
 
     def selection_changed(self, items):
         if items:
@@ -435,7 +422,7 @@ class CreateTaskBase(QtImport.QWidget):
 
             self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
-            self._acquisition_parameters.centred_position.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+            self._acquisition_parameters.centred_position.snapshot_image = api.graphics.get_scene_snapshot()
 
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
@@ -449,8 +436,8 @@ class CreateTaskBase(QtImport.QWidget):
                 # self._path_template.directory = data_directory
                 # self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
-            elif self._session_hwobj.get_group_name() != "":
-                base_dir = self._session_hwobj.get_base_image_directory()
+            elif api.session.get_group_name() != "":
+                base_dir = api.session.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
 
@@ -472,7 +459,7 @@ class CreateTaskBase(QtImport.QWidget):
             #    self._path_template.process_directory = proc_directory
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+            self._path_template.run_number = api.queue_model.get_next_run_number(
                 self._path_template
             )
 
@@ -520,12 +507,12 @@ class CreateTaskBase(QtImport.QWidget):
         #         not isinstance(tree_item, queue_item.TaskQueueItem))
 
     def _update_etr(self):
-        omega = self._beamline_setup_hwobj._get_omega_axis_position()
-        kappa = self._beamline_setup_hwobj._get_kappa_axis_position()
-        kappa_phi = self._beamline_setup_hwobj._get_kappa_phi_axis_position()
-        energy = self._beamline_setup_hwobj._get_energy()
-        transmission = self._beamline_setup_hwobj._get_transmission()
-        resolution = self._beamline_setup_hwobj._get_resolution()
+        omega = api.beamline_setup._get_omega_axis_position()
+        kappa = api.beamline_setup._get_kappa_axis_position()
+        kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
+        energy = api.beamline_setup._get_energy()
+        transmission = api.beamline_setup._get_transmission()
+        resolution = api.beamline_setup._get_resolution()
 
         set_omega = True
         if self._acq_widget:
@@ -563,7 +550,7 @@ class CreateTaskBase(QtImport.QWidget):
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = self._beamline_setup_hwobj.queue_model_hwobj.\
+            self._path_template.run_number = api.queue_model.\
                 get_next_run_number(self._path_template)
 
             #Update energy transmission and resolution
@@ -609,15 +596,15 @@ class CreateTaskBase(QtImport.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = self._graphics_manager_hwobj.get_scene_snapshot(
+                        snapshot = api.graphics.get_scene_snapshot(
                             position
                         )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
-                kappa = self._beamline_setup_hwobj._get_kappa_axis_position()
-                kappa_phi = self._beamline_setup_hwobj._get_kappa_phi_axis_position()
+                kappa = api.beamline_setup._get_kappa_axis_position()
+                kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
 
             if kappa:
                 self.set_kappa(kappa)
@@ -629,7 +616,7 @@ class CreateTaskBase(QtImport.QWidget):
     def approve_creation(self):
         result = True
 
-        path_conflict = self._beamline_setup_hwobj.queue_model_hwobj.check_for_path_collisions(
+        path_conflict = api.queue_model.check_for_path_collisions(
             self._path_template
         )
 
@@ -662,13 +649,12 @@ class CreateTaskBase(QtImport.QWidget):
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
 
-        dm = self._beamline_setup_hwobj.diffractometer_hwobj
-
+        dm = api.diffractometer
         sample_is_mounted = False
         if self._in_plate_mode:
             try:
                 sample_is_mounted = (
-                    self._beamline_setup_hwobj.plate_manipulator_hwobj.getLoadedSample().getCoords()
+                    api.plate_manipulator.getLoadedSample().getCoords()
                     == sample.location
                 )
             except BaseException:
@@ -676,7 +662,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             try:
                 sample_is_mounted = (
-                    self._beamline_setup_hwobj.sample_changer_hwobj.getLoadedSample().getCoords()
+                    api.sample_changer.getLoadedSample().getCoords()
                     == sample.location
                 )
 
@@ -780,7 +766,7 @@ class CreateTaskBase(QtImport.QWidget):
            %s : sample name
         """
 
-        bl_setup = self._beamline_setup_hwobj
+        api.beamline_setup = api.beamline_setup
 
         acq_path_template = deepcopy(path_template)
 
@@ -795,7 +781,7 @@ class CreateTaskBase(QtImport.QWidget):
 
         if "<acronym>-<name>" in acq_path_template.base_prefix:
             acq_path_template.base_prefix = self.get_default_prefix(sample)
-            acq_path_template.run_number = bl_setup.queue_model_hwobj.get_next_run_number(
+            acq_path_template.run_number = api.queue_model.get_next_run_number(
                 acq_path_template
             )
 
@@ -809,7 +795,7 @@ class CreateTaskBase(QtImport.QWidget):
                 "<acronym>", acronym
             )
 
-        # TODO create a method get_user_name in Session hwobj
+        # TODO create a method get_user_name in Session
         user_name = ""
         if os.getenv("SUDO_USER"):
             user_name = os.getenv("SUDO_USER")
@@ -845,7 +831,7 @@ class CreateTaskBase(QtImport.QWidget):
         )
         acq_path_template.base_prefix
 
-        # acq_path_template.suffix = bl_setup.suffix
+        # acq_path_template.suffix = api.beamline_setup.suffix
 
         return acq_path_template
 
@@ -853,13 +839,13 @@ class CreateTaskBase(QtImport.QWidget):
         parameters = self._acquisition_parameters
         path_template = self._path_template
         processing_parameters = self._processing_parameters
-        bl_setup = self._beamline_setup_hwobj
+        api.beamline_setup = api.beamline_setup
 
         acq = queue_model_objects.Acquisition()
 
         parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
-        self._acquisition_parameters.centred_position.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+        self._acquisition_parameters.centred_position.snapshot_image = api.graphics.get_scene_snapshot()
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
         )
@@ -873,9 +859,9 @@ class CreateTaskBase(QtImport.QWidget):
 
     def _create_dc_from_grid(self, sample, grid=None):
         if grid is None:
-            grid = self._graphics_manager_hwobj.create_auto_grid()
+            grid = api.graphics.create_auto_grid()
 
-        grid.set_snapshot(self._graphics_manager_hwobj.get_scene_snapshot(grid))
+        grid.set_snapshot(api.graphics.get_scene_snapshot(grid))
 
         grid_properties = grid.get_properties()
 
@@ -928,7 +914,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             self._path_template.mad_prefix = ""
 
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+        run_number = api.queue_model.get_next_run_number(
             self._path_template
         )
 
@@ -962,7 +948,7 @@ class CreateTaskBase(QtImport.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        if api.diffractometer.in_plate_mode():
             set_max_range = False
 
             if num_images is None:
@@ -984,7 +970,7 @@ class CreateTaskBase(QtImport.QWidget):
             exp_time = None
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
 
-            scan_limits = self._beamline_setup_hwobj.diffractometer_hwobj.get_scan_limits(
+            scan_limits = api.diffractometer.get_scan_limits(
                 num_images, exp_time
             )
 

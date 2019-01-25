@@ -19,8 +19,8 @@
 
 import QtImport
 
+import api
 from gui.utils.widget_utils import DataModelInputBinder
-
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 
@@ -46,10 +46,6 @@ class AcquisitionStillWidget(QtImport.QWidget):
 
         if name is not None:
             self.setObjectName(name)
-
-        # Hardware objects ----------------------------------------------------
-        self._beamline_setup_hwobj = None
-        self._diffractometer_hwobj = None
 
         # Internal variables --------------------------------------------------
 
@@ -146,10 +142,8 @@ class AcquisitionStillWidget(QtImport.QWidget):
     def use_kappa(self, status):
         pass
 
-    def set_beamline_setup(self, beamline_setup):
-        self._beamline_setup_hwobj = beamline_setup
-        limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
-        self._diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
+    def init_api(self):
+        limits_dict = api.beamline_setup.get_acquisition_limit_values()
 
         if "exposure_time" in limits_dict:
             limits = tuple(map(float, limits_dict["exposure_time"].split(",")))
@@ -213,7 +207,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
             self.resolution_validator,
         )
 
-        has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
+        has_shutter_less = api.beamline_setup.detector_has_shutterless()
         self.init_detector_roi_modes()
 
     def exposure_time_ledit_changed(self, new_values):
@@ -296,20 +290,19 @@ class AcquisitionStillWidget(QtImport.QWidget):
             self._acquisition_mib.validate_all()
 
     def init_detector_roi_modes(self):
-        if self._beamline_setup_hwobj is not None:
-            roi_modes = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
-            if (
-                len(roi_modes) > 0
-                and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
-            ):
-                for roi_mode in roi_modes:
-                    self.acq_widget_layout.detector_roi_mode_combo.addItem(roi_mode)
-            self.acq_widget_layout.detector_roi_mode_label.setEnabled(
-                len(roi_modes) > 1
-            )
-            self.acq_widget_layout.detector_roi_mode_combo.setEnabled(
-                len(roi_modes) > 1
-            )
+        roi_modes = api.detector.get_roi_modes()
+        if (
+            len(roi_modes) > 0
+            and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
+        ):
+            for roi_mode in roi_modes:
+                self.acq_widget_layout.detector_roi_mode_combo.addItem(roi_mode)
+        self.acq_widget_layout.detector_roi_mode_label.setEnabled(
+            len(roi_modes) > 1
+        )
+        self.acq_widget_layout.detector_roi_mode_combo.setEnabled(
+            len(roi_modes) > 1
+        )
 
     def update_detector_roi_mode(self, roi_mode_index):
         if (
@@ -321,8 +314,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
             )
 
     def detector_roi_mode_changed(self, roi_mode_index):
-        if self._beamline_setup_hwobj is not None:
-            self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(roi_mode_index)
+        api.detector.set_roi_mode(roi_mode_index)
 
     def update_osc_range_per_frame_limits(self):
         pass

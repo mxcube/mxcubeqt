@@ -19,6 +19,7 @@
 
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.utils import html_template
 from widgets.dc_parameters_widget import DCParametersWidget
@@ -37,16 +38,9 @@ class DCParametersBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.beamline_setup_hwobj = None
-        self.queue_model_hwobj = None
-        self.session_hwobj = None
-
         # Internal variables --------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("queue-model", "string", "/queue-model")
-        self.add_property("beamline_setup", "string", "/beamline-setup")
         self.add_property("useImageTracking", "boolean", True)
 
         # Signals ------------------------------------------------------------
@@ -79,13 +73,15 @@ class DCParametersBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
+        self.parameters_widget.init_api()
+        self.advance_results_widget.init_api()
 
     def populate_dc_parameter_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = (
-            self.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget._base_process_dir = (
-            self.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
 
         data_collection = item.get_model()
@@ -130,20 +126,7 @@ class DCParametersBrick(BaseWidget):
             self.results_static_view.setText(html_template.html_report(data_collection))
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == "beamline_setup":
-            self.beamline_setup_hwobj = self.get_hardware_object(new_value)
-            self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
-            self.parameters_widget.set_beamline_setup(self.beamline_setup_hwobj)
-            self.advance_results_widget.set_beamline_setup(self.beamline_setup_hwobj)
-            if hasattr(self.beamline_setup_hwobj, "image_tracking_hwobj"):
-                self.image_tracking_widget.set_image_tracking_hwobj(
-                    self.beamline_setup_hwobj.image_tracking_hwobj
-                )
-        elif property_name == "queue-model":
-            self.parameters_widget.queue_model_hwobj = self.get_hardware_object(
-                new_value
-            )
-        elif property_name == "useImageTracking":
+        if property_name == "useImageTracking":
             if new_value:
                 self.tool_box.removeItem(
                     self.tool_box.indexOf(self.results_static_view)

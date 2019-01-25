@@ -21,10 +21,11 @@ import os
 
 import QtImport
 
-from HardwareRepository.HardwareObjects import queue_model_objects
 
+import api
 from gui.utils import Colors
 from gui.utils.widget_utils import DataModelInputBinder
+from HardwareRepository.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -38,9 +39,6 @@ class XrayImagingParametersWidget(QtImport.QWidget):
 
         if name is not None:
             self.setObjectName(name)
-
-        # Hardware objects ----------------------------------------------------
-        self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
 
@@ -113,7 +111,7 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         self._parameters_widget.remove_button.setEnabled(state)
         self._parameters_widget.detector_distance_listwidget.setEnabled(state)
 
-    def set_beamline_setup(self, beamline_setup):
+    def init_api(self):
         self._xray_imaging_mib.bind_value_update(
             "camera_write_data", self._parameters_widget.store_data_cbox, bool, None
         )

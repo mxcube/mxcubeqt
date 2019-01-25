@@ -21,6 +21,8 @@ import logging
 
 import QtImport
 
+import api
+
 from gui.utils import queue_item
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -49,11 +51,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.init_models()
         self._advanced_methods = None
         self._grid_map = {}
         self.spacing = [0, 0]
         self.dc_selected = False
+
+        self.init_models()
 
         # Graphic elements ----------------------------------------------------
         self._advanced_methods_widget = QtImport.load_ui_file(
@@ -152,7 +155,15 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acq_widget.acq_widget_layout.osc_total_range_label.setText(
             "Total osc. range per line"
         )
-        # self.enable_widgets(False)
+
+        self._advanced_methods = (
+            api.beamline_setup.get_advanced_methods()
+        )
+        if self._advanced_methods:
+            for method in self._advanced_methods:
+                self._advanced_methods_widget.method_combo.addItem(method)
+        else:
+            self.setEnabled(False)
 
     def enable_widgets(self, state):
         return
@@ -173,39 +184,27 @@ class CreateAdvancedWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
+        has_shutter_less = api.beamline_setup.detector_has_shutterless()
+        self._acquisition_parameters.shutterless = has_shutter_less
 
-            self._acquisition_parameters = self._beamline_setup_hwobj.get_default_acquisition_parameters(
-                "default_advanced_values"
-            )
+        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
+            "default_advanced_values"
+        )
 
-            if not self._advanced_methods:
-                self._advanced_methods = (
-                    self._beamline_setup_hwobj.get_advanced_methods()
-                )
-                if self._advanced_methods:
-                    for method in self._advanced_methods:
-                        self._advanced_methods_widget.method_combo.addItem(method)
-                else:
-                    self.setEnabled(False)
-
-            self.grid_treewidget_item_selection_changed()
-
-    def set_beamline_setup(self, bl_setup_hwobj):
+    def init_api(self):
         """
         In plate mode oscillation start is in the middle of the grid
         """
-        CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)
+        CreateTaskBase.init_api(self)
 
         self._acq_widget.acq_widget_layout.osc_start_label.setText(
             "Oscillation middle:"
         )
 
-        hor_size, ver_size = bl_setup_hwobj.beam_info_hwobj.get_beam_size()
+        hor_size, ver_size = api.beam_info.get_beam_size()
         self.spacing[0] = hor_size
         self.spacing[1] = ver_size
+
         self._advanced_methods_widget.hor_spacing_ledit.setText(
             "%.1f" % (hor_size * 1000)
         )
@@ -234,7 +233,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             msg = "No grid selected. Please select a grid to continue!"
             logging.getLogger("GUI").warning(msg)
             result = False
-            # selected_grid = self._graphics_manager_hwobj.get_auto_grid()
+            # selected_grid = api.graphics.get_auto_grid()
         else:
             grid_properties = selected_grid.get_properties()
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
@@ -290,8 +289,8 @@ class CreateAdvancedWidget(CreateTaskBase):
             if data_collection.is_mesh():
                 # sample_data_model = self.get_sample_item(tree_item).get_model()
                 # self._acq_widget.disable_inverse_beam(True)
-                # self._graphics_manager_hwobj.de_select_all()
-                self._graphics_manager_hwobj.select_shape(data_collection.grid)
+                # api.graphics.de_select_all()
+                api.graphics.select_shape(data_collection.grid)
                 self._advanced_methods_widget.grid_treewidget.setCurrentItem(
                     self._grid_map[data_collection.grid]
                 )
@@ -463,7 +462,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def draw_grid_button_clicked(self):
         """Starts grid drawing
         """
-        self._graphics_manager_hwobj.create_grid(self.spacing)
+        api.graphics.create_grid(self.spacing)
 
     def remove_grid_button_clicked(self):
         """Removes selected grid
@@ -471,7 +470,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         grid_to_delete = self.get_selected_shapes()[0]
 
         if grid_to_delete:
-            self._graphics_manager_hwobj.delete_shape(grid_to_delete)
+            api.graphics.delete_shape(grid_to_delete)
             self._advanced_methods_widget.move_to_grid_button.setEnabled(False)
 
     def hor_spacing_changed(self, value):
@@ -527,7 +526,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         grid = self.get_selected_shapes()[0]
 
         if grid:
-            self._beamline_setup_hwobj.diffractometer_hwobj.move_to_centred_position(
+            api.diffractometer.move_to_centred_position(
                 grid.get_centred_position()
             )
 
@@ -566,7 +565,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         if grid:
             grid.move_by_pix(direction)
-            self._graphics_manager_hwobj.update_grid_motor_positions(grid)
+            api.graphics.update_grid_motor_positions(grid)
 
     def enable_grid_controls(self, state):
         """Enables grid controls if a grid is selectd

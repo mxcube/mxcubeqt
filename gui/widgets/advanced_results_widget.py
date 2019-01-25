@@ -19,10 +19,9 @@
 
 import QtImport
 
+import api
 from gui.utils import queue_item
 from gui.widgets.heat_map_widget import HeatMapWidget
-
-from HardwareRepository.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -56,17 +55,15 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-    def set_beamline_setup(self, bl_setup):
-        if hasattr(bl_setup, "parallel_processing_hwobj"):
-            if bl_setup.parallel_processing_hwobj and not self._initialized:
-                bl_setup.parallel_processing_hwobj.connect(
-                    "processingStarted", self.processing_started
-                )
-                bl_setup.parallel_processing_hwobj.connect(
-                    "processingResultsUpdate", self.update_processing_results
-                )
-                self._initialized = True
-        self.heat_map_widget.set_beamline_setup(bl_setup)
+    def init_api(self):
+        if api.parallel_processing and not self._initialized:
+            api.parallel_processing.connect(
+               "processingStarted", self.processing_started
+            )
+            api.parallel_processing.connect(
+               "processingResultsUpdate", self.update_processing_results
+            )
+            self._initialized = True
 
     def populate_widget(self, item, data_collection):
         # if isinstance(item, queue_item.XrayCenteringQueueItem):

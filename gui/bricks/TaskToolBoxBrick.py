@@ -20,8 +20,10 @@
 import os
 import logging
 
+
 import QtImport
 
+import api
 from gui.BaseComponents import BaseWidget
 from widgets.task_toolbox_widget import TaskToolBoxWidget
 
@@ -41,18 +43,13 @@ class TaskToolBoxBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.graphics_manager_hwobj = None
-        self.diffractometer_hwobj = None
-        self.beamline_setup_hwobj = None
         self.queue_model_hwobj = None
-        self.session_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.ispyb_logged_in = False
         self.tree_brick = None
 
         # Properties ----------------------------------------------------------
-        self.add_property("beamline_setup", "string", "/beamline-setup")
         self.add_property("queue_model", "string", "/queue-model")
         self.add_property("useOscStartCbox", "boolean", False)
         self.add_property("useCompression", "boolean", False)
@@ -94,17 +91,21 @@ class TaskToolBoxBrick(BaseWidget):
         self.task_tool_box_widget.set_expert_mode(state)
 
     def run(self):
-        self.session_hwobj = self.beamline_setup_hwobj.session_hwobj
-        if self.session_hwobj.session_id:
+        if api.session.session_id:
             self.setEnabled(True)
+
+        self.task_tool_box_widget.init_api()
+
+        api.graphics.connect("pointSelected", self.point_selected)
+        api.graphics.connect("pointDeleted", self.point_deleted)
 
         self.request_tree_brick.emit()
         self.task_tool_box_widget.adjust_width(self.width())
 
     def user_group_saved(self, new_user_group):
-        self.session_hwobj.set_user_group(str(new_user_group))
+        api.session.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
-        path = self.session_hwobj.get_base_image_directory() + "/" + str(new_user_group)
+        path = api.session.get_base_image_directory() + "/" + str(new_user_group)
         msg = "Image path is: %s" % path
         logging.getLogger("GUI").info(msg)
 
@@ -146,41 +147,14 @@ class TaskToolBoxBrick(BaseWidget):
 
         self.ispyb_logged_in = logged_in
 
-        if self.session_hwobj is not None:
-            self.session_hwobj.set_user_group("")
+        if api.session is not None:
+            api.session.set_user_group("")
 
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == "beamline_setup":
-            self.beamline_setup_hwobj = self.get_hardware_object(new_value)
-            if self.beamline_setup_hwobj:
-                if self.queue_model_hwobj:
-                    self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
-                    self.task_tool_box_widget.set_beamline_setup(
-                        self.beamline_setup_hwobj
-                    )
-                self.graphics_manager_hwobj = (
-                    self.beamline_setup_hwobj.shape_history_hwobj
-                )
-                if self.graphics_manager_hwobj:
-                    self.graphics_manager_hwobj.connect(
-                        "pointSelected", self.point_selected
-                    )
-                    self.graphics_manager_hwobj.connect(
-                        "pointDeleted", self.point_deleted
-                    )
-            else:
-                logging.getLogger("GUI").error(
-                    "Could not load beamline setup " + "check configuration !."
-                )
-        elif property_name == "queue_model":
-            self.queue_model_hwobj = self.get_hardware_object(new_value)
-            if self.beamline_setup_hwobj:
-                self.beamline_setup_hwobj.queue_model_hwobj = self.queue_model_hwobj
-                self.task_tool_box_widget.set_beamline_setup(self.beamline_setup_hwobj)
-        elif property_name == "useOscStartCbox":
+        if property_name == "useOscStartCbox":
             self.task_tool_box_widget.use_osc_start_cbox(new_value)
         elif property_name == "useCompression":
             self.task_tool_box_widget.enable_compression(new_value)

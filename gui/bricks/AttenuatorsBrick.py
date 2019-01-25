@@ -19,6 +19,8 @@
 
 import QtImport
 
+import api
+
 from gui.utils import Colors
 from gui.BaseComponents import BaseWidget
 
@@ -41,13 +43,10 @@ class AttenuatorsBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.attenuators_hwobj = None
 
         # Internal variables --------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
-        self.add_property("mockup_mnemonic", "string", "")
         self.add_property("formatString", "formatString", "###.##")
 
         # Signals ------------------------------------------------------------
@@ -94,45 +93,16 @@ class AttenuatorsBrick(BaseWidget):
 
         self.instance_synchronize("transmission_ledit", "new_value_ledit")
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.attenuators_hwobj is not None:
-                self.disconnect(self.attenuators_hwobj, "deviceReady", self.connected)
-                self.disconnect(
-                    self.attenuators_hwobj, "deviceNotReady", self.disconnected
-                )
-                self.disconnect(
-                    self.attenuators_hwobj,
-                    "stateChanged",
-                    self.transmission_state_changed,
-                )
-                self.disconnect(
-                    self.attenuators_hwobj,
-                    "valueChanged",
-                    self.transmission_value_changed,
-                )
-            self.attenuators_hwobj = self.get_hardware_object(new_value)
-            if self.attenuators_hwobj is not None:
-                self.connect(self.attenuators_hwobj, "deviceReady", self.connected)
-                self.connect(
-                    self.attenuators_hwobj, "deviceNotReady", self.disconnected
-                )
-                self.connect(
-                    self.attenuators_hwobj,
-                    "stateChanged",
-                    self.transmission_state_changed,
-                )
-                self.connect(
-                    self.attenuators_hwobj,
-                    "valueChanged",
-                    self.transmission_value_changed,
-                )
-                self.connected()
-                self.attenuators_hwobj.update_values()
-            else:
-                self.disconnected()
+    def run(self):
+        if api.transmission is not None:
+            self.connect(api.transmission, "deviceReady", self.connected)
+            self.connect(api.transmission, "deviceNotReady", self.disconnected)
+            self.connect(api.transmission, "stateChanged", self.transmission_state_changed)
+            self.connect(api.transmission, "valueChanged", self.transmission_value_changed)
+            self.connected()
+            api.transmission.update_values()
         else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+            self.disconnected()
 
     def input_field_changed(self, input_field_text):
         if (
@@ -154,7 +124,7 @@ class AttenuatorsBrick(BaseWidget):
             self.new_value_validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
         ):
-            self.attenuators_hwobj.set_value(float(input_field_text))
+            api.transmission.set_value(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base

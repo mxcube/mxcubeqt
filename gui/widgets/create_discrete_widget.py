@@ -21,6 +21,7 @@ import copy
 
 import QtImport
 
+import api
 from gui.utils import queue_item
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.processing_widget import ProcessingWidget
@@ -97,25 +98,21 @@ class CreateDiscreteWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
+        self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
+             api.beamline_setup._get_run_processing_parallel()
+        )
 
     def init_models(self):
-        """
-        Descript. :
-        """
         CreateTaskBase.init_models(self)
         # self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
+        has_shutter_less = api.beamline_setup.detector_has_shutterless()
+        self._acquisition_parameters.shutterless = has_shutter_less
 
-            self._acquisition_parameters = self._beamline_setup_hwobj.get_default_acquisition_parameters(
-                "default_acquisition_values"
-            )
-            self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-                self._beamline_setup_hwobj._get_run_processing_parallel()
-            )
+        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
+            "default_acquisition_values"
+        )
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -181,7 +178,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         try:
             # This is very EMBL specific and soon will be removed
-            if self._beamline_setup_hwobj.detector_hwobj.get_roi_mode_name() == "16M":
+            if api.detector.get_roi_mode_name() == "16M":
                 file_size = 18.0
                 total_num_of_images = 14400
             else:
@@ -192,7 +189,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 self._acq_widget.acq_widget_layout.num_images_ledit.text()
             )
             total, free, perc = (
-                self._beamline_setup_hwobj.machine_info_hwobj.get_ramdisk_size()
+                api.machine_info.get_ramdisk_size()
             )
             free_mb = free / (2 ** 20)
 
@@ -215,12 +212,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
+            snapshot = api.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+            cpos.snapshot_image = api.graphics.get_scene_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1
@@ -284,22 +281,20 @@ class CreateDiscreteWidget(CreateTaskBase):
     def execute_task(self, sample):
         # All this should be in queue_entry level
         group_data = {
-            "sessionId": self._session_hwobj.session_id,
+            "sessionId": api.session.session_id,
             "experimentType": "OSC",
         }
-        gid = self._beamline_setup_hwobj.lims_client_hwobj._store_data_collection_group(
-            group_data
-        )
+        gid = api.lims._store_data_collection_group(group_data)
         sample.lims_group_id = gid
 
         task_list = self._create_task(sample, None)
         task_list[0].lims_group_id = gid
 
         param_list = queue_model_objects.to_collect_dict(
-            task_list[0], self._session_hwobj, sample, None
+            task_list[0], api.session, sample, None
         )
 
-        self._beamline_setup_hwobj.collect_hwobj.collect(
+        api.collect.collect(
             queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list
         )
 

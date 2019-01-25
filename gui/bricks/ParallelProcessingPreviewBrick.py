@@ -73,6 +73,10 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         self.mesh_results_widget.heat_map_widget.setFixedWidth(1300)
         self.line_results_widget.heat_map_widget.setFixedWidth(1300)
 
+    def run(self):
+        self.mesh_results_widget.init_api()
+        self.line_results_widget.init_api()
+
     def populate_widget(self, item):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
@@ -90,9 +94,3 @@ class ParallelProcessingPreviewBrick(BaseWidget):
                 self.mesh_results_widget.setHidden(True)
                 self.line_results_widget.setHidden(False)
                 self.line_results_widget.populate_widget(item, data_collection)
-
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "beamline_setup":
-            bl_setup = self.get_hardware_object(new_value)
-            self.mesh_results_widget.set_beamline_setup(bl_setup)
-            self.line_results_widget.set_beamline_setup(bl_setup)

@@ -18,9 +18,9 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
-
 import QtImport
+
+import api
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Icons, Colors
@@ -43,9 +43,6 @@ class MachineInfoBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.mach_info_hwobj = None
-
         # Internal values -----------------------------------------------------
         self.graphics_initialized = None
         self.value_label_list = []
@@ -54,9 +51,6 @@ class MachineInfoBrick(BaseWidget):
         self.add_property(
             "maxPlotPoints", "integer", 100, comment="Maximal number of plot points"
         )
-
-        # Properties for hwobj initialization ---------------------------------
-        self.add_property("hwobj_mach_info", "string", "")
 
         # Signals -------------------------------------------------------------
 
@@ -74,21 +68,14 @@ class MachineInfoBrick(BaseWidget):
         # Other ---------------------------------------------------------------
         self.setToolTip("Main information about the beamline")
 
-    def property_changed(self, property_name, old_value, new_value):
+    def run(self):
         """Method called when user changes a property in the gui builder"""
-
-        if property_name == "hwobj_mach_info":
-            if self.mach_info_hwobj is not None:
-                self.disconnect(self.mach_info_hwobj, "valuesChanged", self.set_value)
-            self.mach_info_hwobj = self.get_hardware_object(new_value)
-            if self.mach_info_hwobj is not None:
-                self.setEnabled(True)
-                self.connect(self.mach_info_hwobj, "valuesChanged", self.set_value)
-                self.mach_info_hwobj.update_values()
-            else:
-                self.setEnabled(False)
+        if api.machine_info is not None:
+            self.setEnabled(True)
+            self.connect(api.machine_info, "valuesChanged", self.set_value)
+            api.machine_info.update_values()
         else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+            self.setEnabled(False)
 
     def set_value(self, values_list):
         """Slot connected to the valuesChanged signal

@@ -384,9 +384,6 @@ def run(gui_config_file=None):
         "---------------------------------------------------------------------------------"
     )
 
-
-    api.init(hwr_path)
-
     QtImport.QApplication.setDesktopSettingsAware(False)
 
     main_application.lastWindowClosed.connect(main_application.quit)
@@ -395,6 +392,8 @@ def run(gui_config_file=None):
         show_maximized=opts.showMaximized,
         no_border=opts.noBorder,
     )
+
+    api.init(hwr_path)
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(

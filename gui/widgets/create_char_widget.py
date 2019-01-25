@@ -22,6 +22,7 @@ import logging
 
 import QtImport
 
+import api
 from gui.utils import queue_item
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.create_task_base import CreateTaskBase
@@ -183,17 +184,13 @@ class CreateCharWidget(CreateTaskBase):
         self._processing_parameters = queue_model_objects.ProcessingParameters()
         self._set_space_group(self._processing_parameters.space_group)
 
-        if self._beamline_setup_hwobj is not None:
-            self._acquisition_parameters = (
-                self._beamline_setup_hwobj.get_default_char_acq_parameters()
-            )
+        self._acquisition_parameters = (
+            api.beamline_setup.get_default_char_acq_parameters()
+        )
 
-            self._char_params = (
-                self._beamline_setup_hwobj.get_default_characterisation_parameters()
-            )
-        else:
-            self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-
+        self._char_params = (
+            api.beamline_setup.get_default_characterisation_parameters()
+        )
         self._path_template.reference_image_prefix = "ref"
         # The num images drop down default value is 1
         # we would like it to be 2
@@ -266,7 +263,7 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = self._graphics_manager_hwobj.get_selected_shapes()
+        selected_shapes = api.graphics.get_selected_shapes()
 
         for shape in selected_shapes:
             if isinstance(shape, GraphicsItemPoint):
@@ -280,11 +277,11 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+            cpos.snapshot_image = api.graphics.get_scene_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
+            snapshot = api.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 
@@ -313,7 +310,7 @@ class CreateCharWidget(CreateTaskBase):
         tasks.append(char)
         self._path_template.run_number += 1
 
-        if self._beamline_setup_hwobj.collect_hwobj.get_measured_intensity() < 1e9:
+        if api.flux.get_flux() < 1e9:
             logging.getLogger("GUI").error(
                 "No flux reading is available! "
                 + "Characterisation result may be wrong. "

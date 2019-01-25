@@ -21,12 +21,11 @@ import os
 
 import QtImport
 
+import api
 from gui.utils import queue_item
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
-
-
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 
@@ -37,10 +36,6 @@ __license__ = "LGPLv3+"
 class AdvancedParametersWidget(QtImport.QWidget):
     def __init__(self, parent=None, name="advanced_parameters_widget"):
         QtImport.QWidget.__init__(self, parent)
-
-        # Hardware objects ----------------------------------------------------
-        self._queue_model_hwobj = None
-        self._beamline_setup_hwobj = None
 
         # Internal values -----------------------------------------------------
         self._data_collection = None
@@ -84,9 +79,8 @@ class AdvancedParametersWidget(QtImport.QWidget):
         self._acq_widget.acq_widget_layout.energies_combo.hide()
         self._acq_widget.acq_widget_layout.shutterless_cbx.hide()
 
-    def set_beamline_setup(self, bl_setup):
-        self._beamline_setup_hwobj = bl_setup
-        self._acq_widget.set_beamline_setup(bl_setup)
+    def init_api(self):
+        self._acq_widget.init_api()
 
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
@@ -96,7 +90,7 @@ class AdvancedParametersWidget(QtImport.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = self._beamline_setup_hwobj.queue_model_hwobj.get_next_run_number(
+        run_number = api.queue_model.get_next_run_number(
             path_template
         )
 

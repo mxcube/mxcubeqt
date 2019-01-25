@@ -495,8 +495,5 @@ class CharParametersWidget(QtImport.QWidget):
         crystal = self._char.reference_image_collection.crystal
         self.acq_widget.set_energies(crystal.energy_scan_result)
 
-    def set_beamline_setup(self, bl_setup):
-        """
-        Descript. :
-        """
-        self.acq_widget.set_beamline_setup(bl_setup)
+    def init_api(self):
+        self.acq_widget.init_api()

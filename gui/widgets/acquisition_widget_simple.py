@@ -19,6 +19,8 @@
 
 import QtImport
 
+import api
+
 from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_objects
@@ -46,10 +48,6 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
-
-        # Hardware objects ----------------------------------------------------
-        self._beamline_setup_hwobj = None
-        self._diffractometer_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.value_changed_list = []
@@ -140,8 +138,8 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
 
     def use_kappa(self, state):
-        if self._beamline_setup_hwobj is not None:
-            if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        if api.beamline_setup is not None:
+            if api.diffractometer.in_plate_mode():
                 state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
@@ -191,10 +189,8 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
     def energy_selected(self, index):
         pass
 
-    def set_beamline_setup(self, beamline_setup):
-        self._beamline_setup_hwobj = beamline_setup
-        self._diffractometer_hwobj = self._beamline_setup_hwobj.diffractometer_hwobj
-        limits_dict = self._beamline_setup_hwobj.get_acquisition_limit_values()
+    def init_api(self):
+        limits_dict = api.beamline_setup.get_acquisition_limit_values()
 
         if "osc_range" in limits_dict:
             limits = tuple(map(float, limits_dict["osc_range"].split(",")))
@@ -269,9 +265,9 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.resolution_validator,
         )
 
-        self.set_tunable_energy(beamline_setup.tunable_wavelength())
+        self.set_tunable_energy(api.beamline_setup.tunable_wavelength())
 
-        if self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode():
+        if api.diffractometer.in_plate_mode():
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
@@ -334,20 +330,15 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
 
     def init_detector_roi_modes(self):
-        if self._beamline_setup_hwobj is not None:
-            roi_modes = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
-            if (
-                len(roi_modes) > 0
-                and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
-            ):
-                for roi_mode in roi_modes:
-                    self.acq_widget_layout.detector_roi_mode_combo.addItem(roi_mode)
-                self.acq_widget_layout.detector_roi_mode_label.setEnabled(True)
-                self.acq_widget_layout.detector_roi_mode_combo.setEnabled(True)
-                # self._acquisition_mib.bind_value_update('detector_roi_mode',
-                #               self.acq_widget_layout.detector_roi_mode_combo,
-                #               str,
-                #               None)
+        roi_modes = api.detector.get_roi_modes()
+        if (
+            len(roi_modes) > 0
+            and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
+        ):
+            for roi_mode in roi_modes:
+                self.acq_widget_layout.detector_roi_mode_combo.addItem(roi_mode)
+            self.acq_widget_layout.detector_roi_mode_label.setEnabled(True)
+            self.acq_widget_layout.detector_roi_mode_combo.setEnabled(True)
 
     def update_osc_range_limits(self, limits=None):
         pass
@@ -355,7 +346,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
     def update_exp_time_limits(self):
         try:
             exp_time_limits = (
-                self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
+                api.beamline_setup.detector_hwobj.get_exposure_time_limits()
             )
             max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
             top_limit = (
@@ -379,8 +370,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         pass
 
     def detector_roi_mode_changed(self, roi_mode_index):
-        if self._beamline_setup_hwobj is not None:
-            self._beamline_setup_hwobj.detector_hwobj.set_roi_mode(roi_mode_index)
+        api.detector.set_roi_mode(roi_mode_index)
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters

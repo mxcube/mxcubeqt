@@ -17,18 +17,14 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 import QtImport
 
-
+import api
 from gui.utils import queue_item
 from gui.BaseComponents import BaseWidget
 from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
-
-import api
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -127,8 +123,7 @@ class AdvancedBrick(BaseWidget):
         self.tool_box.setCurrentWidget(self.results_widget)
 
     def init_api(self):
-        self.parameters_widget.set_beamline_setup(api.beamline_setup)
-        self.results_widget.set_beamline_setup(api.beamline_setup)
-
-        self.line_parameters_widget.set_beamline_setup(api.beamline_setup)
-        self.line_results_widget.set_beamline_setup(api.beamline_setup)
+        self.parameters_widget.init_api()
+        self.results_widget.init_api()
+        self.line_parameters_widget.init_api()
+        self.line_results_widget.init_api()
