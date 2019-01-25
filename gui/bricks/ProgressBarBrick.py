@@ -20,8 +20,9 @@
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
 
-
 import QtImport
+
+from gui.utils import Colors
 from gui.BaseComponents import BaseWidget
 
 
@@ -58,6 +59,10 @@ class ProgressBarBrick(BaseWidget):
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.setSpacing(2)
         self.setEnabled(False)
+
+        new_palette = QtImport.QPalette()
+        new_palette.setColor(QtImport.QPalette.Highlight, Colors.DARK_GREEN)
+        self.progress_bar.setPalette(new_palette)
 
     def stop_progress(self, *args):
         # if self.use_dialog:

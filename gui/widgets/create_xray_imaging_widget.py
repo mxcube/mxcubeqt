@@ -58,12 +58,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._xray_imaging_parameters_widget = XrayImagingParametersWidget(
-            self,
-            "xray_imaging_widget",
-            xray_imaging_params=self._xray_imaging_parameters,
-        )
-
         self._acq_widget = AcquisitionWidget(
             self,
             "acquisition_widget",
@@ -72,6 +66,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
             path_template=self._path_template,
         )
         self._acq_widget.grid_mode = False
+
+        self._xray_imaging_parameters_widget = XrayImagingParametersWidget(
+            self,
+            "xray_imaging_widget",
+            xray_imaging_params=self._xray_imaging_parameters,
+        )
 
         self._data_path_widget = DataPathWidget(
             self,
@@ -82,8 +82,8 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
-        _main_vlayout.addWidget(self._xray_imaging_parameters_widget)
         _main_vlayout.addWidget(self._acq_widget)
+        _main_vlayout.addWidget(self._xray_imaging_parameters_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(6)
@@ -119,6 +119,8 @@ class CreateXrayImagingWidget(CreateTaskBase):
         self._acq_widget.acq_widget_layout.kappa_phi_ledit.setVisible(False)
         self._acq_widget.acq_widget_layout.shutterless_cbx.setVisible(False)
 
+        self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
+
     def approve_creation(self):
         return True
 
@@ -126,9 +128,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
         CreateTaskBase.enable_compression(self, False)
 
     def init_models(self):
-        """
-        Descript. :
-        """
         CreateTaskBase.init_models(self)
 
         self._xray_imaging_parameters = queue_model_objects.XrayImagingParameters()
@@ -151,9 +150,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
         )
 
     def single_item_selection(self, tree_item):
-        """
-        Descript. :
-        """
         CreateTaskBase.single_item_selection(self, tree_item)
         self.setDisabled(True)
 
@@ -166,8 +162,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._beamline_setup_hwobj.detector_distance_hwobj.get_position()
             )
             self.setDisabled(False)
+            self._xray_imaging_parameters_widget.enable_distance_tools(True)
+
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
+            self._xray_imaging_parameters_widget.enable_distance_tools(True)
+
         elif isinstance(tree_item, queue_item.XrayImagingQueueItem):
             data_model = tree_item.get_model()
 
@@ -185,13 +185,11 @@ class CreateXrayImagingWidget(CreateTaskBase):
             )
 
             self.setDisabled(False)
+            self._xray_imaging_parameters_widget.enable_distance_tools(False)
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
-        """
-        Descript. :
-        """
         if isinstance(shape, GraphicsItemPoint):
             snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
@@ -199,16 +197,32 @@ class CreateXrayImagingWidget(CreateTaskBase):
         else:
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+ 
+        detector_distance_list = []
+        dc_list = []
 
-        # self._path_template.run_number += 1
-        xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)
-        acq = self._create_acq(sample)
-        acq.acquisition_parameters.centred_position = cpos
+        if self.distance_listwidget.count() > 1:
+            for index in range(self.distance_listwidget.count()):
+                detector_distance_list.append(int(self.distance_listwidget.item(index).text()))
+        else:
+            detector_distance_list.append(None)
 
-        dc = queue_model_objects.XrayImaging(
-            xray_imaging_parameters, acq, sample.crystals[0]
-        )
-        dc.set_name(acq.path_template.get_prefix())
-        dc.set_number(acq.path_template.run_number)
+        for detector_distance in detector_distance_list:
+            xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)
+            if detector_distance:
+                print 111, detector_distance
+                xray_imaging_parameters.detector_distance = detector_distance
 
-        return [dc]
+            acq = self._create_acq(sample)
+            acq.acquisition_parameters.centred_position = cpos
+
+            dc = queue_model_objects.XrayImaging(
+                xray_imaging_parameters, acq, sample.crystals[0]
+            )
+            dc.set_name(acq.path_template.get_prefix())
+            dc.set_number(acq.path_template.run_number)
+
+            dc_list.append(dc)
+            self._path_template.run_number += 1
+
+        return dc_list

@@ -398,6 +398,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
                         else:
                             self.create_task(task_model)
                 self.tree_brick.select_last_added_item()
+                self.tree_brick.update_enable_collect()
 
             self.tool_box.currentWidget().update_selection()
 

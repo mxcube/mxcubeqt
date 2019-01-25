@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>179</height>
+    <width>1034</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,60 +26,96 @@
    <string>Acquisition widget</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="ff_path_ledit"/>
-     </item>
-     <item row="1" column="2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="1" column="5">
       <widget class="QPushButton" name="ff_browse_button">
        <property name="text">
         <string>Browse</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="data_path_ledit"/>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="data_path_label">
-       <property name="text">
-        <string>Data:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
+     <item row="0" column="5">
       <widget class="QPushButton" name="data_browse_button">
        <property name="text">
         <string>Browse</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="ff_path_label">
+     <item row="0" column="1">
+      <widget class="QLabel" name="data_path_label">
        <property name="text">
-        <string>Flat field: </string>
+        <string>Data:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0" colspan="2">
+     <item row="1" column="3">
+      <widget class="QLineEdit" name="ff_path_ledit">
+       <property name="minimumSize">
+        <size>
+         <width>500</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
       <widget class="QCheckBox" name="ff_apply_cbox">
        <property name="text">
-        <string>Apply flat field correction</string>
+        <string>Flat field:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="load_images_button">
+     <item row="0" column="3">
+      <widget class="QLineEdit" name="data_path_ledit">
+       <property name="minimumSize">
+        <size>
+         <width>500</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="5">
+      <widget class="QPushButton" name="load_button">
        <property name="text">
         <string>Load</string>
        </property>
       </widget>
      </item>
+     <item row="2" column="5">
+      <widget class="QPushButton" name="config_browse_button">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="config_label">
+       <property name="text">
+        <string>Configuration:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLineEdit" name="config_path_ledit"/>
+     </item>
     </layout>
    </item>
    <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item>
       <widget class="QPushButton" name="first_image_button">
        <property name="minimumSize">
@@ -133,6 +169,12 @@
      </item>
      <item>
       <widget class="QSlider" name="image_slider">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -228,20 +270,20 @@
        </property>
       </widget>
      </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
-   </item>
-   <item row="0" column="1">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

@@ -1185,6 +1185,7 @@ class TreeBrick(BaseWidget):
             phase != "BeamLocation"
         ):
             self.enable_collect_conditions["diffractometer"] = phase != "BeamLocation"
+        if phase:
             self.update_enable_collect()
 
     def ppu_status_changed(self, in_error, status_msg):
@@ -1204,12 +1205,18 @@ class TreeBrick(BaseWidget):
             self.update_enable_collect()
 
     def update_enable_collect(self):
+
+        #Do not allow to start xray imaging from BeamLocation and DataCollection phase
+        self.enable_collect_conditions["imaging"] = True
+        for item in self.get_selected_items():
+            print item, self.diffractometer_hwobj.get_current_phase()
+            if isinstance(item, queue_item.XrayImagingQueueItem) and \
+                self.diffractometer_hwobj.get_current_phase() in ("BeamLocation", "DataCollection"):
+                 self.enable_collect_conditions["imaging"] = False
+
         enable_collect = all(
             item == True for item in self.enable_collect_conditions.values()
         )
-
-        # if self.dc_tree_widget.enable_collect_condition == enable_collect:
-        #    return
 
         if enable_collect:
             if enable_collect != self.dc_tree_widget.enable_collect_condition:
@@ -1235,6 +1242,10 @@ class TreeBrick(BaseWidget):
                             "  - Machine current is to low "
                             + "(Wait till the machine current reaches 90 mA)"
                         )
+                    elif key == "imaging":
+                        logging.getLogger("GUI").warning("To start an imaging collection "
+                            + "diffractometer has to be in SampleCentering or in Transfer phase"
+                            ) 
         self.dc_tree_widget.enable_collect_condition = enable_collect
         self.dc_tree_widget.toggle_collect_button_enabled()
 

@@ -934,6 +934,10 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             | QtImport.Qt.WindowTitleHint
             | QtImport.Qt.CustomizeWindowHint
         )
+        new_palette = QtImport.QPalette()
+        new_palette.setColor(QtImport.QPalette.Highlight, Colors.DARK_GREEN)
+        self._progress_dialog.setPalette(new_palette)
+
         self._progress_dialog.setWindowTitle("Please wait...")
         self._progress_dialog.setCancelButton(None)
         self._progress_dialog.setModal(True)
@@ -1092,7 +1096,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._progress_dialog.show()
 
     def set_progress_dialog_step(self, step, msg):
-        self._progress_dialog.set_value(step)
+        self._progress_dialog.setValue(step)
         if msg:
             self._progress_dialog.setLabelText(msg)
 

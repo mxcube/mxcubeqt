@@ -51,18 +51,18 @@ class XrayImagingResultsWidget(QtImport.QWidget):
 
         # Graphic elements ----------------------------------------------------
         results_gbox = QtImport.QGroupBox("Results", self)
-        self.live_view_cbox = QtImport.QCheckBox("Live view", results_gbox)
-        self.live_view_cbox.setChecked(True)
+        
         self.graphics_view_widget = QtImport.QWidget(results_gbox)
         self._results_widget = QtImport.load_ui_file(
             "xray_imaging_results_widget_layout.ui"
         )
-        tools_gbox = QtImport.QGroupBox("Tools", self)
+        tools_widget = QtImport.QGroupBox(self) 
+        button_widget = QtImport.QWidget(self)
         self.start_centering_button = QtImport.QPushButton(
-            "Start centering", tools_gbox
+            Icons.load_icon("VCRPlay2"), "Centre", tools_widget
         )
         self.accept_centering_button = QtImport.QPushButton(
-            "Create centering point", tools_gbox
+            Icons.load_icon("ThumbUp"), "Save", tools_widget
         )
 
         # Layout --------------------------------------------------------------
@@ -72,41 +72,41 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self._graphics_view_widget_vlayout.setSpacing(0)
         self._graphics_view_widget_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        __results_gbox_vlayout = QtImport.QVBoxLayout(results_gbox)
-        __results_gbox_vlayout.addWidget(self.live_view_cbox)
-        __results_gbox_vlayout.addWidget(self.graphics_view_widget)
-        __results_gbox_vlayout.addWidget(self._results_widget)
-        __results_gbox_vlayout.setSpacing(2)
-        __results_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
+        __button_widget_hlayout = QtImport.QHBoxLayout(button_widget)
+        __button_widget_hlayout.addWidget(self.start_centering_button)
+        __button_widget_hlayout.addWidget(self.accept_centering_button)
+        __button_widget_hlayout.addStretch()
+        __button_widget_hlayout.setSpacing(2)
+        __button_widget_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        __tools_gbox_vlayout = QtImport.QHBoxLayout(tools_gbox)
-        __tools_gbox_vlayout.addWidget(self.start_centering_button)
-        __tools_gbox_vlayout.addWidget(self.accept_centering_button)
-        __tools_gbox_vlayout.addStretch()
-        __tools_gbox_vlayout.setSpacing(2)
-        __tools_gbox_vlayout.setContentsMargins(2, 2, 2, 2)
+        __tools_widget_vlayout = QtImport.QVBoxLayout(tools_widget)
+        __tools_widget_vlayout.addWidget(button_widget)
+        __tools_widget_vlayout.addWidget(self._results_widget)
+        __tools_widget_vlayout.addStretch()
+        __tools_widget_vlayout.setSpacing(2)
+        __tools_widget_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        __main_vlayout = QtImport.QVBoxLayout(self)
-        __main_vlayout.addWidget(results_gbox)
-        __main_vlayout.addWidget(tools_gbox)
-        __main_vlayout.setSpacing(0)
-        __main_vlayout.setContentsMargins(0, 0, 0, 0)
+        __main_hlayout = QtImport.QHBoxLayout(self)
+        __main_hlayout.addWidget(self.graphics_view_widget)
+        __main_hlayout.addWidget(tools_widget)
+        __main_hlayout.setSpacing(0)
+        __main_hlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.live_view_cbox.stateChanged.connect(self.live_view_state_changed)
-
         self._results_widget.data_browse_button.clicked.connect(
             self.data_browse_button_clicked
         )
         self._results_widget.ff_browse_button.clicked.connect(
             self.ff_browse_button_clicked
         )
-        self._results_widget.load_images_button.clicked.connect(
-            self.load_images_button_clicked
+        self._results_widget.config_browse_button.clicked.connect(
+            self.config_browse_button_clicked
+        ) 
+        self._results_widget.load_button.clicked.connect(
+            self.load_button_clicked
         )
-
         self._results_widget.first_image_button.clicked.connect(
             self.first_image_button_clicked
         )
@@ -156,27 +156,32 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self._results_widget.play_button.setIcon(Icons.load_icon("VCRPlay"))
         self._results_widget.stop_button.setIcon(Icons.load_icon("Stop2"))
 
-        self._results_widget.data_path_ledit.setText("/home/karpics/Downloads/data/data00000.tif")
-        self._results_widget.ff_path_ledit.setText("/home/karpics/Downloads/flatfield/flat00000.tif")
- 
+        self.start_centering_button.setFixedSize(70, 70)
+        self.accept_centering_button.setFixedSize(70, 70)
 
     def populate_widget(self, item):
         data_model = item.get_model()
         acq_params = data_model.acquisition.acquisition_parameters
         imaging_params = data_model.xray_imaging_parameters
         path_template = data_model.acquisition.path_template
+
         self._results_widget.data_path_ledit.setText(path_template.get_image_path() % 1)
         if imaging_params.ff_pre or imaging_params.ff_post:
             ff_file_path = os.path.join(
                 path_template.directory, "ff_" + path_template.get_image_file_name() % 1
             )
             self._results_widget.ff_path_ledit.setText(ff_file_path)
-            self._results_widget.ff_path_label.setEnabled(True)
             self._results_widget.ff_path_ledit.setEnabled(True)
+            self._results_widget.ff_apply_cbox.setChecked(True)
         else:
             self._results_widget.ff_path_ledit.setText("")
-            self._results_widget.ff_path_label.setEnabled(False)
             self._results_widget.ff_path_ledit.setEnabled(False)
+            self._results_widget.ff_apply_cbox.setChecked(False)
+
+        config_filename = "%s_%d_00001.json" % (path_template.base_prefix,
+                                                path_template.run_number)
+        self._results_widget.config_path_ledit.setText(os.path.join(path_template.get_archive_directory(),
+                                                                    config_filename))
 
         self.xray_imaging_hwobj.set_osc_start(acq_params.osc_start)
 
@@ -189,9 +194,9 @@ class XrayImagingResultsWidget(QtImport.QWidget):
 
             self.graphics_view = self.xray_imaging_hwobj.get_graphics_view()
             self._graphics_view_widget_vlayout.addWidget(self.graphics_view)
-            self.graphics_view_widget.setFixedSize(400, 400
+            self.graphics_view_widget.setFixedSize(400, 400)
             #    self.graphics_view.scene().width(), self.graphics_view.scene().height()
-            )
+            #)
 
             self.setDisabled(False)
         else:
@@ -200,38 +205,48 @@ class XrayImagingResultsWidget(QtImport.QWidget):
     def image_init(self, image_descr_dict):
         self.total_image_num = image_descr_dict
         self.current_image_num = 0
+        self._results_widget.image_slider.blockSignals(True)
+        self._results_widget.image_spinbox.blockSignals(True)
+
         self._results_widget.image_slider.setMinimum(0)
         self._results_widget.image_slider.setMaximum(self.total_image_num - 1)
         self._results_widget.image_spinbox.setMinimum(1)
         self._results_widget.image_spinbox.setMaximum(self.total_image_num)
         self.refresh_gui()
 
+        self._results_widget.image_slider.blockSignals(False)
+        self._results_widget.image_spinbox.blockSignals(False)
+
     def image_loaded(self, index):
         self.current_image_num = index
         # self._results_widget.data_path_ledit.setText(filename)
         self.refresh_gui()
-
-    def live_view_state_changed(self, state):
-        self.xray_imaging_hwobj.set_live_view_state(state)
 
     def ff_apply_state_changed(self, state):
         self.xray_imaging_hwobj.set_ff_apply(state)
 
     def data_browse_button_clicked(self):
         file_dialog = QtImport.QFileDialog(self)
-        # TODO get from datapath widget
-        # file_dialog.setNameFilter("%s*" % self._base_image_dir)
-        base_image_dir = os.environ["HOME"]
+       
+        try:
+            base_image_dir = os.path.dirname(str(self._results_widget.data_path_ledit.text()))
+        except:
+            base_image_dir = os.environ["HOME"]
 
         selected_filename = str(
             file_dialog.getOpenFileName(self, "Select an image", base_image_dir)
         )
         self._results_widget.data_path_ledit.setText(selected_filename)
+       
+        ff_path = selected_filename[:selected_filename.rindex("/") + 1] + "ff_" + selected_filename[selected_filename.rindex("/") + 1:]
+        self._results_widget.ff_path_ledit.setText(ff_path)
+        
+        config_path = selected_filename[:-4] + "json"
+        if os.path.exists(config_path): 
+            self._results_widget.config_path_ledit.setText(config_path)
 
     def ff_browse_button_clicked(self):
         file_dialog = QtImport.QFileDialog(self)
-        # TODO get from datapath widget
-        # file_dialog.setNameFilter("%s*" % self._base_image_dir)
         base_image_dir = os.environ["HOME"]
 
         selected_filename = str(
@@ -239,10 +254,20 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         )
         self._results_widget.ff_path_ledit.setText(selected_filename)
 
-    def load_images_button_clicked(self):
+    def config_browse_button_clicked(self):
+        file_dialog = QtImport.QFileDialog(self)
+        base_image_dir = os.environ["HOME"]
+
+        selected_filename = str(
+            file_dialog.getOpenFileName(self, "Select a configuration file", base_image_dir)
+        )
+        self._results_widget.config_path_ledit.setText(selected_filename)
+
+    def load_button_clicked(self):
         self.xray_imaging_hwobj.load_images(
             str(self._results_widget.data_path_ledit.text()),
             str(self._results_widget.ff_path_ledit.text()),
+            str(self._results_widget.config_path_ledit.text())
         )
 
     def first_image_button_clicked(self):

@@ -154,12 +154,15 @@ class DataModelInputBinder(object):
         try:
             widget.blockSignals(True)
 
-            if isinstance(widget, QtImport.QLineEdit):
+            if isinstance(widget, QtImport.QLineEdit): 
                 if type_fn is float and validator:
                     value = float(getattr(self.__model, field_name))
                     widget.setText(
                         "{:g}".format(round(float(value), validator.decimals()))
                     )
+                elif type_fn is int and validator:
+                    value = int(getattr(self.__model, field_name))
+                    widget.setText("%d" % value)
                 else:
                     widget.setText(str(getattr(self.__model, field_name)))
 

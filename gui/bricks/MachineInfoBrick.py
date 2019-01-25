@@ -51,7 +51,6 @@ class MachineInfoBrick(BaseWidget):
         self.value_label_list = []
 
         # Properties (name, type, default value, comment)----------------------
-        self.add_property("diskThreshold", "float", 200, comment="Disk threshold")
         self.add_property(
             "maxPlotPoints", "integer", 100, comment="Maximal number of plot points"
         )
@@ -85,6 +84,7 @@ class MachineInfoBrick(BaseWidget):
             if self.mach_info_hwobj is not None:
                 self.setEnabled(True)
                 self.connect(self.mach_info_hwobj, "valuesChanged", self.set_value)
+                self.mach_info_hwobj.update_values()
             else:
                 self.setEnabled(False)
         else:

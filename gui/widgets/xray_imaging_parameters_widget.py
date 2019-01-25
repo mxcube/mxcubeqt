@@ -66,11 +66,52 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
+        self._parameters_widget.ff_pre_cbox.toggled.connect(self.ff_pre_toggled)
+        self._parameters_widget.ff_post_cbox.toggled.connect(self.ff_post_toggled)
+        self._parameters_widget.add_button.pressed.connect(self.add_distance_pressed)
+        self._parameters_widget.remove_button.pressed.connect(self.remove_distance_pressed)
 
         # Other ---------------------------------------------------------------
-        self.detector_distance_validator = QtImport.QDoubleValidator(
-            0, 99999, 1, self._parameters_widget.detector_distance_ledit
+        self.detector_distance_validator = QtImport.QIntValidator(
+            0, 99999, self._parameters_widget.detector_distance_ledit
         )
+
+    def ff_pre_toggled(self, state):
+        self.toggle_ff_controls()
+        
+    def ff_post_toggled(self, state):
+        self.toggle_ff_controls()
+
+    def toggle_ff_controls(self):
+        enable_ff_controls = self._parameters_widget.ff_pre_cbox.isChecked() or \
+           self._parameters_widget.ff_post_cbox.isChecked()
+
+        self._parameters_widget.ff_apply_cbox.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_num_images_label.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_num_images_ledit.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_offset_a_label.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_offset_a_ledit.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_offset_b_label.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_offset_b_ledit.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_offset_c_label.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_offset_c_ledit.setEnabled(enable_ff_controls)
+
+    def add_distance_pressed(self):
+        if str(self._parameters_widget.detector_distance_ledit.text()).isdigit:
+            self._parameters_widget.detector_distance_listwidget.addItem(self._parameters_widget.detector_distance_ledit.text())
+            self._parameters_widget.remove_button.setEnabled(True)
+            self._parameters_widget.detector_distance_listwidget.setCurrentRow(self._parameters_widget.detector_distance_listwidget.count() - 1)
+ 
+    def remove_distance_pressed(self):
+        self._parameters_widget.detector_distance_listwidget.takeItem(
+            self._parameters_widget.detector_distance_listwidget.currentRow())
+        self._parameters_widget.remove_button.setEnabled(
+            self._parameters_widget.detector_distance_listwidget.count > 0) 
+
+    def enable_distance_tools(self, state):
+        self._parameters_widget.add_button.setEnabled(state)
+        self._parameters_widget.remove_button.setEnabled(state)
+        self._parameters_widget.detector_distance_listwidget.setEnabled(state)
 
     def set_beamline_setup(self, beamline_setup):
         self._xray_imaging_mib.bind_value_update(
@@ -90,26 +131,30 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         )
 
         self._xray_imaging_mib.bind_value_update(
+            "ff_ssim_enabled", self._parameters_widget.ff_ssim_cbox, bool, None
+        )
+
+        self._xray_imaging_mib.bind_value_update(
             "ff_num_images", self._parameters_widget.ff_num_images_ledit, int, None
         )
 
         self._xray_imaging_mib.bind_value_update(
             "sample_offset_a",
-            self._parameters_widget.sample_offset_a_ledit,
+            self._parameters_widget.ff_offset_a_ledit,
             float,
             None,
         )
 
         self._xray_imaging_mib.bind_value_update(
             "sample_offset_b",
-            self._parameters_widget.sample_offset_b_ledit,
+            self._parameters_widget.ff_offset_b_ledit,
             float,
             None,
         )
 
         self._xray_imaging_mib.bind_value_update(
             "sample_offset_c",
-            self._parameters_widget.sample_offset_c_ledit,
+            self._parameters_widget.ff_offset_c_ledit,
             float,
             None,
         )
@@ -117,7 +162,7 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         self._xray_imaging_mib.bind_value_update(
             "detector_distance",
             self._parameters_widget.detector_distance_ledit,
-            float,
+            int,
             self.detector_distance_validator,
         )
 

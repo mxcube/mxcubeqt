@@ -31,7 +31,7 @@ import QtImport
 
 from gui import set_splash_screen
 from gui import Configuration, GUIBuilder
-from gui.utils import GUIDisplay, Icons
+from gui.utils import GUIDisplay, Icons, Colors
 from gui.BaseComponents import BaseWidget
 
 from HardwareRepository import HardwareRepository
@@ -62,6 +62,10 @@ class SplashScreen(QtImport.QSplashScreen):
         self.pxsize = 11
        
         self.progress_bar = QtImport.QProgressBar(self)
+
+        new_palette = QtImport.QPalette()
+        new_palette.setColor(QtImport.QPalette.Highlight, Colors.DARK_GREEN)
+        self.progress_bar.setPalette(new_palette)
 
         _vlayout = QtImport.QVBoxLayout(self)
         _vlayout.addWidget(self.progress_bar)        

@@ -109,6 +109,9 @@ class AcquisitionWidget(QtImport.QWidget):
         self.acq_widget_layout.exp_time_ledit.textChanged.connect(
             self.exposure_time_ledit_changed
         )
+        self.acq_widget_layout.exp_time_total_ledit.textEdited.connect(
+            self.exp_time_total_ledit_changed
+        )
         self.acq_widget_layout.first_image_ledit.textChanged.connect(
             self.first_image_ledit_change
         )
@@ -265,12 +268,14 @@ class AcquisitionWidget(QtImport.QWidget):
 
     def update_osc_total_range(self):
         self.acq_widget_layout.osc_total_range_ledit.blockSignals(True)
+
         if not self.grid_mode:
             try:
                 self.acq_widget_layout.osc_total_range_ledit.setText(
-                    str(
+                    "%0.2f" %
+                    (
                         float(self.acq_widget_layout.osc_range_ledit.text())
-                        * float(self.acq_widget_layout.num_images_ledit.text())
+                        * int(self.acq_widget_layout.num_images_ledit.text())
                     )
                 )
             except BaseException:
@@ -279,7 +284,7 @@ class AcquisitionWidget(QtImport.QWidget):
 
     def update_total_exp_time(self):
         try:
-            self.acq_widget_layout.total_exp_time_ledit.setText(
+            self.acq_widget_layout.exp_time_total_ledit.setText(
                 "%.2f"
                 % (
                     float(self.acq_widget_layout.exp_time_ledit.text())
@@ -303,6 +308,17 @@ class AcquisitionWidget(QtImport.QWidget):
             except BaseException:
                 pass
             self.emit_acq_parameters_changed()
+
+    def exp_time_total_ledit_changed(self, new_value):
+        try:
+            exp_time = float(new_value)  / float(self.acq_widget_layout.num_images_ledit.text())
+            self.acq_widget_layout.exp_time_ledit.blockSignals(True)
+            self.acq_widget_layout.exp_time_ledit.setText("%.4f" % exp_time)
+            self._acquisition_parameters.exp_time = exp_time
+            self.acq_widget_layout.exp_time_ledit.blockSignals(False)
+        except BaseException:
+            pass
+        self.emit_acq_parameters_changed()
 
     def update_osc_total_range_limits(self, num_images=None):
         """Updates osc totol range. Limits are changed if a plate is used.
@@ -717,9 +733,6 @@ class AcquisitionWidget(QtImport.QWidget):
             self._acquisition_mib.validate_all()
 
     def init_detector_roi_modes(self):
-        """
-        Descript. :
-        """
         if self._beamline_setup_hwobj is not None:
             roi_modes = self._beamline_setup_hwobj.detector_hwobj.get_roi_modes()
             if (
@@ -775,6 +788,10 @@ class AcquisitionWidget(QtImport.QWidget):
             self.acq_widget_layout.mad_cbox.setChecked(False)
             self.acq_widget_layout.energies_combo.setEnabled(False)
             self.acq_widget_layout.energies_combo.setCurrentIndex(0)
+
+        self.update_osc_total_range()
+        self.update_total_exp_time()
+
         self.emit_acq_parameters_changed()
 
     def set_tunable_energy(self, state):

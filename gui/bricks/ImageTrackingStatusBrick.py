@@ -48,7 +48,7 @@ class ImageTrackingStatusBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.addProperty("mnemonic", "string", "/image-tracking")
+        self.add_property("mnemonic", "string", "/image-tracking")
 
         # Signals ------------------------------------------------------------
 

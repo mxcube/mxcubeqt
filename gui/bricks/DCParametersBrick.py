@@ -81,9 +81,6 @@ class DCParametersBrick(BaseWidget):
         # Other ---------------------------------------------------------------
 
     def populate_dc_parameter_widget(self, item):
-        """
-        Descript. :
-        """
         self.parameters_widget._data_path_widget._base_image_dir = (
             self.session_hwobj.get_base_image_directory()
         )

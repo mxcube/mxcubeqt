@@ -292,18 +292,18 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     @staticmethod
     def open_progress_dialog(msg, max_steps):
-        if BaseWidget._progressDialog:
-            BaseWidget._progressDialog.parent().open_progress_dialog(msg, max_steps)
+        if BaseWidget._progress_dialog:
+            BaseWidget._progress_dialog.parent().open_progress_dialog(msg, max_steps)
 
     @staticmethod
     def set_progress_dialog_step(step, msg):
-        if BaseWidget._progressDialog:
-            BaseWidget._progressDialog.parent().set_progress_dialog_step(step, msg)
+        if BaseWidget._progress_dialog:
+            BaseWidget._progress_dialog.parent().set_progress_dialog_step(step, msg)
 
     @staticmethod
     def close_progress_dialog():
-        if BaseWidget._progressDialog:
-            BaseWidget._progressDialog.parent().close_progress_dialog()
+        if BaseWidget._progress_dialog:
+            BaseWidget._progress_dialog.parent().close_progress_dialog()
 
     @staticmethod
     def set_user_file_directory(user_file_directory):
@@ -971,7 +971,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     def __setitem__(self, property_name, value):
         property_bag = self.property_bag.get_property(property_name)
-        old_value = property_bag.getValue()
+        old_value = property_bag.get_value()
         property_bag.set_value(value)
 
         self._property_changed(property_name,

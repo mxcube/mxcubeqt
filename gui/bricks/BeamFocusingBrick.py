@@ -47,7 +47,7 @@ class BeamFocusingBrick(BaseWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _main_groupbox = QtImport.QGroupBox("Beam focusing", self)
+        _main_groupbox = QtImport.QGroupBox("Beamline mode", self)
         self.beam_focusing_combo = QtImport.QComboBox(_main_groupbox)
         self.beam_focusing_combo.setMinimumWidth(100)
 

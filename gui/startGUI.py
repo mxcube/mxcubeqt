@@ -34,10 +34,11 @@ from optparse import OptionParser
 
 import QtImport
 
+import api
+
 import gui
 from gui import GUISupervisor
 from gui.utils import GUILogHandler, ErrorHandler
-from gui import GUISupervisor
 from HardwareRepository import HardwareRepository
 
 
@@ -78,7 +79,7 @@ class MyCustomEvent(QtImport.QEvent):
 def run(gui_config_file=None):
     """Main run method"""
 
-    default_hwr_server = "localhost:hwr"
+    default_hwr_path = "localhost:hwr"
     # path to user's home dir. (works on Win2K, XP, Unix, Mac...)
     parser = OptionParser(usage="usage: %prog <GUI definition file> [options]")
     parser.add_option(
@@ -127,7 +128,7 @@ def run(gui_config_file=None):
         action="store",
         type="string",
         help="Hardware Repository Server host:port (default"
-        + " to %s) (you can also use " % default_hwr_server
+        + " to %s) (you can also use " % default_hwr_path
         + "HARDWARE_REPOSITORY_SERVER the environment variable)",
         metavar="HOST:PORT",
         dest="hardwareRepositoryServer",
@@ -211,12 +212,12 @@ def run(gui_config_file=None):
     app_style = opts.appStyle
 
     if opts.hardwareRepositoryServer:
-        hwr_server = opts.hardwareRepositoryServer
+        hwr_path = opts.hardwareRepositoryServer
     else:
         # try to set Hardware Repository server from environment
-        hwr_server = os.environ.get("HARDWARE_REPOSITORY_SERVER")
-        if hwr_server is None:
-            hwr_server = default_hwr_server
+        hwr_path = os.environ.get("HARDWARE_REPOSITORY_SERVER")
+        if hwr_path is None:
+            hwr_path = default_hwr_server
 
     # add bricks directories and hardware objects directories from environment
     try:
@@ -278,7 +279,7 @@ def run(gui_config_file=None):
         sys.exit(1)
 
     # configure modules
-    HardwareRepository.setHardwareRepositoryServer(hwr_server)
+    HardwareRepository.setHardwareRepositoryServer(hwr_path)
     HardwareRepository.setUserFileDirectory(user_file_dir)
     if hwobj_directories:
         HardwareRepository.addHardwareObjectsDirs(hwobj_directories)
@@ -357,7 +358,7 @@ def run(gui_config_file=None):
     )
     logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
     logging.getLogger("HWR").info("GUI file: %s" % (gui_config_file or "unnamed"))
-    logging.getLogger("HWR").info("Hardware repository: %s" % hwr_server)
+    logging.getLogger("HWR").info("Hardware repository: %s" % hwr_path)
     logging.getLogger("HWR").info("User file directory: %s" % user_file_dir)
     if len(log_file) > 0:
         logging.getLogger("HWR").info("Log file: %s" % log_file)
@@ -382,6 +383,9 @@ def run(gui_config_file=None):
     logging.getLogger("HWR").info(
         "---------------------------------------------------------------------------------"
     )
+
+
+    api.init(hwr_path)
 
     QtImport.QApplication.setDesktopSettingsAware(False)
 

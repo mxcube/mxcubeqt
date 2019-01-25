@@ -106,10 +106,10 @@ class BeamPositionBrick(BaseWidget):
         self.measure_flux_button.clicked.connect(self.measure_flux_clicked)
 
         # Other ---------------------------------------------------------------
-        self.unf_hor_motor_brick.setLabel("Horizontal")
-        self.unf_ver_motor_brick.setLabel("Vertical")
-        self.double_hor_motor_brick.setLabel("Horizontal")
-        self.double_ver_motor_brick.setLabel("Vertical")
+        self.unf_hor_motor_brick.set_label("Horizontal")
+        self.unf_ver_motor_brick.set_label("Vertical")
+        self.double_hor_motor_brick.set_label("Horizontal")
+        self.double_ver_motor_brick.set_label("Vertical")
 
         self.unf_hor_motor_brick.setEnabled(False)
         self.unf_ver_motor_brick.setEnabled(False)

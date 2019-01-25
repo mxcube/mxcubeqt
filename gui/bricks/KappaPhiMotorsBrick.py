@@ -248,9 +248,9 @@ class KappaPhiMotorsBrick(BaseWidget):
                 Colors.LIGHT_YELLOW,
                 QtImport.QPalette.Base,
             )
-            QtImport.Colors.set_widget_color(
+            Colors.set_widget_color(
                 self.kappaphi_dspinbox.lineEdit(),
-                QtImport.Colors.LIGHT_YELLOW,
+                Colors.LIGHT_YELLOW,
                 QtImport.QPalette.Base,
             )
 
