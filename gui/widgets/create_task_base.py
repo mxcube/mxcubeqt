@@ -150,8 +150,6 @@ class CreateTaskBase(QtImport.QWidget):
         self._in_plate_mode = api.diffractometer.in_plate_mode()
 
         try:
-            self.set_resolution_limits(api.resolution.get_limits())
-
             api.energy.connect("energyChanged", self.set_energy)
             api.energy.connect(
                 "energyLimitsChanged", self.set_energy_limits
@@ -187,8 +185,9 @@ class CreateTaskBase(QtImport.QWidget):
 
             api.resolution.update_values()
             api.detector.update_values()
+            self.set_resolution_limits(api.resolution.get_limits())
         except AttributeError as ex:
-            msg = "Could not connect to one or more hardware objects" + str(ex)
+            msg = "Could not connect to one or more hardware objects " + str(ex)
             logging.getLogger("HWR").warning(msg)
 
         if api.graphics:

@@ -22,7 +22,6 @@ import os
 import string
 import types
 import logging
-
 import gevent.monkey
 
 __credits__ = ["MXCuBE collaboration"]
@@ -61,17 +60,16 @@ _formatter = logging.Formatter("%(asctime)s |%(levelname)-7s| %(message)s")
 # log to stdout
 #
 _hdlr = logging.StreamHandler(sys.stdout)
-#_hdlr.setFormatter(_formatter)
-#logging.getLogger().addHandler(_hdlr)
+_hdlr.setFormatter(_formatter)
+logging.getLogger().addHandler(_hdlr)
 
 
 #
 # add the GUI Handler
 #
-# from Utils import Qt4_GUILogHandler
-# _GUIhdlr =Qt4_GUILogHandler.GUILogHandler()
-
-# _logger.addHandler(_GUIhdlr)
+#from gui.utils import GUILogHandler
+#_GUIhdlr = GUILogHandler.GUILogHandler()
+#_logger.addHandler(_GUIhdlr)
 
 
 #

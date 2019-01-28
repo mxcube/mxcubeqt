@@ -27,7 +27,7 @@ from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
+from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

@@ -32,7 +32,7 @@ from gui.widgets.processing_widget import ProcessingWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
-from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemLine
+from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemLine
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

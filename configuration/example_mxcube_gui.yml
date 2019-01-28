@@ -672,9 +672,9 @@
                       - {comment: Allow to control brick in slave mode, default_value: 0,
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
-                      - {comment: '', default_value: /graphics-manager, hidden: false,
-                        name: mnemonic, old_value: /graphics-manager, type: string,
-                        value: /Qt4_graphics-manager}
+                      - {comment: '', default_value: /graphics, hidden: false,
+                        name: mnemonic, old_value: /graphics, type: string,
+                        value: /graphics}
                       type: CameraBrick
                     - children: []
                       connections: []
@@ -717,7 +717,7 @@
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
                       - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                        old_value: '', type: string, value: /Qt4_graphics-manager}
+                        old_value: '', type: string, value: /graphics}
                       type: GraphicsManagerBrick
                     connections: []
                     name: vbox1
@@ -803,7 +803,7 @@
                     - {comment: Draw a frame around the widget, default_value: 0,
                       hidden: false, name: frame, old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: '', hidden: false, name: graphicsManager,
-                      old_value: '', type: string, value: /Qt4_graphics-manager}
+                      old_value: '', type: string, value: /graphics}
                     - {comment: Hide widget, default_value: 0, hidden: false, name: hide,
                       old_value: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, default_value: 0,
@@ -2956,8 +2956,8 @@
       name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
     - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
       name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-    - {comment: '', default_value: /graphics-manager, hidden: false, name: mnemonic,
-      old_value: /graphics-manager, type: string, value: /Qt4_graphics-manager}
+    - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
+      old_value: /graphics, type: string, value: /graphics}
     - choices: [menuBar, toolBar, both]
       comment: ''
       default_value: menuBar

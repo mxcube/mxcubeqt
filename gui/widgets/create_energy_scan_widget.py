@@ -34,7 +34,7 @@ from HardwareRepository.HardwareObjects.queue_model_enumerables import (
     EXPERIMENT_TYPE,
     COLLECTION_ORIGIN,
 )
-from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
+from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -26,7 +26,7 @@ from gui.BaseComponents import BaseWidget
 from gui.utils import Colors
 from widgets.matplot_widget import TwoDimenisonalPlotWidget
 
-from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsView
+from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
 
 
 __credits__ = ["MXCuBE colaboration"]

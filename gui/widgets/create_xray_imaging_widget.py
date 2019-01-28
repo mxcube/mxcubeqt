@@ -29,7 +29,7 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
 
-from HardwareRepository.HardwareObjects.Qt4_GraphicsLib import GraphicsItemPoint
+from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
