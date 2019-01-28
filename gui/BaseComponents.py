@@ -571,7 +571,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def widget_spinbox_value_changed(brick_name, widget_name, master_sync, text):
         BaseWidget.update_widget(brick_name,
                                  widget_name,
-                                 "set_value",
+                                 "setValue",
                                  (int(text), ),
                                  master_sync)
 
@@ -579,7 +579,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def widget_double_spinbox_value_changed(brick_name, widget_name, master_sync, text):
         BaseWidget.update_widget(brick_name,
                                  widget_name,
-                                 "set_value",
+                                 "setValue",
                                  (float(text), ),
                                  master_sync)
 

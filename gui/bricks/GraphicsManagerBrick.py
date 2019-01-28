@@ -19,12 +19,13 @@
 
 import QtImport
 
+import api
 from gui.utils import Icons
 from gui.BaseComponents import BaseWidget
 
 
 __credits__ = ["MXCuBE collaboration"]
-__version__ = "2.3"
+__license__ = "LGPLv3+"
 __category__ = "Graphics"
 
 
@@ -34,9 +35,6 @@ class GraphicsManagerBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.graphics_manager_hwobj = None
-
         # Internal values -----------------------------------------------------
         self.__shape_map = {}
         self.__point_map = {}
@@ -45,7 +43,6 @@ class GraphicsManagerBrick(BaseWidget):
         self.__original_height = 300
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -133,51 +130,16 @@ class GraphicsManagerBrick(BaseWidget):
         self.main_groupbox_toggled(False)
         self.main_groupbox.setToolTip("Click to open/close item manager")
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.graphics_manager_hwobj is not None:
-                self.disconnect(
-                    self.graphics_manager_hwobj, "shapeCreated", self.shape_created
-                )
-                self.disconnect(
-                    self.graphics_manager_hwobj, "shapeDeleted", self.shape_deleted
-                )
-                self.disconnect(
-                    self.graphics_manager_hwobj, "shapeSelected", self.shape_selected
-                )
-                self.disconnect(
-                    self.graphics_manager_hwobj,
-                    "centringInProgress",
-                    self.centring_in_progress_changed,
-                )
-
-            self.graphics_manager_hwobj = self.get_hardware_object(new_value)
-
-            if self.graphics_manager_hwobj is not None:
-                self.connect(
-                    self.graphics_manager_hwobj, "shapeCreated", self.shape_created
-                )
-                self.connect(
-                    self.graphics_manager_hwobj, "shapeDeleted", self.shape_deleted
-                )
-                self.connect(
-                    self.graphics_manager_hwobj, "shapeSelected", self.shape_selected
-                )
-                self.connect(
-                    self.graphics_manager_hwobj,
-                    "centringInProgress",
-                    self.centring_in_progress_changed,
-                )
-            else:
-                self.setEnabled(False)
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        self.connect(api.graphics, "shapeCreated", self.shape_created)
+        self.connect(api.graphics, "shapeDeleted", self.shape_deleted)
+        self.connect(api.graphics, "shapeSelected", self.shape_selected)
+        self.connect(api.graphics, "centringInProgress", self.centring_in_progress_changed)
 
     def shape_created(self, shape, shape_type):
         """
-        Descript. : adds information about shape in all shapes treewidget
-                    and depending on shape type also information to
-                    treewidget of all points/lines/grids
+        Adds information about shape in all shapes treewidget
+        and depending on shape type also information to
+        treewidget of all points/lines/grids
         """
         info_str_list = (
             str(self.manager_widget.shapes_treewidget.topLevelItemCount() + 1),
@@ -259,7 +221,7 @@ class GraphicsManagerBrick(BaseWidget):
             if self.__grid_map.get(shape):
                 self.__grid_map[shape].setSelected(selected_state)
             self.manager_widget.change_color_button.setEnabled(
-                len(self.graphics_manager_hwobj.get_selected_shapes()) > 0
+                len(api.graphics.get_selected_shapes()) > 0
             )
 
     def centring_in_progress_changed(self, centring_in_progress):
@@ -281,7 +243,7 @@ class GraphicsManagerBrick(BaseWidget):
     def change_color_clicked(self):
         color = QtImport.QColorDialog.getColor()
         if color.isValid():
-            for item in self.graphics_manager_hwobj.get_selected_shapes():
+            for item in api.graphics.get_selected_shapes():
                 item.set_base_color(color)
 
     def display_all_button_clicked(self):
@@ -295,19 +257,19 @@ class GraphicsManagerBrick(BaseWidget):
             treewidget_item.setData(3, QtImport.Qt.DisplayRole, "False")
 
     def clear_all_button_clicked(self):
-        self.graphics_manager_hwobj.clear_all()
+        api.graphics.clear_all()
 
     def create_point_start_button_clicked(self):
-        self.graphics_manager_hwobj.start_centring(tree_click=True)
+        api.graphics.start_centring(tree_click=True)
 
     def create_point_accept_button_clicked(self):
-        self.graphics_manager_hwobj.start_centring()
+        api.graphics.start_centring()
 
     def create_line_button_clicked(self):
-        self.graphics_manager_hwobj.create_line()
+        api.graphics.create_line()
 
     def draw_grid_button_clicked(self):
-        self.graphics_manager_hwobj.create_grid(self.get_spacing())
+        api.graphics.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
         menu = QtImport.QMenu(self.manager_widget.shapes_treewidget)

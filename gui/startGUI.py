@@ -286,12 +286,11 @@ def run(gui_config_file=None):
     if custom_bricks_directories:
         gui.add_custom_bricks_dirs(custom_bricks_directories)
 
-    # set log name and log file
-    if gui_config_file:
-        gui.set_logging_name(os.path.basename(gui_config_file), log_template)
-
     log_lockfile = None
     if len(log_file) > 0:
+        if gui_config_file:
+            gui.set_logging_name(os.path.basename(gui_config_file), log_template)
+ 
         log_lock_filename = os.path.join(
             tempfile.gettempdir(), ".%s.lock" % os.path.basename(log_file)
         )
@@ -342,12 +341,11 @@ def run(gui_config_file=None):
                     else:
                         log_ok = True
                 if log_ok:
-                    log_file = logFile2
+                    log_file = log_file2
                     break
             index += 1
 
-        if len(log_file) > 0:
-            gui.set_log_file(log_file)
+        gui.set_log_file(log_file)
 
     # log startup details
     log_level = getattr(logging, opts.logLevel)

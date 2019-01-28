@@ -77,46 +77,22 @@ def init(hwr_path):
     queue_model = hwr.getHardwareObject("queue-model")
     queue_manager = hwr.getHardwareObject("queue")
 
+    logging.getLogger("API").debug("Initializing API...")
+    error_count = 0
+
     for role in HWOBJ_ROLES:
         if hasattr(beamline_setup, "%s_hwobj" % role):
             setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
         else:
             setattr(sys.modules[__name__], role, None)
-            logging.getLogger("API").warning("%s role is not defined in the beamline_setup" % role)
+            logging.getLogger("HWR").warning("API: %s role is not defined in the beamline_setup" % role)
+            error_count += 1
+
+    if error_count == 0:
+        logging.getLogger("HWR").info("Initializing of API done")
+    else:
+        logging.getLogger("API").info("Initializing of API done (%d warning(s): see messages above)." % error_count)
+     
 
     setattr(sys.modules[__name__], "lims", getattr(beamline_setup, "lims_client_hwobj"))
     setattr(sys.modules[__name__], "graphics", getattr(beamline_setup, "shape_history_hwobj"))
-
-    """
-    global beamline_setup
-    global transmission
-    global resolution
-    global energy
-    global flux
-    global beam_info
-    global osc_axis
-    global kappa_axis
-    global kappa_phi_axis
-    global detector
-    global detector_distance
-    global door_interlock
-    global fast_shutter
-    global machine_info
-    global safety_shutter
-
-    global diffractometer
-    global sample_changer
-    global plate_manipulator
-
-    global graphics
-    global session
-    global collect
-    global lims
-    global energyscan
-    global xrf_spectrum
-    global xray_imaging
-
-    global data_analysis
-    global auto_processing
-    global parallel_processing
-    """

@@ -76,17 +76,17 @@ class AdvancedBrick(BaseWidget):
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget._base_image_dir = (
-            api.beamline_setup.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget._base_process_dir = (
-            api.beamline_setup.session_hwobj.get_base_process_directory()
+            api.session.get_base_process_directory()
         )
 
         self.line_parameters_widget._data_path_widget._base_image_dir = (
-            api.beamline_setup.session_hwobj.get_base_image_directory()
+            api.session.get_base_image_directory()
         )
         self.line_parameters_widget._data_path_widget._base_process_dir = (
-            api.beamline_setup.session_hwobj.get_base_process_directory()
+            api.sessionget_base_process_directory()
         )
 
         # self.parameters_widget.populate_widget(item)

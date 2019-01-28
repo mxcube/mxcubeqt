@@ -190,7 +190,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
+                    snapshot = api.graphics.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot

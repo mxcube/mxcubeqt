@@ -202,7 +202,6 @@ class TreeBrick(BaseWidget):
         # self.sample_changer_widget.setFixedHeight(46)
         # self.dc_tree_widget.set_centring_method(1)
 
-    def run(self):
         if not api.sample_changer:
             logging.getLogger("GUI").debug(
                 "TreeBrick: sample changer hwobj not defined."
@@ -258,7 +257,6 @@ class TreeBrick(BaseWidget):
         self.connect(api.diffractometer, "minidiffPhaseChanged", self.diffractometer_phase_changed)
         self.diffractometer_phase_changed(api.diffractometer.get_current_phase())
 
-
         self.connect(
             api.queue_manager,
             "show_workflow_tab",
@@ -287,7 +285,8 @@ class TreeBrick(BaseWidget):
         self.connect(
             api.queue_manager,
             "queue_stopped",
-            self.queue_stop_handler)
+            self.queue_stop_handler
+        )
         self.connect(
             api.queue_model,
             "child_added",
@@ -322,6 +321,7 @@ class TreeBrick(BaseWidget):
         if has_shutter_less:
             self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
 
+    def run(self):
         """Adds save, load and auto save menus to the menubar
            Emits signals to close tabs"""
         self.tools_menu = QtImport.QMenu("Queue", self)
@@ -436,6 +436,7 @@ class TreeBrick(BaseWidget):
         Then it tries to initialize two sample changers and create
         two associated queue models.
         """
+
         loaded_queue_index = None
         self.is_logged_in = logged_in
         # self.enable_collect(logged_in)

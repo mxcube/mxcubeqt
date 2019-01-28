@@ -1307,14 +1307,14 @@ class DataCollectTree(QtImport.QWidget):
             mode_str = "ispyb"
         else:
             mode_str = "plate"
+
         api.queue_manager.clear()
         api.queue_model.clear_model(mode_str)
         self.sample_tree_widget.clear()
         api.queue_model.select_model(mode_str)
 
         for basket_index, basket in enumerate(basket_list):
-            api.queue_model.add_child(api.queue_model.
-                                             get_model_root(), basket)
+            api.queue_model.add_child(api.queue_model.get_model_root(), basket)
             basket.set_enabled(False)
             for sample in sample_list:
                 if sample.location[0] == basket_index + 1:
