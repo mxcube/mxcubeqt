@@ -20,11 +20,12 @@
 
 import QtImport
 
+import api
 from gui.utils import Colors, Icons
 from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]
-__version__ = "2.3"
+__license__ = "LGPLv3+"
 __category__ = "EMBL"
 
 
@@ -34,14 +35,10 @@ class MarvinBrick(BaseWidget):
 
         BaseWidget.__init__(self, *args)
 
-        # Hardware objects ----------------------------------------------------
-        self.sample_changer_hwobj = None
-
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
         self.add_property("formatString", "formatString", "#.#")
-        self.add_property("hwobj_sample_changer", "", "/sc-generic")
 
         # Signals ------------------------------------------------------------
 
@@ -154,36 +151,19 @@ class MarvinBrick(BaseWidget):
         )
 
         self.puck_switches_gbox.setSizePolicy(QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed)
-        # self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Preferred)
-
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "hwobj_sample_changer":
-            if self.sample_changer_hwobj:
-                self.disconnect(
-                    self.sample_changer_hwobj,
-                    "statusListChanged",
-                    self.status_list_changed,
-                )
-                self.disconnect(
-                    self.sample_changer_hwobj, "infoDictChanged", self.info_dict_changed
-                )
-            self.sample_changer_hwobj = self.get_hardware_object(new_value)
-            if self.sample_changer_hwobj:
-                self.init_tables()
-                self.connect(
-                    self.sample_changer_hwobj,
-                    "statusListChanged",
-                    self.status_list_changed,
-                )
-                self.connect(
-                    self.sample_changer_hwobj, "infoDictChanged", self.info_dict_changed
-                )
-                self.sample_changer_hwobj.update_values()
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        self.init_tables()
+        self.connect(
+             api.sample_changer,
+             "statusListChanged",
+             self.status_list_changed,
+        )
+        self.connect(
+             api.sample_changer, "infoDictChanged", self.info_dict_changed
+        )
+        api.sample_changer.update_values()
 
     def init_tables(self):
-        self.status_str_desc = self.sample_changer_hwobj.get_status_str_desc()
+        self.status_str_desc = api.sample_changer.get_status_str_desc()
         self.index_dict = {}
         self.status_table.setRowCount(len(self.status_str_desc))
         for row, key in enumerate(self.status_str_desc.keys()):
@@ -269,16 +249,16 @@ class MarvinBrick(BaseWidget):
         # self.current_command_ledit = QtImport.QLineEdit('', self)
 
     def open_lid_clicked(self):
-        self.sample_changer_hwobj.open_lid()
+        api.sample_changer.open_lid()
 
     def close_lid_clicked(self):
-        self.sample_changer_hwobj.close_lid()
+        api.sample_changer.close_lid()
 
     def base_to_center_clicked(self):
-        self.sample_changer_hwobj.base_to_center()
+        api.sample_changer.base_to_center()
 
     def center_to_base_clicked(self):
-        self.sample_changer_hwobj.center_to_base()
+        api.sample_changer.center_to_base()
 
     def dry_gripper_clicked(self):
-        self.sample_changer_hwobj.dry_gripper()
+        api.sample_changer.dry_gripper()
