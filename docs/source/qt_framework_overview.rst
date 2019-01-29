@@ -1,16 +1,7 @@
-Qt framework based GUI
-######################
+Qt based GUI
+############
 
-`BlissFramework <https://github.com/mxcube/BlissFramework.git>`_ is the graphical user interface 
-based on bricks (available in 
-`BlissFramework/Bricks <https://github.com/mxcube/BlissFramework/tree/master/Bricks>`_ and 
-`mxcube/Bricks <https://github.com/mxcube/mxcube/tree/master/Bricks>`_)  
-and basic layout items (horizonal box, vertical box, groupbox etc.). 
-Originaly it was written in Qt3 and later adopted to the Qt4 platform. 
-It is possible to run MXCuBE on both Qt versions (:doc:`installation_instructions_qt4`), but 
-it is not possible to run both versions of Qt simultaneously. 
-To clearly separate these two Qt version, Qt4 bricks, widgets and other 
-files have prefix Qt4_.
+Initaly MXCuBE was written in Qt3 and later adopted to the Qt4/5/PySide platform. 
 
 Best Practices
 **************

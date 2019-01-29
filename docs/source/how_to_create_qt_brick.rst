@@ -2,24 +2,22 @@ How to create GUI brick in Qt version
 #####################################
 
 * MXCuBE is based on building bricks that are linked together with GUI designer.
-* Before creating and submiting a new brick to the git repository, please inspect `BlissFramework/Bricks <https://github.com/mxcube/BlissFramework/tree/master/Bricks>`_  and `mxcube/Bricks <https://github.com/mxcube/mxcube/tree/master/Bricks>`_ directories if there is a brick that might fit to your needs.
-* `BlissFramework/Bricks <https://github.com/mxcube/BlissFramework/tree/master/Bricks>`_ stores basic atomic bricks and `mxcube/Bricks <https://github.com/mxcube/mxcube/tree/master/Bricks>`_ are more widget based complex bricks. 
+* Before creating and submiting a new brick to the git repository, please inspect `gui/bricks <https://github.com/mxcube/gui/tree/master/bricks>`_  directory if there is a brick that might fit to your needs.
 * The main idea is to keep a commot graphical layout among many software users and try to keep optimal set of bricks.
 * If it is necessary to create a new brick then use starting template and add necessary graphical elements:
 
 .. code-block:: python
 
-   from PyQt4 import QtGui
-   from PyQt4 import QtCore
+   import QtImport
 
-   from BlissFramework.Qt4_BaseComponents import BlissWidget
+   from gui.BaseComponents import BaseWidget
 
    __category__ = "General"
 
-   class Qt4_ExampleBrick(BlissWidget):
+   class ExampleBrick(BaseWidget):
 
        def __init__(self):
-           BlissWidget.__init__(self)
+           BaseWidget.__init__(self)
 
            # Hardware objects ----------------------------------------------------
            self.test_hwobj = None       
@@ -28,11 +26,11 @@ How to create GUI brick in Qt version
            self.test_internal_variable = None
 
            # Properties ---------------------------------------------------------- 
-           self.addProperty('mnemonic', 'string', '')  
-           self.addProperty('booleanProperty', 'boolean', False)
-           self.addProperty('stringProperty', 'string', 'initString')
-           self.addProperty('integerPropery', 'integer', 0)
-           self.addProperty('comboProperty', 'combo', ("combo1", "combo2", "combo3"), "combo1")
+           self.add_property('mnemonic', 'string', '')  
+           self.add_property('booleanProperty', 'boolean', False)
+           self.add_property('stringProperty', 'string', 'initString')
+           self.add_property('integerPropery', 'integer', 0)
+           self.add_property('comboProperty', 'combo', ("combo1", "combo2", "combo3"), "combo1")
 
            # Signals ------------------------------------------------------------
            self.defineSignal("test_brick_signal", ())
@@ -41,12 +39,12 @@ How to create GUI brick in Qt version
            self.defineSlot("test_brick_slot", ())
 
            # Graphic elements ----------------------------------------------------
-           self.test_ledit = QtGui.QLineEdit("Test linedit", self)
-           self.test_button = QtGui.QPushButton("Test button", self)
-           self.test_combo = QtGui.QComboBox(self)
+           self.test_ledit = QtImport.QLineEdit("Test linedit", self)
+           self.test_button = QtImport.QPushButton("Test button", self)
+           self.test_combo = QtImport.QComboBox(self)
 
            # Layout --------------------------------------------------------------
-           _main_vlayout = QtGui.QVBoxLayout(self)
+           _main_vlayout = QtImport.QVBoxLayout(self)
            _main_vlayout.addWidget(self.test_ledit)
            _main_vlayout.addWidget(self.test_button)
            _main_vlayout.addWidget(self.test_combo)
@@ -69,11 +67,11 @@ Pogramming guidlines
 * Follow :doc:`Best practices <qt_framework_overview>` when programming in Qt.
 * ``Hardware objects`` defines used hardware objects. Use syntax ``self.***_hwobj``.
 * ``Internal variables`` defines internal variables (booleans, strings, integers, lists etc). Use reasonable variable names (for example: self.energy_limits_list clearly defines that variable is a list that contains energy limits) and assign None or a default value.
-* In ``Properties`` section properties of the brick are defined. With GUI designer these properties are defined. They are stored in the gui file and preserved when MXCuBE is closed. Method ``propertyChanged`` is executed at the startup and can be used to read these properties.
+* In ``Properties`` section properties of the brick are defined. With GUI designer these properties are defined. They are stored in the gui file and preserved when MXCuBE is closed. Method ``property_changed`` is executed at the startup and can be used to read these properties.
 
 .. code-block:: python
 
-   def propertyChanged(self, property_name, old_values, new_value):
+   def property_changed(self, property_name, old_values, new_value):
 
         if property_name == "mnemonic":
             # property mnemonic is reserved for hardware objects
@@ -83,13 +81,13 @@ Pogramming guidlines
             # disconnect signals if hwobj already exists
 
             if self.test_hwobj is not None:
-                self.disconnect(self.test_hwobj, QtCore.SIGNAL("testQtSignal"), self.test_method)
+                self.disconnect(self.test_hwobj, "testQtSignal", self.test_method)
 
             # with method getHardwareObject necessary hardware object is initialized
             # The value of the property should be the name of xml file that
             # contains the configuration of the hardware object.
 
-            self.test_hwobj = self.getHardwareObject(new_value)
+            self.test_hwobj = self.get_hardware_object(new_value)
 
             # If hwobj is not initialized then function returns None
 
@@ -99,7 +97,7 @@ Pogramming guidlines
                 # it binds "testQtSignal" of self.test_hwobj to self.test_method method
                 # it means that when hwovj emits "testQtSignal" signal, self.test_method
                 # will be called
-                self.connect(self.test_hwobj, QtCore.SIGNAL("testQtSignal"), self.test_method)
+                self.connect(self.test_hwobj, "testQtSignal", self.test_method)
             else:
 
                 # If hwobj is not initialized then the brick is disabled
@@ -121,14 +119,14 @@ Pogramming guidlines
             # combo style property is in a string type
             pass
         else:
-            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
 * Use ``Signals`` and ``Slots`` to define interface between bricks. The only way how two separate bricks can communicate is via this signal and slot mechanism. Example code:
 
 .. code-block:: python
    
    # in the code use method "emit" to emit neccessary signal
-   self.emit(QtCore.SIGNAL("testBrickSignal"), value_to_send)
+   self.emit("testBrickSignal", value_to_send)
 
    # define method with slot name to receive emited value
    self.test_brick_slot(self, received_value):
@@ -168,18 +166,18 @@ In the GUI builder define signal/slot connection:
 Brick based on widgets
 **********************
 
-It is recommended to use widgets to compose a brick. A widget in the MXCuBE context is a basic graphical element that has a defined function. Widgets are not bricks and can not be used as a stand alone brick via GUI designer. All widget are located in `widgets directory <https://github.com/mxcube/mxcube/tree/master/Bricks/widgets>`_. 
+It is recommended to use widgets to compose a brick. A widget in the MXCuBE context is a basic graphical element that has a defined function. Widgets are not bricks and can not be used as a stand alone brick via GUI designer. All widget are located in `widgets directory <https://github.com/mxcube/mxcube/tree/master/gui/widgets>`_. 
 
-In this example ``Qt4_dc_tree_widget.py`` is used in  ``Qt4_TreeBrick``.
+In this example ``dc_tree_widget.py`` is used in  ``TreeBrick``.
 
 .. code-block:: python
-   class DataCollectTree(QtGui.QWidget):
+   class DataCollectTree(QtImport.QWidget):
          def __init__(self, parent = None, name = "data_collect",
                       selection_changed = None):
              """
              Descript. :
              """
-             QtGui.QWidget.__init__(self, parent)
+             QtImport.QWidget.__init__(self, parent)
              self.setObjectName(name)
 
 
@@ -187,13 +185,13 @@ In this example ``Qt4_dc_tree_widget.py`` is used in  ``Qt4_TreeBrick``.
 .. code-block:: python
 
    # ...
-   from widgets.Qt4_dc_tree_widget import DataCollectTree
+   from widgets.dc_tree_widget import DataCollectTree
    # ...
 
    self.dc_tree_widget = DataCollectTree(self)
   
    # ...
-   main_layout = QtGui.QVBoxLayout(self)
+   main_layout = QtImport.QVBoxLayout(self)
    # ...
    main_layout.addWidget(self.dc_tree_widget)
    main_layout.setSpacing(0)
@@ -202,7 +200,7 @@ In this example ``Qt4_dc_tree_widget.py`` is used in  ``Qt4_TreeBrick``.
 Bricks and widgets build by Qt designer
 ***************************************
 
-Qt designer is a powefull tool that allows to create layout for widgets and bricks. When many graphical elements are used then the layout management becomes difficult and it is easy to get lost. With Qt designer a layout is designed and stored in ui file (see `ui files directory <https://github.com/mxcube/mxcube/tree/master/Bricks/widgets/ui_files>`_). This ui file is initialized and used via widget or Brick.
+Qt designer is a powefull tool that allows to create layout for widgets and bricks. When many graphical elements are used then the layout management becomes difficult and it is easy to get lost. With Qt designer a layout is designed and stored in ui file (see `ui files directory <https://github.com/mxcube/mxcube/tree/master/gui/ui_files>`_). This ui file is initialized and used via widget or Brick.
 
 1. Use Qt designer to create layout and save ui file:
 
@@ -215,12 +213,8 @@ Qt designer is a powefull tool that allows to create layout for widgets and bric
 .. code-block:: python
 
    # ...
-   from PyQt4 import uic
-   
-   # ...
-   self.sample_changer_widget = uic.loadUi(os.path.join(\
-        os.path.dirname(__file__),
-        "widgets/ui_files/Qt4_sample_changer_widget_layout.ui"))
+   self.sample_changer_widget = QtImport.load_ui_file(
+        "sample_changer_widget_layout.ui")
 
    # ...
    # Access ui widget by its name
