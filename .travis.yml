@@ -8,7 +8,7 @@ install:
 #  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry pip install -r requirements_2.txt; fi
 #  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_3.txt; fi
   - pip install -r requirements.txt 
-  - pip install pylint
+  - pip install pylint PyYAML
 script:
   - python -m pytest
   - pylint -E .

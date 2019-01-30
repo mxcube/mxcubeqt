@@ -15,9 +15,9 @@ hr_server = os.path.join(MXCUBE_ROOT,
 os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
 
 def close_app():
-    sys.exit(1)
+    sys.exit(0)
 
-gevent.spawn_later(20, close_app)
+gevent.spawn_later(30, close_app)
 
 from gui import startGUI
 startGUI.run(MXCUBE_GUI_FILE)
