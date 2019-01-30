@@ -23,7 +23,7 @@ install:
   - make -j 2
   - sudo make install
   - cd ..
-  - pip install pytest-xvfb
+  - pip install pytest-xvfb pylint
 #  - sudo apt-get install python-qt4
   - sudo apt-get install libyaml-dev
   - sudo apt-get install python-yaml  
