@@ -3,12 +3,10 @@ python:
   - "2.7"
 install:
   - pip install -r requirements.txt 
-  - pip install pytest==4.0.1
-  - pip install pytest-xvfb
+  - pip install pytest==4.0.1 pytest-xvfb PyYAML
 
   - sudo apt-get install libyaml-dev
   - sudo apt-get install python-yaml
-
 # Build and install qt
   - cd ..
   - curl -L -O http://sourceforge.net/projects/pyqt/files/sip/sip-4.14.1/sip-4.14.1.tar.gz
