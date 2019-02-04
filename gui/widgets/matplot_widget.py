@@ -17,13 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from gui.utils import Colors
-import matplotlib.pyplot as plt
-import QtImport
-
 import numpy as np
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from gui.utils import Colors, QtImport
 
 if QtImport.qt_variant == "PyQt5":
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -277,6 +275,8 @@ class MplCanvas(FigureCanvas):
             )
 
         self._curves_dict[name] = line
+
+        self.axes.set_xlim(0, y_axis_array.size)
 
         self.refresh()
 

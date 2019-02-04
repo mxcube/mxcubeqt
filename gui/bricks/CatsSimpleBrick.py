@@ -34,9 +34,8 @@ puck. This HT puck has special handling by the Cats sample changer.
 
 import logging
 
-import QtImport
-
 from gui.BaseComponents import BaseWidget
+from gui.utils import QtImport
 from gui.utils import sample_changer_helper as sc_helper
 from gui.bricks.SampleChangerBrick import SampleChangerBrick, BasketView, VialView
 

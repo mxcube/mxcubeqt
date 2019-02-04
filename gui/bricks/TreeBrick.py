@@ -20,12 +20,8 @@ import os
 import logging
 from collections import namedtuple
 
-import QtImport
-
-
 from gui.BaseComponents import BaseWidget
-from gui.utils import queue_item
-from gui.utils import Icons, Colors
+from gui.utils import queue_item, Icons, Colors, QtImport
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from gui.widgets.dc_tree_widget import DataCollectTree
 

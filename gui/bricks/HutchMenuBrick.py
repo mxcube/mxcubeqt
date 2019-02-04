@@ -17,14 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
-
-import QtImport
 
 import api
 from gui.BaseComponents import BaseWidget
-from gui.utils import Colors, Icons
+from gui.utils import Colors, Icons, QtImport
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 

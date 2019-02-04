@@ -31,14 +31,11 @@ import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 from optparse import OptionParser
 
-
-import QtImport
-
 import api
 
 import gui
 from gui import GUISupervisor
-from gui.utils import GUILogHandler, ErrorHandler
+from gui.utils import GUILogHandler, ErrorHandler, QtImport
 from HardwareRepository import HardwareRepository
 
 

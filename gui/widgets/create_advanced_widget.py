@@ -19,11 +19,8 @@
 
 import logging
 
-import QtImport
-
 import api
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget

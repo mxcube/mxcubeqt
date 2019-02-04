@@ -380,11 +380,14 @@
         </item>
         <item row="5" column="0">
          <widget class="QCheckBox" name="ff_ssim_cbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>FF ssim</string>
           </property>
           <property name="checked">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>

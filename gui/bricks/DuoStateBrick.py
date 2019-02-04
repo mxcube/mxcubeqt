@@ -20,9 +20,7 @@
 import re
 import logging
 
-import QtImport
-
-from gui.utils import Icons, Colors
+from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 

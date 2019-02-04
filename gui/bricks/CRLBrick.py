@@ -21,9 +21,7 @@
 CRLBrick
 """
 
-import QtImport 
-
-from gui.utils import Colors, Icons
+from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE collaboration"]

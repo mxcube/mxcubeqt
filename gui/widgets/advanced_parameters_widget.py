@@ -17,12 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-import QtImport
-
 import api
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget

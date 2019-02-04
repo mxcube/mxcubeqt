@@ -27,11 +27,9 @@ import pickle
 import logging
 import collections
 
-import QtImport
-
 from gui import set_splash_screen
 from gui import Configuration, GUIBuilder
-from gui.utils import GUIDisplay, Icons, Colors
+from gui.utils import GUIDisplay, Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 from HardwareRepository import HardwareRepository
@@ -349,7 +347,7 @@ class GUISupervisor(QtImport.QWidget):
     def execute(self, config):
         """Start in execution mode"""
         self.splash_screen.set_message("Executing configuration...")
-        self.splash_screen.set_progress_value(80)
+        self.splash_screen.set_progress_value(90)
         self.display()
 
         main_window = None
@@ -414,7 +412,7 @@ class GUISupervisor(QtImport.QWidget):
                                     #    slot)
                     make_connections(item["children"])
 
-            self.splash_screen.set_progress_value(90)
+            self.splash_screen.set_progress_value(95)
             self.splash_screen.set_message("Connecting bricks...")
             make_connections(config.windows_list)
 

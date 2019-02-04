@@ -24,10 +24,8 @@ import traceback
 import sys
 import os
 
-import QtImport
-
 from gui.BaseComponents import BaseWidget
-from gui.utils import Colors, sample_changer_helper
+from gui.utils import Colors, sample_changer_helper, QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]

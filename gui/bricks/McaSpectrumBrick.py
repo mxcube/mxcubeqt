@@ -21,11 +21,10 @@
 import logging
 import numpy.oldnumeric as Numeric
 
-import QtImport
-
 from PyMca import McaAdvancedFit
 from PyMca import ConfigDict
 
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 
 

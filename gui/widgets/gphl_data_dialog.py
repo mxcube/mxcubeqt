@@ -24,9 +24,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-import QtImport
-
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
 

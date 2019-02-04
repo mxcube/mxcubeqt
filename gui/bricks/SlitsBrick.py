@@ -50,14 +50,12 @@ Depending of the beam focusing mode user can enter gap sizes by using spinboxes.
 -----------------------------------------------------------------------
 """
 
-import QtImport
-
 try:
     uni_chr = unichr
 except:
     uni_chr = chr
 
-from gui.utils import Colors, Icons
+from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
 

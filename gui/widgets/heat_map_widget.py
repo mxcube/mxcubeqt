@@ -21,9 +21,8 @@ import os
 import numpy as np
 from copy import deepcopy
 
-import QtImport
-
 import api
+from gui.utils import QtImport
 # try:
 # from widgets.Qt4_pyqtgraph_widget import TwoDimenisonalPlotWidget
 # except:
@@ -448,6 +447,7 @@ class HeatMapWidget(QtImport.QWidget):
         """
         Displays results on the widget
         """
+
         self.__results_raw = results
         self.__results_display = results
 

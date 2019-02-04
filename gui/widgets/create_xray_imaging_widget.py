@@ -19,11 +19,8 @@
 
 import copy
 
-import QtImport
-
 import api
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
@@ -211,7 +208,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
         for detector_distance in detector_distance_list:
             xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)
             if detector_distance:
-                print 111, detector_distance
                 xray_imaging_parameters.detector_distance = detector_distance
 
             acq = self._create_acq(sample)

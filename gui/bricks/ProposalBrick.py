@@ -22,10 +22,8 @@ import os
 import time
 import logging
 
-import QtImport
-
 import api
-from gui.utils import Colors, Icons
+from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
 

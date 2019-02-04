@@ -20,10 +20,8 @@
 import os
 import logging
 
-
-import QtImport
-
 import api
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from widgets.task_toolbox_widget import TaskToolBoxWidget
 

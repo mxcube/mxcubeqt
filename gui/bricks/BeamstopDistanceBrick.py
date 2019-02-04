@@ -21,9 +21,7 @@
 BeamstopDistanceBrick
 """
 
-import QtImport
-
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 

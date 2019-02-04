@@ -21,9 +21,7 @@
 BeamAlignBrick
 """
 
-import QtImport
-
-from gui.utils import Icons
+from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
 

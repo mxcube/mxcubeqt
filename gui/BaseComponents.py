@@ -25,10 +25,8 @@ import time
 import operator
 import weakref
 
-import QtImport
-
 import gui
-from gui.utils import PropertyBag, Connectable, Colors
+from gui.utils import PropertyBag, Connectable, Colors, QtImport
 
 from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject

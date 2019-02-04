@@ -22,10 +22,8 @@ import abc
 import logging
 from copy import deepcopy
 
-import QtImport
-
 import api
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,

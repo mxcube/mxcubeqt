@@ -17,10 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-import QtImport
-
+from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.reference_image_widget import ReferenceImageWidget
 from gui.widgets.char_type_widget import CharTypeWidget

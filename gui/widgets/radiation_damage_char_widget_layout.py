@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import QtImport
+from gui.utils import QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]

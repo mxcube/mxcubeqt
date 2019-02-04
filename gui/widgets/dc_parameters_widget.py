@@ -19,9 +19,8 @@
 
 import logging
 
-import QtImport
-
 import api
+from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.processing_widget import ProcessingWidget

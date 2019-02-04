@@ -19,16 +19,12 @@
 
 import copy
 
-import QtImport
-
 import api
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.processing_widget import ProcessingWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.create_task_base import CreateTaskBase
-
-
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,

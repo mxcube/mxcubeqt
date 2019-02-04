@@ -71,9 +71,7 @@ import logging
 from datetime import datetime
 import smtplib
 
-import QtImport
-
-from gui.utils import Icons, Colors, GUILogHandler
+from gui.utils import Icons, Colors, GUILogHandler, QtImport
 from gui.BaseComponents import BaseWidget
 
 

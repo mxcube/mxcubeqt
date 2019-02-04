@@ -19,9 +19,7 @@
 
 import logging
 
-import QtImport
-
-from gui.utils import Colors, Icons
+from gui.utils import Colors, Icons, QtImport
 from gui.utils.QLed import QLed
 from gui.BaseComponents import BaseWidget
 

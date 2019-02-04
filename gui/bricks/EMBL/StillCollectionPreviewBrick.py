@@ -20,10 +20,8 @@
 import os
 import numpy as np
 
-import QtImport
-
 from gui.BaseComponents import BaseWidget
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView

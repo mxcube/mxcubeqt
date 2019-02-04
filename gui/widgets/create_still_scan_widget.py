@@ -19,11 +19,8 @@
 
 import copy
 
-import QtImport
-
 import api
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.acquisition_still_widget import AcquisitionStillWidget

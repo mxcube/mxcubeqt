@@ -17,12 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import logging
-
-import QtImport
-
-from gui.utils import Colors, Icons, queue_item
+from gui.utils import Colors, Icons, queue_item, QtImport
 from gui.widgets.matplot_widget import PolarScaterWidget
 
 

@@ -19,10 +19,8 @@
 
 import logging
 
-import QtImport
-
 import api
-from gui.utils import Icons, queue_item
+from gui.utils import Icons, queue_item, QtImport
 from gui.widgets.create_discrete_widget import CreateDiscreteWidget
 from gui.widgets.create_helical_widget import CreateHelicalWidget
 from gui.widgets.create_char_widget import CreateCharWidget

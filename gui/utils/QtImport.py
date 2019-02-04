@@ -349,4 +349,6 @@ if qt_variant in ("PyQt4", "PyQt5", "PySide"):
 
 
 def load_ui_file(filename):
-    return loadUi(os.path.join(os.path.dirname(__file__), "ui_files", filename))
+    current_path = os.path.dirname(os.path.abspath(__file__)).split(os.sep)
+    current_path = os.path.join(*current_path[1:-1])
+    return loadUi(os.path.join("/", current_path, "ui_files", filename))

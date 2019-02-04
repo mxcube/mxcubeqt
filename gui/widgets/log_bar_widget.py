@@ -20,9 +20,7 @@
 import time
 import gevent
 
-import QtImport
-
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]

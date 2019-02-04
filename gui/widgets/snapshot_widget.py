@@ -17,7 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
+
+from gui.utils import QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -54,14 +55,15 @@ class SnapshotWidget(QtImport.QWidget):
         self.animation_gbox.setHidden(True)
 
     def display_snapshot(self, image, width=None):
-        if width is not None:
-            ration = image.height() / float(image.width())
-            image = image.scaled(
-                width, width * ration, QtImport.Qt.KeepAspectRatio, QtImport.Qt.SmoothTransformation
-            )
+        if image is not None:
+            if width is not None:
+                ration = image.height() / float(image.width())
+                image = image.scaled(
+                    width, width * ration, QtImport.Qt.KeepAspectRatio, QtImport.Qt.SmoothTransformation
+                )
+                self.setFixedWidth(width)
 
-        self.snapshot_label.setPixmap(QtImport.QPixmap(image))
-        self.setFixedWidth(width)
+            self.snapshot_label.setPixmap(QtImport.QPixmap(image))
 
     def display_animation(self, animation_filename):
         self.animation_gbox.setVisible(True)

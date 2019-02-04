@@ -17,10 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
 import api
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
