@@ -215,7 +215,7 @@ class ConfigurationTable(QtImport.QTableWidget):
 
     def on_reset_click(self):
         self.endEdit(self.currentRow(), 1, 0, 0)
-        prop_name = str(self.item(row, 0).text())
+        prop_name = str(self.item(self.currentRow(), 0).text())
         if self.display_hwobj:
             prop_name = "hwobj_" + prop_name
 

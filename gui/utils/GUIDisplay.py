@@ -253,7 +253,7 @@ class CustomMenuBar(QtImport.QMenuBar):
         """Whats this"""
 
         if self.execution_mode:
-            BaseWidget.updateWhatsThis()
+            BaseWidget.update_whats_this()
 
     def about_clicked(self):
         """Display dialog with info about mxcube"""
@@ -652,7 +652,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
             slot_name = "showPage_%s" % label
 
-            def tab_slot(self, page_index=self.indexOf(scroll_area)):
+            def tab_show_slot(self, page_index=self.indexOf(scroll_area)):
                 self.setCurrentIndex(page_index)
 
             try:
@@ -661,7 +661,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
                 # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_show_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -669,7 +669,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 )
             slot_name = "hidePage_%s" % label
 
-            def tab_slot(
+            def tab_hide_slot(
                 self,
                 hide=True,
                 page={
@@ -712,7 +712,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
                 # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_hide_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -723,7 +723,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'enable page' slot
             slot_name = "enablePage_%s" % label
 
-            def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
+            def enable_page_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.page(page_index).setEnabled(enable)
 
             try:
@@ -732,7 +732,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    enable_page_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -743,7 +743,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'enable tab' slot
             slot_name = "enableTab_%s" % label
 
-            def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
+            def tab_enable_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.setTabEnabled(page_index, enable)
 
             try:
@@ -752,7 +752,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_enable_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -763,7 +763,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'tab reset count' slot
             slot_name = "resetTabCount_%s" % label
 
-            def tab_slot(self, erase_count, page_index=self.indexOf(scroll_area)):
+            def tab_reset_count_slot(self, erase_count, page_index=self.indexOf(scroll_area)):
                 tab_label = str(self.tabLabel(self.page(page_index)))
                 label_list = tab_label.split()
                 found = False
@@ -804,7 +804,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_reset_count_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -814,7 +814,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'tab increase count' slot
             slot_name = "incTabCount_%s" % label
 
-            def tab_slot(
+            def tab_inc_count_slot(
                 self, delta, only_if_hidden, page_index=self.indexOf(scroll_area)
             ):
                 if only_if_hidden and page_index == self.currentPageIndex():
@@ -857,7 +857,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
                 # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_inc_count_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
