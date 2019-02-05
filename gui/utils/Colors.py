@@ -19,8 +19,7 @@
 
 from QtImport import Qt, QColor, QPalette
 
-from random import randint
-import numpy as np
+from random import randint, uniform
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -84,8 +83,9 @@ def get_random_hex(alpha=255):
 
 
 def get_random_numpy_color(alpha=255):
-    return np.random.rand(3, 1)
-
+    return (uniform(0, 1),
+            uniform(0, 1),
+            uniform(0, 1))
 
 def color_to_hexa(color):
     return "#%x%x%x" % (color.red(), color.green(), color.blue())

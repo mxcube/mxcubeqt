@@ -265,10 +265,10 @@ class CustomMenuBar(QtImport.QMenuBar):
                <p>Macromolecular Xtallography Customized Beamline Environment<p>
                Python %s - Qt %s - PyQt %s on %s"""
             % (
-                __version__,
+                "2x",
                 platform.python_version(),
-                QT_VERSION_STR,
-                QT_VERSION_STR,
+                QtImport.qt_version_no,
+                QtImport.pyqt_version_no,
                 platform.system(),
             ),
         )

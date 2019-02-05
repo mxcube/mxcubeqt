@@ -214,7 +214,7 @@ def run(gui_config_file=None):
         # try to set Hardware Repository server from environment
         hwr_path = os.environ.get("HARDWARE_REPOSITORY_SERVER")
         if hwr_path is None:
-            hwr_path = default_hwr_server
+            hwr_path = default_hwr_path
 
     # add bricks directories and hardware objects directories from environment
     try:

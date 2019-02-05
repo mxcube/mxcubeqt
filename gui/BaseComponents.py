@@ -85,6 +85,7 @@ class InstanceEventFilter(QtImport.QObject):
                         or isinstance(event, QtImport.QFocusEvent):
                     if obj.should_filter_event():
                         return True
+
                 return QtImport.QObject.eventFilter(self, widget, event)
             try:
                 obj = obj.parent()
@@ -168,6 +169,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     _menubar = None
     _statusbar = None
     _progressbar = None
+    _progress_dialog = None
 
     _application_event_filter = InstanceEventFilter(None)
 
@@ -332,14 +334,15 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def connect_group_box(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
         widget.toggled.connect(lambda
-                               s: BaseWidget.widgetGroupBoxToggled(brick_name,
-                                                                   widget_name, master_sync, s))
+                               s: BaseWidget.widget_groupbox_toggled(brick_name,
+                                                                     widget_name, master_sync, s))
 
     def connect_combobox(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
-        widget.activated.connect(lambda
-                                 i: BaseWidget.widget_combobox_activated(brick_name,
-                                                                         widget_name, widget, master_sync, i))
+        widget.activated.connect(
+            lambda
+            i: BaseWidget.widget_combobox_activated(brick_name,
+                                                    widget_name, widget, master_sync, i))
 
     def connect_line_edit(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
@@ -362,7 +365,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def connect_generic_widget(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
         widget.widgetSynchronize.connect(lambda
-                                         state: BaseWidget.widgetGenericChanged(brick_name, widget_name,
+                                         state: BaseWidget.widget_generic_changed(brick_name, widget_name,
                                                                                 master_sync, state))
 
     def _instance_mode_changed(self, mode):
@@ -539,7 +542,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     @staticmethod
     def widget_groupbox_toggled(brick_name, widget_name, master_sync, state):
-        BaseWidget.updateWidget(brick_name,
+        BaseWidget.update_widget(brick_name,
                                 widget_name,
                                 "setChecked",
                                 (state,),
@@ -611,8 +614,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         try:
             method_to_add = WeakMethod(method)
         except TypeError:
-            methos_to_add = method
-        BaseWidget._events_cache[m] = (timestamp, methos_to_add, args)
+            method_to_add = method
+        BaseWidget._events_cache[method_to_add] = (timestamp, method_to_add, args)
 
     @staticmethod
     def synchronize_with_cache():
@@ -751,8 +754,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         if instance_filter:
             self.connect_signal_slot_filter(_sender,
                                             pysignal and
-                                            SIGNAL(signal) or
-                                            SIGNAL(signal),
+                                            QtImport.pyqtSignal(signal) or
+                                            QtImport.pyqtSignal(signal),
                                             slot, should_cache)
         else:
             # Porting to Qt5

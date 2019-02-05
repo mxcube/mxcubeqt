@@ -28,14 +28,6 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-if not hasattr(gevent, "wait"):
-
-    def mywait(timeout=None):
-        return gevent.run(timeout)
-
-    gevent.wait = mywait
-
-
 # Relative location of
 STD_BRICKS_LOCATION = "gui.bricks"
 
