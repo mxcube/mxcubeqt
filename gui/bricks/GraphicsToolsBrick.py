@@ -29,7 +29,7 @@ __category__ = "Graphics"
 
 class GraphicsToolsBrick(BaseWidget):
     """
-    Brick is like a menu in the menuBar or/and in the toolbar
+    Brick is like a menu in the menubar or/and in the toolbbr
     """
 
     def __init__(self, *args):
@@ -168,20 +168,20 @@ class GraphicsToolsBrick(BaseWidget):
         # self.camera_control_action.setEnabled(False)
 
         if self.target_menu == "menuBar":
-            if BaseWidget._menuBar is not None:
-                BaseWidget._menuBar.insert_menu(self.tools_menu, 3)
+            if BaseWidget._menubar is not None:
+                BaseWidget._menubar.insert_menu(self.tools_menu, 3)
         elif self.target_menu == "toolBar":
-            if BaseWidget._toolBar is not None:
+            if BaseWidget._toolbar is not None:
                 for action in self.tools_menu.actions():
-                    BaseWidget._toolBar.addAction(action)
+                    BaseWidget._toolbar.addAction(action)
         else:
-            if BaseWidget._menuBar is not None:
-                BaseWidget._menuBar.insert_menu(self.tools_menu, 2)
+            if BaseWidget._menubar is not None:
+                BaseWidget._menubar.insert_menu(self.tools_menu, 2)
 
-            if BaseWidget._toolBar is not None:
+            if BaseWidget._toolbar is not None:
                 toolbar_actions = []
                 for action in self.tools_menu.actions():
-                    BaseWidget._toolBar.addAction(action)
+                    BaseWidget._toolbar.addAction(action)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "targetMenu":

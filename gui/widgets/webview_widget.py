@@ -17,16 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    if QtImport.qt_variant == "PyQt5":
-        from PyQt5.QtWebKit import QWebView
-    else:
-        from PyQt4.QtWebKit import QWebView
-    QWEBVIEW_AVAILABLE = True
-except BaseException:
-    QWEBVIEW_AVAILABLE = False
-
 from gui.utils import Icons, QtImport
+
+if hasattr(QtImport, "QWebView"):
+    QWEBVIEW_AVAILABLE = True
+else:
+    QWEBVIEW_AVAILABLE = False
 
 
 class WebViewWidget(QtImport.QWidget):
@@ -48,7 +44,7 @@ class WebViewWidget(QtImport.QWidget):
         self.forward_button.setIcon(Icons.load_icon("Right2"))
 
         if QWEBVIEW_AVAILABLE:
-            self.web_page_viewer = QWebView(self)
+            self.web_page_viewer = QtImport.QWebView(self)
             self.web_page_viewer.settings().setObjectCacheCapacities(0, 0, 0)
         else:
             self.web_page_viewer = QtImport.QTextBrowser(self)

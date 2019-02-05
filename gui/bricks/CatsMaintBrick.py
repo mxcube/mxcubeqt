@@ -85,6 +85,7 @@ class CatsMaintBrick(BaseWidget):
 
         self.device = None
         self.state = None
+        self.status = None
 
         self.path_running = None
         self.powered = None
@@ -410,13 +411,6 @@ class CatsMaintBrick(BaseWidget):
         try:
             if self.device is not None:
                 self.device._doMagnetOff()
-        except BaseException:
-            QtImport.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
-
-    def home(self):
-        try:
-            if self.device is not None:
-                self.device._doHome()
         except BaseException:
             QtImport.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 

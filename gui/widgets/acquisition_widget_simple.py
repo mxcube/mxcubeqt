@@ -337,9 +337,6 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.acq_widget_layout.detector_roi_mode_label.setEnabled(True)
             self.acq_widget_layout.detector_roi_mode_combo.setEnabled(True)
 
-    def update_osc_range_limits(self, limits=None):
-        pass
-
     def update_exp_time_limits(self):
         try:
             exp_time_limits = (

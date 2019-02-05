@@ -430,8 +430,8 @@ class GUISupervisor(QtImport.QWidget):
                 if window._show:
                     window.show()
 
-        if BaseWidget._menuBar:
-            BaseWidget._menuBar.set_exp_mode(False)
+        if BaseWidget._menubar:
+            BaseWidget._menubar.set_exp_mode(False)
 
         return main_window
 

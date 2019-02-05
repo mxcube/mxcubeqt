@@ -46,6 +46,7 @@ import os
 import logging
 import numpy as np
 
+from gui.utils import QtImport
 pymca_imported = False
 try:
     if QtImport.qt_variant == "PyQt5":
@@ -61,7 +62,6 @@ except BaseException:
 if not pymca_imported:
     from gui.widgets.matplot_widget import TwoAxisPlotWidget
 
-from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 
 

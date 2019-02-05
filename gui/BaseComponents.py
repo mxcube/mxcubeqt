@@ -167,6 +167,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     _events_cache = {}
     _menu_background_color = None
     _menubar = None
+    _toolbar = None
     _statusbar = None
     _progressbar = None
     _progress_dialog = None
@@ -426,7 +427,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             BaseWidget.INSTANCE_USERID_LOGGED
 
     @staticmethod
-    def is_instance_user_id_house():
+    def is_instance_user_id_inhouse():
         return BaseWidget._instance_user_id == \
             BaseWidget.INSTANCE_USERID_INHOUSE
 

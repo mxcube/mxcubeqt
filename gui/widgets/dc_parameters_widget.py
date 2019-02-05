@@ -46,7 +46,6 @@ class DCParametersWidget(QtImport.QWidget):
 
         # Internal variables --------------------------------------------------
         self._data_collection = None
-        self.add_dc_cb = None
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
@@ -107,9 +106,6 @@ class DCParametersWidget(QtImport.QWidget):
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
         path_conflict = api.queue_model.check_for_path_collisions(path_template)
-
-    def __add_data_collection(self):
-        return self.add_dc_cb(self._data_collection, self.collection_type)
 
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template

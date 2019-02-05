@@ -17,6 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 import api
 from gui.utils import queue_item, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
@@ -98,7 +100,7 @@ class AdvancedParametersWidget(QtImport.QWidget):
 
     def tab_changed(self):
         if self._tree_view_item:
-            self.populate_widget(self._tree_view_item)
+            self.populate_widget(self._tree_view_item, None)
 
     def populate_widget(self, tree_view_item, data_collection):
         self._tree_view_item = tree_view_item

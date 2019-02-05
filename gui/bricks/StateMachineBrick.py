@@ -94,14 +94,14 @@ class StateMachineBrick(BaseWidget):
         self.graph_graphics_view.setRenderHint(QtImport.QPainter.Antialiasing)
         self.graph_graphics_view.setRenderHint(QtImport.QPainter.TextAntialiasing)
 
-    def propertyChanged(self, property_name, old_value, new_value):
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_state_machine":
             if self.state_machine_hwobj is not None:
                 self.state_machine_hwobj.disconnect("stateChanged", self.state_changed)
                 self.state_machine_hwobj.disconnect(
                     "conditionChanged", self.condition_changed
                 )
-            self.state_machine_hwobj = self.getHardwareObject(new_value)
+            self.state_machine_hwobj = self.get_hardware_object(new_value)
             if self.state_machine_hwobj is not None:
                 self.state_machine_hwobj.connect("stateChanged", self.state_changed)
                 self.state_machine_hwobj.connect(
@@ -111,7 +111,7 @@ class StateMachineBrick(BaseWidget):
                 self.init_state_graph()
                 self.state_machine_hwobj.update_values()
         else:
-            BaseWidget.propertyChanged(self, property_name, old_value, new_value)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def init_state_machine(self):
         self.cond_list = self.state_machine_hwobj.get_condition_list()
@@ -126,7 +126,7 @@ class StateMachineBrick(BaseWidget):
 
         self.cond_states_table.setColumnCount(len(self.states_list))
         self.cond_states_table.setHorizontalHeader(
-            RotatedHeaderView(self.cond_states_table)
+            QtImport.RotatedHeaderView(self.cond_states_table)
         )
 
         states_name_list = []
@@ -254,7 +254,7 @@ class StateMachineBrick(BaseWidget):
                 return state
 
     def get_condition_index_by_name(self, name):
-        for index, condition in enumerate(condition_list):
+        for index, condition in enumerate(self.cond_list):
             if condition["name"] == name:
                 return index
 

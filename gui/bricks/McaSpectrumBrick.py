@@ -73,7 +73,7 @@ class McaSpectrumBrick(BaseWidget):
             # elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
             self.mcafit._energyAxis = False
             self.mcafit.toggleEnergyAxis()
-            # result = self._fit()
+            result = self._fit()
             # pyarch file name and directory
             pf = config["legend"].split(".")
             pd = pf[0].split("/")

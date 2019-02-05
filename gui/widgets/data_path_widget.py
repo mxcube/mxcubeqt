@@ -22,7 +22,7 @@ import string
 import logging
 
 from gui.utils import Colors, QtImport
-from utils.widget_utils import DataModelInputBinder
+from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 

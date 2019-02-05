@@ -35,7 +35,7 @@ puck. This HT puck has special handling by the Cats sample changer.
 import logging
 
 from gui.BaseComponents import BaseWidget
-from gui.utils import QtImport
+from gui.utils import Colors, QtImport
 from gui.utils import sample_changer_helper as sc_helper
 from gui.bricks.SampleChangerBrick import SampleChangerBrick, BasketView, VialView
 
@@ -75,9 +75,9 @@ class CatsStatusView(QtImport.QGroupBox, BaseWidget):
         color = sc_helper.SC_STATE_COLOR.get(state, None)
 
         if color is None:
-            color = widget_colors.LINE_EDIT_ORIGINAL
+            color = Colors.LINE_EDIT_ORIGINAL
 
-        widget_colors.set_widget_color(self.status_label, color)
+        Colors.set_widget_color(self.status_label, color)
 
         enabled = sc_helper.SC_STATE_GENERAL.get(state, False)
         self.status_label.setEnabled(enabled)
@@ -243,7 +243,7 @@ class CatsSimpleBrick(SampleChangerBrick):
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(False)
-            abort_color = widget_colors.LIGHT_GRAY
+            abort_color = Colors.LIGHT_GRAY
         elif ready:
             logging.getLogger().info("CatsSimpleBrick update buttons (ready)")
             self.load_button.setEnabled(True)
@@ -252,17 +252,17 @@ class CatsSimpleBrick(SampleChangerBrick):
             else:
                 self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(False)
-            abort_color = widget_colors.LIGHT_GRAY
+            abort_color = Colors.LIGHT_GRAY
         else:
             logging.getLogger().info("CatsSimpleBrick update buttons (other)")
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.abort_button.setEnabled(True)
-            abort_color = widget_colors.LIGHT_RED
+            abort_color = Colors.LIGHT_RED
 
         self.abort_button.setStyleSheet("background-color: %s;" % abort_color.name())
 
-        # widget_colors.set_widget_color(self.abort_button, abort_color)
+        # Colors.set_widget_color(self.abort_button, abort_color)
 
     def load_selected_sample(self):
 

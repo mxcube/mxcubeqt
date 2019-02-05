@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
+import logging
 
 import api
 from gui.utils import queue_item, QtImport

@@ -17,11 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from gui.utils import Colors, Icons, QtImport
 import gui.utils.sample_changer_helper as sc_helper
+from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository.HardwareObjects.abstract import AbstractSampleChanger
+from HardwareRepository.HardwareObjects.abstract.sample_changer import Container
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -125,7 +125,6 @@ class VialNumberView(QtImport.QLabel):
 
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
-        ogging.getLogger("HWR").debug("mouse released on vial number view")
         self.singleClickSignal.emit(self.vial_index)
         QtImport.QLabel.mouseReleaseEvent(self, event)
 
@@ -323,7 +322,7 @@ class BasketView(QtImport.QWidget):
         self,
         parent,
         basket_index,
-        vials_per_basket,
+        vials_per_basket=10,
         max_per_row=None,
         basket_label="Basket",
     ):
@@ -931,7 +930,7 @@ class SampleChangerBrick(BaseWidget):
 
         self.sample_changer_hwobj = None
         self.in_expert_mode = None
-        self.basket_count = None
+        self.basket_count = ""
         self.basket_label = None
         self.basket_per_column_default = 9
         self.baskets = []
@@ -1262,13 +1261,13 @@ class SampleChangerBrick(BaseWidget):
             self.status.setMinidiffStatus(self.sample_changer_hwobj.minidiffCanMove())
 
     def changeBasket(self, basket_number):
-        address = AbstractSampleChanger.Basket.getBasketAddress(basket_number)
+        address = Container.Basket.getBasketAddress(basket_number)
         self.sample_changer_hwobj.select(address, wait=False)
 
     def changeSample(self, sample_number):
         basket_index = self.sample_changer_hwobj.getSelectedComponent().getIndex()
         basket_number = basket_index + 1
-        address = AbstractSampleChanger.Pin.getSampleAddress(
+        address = Container.Pin.getSampleAddress(
             basket_number, sample_number
         )
         self.sample_changer_hwobj.select(address, wait=False)
@@ -1340,7 +1339,7 @@ class SampleChangerBrick(BaseWidget):
         baskets_to_scan = []
         for index, basket_checkbox in enumerate(self.baskets):
             baskets_to_scan.append(
-                AbstractSampleChanger.Basket.getBasketAddress(index + 1)
+                Container.Basket.getBasketAddress(index + 1)
                 if basket_checkbox.isChecked()
                 else None
             )

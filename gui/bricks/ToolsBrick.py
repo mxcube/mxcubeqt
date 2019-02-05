@@ -61,7 +61,7 @@ class ToolsBrick(BaseWidget):
         """Adds menu to the tool bar"""
         self.tools_menu = QtImport.QMenu("Tools", self)
         self.tools_menu.addSeparator()
-        BaseWidget._menuBar.insert_menu(self.tools_menu, 2)
+        BaseWidget._menubar.insert_menu(self.tools_menu, 2)
         self.init_tools()
 
     def property_changed(self, property_name, old_value, new_value):

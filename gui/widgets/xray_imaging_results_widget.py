@@ -20,7 +20,7 @@
 import os
 
 from gui.utils import Icons, QtImport
-from widgets.matplot_widget import TwoDimenisonalPlotWidget
+from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -71,9 +71,26 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.popup_menu = QtImport.QMenu(self)
         self.popup_menu.menuAction().setIconVisibleInMenu(True)
 
+        self.popup_menu.addAction(
+            Icons.load_icon("VCRPlay2"),
+            "Start 3-click centering",
+            self.start_centering_clicked,
+        )
+        self.popup_menu.addAction(
+            Icons.load_icon("VCRPlay"),
+            "Start n-click centering",
+            self.start_n_centering_clicked,
+        )
+        self.popup_menu.addAction(
+            Icons.load_icon("ThumbUp"),
+            "Create centering point",
+            self.accept_centering_clicked,
+        )
+
+        self.popup_menu.addSeparator()
         self.measure_distance_action = self.popup_menu.addAction(
             Icons.load_icon("measure_distance"),
-            "Distance",
+            "Distance and histogram",
             self.measure_distance_clicked,
         )
 
@@ -177,8 +194,8 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.start_n_centering_button.setFixedSize(70, 50)
         self.accept_centering_button.setFixedSize(70, 50)
 
-        self.results_widget.data_path_ledit.setText("/home/karpics/Downloads/data/data_1_00000.tif")
-        self.results_widget.ff_path_ledit.setText("/home/karpics/Downloads/flatfield/ff_data_1_00000.tif")
+        #self.results_widget.data_path_ledit.setText("/home/karpics/Downloads/data/data_1_00000.tif")
+        #self.results_widget.ff_path_ledit.setText("/home/karpics/Downloads/flatfield/ff_data_1_00000.tif")
 
     def contextMenuEvent(self, event):
         self.popup_menu.popup(QtImport.QCursor.pos())
@@ -219,8 +236,8 @@ class XrayImagingResultsWidget(QtImport.QWidget):
 
             self.graphics_view = self.xray_imaging_hwobj.get_graphics_view()
             self._graphics_view_widget_vlayout.addWidget(self.graphics_view)
-            self.graphics_view_widget.setFixedSize(400, 400
-            #    self.graphics_view.scene().width(), self.graphics_view.scene().height()
+            self.graphics_view_widget.setFixedSize(
+                self.graphics_view.scene().width(), self.graphics_view.scene().height()
             )
 
             self.setDisabled(False)
@@ -349,6 +366,9 @@ class XrayImagingResultsWidget(QtImport.QWidget):
 
     def start_centering_clicked(self):
         self.xray_imaging_hwobj.start_centering()
+
+    def start_n_centering_clicked(self):
+        self.xray_imaging_hwobj.start_n_centering()
 
     def accept_centering_clicked(self):
         self.beamline_setup_hwobj.shape_history_hwobj.accept_centring()

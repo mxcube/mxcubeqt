@@ -26,7 +26,7 @@ from gui.utils import QtImport
 # try:
 # from widgets.Qt4_pyqtgraph_widget import TwoDimenisonalPlotWidget
 # except:
-from widgets.matplot_widget import TwoDimenisonalPlotWidget
+from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 
 __credits__ = ["MXCuBE collaboration"]

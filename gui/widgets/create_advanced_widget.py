@@ -209,6 +209,10 @@ class CreateAdvancedWidget(CreateTaskBase):
             "%.1f" % (ver_size * 1000)
         )
 
+        api.graphics.connect("shapeCreated", self.shape_created)
+        api.graphics.connect("shapeChanged", self.shape_changed)
+        api.graphics.connect("shapeDeleted", self.shape_deleted)
+
     def set_beam_info(self, beam_info):
         self.spacing[0] = beam_info["size_x"]
         self.spacing[1] = beam_info["size_y"]

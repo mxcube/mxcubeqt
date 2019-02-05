@@ -56,9 +56,9 @@ class TreeBrick(BaseWidget):
     populate_sample_details = QtImport.pyqtSignal(object)
     populate_energy_scan_widget = QtImport.pyqtSignal(object)
     populate_xrf_spectrum_widget = QtImport.pyqtSignal(object)
-    populate_workflow_tab = QtImport.pyqtSignal(object)
     populate_advanced_widget = QtImport.pyqtSignal(object)
     populate_xray_imaging_widget = QtImport.pyqtSignal(object)
+    populate_workflow_widget = QtImport.pyqtSignal(object)
 
     selection_changed = QtImport.pyqtSignal(object)
     set_directory = QtImport.pyqtSignal(str)
@@ -347,8 +347,8 @@ class TreeBrick(BaseWidget):
         )
         self.queue_sync_action.setEnabled(False)
 
-        if BaseWidget._menuBar is not None:
-            BaseWidget._menuBar.insert_menu(self.tools_menu, 1)
+        if BaseWidget._menubar is not None:
+            BaseWidget._menubar.insert_menu(self.tools_menu, 1)
 
         self.hide_dc_parameters_tab.emit(True)
         self.hide_dcg_tab.emit(True)
@@ -467,7 +467,7 @@ class TreeBrick(BaseWidget):
                 if self["usePlateNavigator"]:
                     self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
-                beamline_setup_hwobj.set_plate_mode(True)
+                api.beamline_setup.set_plate_mode(True)
                 if plate_sample_content:
                     plate_row_list, plate_sample_list = self.dc_tree_widget.samples_from_sc_content(
                         plate_row_content, plate_sample_content
@@ -685,15 +685,10 @@ class TreeBrick(BaseWidget):
                         sample_list.append(lims_sample)
                     else:
                         log.warning(
-                            "The sample with the barcode (%s) exists"
+                            "The sample with the barcode (%s) exists" % sc_sample.code
                             + " in LIMS but the location does not mat"
-                            + "ch. Sample changer location: %s, LIMS "
-                            + "location %s"
-                            % (
-                                sc_sample.code,
-                                sc_sample.location,
-                                lims_sample.lims_location,
-                            )
+                            + "ch. Sample changer location: %s, LIMS " % sc_sample.location
+                            + "location %s" % lims_sample.lims_location
                         )
                         sample_list.append(sc_sample)
                 else:  # No sample with that barcode, continue with location
@@ -918,7 +913,7 @@ class TreeBrick(BaseWidget):
         self.populate_workflow_tab(item, running=running)
 
     def populate_workflow_tab(self, item, running=False):
-        self.populate_workflow_tab.emit(item, running)
+        self.populate_workflow_widget.emit(item, running)
 
     def show_xray_imaging_tab(self, item):
         self.show_tab("xray_imaging")

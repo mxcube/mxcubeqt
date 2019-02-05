@@ -12,7 +12,7 @@
 #  MXCuBE is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU LEsser General Public License for more details.
+#  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
@@ -22,13 +22,11 @@ import smtplib
 import gevent
 import logging
 import collections
+from email import Utils
 
-import InstanceServer
-
-import QtImport 
-
-from gui.utils import Colors, Icons
+from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
+from HardwareRepository.HardwareObjects import InstanceServer
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -395,13 +393,13 @@ class InstanceListBrick(BaseWidget):
                     self.instance_server_hwobj.setProposal(proposal_dict)
 
             if is_inhouse:
-                BaseWidget.setInstanceUserId(BaseWidget.INSTANCE_USERID_INHOUSE)
+                BaseWidget.set_instance_user_id(BaseWidget.INSTANCE_USERID_INHOUSE)
                 self.ask_control_button.hide()
                 self.take_control_button.show()
-                self.take_control_button.setEnabled(BaseWidget.isInstanceRoleServer())
+                self.take_control_button.setEnabled(BaseWidget.is_instance_role_server())
                 if (
                     self.hutch_trigger_hwobj is not None
-                    and not BaseWidget.isInstanceModeMaster()
+                    and not BaseWidget.is_instance_mode_master()
                 ):
                     hutch_opened = 1 - int(
                         self.hutch_trigger_hwobj.door_is_interlocked()
@@ -413,18 +411,18 @@ class InstanceListBrick(BaseWidget):
                     )
                     self.take_control_button.setEnabled(1 - hutch_opened)
             else:
-                BaseWidget.setInstanceUserId(BaseWidget.INSTANCE_USERID_LOGGED)
+                BaseWidget.set_instance_user_id(BaseWidget.INSTANCE_USERID_LOGGED)
                 self.take_control_button.hide()
                 self.ask_control_button.show()
                 self.ask_control_button.setEnabled(
-                    not BaseWidget.isInstanceModeMaster()
+                    not BaseWidget.is_instance_mode_master()
                 )
         else:
             if self.instance_server_hwobj is not None:
                 self.my_proposal = None
                 self.instance_server_hwobj.setProposal(None)
 
-            BaseWidget.setInstanceUserId(BaseWidget.INSTANCE_USERID_UNKNOWN)
+            BaseWidget.set_instance_user_id(BaseWidget.INSTANCE_USERID_UNKNOWN)
             self.take_control_button.hide()
             self.ask_control_button.show()
             self.ask_control_button.setEnabled(False)
@@ -530,8 +528,8 @@ class InstanceListBrick(BaseWidget):
 
     def widget_update(self, timestamp, method, method_args, master_sync=True):
         if self.instance_server_hwobj.isServer():
-            BaseWidget.addEventToCache(timestamp, method, *method_args)
-            if not master_sync or BaseWidget.shouldRunEvent():
+            BaseWidget.add_event_to_cache(timestamp, method, *method_args)
+            if not master_sync or BaseWidget.should_run_event():
                 try:
                     try:
                         if not master_sync:
@@ -555,7 +553,7 @@ class InstanceListBrick(BaseWidget):
             method.__self__.blockSignals(False)
             return
 
-            if not master_sync or BaseWidget.shouldRunEvent():
+            if not master_sync or BaseWidget.should_run_event():
                 try:
                     try:
                         if not master_sync:
@@ -572,7 +570,7 @@ class InstanceListBrick(BaseWidget):
                     except AttributeError:
                         pass
             else:
-                BaseWidget.addEventToCache(timestamp, method, *method_args)
+                BaseWidget.add_event_to_cache(timestamp, method, *method_args)
 
     def widget_call(self, timestamp, method, method_args):
         try:
@@ -710,7 +708,7 @@ class InstanceListBrick(BaseWidget):
         if item is None:
             return
 
-        if BaseWidget.isInstanceModeMaster() and self.give_control_chbox.isChecked():
+        if BaseWidget.is_instance_mode_master() and self.give_control_chbox.isChecked():
             for user_id in self.connections:
                 if self.connections[user_id][0] == item:
                     self.instance_server_hwobj.giveControl(
@@ -750,9 +748,9 @@ class InstanceListBrick(BaseWidget):
             if self.xmlrpc_server:
                 self.xmlrpc_server.close()
 
-            if BaseWidget.isInstanceUserIdLogged():
+            if BaseWidget.is_instance_user_id_logged():
                 self.ask_control_button.setEnabled(True)
-            elif BaseWidget.isInstanceUserIdInhouse():
+            elif BaseWidget.is_instance_user_id_inhouse():
                 if self.hutch_trigger_hwobj is not None:
                     hutch_opened = 1 - int(
                         self.hutch_trigger_hwobj.door_is_interlocked()
@@ -765,7 +763,7 @@ class InstanceListBrick(BaseWidget):
                         or "enabling"
                     )
                     self.take_control_button.setEnabled(1 - hutch_opened)
-            if BaseWidget.isInstanceRoleServer():
+            if BaseWidget.is_instance_role_server():
                 self.take_control_button.setEnabled(True)
 
         if not gui_only:
@@ -784,7 +782,7 @@ class InstanceListBrick(BaseWidget):
                 except BaseException:
                     proposal = "unknown"
 
-                is_local = BaseWidget.isInstanceLocationLocal()
+                is_local = BaseWidget.is_instance_location_local()
 
                 if is_local:
                     control_place = "LOCAL"
@@ -837,17 +835,17 @@ class InstanceListBrick(BaseWidget):
             self.update_mirroring()
 
     def update_mirroring(self):
-        if BaseWidget.isInstanceModeSlave():
-            if BaseWidget.isInstanceUserIdUnknown():
+        if BaseWidget.is_instance_mode_slave():
+            if BaseWidget.is_instance_user_id_unknown():
                 if (
-                    BaseWidget.isInstanceRoleServer()
+                    BaseWidget.is_instance_role_server()
                     and self.in_control is not None
                     and self.in_control[1] is None
                 ):
                     BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_ALLOW)
                 else:
                     BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_PREVENT)
-            elif BaseWidget.isInstanceUserIdInhouse():
+            elif BaseWidget.is_instance_user_id_inhouse():
                 BaseWidget.set_instance_mirror(BaseWidget.INSTANCE_MIRROR_ALLOW)
             else:
                 try:
@@ -1000,7 +998,7 @@ class InstanceListBrick(BaseWidget):
                             + "Email address: %s\n" % user_info["email"]
                             + "Users at ESRF: %s" % users_in_esrf
                         )
-                    email_date = email.Utils.formatdate(localtime=True)
+                    email_date = Utils.formatdate(localtime=True)
                     toaddrs = event.toaddrs.replace(" ", ",")
                     email_message = (
                         "From: %s\r\n" % event.fromaddrs
@@ -1026,7 +1024,7 @@ class InstanceListBrick(BaseWidget):
 
     def wants_control(self, client_id):
         if (
-            BaseWidget.isInstanceModeMaster()
+            BaseWidget.is_instance_mode_master()
             and self.give_control_msgbox is None
             and self.allow_timeout_control_chbox.isChecked()
         ):

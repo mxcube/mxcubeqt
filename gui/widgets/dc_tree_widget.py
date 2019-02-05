@@ -945,8 +945,8 @@ class DataCollectTree(QtImport.QWidget):
         api.graphics.set_cursor_busy(True)
         try:
             api.queue_manager.execute()
-        except (Exception, e):
-            raise e
+        except Exception as ex:
+            raise ex
         self.parent().set_condition_state("confirmation_window_accepted",
                                           False)
 

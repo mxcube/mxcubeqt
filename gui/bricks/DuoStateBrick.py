@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import new
 import logging
 
 from gui.utils import Icons, Colors, QtImport
@@ -221,12 +222,12 @@ class DuoStateBrick(BaseWidget):
         else:
             self.buttons_widget.hide()
 
-    def propertyChanged(self, propertyName, oldValue, newValue):
-        if propertyName == "mnemonic":
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "mnemonic":
             if self.wrapper_hwobj is not None:
                 self.wrapper_hwobj.duoStateChangedSignal.disconnect(self.stateChanged)
 
-            h_obj = self.getHardwareObject(newValue)
+            h_obj = self.get_hardware_object(new_value)
             if h_obj is not None:
                 self.wrapper_hwobj = WrapperHO(h_obj)
                 self.main_gbox.show()
@@ -244,22 +245,22 @@ class DuoStateBrick(BaseWidget):
             else:
                 self.wrapper_hwobj = None
                 # self.main_gbox.hide()
-        elif propertyName == "expertModeControlOnly":
-            if newValue:
+        elif property_name == "expertModeControlOnly":
+            if new_value:
                 if self.__expertMode:
                     self.buttons_widget.show()
                 else:
                     self.buttons_widget.hide()
             else:
                 self.buttons_widget.show()
-        elif propertyName == "forceNoControl":
-            if newValue:
+        elif property_name == "forceNoControl":
+            if new_value:
                 self.buttons_widget.hide()
             else:
                 self.buttons_widget.show()
-        elif propertyName == "icons":
+        elif property_name == "icons":
             w = self.fontMetrics().width("Set out")
-            icons_list = newValue.split()
+            icons_list = new_value.split()
             try:
                 self.set_in_button.setIcon(Icons.load_icon(icons_list[0]))
             except IndexError:
@@ -271,55 +272,55 @@ class DuoStateBrick(BaseWidget):
                 self.set_out_button.setText(self["setout"])
                 # self.set_out_button.setMinimumWidth(w)
 
-        # elif propertyName=='in':
+        # elif property_name=='in':
         #    if self.wrapper_hwobj is not None:
         #        self.stateChanged(self.wrapper_hwobj.getState())
 
-        # elif propertyName=='out':
+        # elif property_name=='out':
         #    if self.wrapper_hwobj is not None:
         #        self.stateChanged(self.wrapper_hwobj.getState())
 
-        elif propertyName == "setin":
+        elif property_name == "setin":
             icons = self["icons"]
             # w=self.fontMetrics().width("Set out")
             icons_list = icons.split()
             try:
                 i = icons_list[0]
             except IndexError:
-                self.set_in_button.setText(newValue)
+                self.set_in_button.setText(new_value)
                 # self.set_in_button.setMinimumWidth(w)
-            help_text = newValue + " the " + self["username"].lower()
+            help_text = new_value + " the " + self["username"].lower()
             self.set_in_button.setToolTip(help_text)
             self.set_in_button.setText(self["setin"])
 
-        elif propertyName == "setout":
+        elif property_name == "setout":
             icons = self["icons"]
             # w=self.fontMetrics().width("Set out")
             icons_list = icons.split()
             try:
                 i = icons_list[1]
             except IndexError:
-                self.set_out_button.setText(newValue)
+                self.set_out_button.setText(new_value)
                 # self.set_out_button.setMinimumWidth(w)
-            help_text = newValue + " the " + self["username"].lower()
+            help_text = new_value + " the " + self["username"].lower()
             self.set_out_button.setToolTip(help_text)
             self.set_out_button.setText(self["setout"])
 
-        elif propertyName == "username":
-            if newValue == "":
+        elif property_name == "username":
+            if new_value == "":
                 if self.wrapper_hwobj is not None:
                     name = self.wrapper_hwobj.userName()
                     if name != "":
                         self["username"] = name
                         return
-            help_text = self["setin"] + " the " + newValue.lower()
+            help_text = self["setin"] + " the " + new_value.lower()
             self.set_in_button.setToolTip(help_text)
-            help_text = self["setout"] + " the " + newValue.lower()
+            help_text = self["setout"] + " the " + new_value.lower()
             self.set_out_button.setToolTip(help_text)
             self.main_gbox.setTitle(self["username"])
 
         else:
-            BaseWidget.propertyChanged(self, propertyName, oldValue, newValue)
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
 
 ###

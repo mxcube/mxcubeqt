@@ -540,13 +540,13 @@ class MotorSpinBoxBrick(BaseWidget):
         if self.motor_hwobj is None:
             # first time motor is set
             try:
-                s = float(self.default_step)
+                step = float(self.default_step)
             except BaseException:
                 try:
-                    s = motor_hwobj.GUIstep
+                    step = self.motor_hwobj.GUIstep
                 except BaseException:
-                    s = 1.0
-            self.set_line_step(s)
+                    step = 1.0
+            self.set_line_step(step)
 
         if self.motor_hwobj is not None:
             self.connect(self.motor_hwobj, "limitsChanged", self.limits_changed)
