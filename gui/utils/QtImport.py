@@ -117,6 +117,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
         from PyQt5.QtCore import *
         from PyQt5.QtGui import *
         from PyQt5.QtWidgets import *
+        from PyQt5.QtWebKit import *
         from PyQt5.QtPrintSupport import *
         from PyQt5.uic import *
 
@@ -167,6 +168,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
 
         # from PyQt4.QtSvg import *
         from PyQt4.QtTest import *
+        from PyQt4.QtWebKit import *
 
         def getQApp():
             return qApp
@@ -199,6 +201,7 @@ if (qt_variant == "PySide") or (qt_variant is None and not qt_imported):
         from PySide.QtGui import *
         from PySide.QtUiTools import *
         from PySide.QtSvg import *
+        from PySide.QtWebKit import *
 
         pyqtSignal = Signal
         pyqtSlot = Slot

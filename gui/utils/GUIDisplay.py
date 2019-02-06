@@ -979,8 +979,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         self._menubar.configure(menu_data, exp_pwd, execution_mode)
         self._menubar.show()
-        BaseWidget._menuBar = self._menubar
-        BaseWidget._toolBar = self._toolbar
+        BaseWidget._menubar = self._menubar
+        BaseWidget._toolbar = self._toolbar
 
     def set_statusbar(self):
         """Sets statusbar"""
