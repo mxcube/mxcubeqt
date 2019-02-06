@@ -403,6 +403,49 @@ class CustomGroupBox(QtImport.QGroupBox):
             if hasattr(child, "setVisible"):
                 child.setVisible(state == True)
 
+def verticalSpacer(*args, **kwargs):
+    """Vertical spacer"""
+    kwargs["orientation"] = "vertical"
+    return WindowDisplayWidget.Spacer(*args, **kwargs)
+
+def horizontalSpacer(*args, **kwargs):
+    """Horizontal spacer"""
+
+    kwargs["orientation"] = "horizontal"
+    return WindowDisplayWidget.Spacer(*args, **kwargs)
+
+def horizontalSplitter(*args, **kwargs):
+    """Horizontal splitter"""
+
+    return QtImport.QSplitter(QtImport.Qt.Horizontal, *args)
+
+def verticalSplitter(*args, **kwargs):
+    """Vertical splitter"""
+
+    return QtImport.QSplitter(QtImport.Qt.Vertical, *args)
+
+def verticalBox(*args, **kwargs):
+    """Vertical box"""
+    kwargs["layout"] = "vertical"
+    return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+
+def horizontalBox(*args, **kwargs):
+    """Horizontal box"""
+
+    kwargs["layout"] = "horizontal"
+    return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+
+def horizontalGroupBox(*args, **kwargs):
+    """Horizontal group box"""
+
+    kwargs["layout"] = "horizontal"
+    return CustomGroupBox(*args, **kwargs)
+
+def verticalGroupBox(*args, **kwargs):
+    """Vertical group box"""
+
+    kwargs["layout"] = "vertical"
+    return CustomGroupBox(*args, **kwargs)
 
 class WindowDisplayWidget(QtImport.QScrollArea):
     """Main widget"""
@@ -541,51 +584,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         def set_expert_mode(self, expert_mode):
             self.open_in_dialog_button.setVisible(expert_mode)
-
-    def verticalSpacer(*args, **kwargs):
-        """Vertical spacer"""
-
-        kwargs["orientation"] = "vertical"
-        return WindowDisplayWidget.Spacer(*args, **kwargs)
-
-    def horizontalSpacer(*args, **kwargs):
-        """Horizontal spacer"""
-
-        kwargs["orientation"] = "horizontal"
-        return WindowDisplayWidget.Spacer(*args, **kwargs)
-
-    def horizontalSplitter(*args, **kwargs):
-        """Horizontal splitter"""
-
-        return QtImport.QSplitter(QtImport.Qt.Horizontal, *args)
-
-    def verticalSplitter(*args, **kwargs):
-        """Vertical splitter"""
-
-        return QtImport.QSplitter(QtImport.Qt.Vertical, *args)
-
-    def verticalBox(*args, **kwargs):
-        """Vertical box"""
-        kwargs["layout"] = "vertical"
-        return WindowDisplayWidget.CustomFrame(*args, **kwargs)
-
-    def horizontalBox(*args, **kwargs):
-        """Horizontal box"""
-
-        kwargs["layout"] = "horizontal"
-        return WindowDisplayWidget.CustomFrame(*args, **kwargs)
-
-    def horizontalGroupBox(*args, **kwargs):
-        """Horizontal group box"""
-
-        kwargs["layout"] = "horizontal"
-        return CustomGroupBox(*args, **kwargs)
-
-    def verticalGroupBox(*args, **kwargs):
-        """Vertical group box"""
-
-        kwargs["layout"] = "vertical"
-        return CustomGroupBox(*args, **kwargs)
 
     class CustomTabWidget(QtImport.QTabWidget):
         """Tab widget"""

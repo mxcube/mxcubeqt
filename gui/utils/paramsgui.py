@@ -114,9 +114,7 @@ class File(QtImport.QWidget):
         if "defaultValue" in options:
             self.filepath.setText(options["defaultValue"])
         self.open_dialog_btn = QtImport.QPushButton("...", self)
-        QtImport.QObject.connect(
-            self.open_dialog_btn, QtImport.SIGNAL("clicked()"), self.open_file_dialog
-        )
+        self.open_dialog_btn.clicked.connect(self.open_file_dialog)
 
         self.layout().addWidget(self.filepath)
         self.layout().addWidget(self.open_dialog_btn)
