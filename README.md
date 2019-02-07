@@ -1,6 +1,8 @@
 # MXCuBE
 
 [![Build Status](https://travis-ci.org/mxcube/mxcube.svg?branch=master)](https://travis-ci.org/mxcube/mxcube)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 MXCuBE stands for Macromolecular Xtallography Customized Beamline Environment.
 The project started in 2005 at [ESRF](http://www.esrf.eu), since then it has
