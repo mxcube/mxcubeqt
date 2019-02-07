@@ -149,7 +149,6 @@ class VerticalCrystalDimensionWidgetLayout(QtImport.QWidget):
         self.languageChange()
 
         self.resize(QtImport.QSize(307, 163).expandedTo(self.minimumSizeHint()))
-        self.clearWState(QtImport.Qt.WState_Polished)
 
     def languageChange(self):
         self.setCaption(self.__tr("VerticalCrystalDimensionWidget"))

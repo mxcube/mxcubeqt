@@ -387,7 +387,7 @@ class ToolButton(QtImport.QToolButton):
             callback = text
         else:
             self.setTextLabel(text)
-            self.setTextPosition(QtImport.QToolButton.BesideIcon)
+            self.setToolButtonStyle(QtImport.Qt.ToolButtonTextBesideIcon)
             self.setUsesTextLabel(True)
 
         if callback is not None:

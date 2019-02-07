@@ -626,7 +626,7 @@ class InstanceListBrick(BaseWidget):
             "mxCuBE",
             "You're about to take control of the application, "
             + "taking over %s!" % control_user_print,
-            QtImport.QMessageBox.QtImport.Question,
+            QtImport.QMessageBox.Question,
             QtImport.QMessageBox.Ok,
             QtImport.QMessageBox.Cancel,
             QtImport.QMessageBox.NoButton,
@@ -1034,7 +1034,7 @@ class InstanceListBrick(BaseWidget):
                 "Pass control",
                 "The user %s wants to have control " % client_print
                 + "of the application!",
-                QtImport.QMessageBox.QtImport.Question,
+                QtImport.QMessageBox.Question,
                 QtImport.QMessageBox.Yes,
                 QtImport.QMessageBox.No,
                 QtImport.QMessageBox.NoButton,

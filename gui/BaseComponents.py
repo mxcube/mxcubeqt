@@ -727,7 +727,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         signal_slot_filter = SignalSlotFilter(signal, slot, should_cache)
         self._signal_slot_filters[uid] = signal_slot_filter
 
-        QtImport.QObject.connect(sender, signal, signal_slot_filter)
+        signal.connect(signal_slot_filter)
+        #QtImport.QObject.connect(sender, signal, signal_slot_filter)
 
     def connect_hwobj(self, sender, signal, slot,
                       instance_filter=False, should_cache=True):
@@ -796,24 +797,27 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                        QtImport.QtCore.SIGNAL(signal), hash(slot))
                 signal_slot_filter = self._signal_slot_filters[uid]
             except KeyError:
-                QtImport.QObject.disconnect(sender,
-                                            pysignal and
-                                            QtImport.QtCore.SIGNAL(signal) or
-                                            QtImport.QtCore.SIGNAL(signal),
-                                            slot)
+                getattr(sender, signal).disconnect(slot)
+                #QtImport.QObject.disconnect(sender,
+                #                            pysignal and
+                #                            QtImport.QtCore.SIGNAL(signal) or
+                #                            QtImport.QtCore.SIGNAL(signal),
+                #                            slot)
             else:
-                QtImport.QObject.disconnect(sender,
-                                            pysignal and
-                                            QtImport.SIGNAL(signal) or
-                                            QtImport.SIGNAL(signal),
-                                            signal_slot_filter)
+                getattr(sender, signal).disconnect(signal_slot_filter)
+                #QtImport.QObject.disconnect(sender,
+                #                            pysignal and
+                #                            QtImport.SIGNAL(signal) or
+                #                            QtImport.SIGNAL(signal),
+                #                            signal_slot_filter)
                 del self._signal_slot_filters[uid]
         else:
-            QtImport.QObject.disconnect(sender,
-                                        pysignal and
-                                        QtImport.SIGNAL(signal) or
-                                        QtImport.SIGNAL(signal),
-                                        signal_slot_filter)
+            getattr(sender, signal).disconnect(signal_slot_filter)
+            #QtImport.QObject.disconnect(sender,
+            #                            pysignal and
+            #                            QtImport.SIGNAL(signal) or
+            #                            QtImport.SIGNAL(signal),
+            #                            signal_slot_filter)
 
     def reparent(self, widget_to):
         saved_enabled_state = self.isEnabled()

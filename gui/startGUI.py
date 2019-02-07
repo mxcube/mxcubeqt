@@ -269,11 +269,10 @@ def run(gui_config_file=None):
         QtImport.QMessageBox.warning(
             None,
             "Warning",
-            "Another instance of MXCuBE is running.\n"
-            + "Please close it and start MXCuBE again.",
+            "Another instance of MXCuBE is running.\n",
             QtImport.QMessageBox.Ok,
         )
-        sys.exit(1)
+        #sys.exit(1)
 
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_path)

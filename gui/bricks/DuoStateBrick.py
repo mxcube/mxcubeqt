@@ -174,22 +174,22 @@ class DuoStateBrick(BaseWidget):
                     label_str = prop_label
             self.state_ledit.setText("%s" % label_str)
 
-        try:
+        if state in self.STATES:
             in_enable = self.STATES[state][1]
             out_enable = self.STATES[state][2]
-        except KeyError:
+        else:
             in_enable = False
             out_enable = False
 
         self.set_in_button.setEnabled(in_enable)
         self.set_out_button.setEnabled(out_enable)
 
-        try:
+        if state in self.STATES:
             in_state = self.STATES[state][3]
             out_state = self.STATES[state][4]
-        except KeyError:
-            in_state = QtImport.QPushButton.Off
-            out_state = QtImport.QPushButton.Off
+        else:
+            in_state = True
+            out_state = False
         if in_state is not None:
             self.set_in_button.blockSignals(True)
             self.set_in_button.setChecked(in_state)

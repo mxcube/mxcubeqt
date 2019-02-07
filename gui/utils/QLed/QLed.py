@@ -1,6 +1,5 @@
-from QtImport import *
-
-from qled_resources import *
+from gui.utils import QtImport
+from gui.utils.QLedfrom import qled_resources
 
 
 class QLed(QWidget):
