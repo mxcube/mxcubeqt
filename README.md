@@ -25,7 +25,7 @@ Latest information about the MXCuBE project can be found in the
 
 * [How to install and run Qt version](https://github.com/mxcube/mxcube/blob/master/docs/source/installation_instructions_qt4.rst)
 * [How to install and run Web version](https://github.com/mxcube/mxcube3/wiki/Installing-MXCuBE3)
-* [Contributing guidlines](https://github.com/mxcube/mxcube/blob/master/CONTRIBUTING.md)
+* [Contributing guidelines](https://github.com/mxcube/mxcube/blob/master/CONTRIBUTING.md)
 
 More detailed information is available in the [docs directory](https://github.com/mxcube/mxcube/tree/master/docs). Use [sphinx](http://sphinx-doc.org/) to build the documentation.
 
