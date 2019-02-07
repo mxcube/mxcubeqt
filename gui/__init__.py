@@ -45,8 +45,8 @@ def get_splash_screen():
 
 
 _logger = logging.getLogger()
-_formatter = logging.Formatter("%(asctime)s |%(levelname)-7s| %(message)s")
-
+_logger.setLevel(logging.DEBUG)
+_formatter = logging.Formatter('%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s')
 
 #
 # log to stdout

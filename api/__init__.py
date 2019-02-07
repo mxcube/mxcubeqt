@@ -32,6 +32,10 @@ api provides access to the hardware repository.
 Following namespace is used:
 """
 
+_hwr_logger = logging.getLogger("HWR")
+for handler in _hwr_logger.handlers:
+    _hwr_logger.removeHandler(handler)
+
 beamline_setup = None
 queue_model = None
 queue_manager = None
