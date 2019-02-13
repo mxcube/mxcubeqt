@@ -841,63 +841,56 @@ class TreeBrick(BaseWidget):
         self.dc_tree_widget.plate_navigator_widget.refresh_plate_location()
         self.dc_tree_widget.scroll_to_item()
 
-    def show_tab(self, name):
-        self.sample_changer_widget.details_button.setText("Show SC-details")
-        self.hide_dc_parameters_tab.emit(True)
-        self.hide_dcg_tab.emit(True)
-        self.hide_sample_centring_tab.emit(True)
-        self.hide_sample_tab.emit(True)
-        self.hide_sample_changer_tab.emit(True)
-        self.hide_plate_manipulator_tab.emit(True)
-        self.hide_char_parameters_tab.emit(True)
-        self.hide_energy_scan_tab.emit(True)
-        self.hide_xrf_spectrum_tab.emit(True)
-        self.hide_workflow_tab.emit(True)
-        self.hide_advanced_tab.emit(True)
-        self.hide_xray_imaging_tab.emit(True)
-
-        getattr(self, "hide_%s_tab" % name).emit(False)
-
     def show_sample_centring_tab(self):
-        self.show_tab("sample_centring")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_sample_centring_tab.emit(False)
 
     def show_sample_tab(self, item):
-        self.show_tab("sample")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_sample_tab.emit(False)
 
     def show_dcg_tab(self, item):
-        self.show_tab("dcg")
-
-    def populate_dc_parameters_tab(self, item=None):
-        self.populate_dc_parameter_widget.emit(item)
-
-    def show_datacollection_tab(self, item):
-        self.show_tab("dc_parameters")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_dcg_tab.emit(False)
+        self.populate_dc_group_tab(item)
 
     def populate_dc_group_tab(self, item=None):
         self.populate_dc_group_widget.emit(item)
 
+    def show_datacollection_tab(self, item):
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_dc_parameters_tab.emit(False)
+        self.populate_dc_parameters_tab(item)
+
+    def populate_dc_parameters_tab(self, item=None):
+        self.populate_dc_parameter_widget.emit(item)
+
     def show_char_parameters_tab(self, item):
-        self.show_tab("char_parameters")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_char_parameters_tab.emit(False)
 
     def populate_char_parameters_tab(self, item):
         self.populate_char_parameter_widget.emit(item)
 
     def show_energy_scan_tab(self, item):
-        self.show_tab("energy_scan")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_energy_scan_tab.emit(False)
         self.populate_energy_scan_tab(item)
 
     def populate_energy_scan_tab(self, item):
         self.populate_energy_scan_widget.emit(item)
 
     def show_xrf_spectrum_tab(self, item):
-        self.show_tab("xrf_spectrum")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_xrf_spectrum_tab.emit(False)
         self.populate_xrf_spectrum_tab(item)
 
     def populate_xrf_spectrum_tab(self, item):
         self.populate_xrf_spectrum_widget.emit(item)
 
     def show_advanced_tab(self, item):
-        self.show_tab("advanced")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_advanced_tab.emit(False)
         self.populate_advanced_tab(item)
 
     def populate_advanced_tab(self, item):
@@ -907,7 +900,7 @@ class TreeBrick(BaseWidget):
         self.show_workflow_tab(None)
 
     def show_workflow_tab(self, item):
-        self.show_tab("workflow")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
 
         running = api.queue_manager.is_executing()
         self.populate_workflow_tab(item, running=running)
@@ -916,7 +909,8 @@ class TreeBrick(BaseWidget):
         self.populate_workflow_widget.emit(item, running)
 
     def show_xray_imaging_tab(self, item):
-        self.show_tab("xray_imaging")
+        self.sample_changer_widget.details_button.setText("Show SC-details")
+        self.hide_xray_imaging_tab.emit(False)
         self.populate_xray_imaging_tab(item)
 
     def populate_xray_imaging_tab(self, item):

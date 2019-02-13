@@ -654,10 +654,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 self.setCurrentIndex(page_index)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
                     tab_show_slot, self
                 )
@@ -698,11 +694,10 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         slot_name = "showPage_%s" % page["label"].replace(" ", "_")
                         getattr(self, slot_name)()
                         page["hidden"] = False
-                        self.setCurrentWidget(page["widget"])
                     else:
                         slot_name = "showPage_%s" % page["label"].replace(" ", "_")
                         getattr(self, slot_name)()
-                        self.setCurrentWidget(page["widget"])
+                    self.setCurrentWidget(page["widget"])
 
             try:
                 # LNLS
