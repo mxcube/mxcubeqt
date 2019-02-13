@@ -700,10 +700,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     self.setCurrentWidget(page["widget"])
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
                     tab_hide_slot, self
                 )
@@ -720,10 +716,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 self.page(page_index).setEnabled(enable)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
                     enable_page_slot, self
                 )
@@ -740,10 +732,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 self.setTabEnabled(page_index, enable)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
                     tab_enable_slot, self
                 )
@@ -792,10 +780,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         self.setTabLabel(self.page(page_index), new_label)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
                     tab_reset_count_slot, self
                 )
@@ -845,10 +829,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     self.setTabLabel(self.page(page_index), new_label)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
                     tab_inc_count_slot, self
                 )
