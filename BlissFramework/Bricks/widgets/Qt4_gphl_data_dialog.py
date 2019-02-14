@@ -128,6 +128,8 @@ class GphlDataDialog(QtGui.QDialog):
         self.cplx_gbox = QtGui.QGroupBox('Indexing solution', self)
         QtGui.QVBoxLayout(self.cplx_gbox)
         main_layout.addWidget(self.cplx_gbox)
+        self.cplx_gbox.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                          QtGui.QSizePolicy.Expanding)
         self.cplx_widget = None
 
         # Parameter box

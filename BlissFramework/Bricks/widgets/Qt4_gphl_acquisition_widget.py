@@ -153,7 +153,8 @@ class GphlSetupWidget(QtGui.QWidget):
 
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
-    def __init__(self, parent=None, name='gphl_acquisition_widget'):
+    def __init__(self, parent=None, name='gphl_acquisition_widget',
+                 workflow_object=None):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
@@ -162,11 +163,8 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        bl_setup_hwobj = HardwareRepository.HardwareRepository().getHardwareObject(
-            'beamline-setup'
-        )
         xx = next(
-            bl_setup_hwobj.gphl_workflow_hwobj.getObjects("test_crystals")
+            workflow_object.getObjects("test_crystals")
         )
         for test_crystal in xx.getObjects("test_crystal"):
             dd = test_crystal.getProperties()
@@ -274,11 +272,11 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         ('Cubic        | 432', CrystalSystemData('Cubic', ('432',)))
     ))
 
-    def __init__(self, parent=None, name='gphl_acquisition_widget'):
-        GphlSetupWidget.__init__(self, parent=parent, name=name)
+    def __init__(self, parent=None, name='gphl_acquisition_widget',
+                 workflow_object=None):
+        GphlSetupWidget.__init__(self, parent=parent, name=name,)
 
          # Internal variables -------------------------------------------------
-        self.beam_energy_tags = ()
 
         _parameters_widget = self._parameters_widget
 
@@ -319,32 +317,6 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             widget, float, QtGui.QDoubleValidator(0.01, 20, 2, self), 0.0
         )
 
-        row += 1
-        label_name = 'beam_energies_label'
-        label_str = "Beam energies (keV):"
-        label=QtGui.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-
-        self.beam_energy_tags = ('energy_1', 'energy_2', 'energy_3',
-                                 'energy_4',)
-
-        ii = 0
-        for label_str in ("First beam energy", "Second beam energy",
-                          "Third beam energy", "Fourth beam energy"):
-            ii += 1
-            row += 1
-            field_name = 'energy_%s' % ii
-            label_name = self._get_label_name(field_name)
-            label=QtGui.QLabel(label_str, _parameters_widget)
-            _parameters_widget.layout().addWidget(label, row, 0)
-            self._widget_data[label_name] = (label, str, None, label_str)
-            widget = QtGui.QLineEdit()
-            widget.setAlignment(QtCore.Qt.AlignLeft)
-            _parameters_widget.layout().addWidget(widget, row, 1)
-            self._widget_data[field_name] = (
-                widget, float, QtGui.QDoubleValidator(0.01, 200, 2, self), 0.0
-            )
 
     def populate_widget(self, beam_energies={}, **kw):
         GphlSetupWidget.populate_widget(self, **kw)
@@ -356,11 +328,6 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         self._refresh_interface('crystal_system', None)
 
         skip_fields = []
-        for tag in self.beam_energy_tags[len(beam_energies):]:
-            skip_fields.append(tag)
-            skip_fields.append(self._get_label_name(tag))
-        if not beam_energies:
-            skip_fields.append('beam_energies_label')
 
         for tag, tt in self._widget_data.items():
             if tag in skip_fields:
@@ -371,28 +338,12 @@ class GphlAcquisitionWidget(GphlSetupWidget):
 
                 if tag in kw:
                     value = kw[tag]
-                elif tag in self.beam_energy_tags:
-                    ii = self.beam_energy_tags.index(tag)
-                    if ii < len(beam_energies):
-                        name = list(beam_energies)[ii]
-                        value = beam_energies[name]
-                        label_tag = self._get_label_name(tag)
-                        setattr(data_object, label_tag, name)
                 setattr(data_object, tag, value)
                 self._parameter_mib.bind_value_update(tag, widget, w_type, validator)
 
         # Must be redone here, after values and bindings are set
         self._parameter_mib.set_model(data_object)
 
-    def get_energy_dict(self):
-        """get role:value dict for energies"""
-        result = OrderedDict()
-        for tag in self.beam_energy_tags:
-            if hasattr(self._data_object, tag):
-                role = getattr(self._data_object, self._get_label_name(tag))
-                result[role] = getattr(self._data_object, tag)
-        #
-        return result
 
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""

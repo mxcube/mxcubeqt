@@ -55,29 +55,24 @@ class TaskToolBoxWidget(QWidget):
         # Graphic elements ----------------------------------------------------
         self.method_label = QLabel("Collection method", self)
         self.method_label.setAlignment(Qt.AlignCenter)
-        #Qt4_widget_colors.set_widget_color(self.method_label,
-        #                                   Qt4_widget_colors.SKY_BLUE)
-        #font = self.method_group_box.font()
-        #font.setPointSize(10)
-        #self.method_group_box.setFont(font)
 
         self.tool_box = QToolBox(self)
         self.tool_box.setObjectName("tool_box")
-        self.tool_box.setFixedWidth(475)
-        #self.tool_box.setFont(font)
+        #self.tool_box.setFixedWidth(600)
 
         self.discrete_page = CreateDiscreteWidget(self.tool_box, "Discrete",)
         self.char_page = CreateCharWidget(self.tool_box, "Characterise")
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        if hasattr(parent.getHardwareObject('beamline-setup'),
-                   'gphl_workflow_hwobj'):
+        beamline_setup = parent.getHardwareObject('beamline-setup')
+        gphl_workflow_hwobj = beamline_setup.getObjectByRole('gphl_workflow')
+        if gphl_workflow_hwobj is None:
+            self.gphl_workflow_page = None
+            logging.getLogger("HWR").info("GPhL workflow is not available")
+        else:
             self.gphl_workflow_page = CreateGphlWorkflowWidget(self.tool_box,
                                                                "gphl_workflow")
-        else:
-            self.gphl_workflow_page = None
-            logging.getLogger("GUI").info("GPhL workflow is not available")
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
         #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
 
@@ -197,18 +192,15 @@ class TaskToolBoxWidget(QWidget):
             #self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
             #self.xray_imaging_page.hide()
             #logging.getLogger("GUI").warning("Xray Imaging task not available")
-
-        has_gphl_workflow = False
+        gphl_workflow_hwobj = None
         if hasattr(beamline_setup_hwobj, 'gphl_workflow_hwobj'):
-            if beamline_setup_hwobj.gphl_workflow_hwobj:
-                has_gphl_workflow = True
+            gphl_workflow_hwobj = beamline_setup_hwobj.gphl_workflow_hwobj
 
-        if has_gphl_workflow:
-            self.gphl_workflow_page.initialise_workflows(
-                beamline_setup_hwobj.gphl_workflow_hwobj
-            )
+        if gphl_workflow_hwobj is None:
+            logging.getLogger("HWR").info("GPhL workflow task not available")
         else:
-            logging.getLogger("GUI").info("GPhL workflow task not available")
+            self.gphl_workflow_page.initialise_workflows(gphl_workflow_hwobj,
+                                                         beamline_setup_hwobj)
 
 
     def update_data_path_model(self):
