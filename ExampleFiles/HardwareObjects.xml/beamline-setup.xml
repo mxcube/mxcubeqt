@@ -18,14 +18,13 @@
   <object href="/session" role="session"/>
   <object href="/lims-client-mockup" role="lims_client"/>
   <object href="/data-analysis" role="data_analysis"/>
-  <!--<object href="/gphl-workflow" role="gphl_workflow"/>-->
-  <!--<object href="/gphl-setup" role="gphl_connection"/>-->
+  <object href="/gphl-workflow" role="gphl_workflow"/>
+  <object href="/gphl-setup" role="gphl_connection"/>
   <!--<object href="/workflow-mockup" role="workflow"/> -->
  
   <!-- Procedures and routines -->
   <object href="/energyscan-mockup" role="energyscan"/>
   <object href="/mxcollect" role="collect"/>
-  <!--<object href="/collect-emulator" role="collect"/>-->
   <object href="/parallel-processing" role="parallel_processing"/>
   <object href="/xrf-spectrum-mockup" role="xrf_spectrum"/>
   <object href="/detector-mockup" role="detector"/>
