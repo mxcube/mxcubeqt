@@ -17,10 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
 import api
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.heat_map_widget import HeatMapWidget
 
 
@@ -56,7 +54,7 @@ class AdvancedResultsWidget(QtImport.QWidget):
         # Other ---------------------------------------------------------------
 
     def init_api(self):
-        if api.parallel_processing and not self._initialized:
+        if not self._initialized:
             api.parallel_processing.connect(
                "processingStarted", self.processing_started
             )

@@ -30,11 +30,8 @@ import webbrowser
 from datetime import datetime
 from collections import namedtuple
 
-import QtImport
-
 import api
-
-from gui.utils import Colors, Icons, queue_item
+from gui.utils import Colors, Icons, queue_item, QtImport
 from gui.widgets.confirm_dialog import ConfirmDialog
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 
@@ -948,8 +945,8 @@ class DataCollectTree(QtImport.QWidget):
         api.graphics.set_cursor_busy(True)
         try:
             api.queue_manager.execute()
-        except (Exception, e):
-            raise e
+        except Exception as ex:
+            raise ex
         self.parent().set_condition_state("confirmation_window_accepted",
                                           False)
 

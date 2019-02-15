@@ -17,13 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-import QtImport
-
-
 import api
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from HardwareRepository.HardwareObjects import queue_model_objects
 
@@ -85,6 +80,7 @@ class XrayImagingParametersWidget(QtImport.QWidget):
            self._parameters_widget.ff_post_cbox.isChecked()
 
         self._parameters_widget.ff_apply_cbox.setEnabled(enable_ff_controls)
+        self._parameters_widget.ff_ssim_cbox.setEnabled(enable_ff_controls)
         self._parameters_widget.ff_num_images_label.setEnabled(enable_ff_controls)
         self._parameters_widget.ff_num_images_ledit.setEnabled(enable_ff_controls)
         self._parameters_widget.ff_offset_a_label.setEnabled(enable_ff_controls)

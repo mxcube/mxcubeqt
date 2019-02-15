@@ -17,8 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
+from gui.utils import QtImport
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.data_path_widget import DataPathWidget
 

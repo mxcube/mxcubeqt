@@ -93,7 +93,7 @@ class Property:
         self.comment = comment
 
     def get_comment(self):
-        return comment
+        return self.comment
 
     def as_dict(self):
         return {"type": self.type, "value": self.value}
@@ -232,20 +232,20 @@ class FormatStringProperty(Property):
 
         self.type = "formatString"
 
-    def set_value(self, format):
+    def set_value(self, format_str):
         self.old_value = self.value
-        self.value = str(format)
+        self.value = str(format_str)
 
-        if format.startswith("+"):
+        if format_str.startswith("+"):
             prefix = "+"
-            format = format[1:]
-        elif format.startswith(" "):
+            format_str = format_str[1:]
+        elif format_str.startswith(" "):
             prefix = ""
-            format = format[1:]
+            format_Str = format_str[1:]
         else:
             prefix = ""
 
-        parts = format.split(".")
+        parts = format_str.split(".")
 
         if len(parts) == 2:
             self.format_string = (

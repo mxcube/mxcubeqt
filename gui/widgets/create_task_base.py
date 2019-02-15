@@ -22,10 +22,8 @@ import abc
 import logging
 from copy import deepcopy
 
-import QtImport
-
 import api
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
@@ -189,11 +187,6 @@ class CreateTaskBase(QtImport.QWidget):
         except AttributeError as ex:
             msg = "Could not connect to one or more hardware objects " + str(ex)
             logging.getLogger("HWR").warning(msg)
-
-        if api.graphics:
-            api.graphics.connect("shapeCreated", self.shape_created)
-            api.graphics.connect("shapeChanged", self.shape_changed)
-            api.graphics.connect("shapeDeleted", self.shape_deleted)
 
         self.init_models()
 
@@ -893,9 +886,6 @@ class CreateTaskBase(QtImport.QWidget):
         return dc
 
     def shape_deleted(self, shape, shape_type):
-        return
-
-    def shape_created(self, shape, shape_type):
         return
 
     def shape_changed(self, shape, shape_type):

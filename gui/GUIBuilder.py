@@ -26,11 +26,9 @@ import weakref
 import logging
 import subprocess
 
-import QtImport
-
 import gui
 from gui import Configuration
-from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay
+from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay, QtImport
 from gui.bricks import LogViewBrick
 from gui.BaseLayoutItems import ContainerCfg
 
@@ -389,7 +387,7 @@ class ToolButton(QtImport.QToolButton):
             callback = text
         else:
             self.setTextLabel(text)
-            self.setTextPosition(QtImport.QToolButton.BesideIcon)
+            self.setToolButtonStyle(QtImport.Qt.ToolButtonTextBesideIcon)
             self.setUsesTextLabel(True)
 
         if callback is not None:

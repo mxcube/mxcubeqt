@@ -17,9 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
-from gui.utils import PropertyBag
+from gui.utils import PropertyBag, QtImport
 
 DEFAULT_MARGIN = 2
 DEFAULT_SPACING = 2
@@ -30,7 +28,7 @@ __license__ = "LGPLv3+"
 
 
 class _CfgItem:
-    def __init__(self, name, item_type=""):
+    def __init__(self, name=None, item_type=""):
         self.name = name
         self.type = item_type
         self.children = []
@@ -176,14 +174,14 @@ class TabCfg(ContainerCfg):
         self.signals.update({"notebookPageChanged": "pageName"})
 
     def __repr__(self):
-        try:
-            widget = self.widget
-        except AttributeError:
+        if hasattr(self, "widget"):
+            widget = getattr(self, "widget")
+        else:  
             r = repr(self.__dict__)
-        else:
-            delattr(self, "widget")
-            r = repr(self.__dict__)
-            self.widget = widget
+
+        delattr(self, "widget")
+        r = repr(self.__dict__)
+        self.widget = widget
         return r
 
     def add_child(self, item):

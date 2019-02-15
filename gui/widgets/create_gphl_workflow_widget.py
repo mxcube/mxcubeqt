@@ -22,9 +22,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-import QtImport
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.gphl_acquisition_widget import GphlAcquisitionWidget

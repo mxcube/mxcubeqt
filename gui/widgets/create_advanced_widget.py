@@ -19,11 +19,8 @@
 
 import logging
 
-import QtImport
-
 import api
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
@@ -211,6 +208,10 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._advanced_methods_widget.ver_spacing_ledit.setText(
             "%.1f" % (ver_size * 1000)
         )
+
+        api.graphics.connect("shapeCreated", self.shape_created)
+        api.graphics.connect("shapeChanged", self.shape_changed)
+        api.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def set_beam_info(self, beam_info):
         self.spacing[0] = beam_info["size_x"]

@@ -17,8 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
 from gui.widgets.xray_imaging_results_widget import XrayImagingResultsWidget

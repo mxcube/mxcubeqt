@@ -1,6 +1,8 @@
 # MXCuBE
 
 [![Build Status](https://travis-ci.org/mxcube/mxcube.svg?branch=master)](https://travis-ci.org/mxcube/mxcube)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 MXCuBE stands for Macromolecular Xtallography Customized Beamline Environment.
 The project started in 2005 at [ESRF](http://www.esrf.eu), since then it has
@@ -23,7 +25,7 @@ Latest information about the MXCuBE project can be found in the
 
 * [How to install and run Qt version](https://github.com/mxcube/mxcube/blob/master/docs/source/installation_instructions_qt4.rst)
 * [How to install and run Web version](https://github.com/mxcube/mxcube3/wiki/Installing-MXCuBE3)
-* [Contributing guidlines](https://github.com/mxcube/mxcube/blob/master/CONTRIBUTING.md)
+* [Contributing guidelines](https://github.com/mxcube/mxcube/blob/master/CONTRIBUTING.md)
 
 More detailed information is available in the [docs directory](https://github.com/mxcube/mxcube/tree/master/docs). Use [sphinx](http://sphinx-doc.org/) to build the documentation.
 

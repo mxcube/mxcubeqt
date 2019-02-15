@@ -46,15 +46,13 @@ Sizes are estimated by related HO
 -----------------------------------------------------------------------
 """
 
-import QtImport
-
 try:
     uni_chr = unichr
 except:
     uni_chr = chr
 
 import api
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 

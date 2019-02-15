@@ -24,10 +24,8 @@ import traceback
 import sys
 import os
 
-import QtImport
-
 from gui.BaseComponents import BaseWidget
-from gui.utils import Colors, sample_changer_helper
+from gui.utils import Colors, sample_changer_helper, QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -87,6 +85,7 @@ class CatsMaintBrick(BaseWidget):
 
         self.device = None
         self.state = None
+        self.status = None
 
         self.path_running = None
         self.powered = None
@@ -412,13 +411,6 @@ class CatsMaintBrick(BaseWidget):
         try:
             if self.device is not None:
                 self.device._doMagnetOff()
-        except BaseException:
-            QtImport.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
-
-    def home(self):
-        try:
-            if self.device is not None:
-                self.device._doHome()
         except BaseException:
             QtImport.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 

@@ -19,8 +19,7 @@
 
 import os
 
-import QtImport
-
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.utils.widget_utils import DataModelInputBinder
 

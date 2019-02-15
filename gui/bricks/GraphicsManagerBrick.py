@@ -17,10 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
 import api
-from gui.utils import Icons
+from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
 

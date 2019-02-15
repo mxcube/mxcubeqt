@@ -17,15 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
 
-
-import QtImport
-
 import api
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
-from widgets.task_toolbox_widget import TaskToolBoxWidget
+from gui.widgets.task_toolbox_widget import TaskToolBoxWidget
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -91,7 +88,6 @@ class TaskToolBoxBrick(BaseWidget):
         self.task_tool_box_widget.init_api()
 
         api.graphics.connect("pointSelected", self.point_selected)
-        api.graphics.connect("pointDeleted", self.point_deleted)
 
         self.request_tree_brick.emit()
         self.task_tool_box_widget.adjust_width(self.width())
@@ -207,9 +203,3 @@ class TaskToolBoxBrick(BaseWidget):
         self.task_tool_box_widget.char_page.refresh_current_item()
         self.task_tool_box_widget.energy_scan_page.refresh_current_item()
         self.task_tool_box_widget.xrf_spectrum_page.refresh_current_item()
-
-    def point_deleted(self, shape):
-        """
-        Callback for the DrawingEvent object called when a shape is deleted.
-        """
-        self.task_tool_box_widget.helical_page.shape_deleted(shape)

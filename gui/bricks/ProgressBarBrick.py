@@ -20,9 +20,7 @@
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
 
-import QtImport
-
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 

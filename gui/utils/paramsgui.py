@@ -20,8 +20,9 @@
 import os.path
 import logging
 import sys
+from lxml import etree
 
-import QtImport
+from gui.utils import QtImport
 
 
 """port of paramsgui - rhfogh Jan 2018
@@ -114,9 +115,7 @@ class File(QtImport.QWidget):
         if "defaultValue" in options:
             self.filepath.setText(options["defaultValue"])
         self.open_dialog_btn = QtImport.QPushButton("...", self)
-        QtImport.QObject.connect(
-            self.open_dialog_btn, QtImport.SIGNAL("clicked()"), self.open_file_dialog
-        )
+        self.open_dialog_btn.clicked.connect(self.open_file_dialog)
 
         self.layout().addWidget(self.filepath)
         self.layout().addWidget(self.open_dialog_btn)
@@ -176,7 +175,7 @@ class DoubleSpinBox(QtImport.QDoubleSpinBox):
 
     def __init__(self, parent, options):
         QtImport.QDoubleSpinBox.__init__(self, parent)
-        self.lineEdit().setAlignment(QtImport.QWidget.AlignLeft)
+        self.lineEdit().setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
         if "unit" in options:
             self.setSuffix(" " + options["unit"])
@@ -320,8 +319,6 @@ class FieldsWidget(QtImport.QWidget):
         print(self.get_xml(True))
 
     def get_xml(self, olof=False):
-        from lxml import etree
-
         root = etree.Element("parameters")
         for w in self.field_widgets:
             name = w.get_name()

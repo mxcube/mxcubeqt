@@ -17,7 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
+
+from gui.utils import QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -148,7 +149,6 @@ class VerticalCrystalDimensionWidgetLayout(QtImport.QWidget):
         self.languageChange()
 
         self.resize(QtImport.QSize(307, 163).expandedTo(self.minimumSizeHint()))
-        self.clearWState(QtImport.Qt.WState_Polished)
 
     def languageChange(self):
         self.setCaption(self.__tr("VerticalCrystalDimensionWidget"))

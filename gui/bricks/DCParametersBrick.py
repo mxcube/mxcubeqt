@@ -17,15 +17,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
 import api
 from gui.BaseComponents import BaseWidget
-from gui.utils import html_template
-from widgets.dc_parameters_widget import DCParametersWidget
-from widgets.image_tracking_widget import ImageTrackingWidget
-from widgets.advanced_results_widget import AdvancedResultsWidget
-from widgets.snapshot_widget import SnapshotWidget
+from gui.utils import html_template, QtImport
+from gui.widgets.dc_parameters_widget import DCParametersWidget
+from gui.widgets.image_tracking_widget import ImageTrackingWidget
+from gui.widgets.advanced_results_widget import AdvancedResultsWidget
+from gui.widgets.snapshot_widget import SnapshotWidget
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -178,13 +178,13 @@ class ConfigurationTable(QtImport.QTableWidget):
         old_value = item_property.get_user_value()
 
         if item_property.get_type() == "boolean":
-            item_property.setValue(self.item(row, 1).checkState())
+            item_property.set_value(self.item(row, 1).checkState())
         elif item_property.get_type() == "combo":
-            item_property.setValue(self.cellWidget(row, 1).currentText())
+            item_property.set_value(self.cellWidget(row, 1).currentText())
         elif item_property.get_type() == "file":
-            item_property.setValue(self.cellWidget(row, 1).get_filename())
+            item_property.set_value(self.cellWidget(row, 1).get_filename())
         elif item_property.get_type() == "color":
-            item_property.setValue(self.cellWidget(row, 1).color)
+            item_property.set_value(self.cellWidget(row, 1).color)
         else:
             try:
                 item_property.set_value(str(self.item(row, 1).text()))
@@ -215,7 +215,7 @@ class ConfigurationTable(QtImport.QTableWidget):
 
     def on_reset_click(self):
         self.endEdit(self.currentRow(), 1, 0, 0)
-        prop_name = str(self.item(row, 0).text())
+        prop_name = str(self.item(self.currentRow(), 0).text())
         if self.display_hwobj:
             prop_name = "hwobj_" + prop_name
 
@@ -223,7 +223,7 @@ class ConfigurationTable(QtImport.QTableWidget):
 
         default_value = prop.getDefaultValue()
         if not default_value is None:
-            prop.setValue(default_value)
+            prop.set_value(default_value)
 
         self.set_widget_from_property(self.currentRow(), prop)
 
@@ -246,12 +246,12 @@ class ConfigurationTable(QtImport.QTableWidget):
                 old_value = prop.get_user_value()
 
                 if prop.get_type() == "boolean":
-                    prop.setValue(self.item(row, 1).isChecked())
+                    prop.set_value(self.item(row, 1).isChecked())
                 elif prop.get_type() == "combo":
-                    prop.setValue(self.item(row, 1).currentText())
+                    prop.set_value(self.item(row, 1).currentText())
                 else:
                     try:
-                        prop.setValue(str(self.text(row, 1)))
+                        prop.set_value(str(self.text(row, 1)))
                     except BaseException:
                         logging.getLogger().error(
                             "Cannot assign value to property %s" % prop_name

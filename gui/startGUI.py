@@ -31,14 +31,11 @@ import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 from optparse import OptionParser
 
-
-import QtImport
-
 import api
 
 import gui
 from gui import GUISupervisor
-from gui.utils import GUILogHandler, ErrorHandler
+from gui.utils import GUILogHandler, ErrorHandler, QtImport
 from HardwareRepository import HardwareRepository
 
 
@@ -217,7 +214,7 @@ def run(gui_config_file=None):
         # try to set Hardware Repository server from environment
         hwr_path = os.environ.get("HARDWARE_REPOSITORY_SERVER")
         if hwr_path is None:
-            hwr_path = default_hwr_server
+            hwr_path = default_hwr_path
 
     # add bricks directories and hardware objects directories from environment
     try:
@@ -272,11 +269,10 @@ def run(gui_config_file=None):
         QtImport.QMessageBox.warning(
             None,
             "Warning",
-            "Another instance of MXCuBE is running.\n"
-            + "Please close it and start MXCuBE again.",
+            "Another instance of MXCuBE is running.\n",
             QtImport.QMessageBox.Ok,
         )
-        sys.exit(1)
+        #sys.exit(1)
 
     # configure modules
     HardwareRepository.setHardwareRepositoryServer(hwr_path)

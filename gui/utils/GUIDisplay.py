@@ -253,7 +253,7 @@ class CustomMenuBar(QtImport.QMenuBar):
         """Whats this"""
 
         if self.execution_mode:
-            BaseWidget.updateWhatsThis()
+            BaseWidget.update_whats_this()
 
     def about_clicked(self):
         """Display dialog with info about mxcube"""
@@ -265,10 +265,10 @@ class CustomMenuBar(QtImport.QMenuBar):
                <p>Macromolecular Xtallography Customized Beamline Environment<p>
                Python %s - Qt %s - PyQt %s on %s"""
             % (
-                __version__,
+                "2x",
                 platform.python_version(),
-                QT_VERSION_STR,
-                QT_VERSION_STR,
+                QtImport.qt_version_no,
+                QtImport.pyqt_version_no,
                 platform.system(),
             ),
         )
@@ -403,6 +403,49 @@ class CustomGroupBox(QtImport.QGroupBox):
             if hasattr(child, "setVisible"):
                 child.setVisible(state == True)
 
+def verticalSpacer(*args, **kwargs):
+    """Vertical spacer"""
+    kwargs["orientation"] = "vertical"
+    return WindowDisplayWidget.Spacer(*args, **kwargs)
+
+def horizontalSpacer(*args, **kwargs):
+    """Horizontal spacer"""
+
+    kwargs["orientation"] = "horizontal"
+    return WindowDisplayWidget.Spacer(*args, **kwargs)
+
+def horizontalSplitter(*args, **kwargs):
+    """Horizontal splitter"""
+
+    return QtImport.QSplitter(QtImport.Qt.Horizontal, *args)
+
+def verticalSplitter(*args, **kwargs):
+    """Vertical splitter"""
+
+    return QtImport.QSplitter(QtImport.Qt.Vertical, *args)
+
+def verticalBox(*args, **kwargs):
+    """Vertical box"""
+    kwargs["layout"] = "vertical"
+    return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+
+def horizontalBox(*args, **kwargs):
+    """Horizontal box"""
+
+    kwargs["layout"] = "horizontal"
+    return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+
+def horizontalGroupBox(*args, **kwargs):
+    """Horizontal group box"""
+
+    kwargs["layout"] = "horizontal"
+    return CustomGroupBox(*args, **kwargs)
+
+def verticalGroupBox(*args, **kwargs):
+    """Vertical group box"""
+
+    kwargs["layout"] = "vertical"
+    return CustomGroupBox(*args, **kwargs)
 
 class WindowDisplayWidget(QtImport.QScrollArea):
     """Main widget"""
@@ -542,51 +585,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         def set_expert_mode(self, expert_mode):
             self.open_in_dialog_button.setVisible(expert_mode)
 
-    def verticalSpacer(*args, **kwargs):
-        """Vertical spacer"""
-
-        kwargs["orientation"] = "vertical"
-        return WindowDisplayWidget.Spacer(*args, **kwargs)
-
-    def horizontalSpacer(*args, **kwargs):
-        """Horizontal spacer"""
-
-        kwargs["orientation"] = "horizontal"
-        return WindowDisplayWidget.Spacer(*args, **kwargs)
-
-    def horizontalSplitter(*args, **kwargs):
-        """Horizontal splitter"""
-
-        return QtImport.QSplitter(QtImport.Qt.Horizontal, *args)
-
-    def verticalSplitter(*args, **kwargs):
-        """Vertical splitter"""
-
-        return QtImport.QSplitter(QtImport.Qt.Vertical, *args)
-
-    def verticalBox(*args, **kwargs):
-        """Vertical box"""
-        kwargs["layout"] = "vertical"
-        return WindowDisplayWidget.CustomFrame(*args, **kwargs)
-
-    def horizontalBox(*args, **kwargs):
-        """Horizontal box"""
-
-        kwargs["layout"] = "horizontal"
-        return WindowDisplayWidget.CustomFrame(*args, **kwargs)
-
-    def horizontalGroupBox(*args, **kwargs):
-        """Horizontal group box"""
-
-        kwargs["layout"] = "horizontal"
-        return CustomGroupBox(*args, **kwargs)
-
-    def verticalGroupBox(*args, **kwargs):
-        """Vertical group box"""
-
-        kwargs["layout"] = "vertical"
-        return CustomGroupBox(*args, **kwargs)
-
     class CustomTabWidget(QtImport.QTabWidget):
         """Tab widget"""
 
@@ -652,16 +650,12 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
             slot_name = "showPage_%s" % label
 
-            def tab_slot(self, page_index=self.indexOf(scroll_area)):
+            def tab_show_slot(self, page_index=self.indexOf(scroll_area)):
                 self.setCurrentIndex(page_index)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_show_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -669,7 +663,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 )
             slot_name = "hidePage_%s" % label
 
-            def tab_slot(
+            def tab_hide_slot(
                 self,
                 hide=True,
                 page={
@@ -700,19 +694,14 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         slot_name = "showPage_%s" % page["label"].replace(" ", "_")
                         getattr(self, slot_name)()
                         page["hidden"] = False
-                        self.setCurrentWidget(page["widget"])
                     else:
                         slot_name = "showPage_%s" % page["label"].replace(" ", "_")
                         getattr(self, slot_name)()
-                        self.setCurrentWidget(page["widget"])
+                    self.setCurrentWidget(page["widget"])
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")] = new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_hide_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -723,16 +712,12 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'enable page' slot
             slot_name = "enablePage_%s" % label
 
-            def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
+            def enable_page_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.page(page_index).setEnabled(enable)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    enable_page_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -743,16 +728,12 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'enable tab' slot
             slot_name = "enableTab_%s" % label
 
-            def tab_slot(self, enable, page_index=self.indexOf(scroll_area)):
+            def tab_enable_slot(self, enable, page_index=self.indexOf(scroll_area)):
                 self.setTabEnabled(page_index, enable)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_enable_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -763,7 +744,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'tab reset count' slot
             slot_name = "resetTabCount_%s" % label
 
-            def tab_slot(self, erase_count, page_index=self.indexOf(scroll_area)):
+            def tab_reset_count_slot(self, erase_count, page_index=self.indexOf(scroll_area)):
                 tab_label = str(self.tabLabel(self.page(page_index)))
                 label_list = tab_label.split()
                 found = False
@@ -799,12 +780,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         self.setTabLabel(self.page(page_index), new_label)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_reset_count_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -814,7 +791,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'tab increase count' slot
             slot_name = "incTabCount_%s" % label
 
-            def tab_slot(
+            def tab_inc_count_slot(
                 self, delta, only_if_hidden, page_index=self.indexOf(scroll_area)
             ):
                 if only_if_hidden and page_index == self.currentPageIndex():
@@ -852,12 +829,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     self.setTabLabel(self.page(page_index), new_label)
 
             try:
-                # LNLS
-                # python2.7
-                # self.__dict__[slotName.replace(" ", "_")]=new.instancemethod(tab_slot, self, None)
-                # python3.4
                 self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_slot, self
+                    tab_inc_count_slot, self
                 )
             except BaseException:
                 logging.getLogger().exception(
@@ -979,8 +952,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         self._menubar.configure(menu_data, exp_pwd, execution_mode)
         self._menubar.show()
-        BaseWidget._menuBar = self._menubar
-        BaseWidget._toolBar = self._toolbar
+        BaseWidget._menubar = self._menubar
+        BaseWidget._toolbar = self._toolbar
 
     def set_statusbar(self):
         """Sets statusbar"""

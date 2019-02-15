@@ -34,6 +34,9 @@
    </property>
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_2">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
      <property name="spacing">
       <number>2</number>
      </property>
@@ -99,6 +102,9 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="3">
+      <widget class="QLineEdit" name="config_path_ledit"/>
+     </item>
      <item row="2" column="1">
       <widget class="QLabel" name="config_label">
        <property name="text">
@@ -106,36 +112,24 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QLineEdit" name="config_path_ledit"/>
-     </item>
     </layout>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QPushButton" name="first_image_button">
-       <property name="minimumSize">
+    <layout class="QGridLayout" name="gridLayout_4">
+     <item row="0" column="15">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
         <size>
-         <width>27</width>
-         <height>27</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>27</width>
-         <height>27</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
+      </spacer>
      </item>
-     <item>
+     <item row="1" column="1">
       <widget class="QPushButton" name="prev_image_button">
        <property name="minimumSize">
         <size>
@@ -154,75 +148,7 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="minus_quarter_button">
-       <property name="maximumSize">
-        <size>
-         <width>27</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-90</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSlider" name="image_slider">
-       <property name="maximumSize">
-        <size>
-         <width>400</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="plus_quarter_button">
-       <property name="maximumSize">
-        <size>
-         <width>27</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>+90</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="next_image_button">
-       <property name="maximumSize">
-        <size>
-         <width>27</width>
-         <height>27</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="last_image_button">
-       <property name="maximumSize">
-        <size>
-         <width>27</width>
-         <height>27</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="image_spinbox"/>
-     </item>
-     <item>
+     <item row="1" column="12">
       <widget class="QPushButton" name="play_button">
        <property name="minimumSize">
         <size>
@@ -241,7 +167,84 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="4">
+      <widget class="QDial" name="image_dial"/>
+     </item>
+     <item row="1" column="9">
+      <widget class="QPushButton" name="next_image_button">
+       <property name="maximumSize">
+        <size>
+         <width>27</width>
+         <height>27</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="9">
+      <widget class="QPushButton" name="plus_quarter_button">
+       <property name="maximumSize">
+        <size>
+         <width>27</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>+90</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="minus_quarter_button">
+       <property name="maximumSize">
+        <size>
+         <width>27</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-90</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPushButton" name="first_image_button">
+       <property name="minimumSize">
+        <size>
+         <width>27</width>
+         <height>27</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>27</width>
+         <height>27</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="9">
+      <widget class="QPushButton" name="last_image_button">
+       <property name="maximumSize">
+        <size>
+         <width>27</width>
+         <height>27</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QSpinBox" name="image_spinbox"/>
+     </item>
+     <item row="2" column="12">
       <widget class="QPushButton" name="stop_button">
        <property name="minimumSize">
         <size>
@@ -260,7 +263,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="3" column="12">
       <widget class="QCheckBox" name="repeat_cbox">
        <property name="text">
         <string>Repeat</string>
@@ -269,19 +272,6 @@
         <bool>true</bool>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>

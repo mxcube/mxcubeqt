@@ -28,14 +28,6 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-if not hasattr(gevent, "wait"):
-
-    def mywait(timeout=None):
-        return gevent.run(timeout)
-
-    gevent.wait = mywait
-
-
 # Relative location of
 STD_BRICKS_LOCATION = "gui.bricks"
 
@@ -53,8 +45,8 @@ def get_splash_screen():
 
 
 _logger = logging.getLogger()
-_formatter = logging.Formatter("%(asctime)s |%(levelname)-7s| %(message)s")
-
+_logger.setLevel(logging.DEBUG)
+_formatter = logging.Formatter('%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s')
 
 #
 # log to stdout

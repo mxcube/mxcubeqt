@@ -20,9 +20,7 @@
 import copy
 import logging
 
-import QtImport
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 

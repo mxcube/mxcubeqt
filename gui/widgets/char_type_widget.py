@@ -17,8 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
+from gui.utils import QtImport
 from gui.widgets.routine_dc_char_widget_layout import RoutineDCWidgetLayout
 from gui.widgets.sad_char_widget_layout import SADWidgetLayout
 from gui.widgets.radiation_damage_char_widget_layout import RadiationDamageWidgetLayout

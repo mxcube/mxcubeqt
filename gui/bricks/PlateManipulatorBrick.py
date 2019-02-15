@@ -17,12 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-import QtImport
-
 from gui.BaseComponents import BaseWidget
-from gui.utils import Icons
+from gui.utils import Icons, QtImport
 from gui.utils.sample_changer_helper import SampleChanger
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 

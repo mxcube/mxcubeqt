@@ -17,11 +17,9 @@
 #  You should have received a copy of the GNU LesserGeneral Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import loggging
+import logging
 
-import QtImport
-
-from gui.utils import Icons
+from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.bricks import MotorSpinBoxBrick
 

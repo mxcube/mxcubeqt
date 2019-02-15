@@ -19,9 +19,7 @@
 
 import logging
 
-import QtImport
-
-from gui.utils import GUILogHandler
+from gui.utils import GUILogHandler, QtImport
 from gui.widgets.log_bar_widget import LogBarWidget
 from gui.BaseComponents import BaseWidget
 

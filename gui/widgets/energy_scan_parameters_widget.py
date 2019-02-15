@@ -17,14 +17,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import QtImport
-
 import api
-from widgets.data_path_widget import DataPathWidget
-from widgets.periodic_table_widget import PeriodicTableWidget
+from gui.utils import QtImport
+from gui.widgets.data_path_widget import DataPathWidget
+from gui.widgets.periodic_table_widget import PeriodicTableWidget
 # from widgets.matplot_widget import TwoAxisPlotWidget
-from widgets.pymca_plot_widget import PymcaPlotWidget
-from widgets.snapshot_widget import SnapshotWidget
+from gui.widgets.pymca_plot_widget import PymcaPlotWidget
+from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 

@@ -24,9 +24,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-import QtImport
-
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
 
@@ -164,7 +162,7 @@ class GphlDataDialog(QtImport.QDialog):
         # Button bar
         button_layout = QtImport.QHBoxLayout(None)
         hspacer = QtImport.QSpacerItem(
-            1, 20, QtGui.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
+            1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
         )
         button_layout.addItem(hspacer)
         self.continue_button = QtImport.QPushButton("Continue", self)

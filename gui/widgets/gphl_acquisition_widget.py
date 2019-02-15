@@ -27,8 +27,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-import QtImport
-
+from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_enumerables

@@ -20,11 +20,8 @@
 import copy
 import logging
 
-import QtImport
-
 import api
-
-from gui.utils import queue_item
+from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
@@ -148,6 +145,9 @@ class CreateHelicalWidget(CreateTaskBase):
         for shape in shapes:
             if isinstance(shape, GraphicsItemLine):
                 self.shape_created(shape, "Line")
+        api.graphics.connect("shapeCreated", self.shape_created)
+        api.graphics.connect("shapeChanged", self.shape_changed)
+        api.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":
@@ -173,12 +173,6 @@ class CreateHelicalWidget(CreateTaskBase):
             )
             self._lines_widget.lines_treewidget.takeTopLevelItem(shape_index.row())
             self._lines_map.pop(shape)
-
-    def shape_changed(self, shape, shape_type):
-        lines_treewidget_item = self._lines_map.get(shape)
-        if lines_treewidget_item:
-            lines_treewidget_item.setText(1, "%d" % shape.get_points_index()[0])
-            lines_treewidget_item.setText(2, "%d" % shape.get_points_index()[1])
 
     def approve_creation(self):
         base_result = CreateTaskBase.approve_creation(self)

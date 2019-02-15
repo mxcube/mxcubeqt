@@ -19,9 +19,7 @@
 
 import os
 
-import QtImport
-
-from gui.utils import Colors, queue_item
+from gui.utils import Colors, queue_item, QtImport
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 

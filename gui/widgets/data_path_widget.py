@@ -21,10 +21,8 @@ import os
 import string
 import logging
 
-import QtImport
-
-from gui.utils import Colors
-from utils.widget_utils import DataModelInputBinder
+from gui.utils import Colors, QtImport
+from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 
@@ -218,10 +216,15 @@ class DataPathWidget(QtImport.QWidget):
 
     def set_data_path(self, path):
         (dir_name, file_name) = os.path.split(path)
+        if self._data_model.precision:
+            precision = self._data_model.precision
+        else:
+            precision = "5"
+
         self.set_directory(dir_name)
         file_name = file_name.replace(
             "%" + str(self._data_model.precision) + "d",
-            int(self._data_model.precision) * "#",
+            int(precision) * "#",
         )
         self.data_path_layout.file_name_value_label.setText(file_name)
 

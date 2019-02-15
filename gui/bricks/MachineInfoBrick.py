@@ -18,12 +18,10 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import QtImport
-
 import api
 
 from gui.BaseComponents import BaseWidget
-from gui.utils import Icons, Colors
+from gui.utils import Icons, Colors, QtImport
 from gui.widgets.matplot_widget import TwoAxisPlotWidget
 
 

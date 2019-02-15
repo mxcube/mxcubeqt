@@ -20,12 +20,9 @@
 import os
 import logging
 
-import QtImport
-
 import api
-
+from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
-
 from HardwareRepository.HardwareObjects import queue_model_objects
 
 

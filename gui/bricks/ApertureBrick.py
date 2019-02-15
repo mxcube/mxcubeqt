@@ -45,15 +45,13 @@ Apertures are allowed according the bam focusing mode.
 -----------------------------------------------------------------------
 """
 
-import QtImport
-
 try:
     uni_chr = unichr
 except:
     uni_chr = chr
 
+from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
-from gui.utils import Colors
 
 
 __credits__ = ["MXCuBE collaboration"]

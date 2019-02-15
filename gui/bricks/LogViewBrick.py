@@ -71,9 +71,7 @@ import logging
 from datetime import datetime
 import smtplib
 
-import QtImport
-
-from gui.utils import Icons, Colors, GUILogHandler
+from gui.utils import Icons, Colors, GUILogHandler, QtImport
 from gui.BaseComponents import BaseWidget
 
 
@@ -253,7 +251,7 @@ class Submitfeedback(QtImport.QWidget):
                 logging.getLogger().error(str(error_dict))
 
             QtImport.QMessageBox.information(
-                self, "Thank you!", "Your comments have been submitted.", QMessageBox.Ok
+                self, "Thank you!", "Your comments have been submitted.", QtImport.QMessageBox.Ok
             )
             self.message_textedit.clear()
 
