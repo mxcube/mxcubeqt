@@ -1,4 +1,5 @@
 <equipment class = "SampleChangerMockup">
+ <useUpdateTimer>False</useUpdateTimer>
  <!-- SC3 commands and channels -->
  <test_sample_names>
   <!-- Sample names to show in UI and matching addresses.   -->
