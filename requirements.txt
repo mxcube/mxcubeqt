@@ -1,7 +1,7 @@
 PyDispatcher
 gevent
 suds
-simplejson
+jsonpickle
 simpleyaml
 numpy
 scipy
