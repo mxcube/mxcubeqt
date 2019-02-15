@@ -1316,8 +1316,8 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         for basket in baskets_at_sc:
             presences.append([[VialView.VIAL_UNKNOWN]] * self.vials_per_basket if \
                basket.isPresent() else [[VialView.VIAL_NONE]] * self.vials_per_basket)
-            self.baskets[basketno].set_number_of_samples( basket.getNumberOfSamples() )
-            basketno += 1
+            # self.baskets[basketno].set_number_of_samples( basket.getNumberOfSamples() )
+            # basketno += 1
 
         for sample in self.sample_changer_hwobj.getSampleList():
             matrix = sample.getID() or ""
