@@ -7,6 +7,9 @@
     <!-- default image width selection  if None are given by the workflow-->
     <!-- First value is the default; values are sorted before use -->
     <default_image_widths> 0.1 0.05 0.2</default_image_widths>
+    <!-- Collect snapshots after centring -->
+    <!-- NB this will NOT be active if you use the [Collect Now] button -->
+    <collect_centring_snapshots>True</collect_centring_snapshots>
 
     <!-- Describes the test crystals used for diffractometer calibration -->
     <test_crystals>
