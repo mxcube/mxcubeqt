@@ -10,6 +10,8 @@
     <!-- Collect snapshots after centring -->
     <!-- NB this will NOT be active if you use the [Collect Now] button -->
     <collect_centring_snapshots>True</collect_centring_snapshots>
+    <!-- NB Adds a sample centrein bewfore eacj wedge. BAD if you interleave! -->
+    <!--<centre_before_sweep>True</centre_before_sweep>-->
 
     <!-- Describes the test crystals used for diffractometer calibration -->
     <test_crystals>
