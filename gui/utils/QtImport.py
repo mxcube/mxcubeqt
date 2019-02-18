@@ -75,7 +75,6 @@ qt_version_no = []
 mpl_imported = False
 mpl_version = None
 mpl_version_no = False
-
 #
 #  Matplotlib import
 #
@@ -118,14 +117,8 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
         from PyQt5.QtCore import *
         from PyQt5.QtGui import *
         from PyQt5.QtWidgets import *
-        from PyQt5.QtWebKit import *
         from PyQt5.QtPrintSupport import *
         from PyQt5.uic import *
-
-        try:
-            from PyQt5.QtSvg import *
-        except BaseException:
-            print("QtSvg is not imported. It maybe needs to be installed")
 
         getQApp = QCoreApplication.instance
 
@@ -138,6 +131,15 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
     except BaseException:
         pass
 
+    try:
+        from PyQt5.QtWebKit import *
+    except BaseException:
+        pass
+
+    try:
+       from PyQt5.QtSvg import * 
+    except BaseException:
+       print("QtSvg is not imported. It maybe needs to be installed")
 #
 # PyQt4
 #
@@ -167,10 +169,6 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
         from PyQt4.QtGui import *
         from PyQt4.uic import *
 
-        # from PyQt4.QtSvg import *
-        from PyQt4.QtTest import *
-        from PyQt4.QtWebKit import *
-
         def getQApp():
             return qApp
 
@@ -181,6 +179,11 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
         ver = _ver + ["0"] * (3 - len(_ver))
         pyqt_version_no = list(map(int, ver))[:3]
     except BaseException:
+        pass
+
+    try:
+        from PyQt4.QtWebKit import * 
+    except ImportError:
         pass
 
 #

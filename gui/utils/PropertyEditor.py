@@ -23,9 +23,7 @@ import types
 import weakref
 import logging
 
-import QtImport
-
-from gui.utils import Icons, PropertyBag, Colors
+from gui.utils import Icons, PropertyBag, Colors, QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]

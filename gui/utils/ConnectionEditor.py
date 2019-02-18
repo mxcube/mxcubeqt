@@ -19,9 +19,7 @@
 
 """Connection editor"""
 
-import QtImport
-
-from gui.utils import Icons
+from gui.utils import Icons, QtImport
 
 
 __credits__ = ["MXCuBE collaboration"]

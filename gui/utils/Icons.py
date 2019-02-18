@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from QtImport import QPixmap, QIcon
+from gui.utils.QtImport import QPixmap, QIcon
 
 
 ROOT_DIR_PARTS = os.path.dirname(os.path.abspath(__file__)).split(os.sep)

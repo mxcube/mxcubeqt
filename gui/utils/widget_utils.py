@@ -19,9 +19,7 @@
 
 import decimal
 
-import QtImport
-
-from gui.utils import Colors
+from gui.utils import Colors, QtImport
 from HardwareRepository.dispatcher import dispatcher
 
 

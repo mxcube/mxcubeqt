@@ -28,10 +28,8 @@ import webbrowser
 import collections
 from functools import partial
 
-import QtImport
-
 from gui import Configuration
-from gui.utils import Icons, Colors, PropertyEditor
+from gui.utils import Icons, Colors, PropertyEditor, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 

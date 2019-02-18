@@ -22,7 +22,7 @@ import time
 import weakref
 import gevent
 
-import QtImport
+from gui.utils import QtImport
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
