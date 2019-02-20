@@ -133,7 +133,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
 
     try:
         from PyQt5.QtWebKit import *
-    except BaseException:
+    except ImportError:
         pass
 
     try:
