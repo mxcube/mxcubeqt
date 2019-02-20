@@ -18,7 +18,6 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import new
 import logging
 
 from gui.utils import Icons, Colors, QtImport
@@ -419,9 +418,17 @@ class WrapperHO(QtImport.QObject):
 
     def __setstate__(self, dict):
         self.__dict__ = dict.copy()
-        self.setIn = new.instancemethod(lambda self: None, self)
-        self.setOut = self.setIn
-        self.getState = new.instancemethod(lambda self: "unknown", self)
+        try:
+            #Python2 
+            import new
+            self.setIn = new.instancemethod(lambda self: None, self)
+            self.setOut = self.setIn
+            self.getState = new.instancemethod(lambda self: "unknown", self)
+        except:
+            import types
+            self.setIn = types.MethodType(lambda self: None, self)
+            self.setOut = self.setIn
+            self.getState = types.MethodType(lambda self: "unknown", self)
 
     def userName(self):
         return self.dev.userName()

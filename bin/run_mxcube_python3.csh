@@ -1,3 +1,3 @@
 #!/bin/csh -f
 
-python3 /home/USER/mxcube2/bin/mxcube --hardwareRepository=/home/USER/mxcube2/HardwareRepository/configuration/xml-qt $argv
+python3 /home/mxuser/mxcube/bin/mxcube --hardwareRepository=/home/mxuser/mxcube/HardwareRepository/configuration/xml-qt $argv

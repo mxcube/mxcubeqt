@@ -21,7 +21,7 @@ import sys
 import logging
 import traceback
 
-import QtImport
+from gui.utils import QtImport
 
 _handler = None
 

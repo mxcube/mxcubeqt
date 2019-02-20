@@ -20,7 +20,6 @@
 import os.path
 import logging
 import sys
-from lxml import etree
 
 from gui.utils import QtImport
 
@@ -319,6 +318,7 @@ class FieldsWidget(QtImport.QWidget):
         print(self.get_xml(True))
 
     def get_xml(self, olof=False):
+        from lxml import etree
         root = etree.Element("parameters")
         for w in self.field_widgets:
             name = w.get_name()

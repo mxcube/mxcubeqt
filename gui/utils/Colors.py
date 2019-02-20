@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from QtImport import Qt, QColor, QPalette
+from gui.utils.QtImport import Qt, QColor, QPalette
 
 from random import randint, uniform
 

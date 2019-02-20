@@ -18,11 +18,16 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import smtplib
 import gevent
 import logging
 import collections
-from email import Utils
+
+if sys.version_info[0] == 3:
+    from email import utils
+else:
+    from email import Utils as utils
 
 from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
@@ -998,7 +1003,7 @@ class InstanceListBrick(BaseWidget):
                             + "Email address: %s\n" % user_info["email"]
                             + "Users at ESRF: %s" % users_in_esrf
                         )
-                    email_date = Utils.formatdate(localtime=True)
+                    email_date = utils.formatdate(localtime=True)
                     toaddrs = event.toaddrs.replace(" ", ",")
                     email_message = (
                         "From: %s\r\n" % event.fromaddrs
