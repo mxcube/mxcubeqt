@@ -22,7 +22,7 @@ install:
   - python configure.py --confirm-license
   - make -j 2
   - sudo make install
-  - cd ..
+  - cd
 script:
   - python -m pytest
   - pylint -E gui/
