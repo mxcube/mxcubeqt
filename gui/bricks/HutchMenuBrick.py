@@ -26,9 +26,6 @@ from gui.utils import Colors, Icons, QtImport
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 
-if sys.version_info[0] == 3:
-    unicode = str
-
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -157,7 +154,7 @@ class HutchMenuBrick(BaseWidget):
 
     def save_snapshot_clicked(self):
         formats = [
-            "*.%s" % unicode(image_format).lower()
+            "*.%s" % image_format.lower()
             for image_format in QtImport.QImageWriter.supportedImageFormats()
         ]
 
