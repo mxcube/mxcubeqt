@@ -1,3 +1,6 @@
+#pylint: skip-file
+#TODO pylint indicates E1136 in zip method. Fix this and remove ski-file
+
 #
 #  Project: MXCuBE
 #  https://github.com/mxcube
@@ -1052,10 +1055,12 @@ class GUIEditorWindow(QtImport.QWidget):
         # find common ancestor
         target_item_ancestors = [target_item.parent()]
         source_item_ancestors = [source_item.parent()]
+
         while target_item_ancestors[0]:
             target_item_ancestors.insert(0, target_item_ancestors[0].parent())
         while source_item_ancestors[0]:
             source_item_ancestors.insert(0, source_item_ancestors[0].parent())
+
         common_ancestor = zip(target_item_ancestors, source_item_ancestors)[-1][0]
         if common_ancestor != self.root_element:
             common_ancestor_name = str(common_ancestor.text(0))

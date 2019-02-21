@@ -19,7 +19,7 @@
 
 import os
 import time
-import InstanceServer
+from HardwareRepository.HardwareObjects import InstanceServer
 
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget

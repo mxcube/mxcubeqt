@@ -196,7 +196,6 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def select_shape_with_cpos(self, start_cpos, end_cpos, num_images):
-        selected_line = None
         self._lines_widget.overlay_slider.setEnabled(False)
         self._lines_widget.overlay_cbox.setEnabled(False)
 
@@ -210,20 +209,9 @@ class CreateHelicalWidget(CreateTaskBase):
                 ):
                     api.graphics.select_shape(shape)
                     shape.set_num_images(num_images)
-                    selected_line = shape
 
                     self._lines_widget.overlay_slider.setEnabled(True)
                     self._lines_widget.overlay_cbox.setEnabled(True)
-
-        # de-select previous selected list items and
-        # select the current shape (Line).
-        """
-        for (list_item, shape) in self._lines_map.items():
-            if selected_line == shape:
-                list_item.setSelected(True)
-            else:
-                list_item.setSelected(False)
-        """
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)

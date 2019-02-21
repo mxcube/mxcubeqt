@@ -21,7 +21,7 @@ import logging
 from collections import namedtuple
 
 from gui.BaseComponents import BaseWidget
-from gui.utils import queue_item, Icons, Colors, QtImport
+from gui.utils import queue_item, Colors, QtImport
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from gui.widgets.dc_tree_widget import DataCollectTree
 
@@ -605,7 +605,7 @@ class TreeBrick(BaseWidget):
         l_samples = dict()
 
         # TODO: add test for sample changer type, here code is for Robodiff only
-        for location, l_sample in location_samples.iteritems():
+        for location, l_sample in location_samples.items():
             if l_sample.lims_location != (None, None):
                 basket, sample = l_sample.lims_location
                 cell = int(round((basket + 0.5) / 3.0))

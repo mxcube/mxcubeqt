@@ -100,7 +100,7 @@ class Configuration:
         "vsplitter": BaseLayoutItems.SplitterCfg,
     }
 
-    def __init__(self, config=None, load_from_dict=None):
+    def __init__(self, config=None):
         """__init__ method"""
         self.has_changed = False
 
@@ -110,7 +110,7 @@ class Configuration:
             self.bricks = {}
             self.items = {}
         else:
-            self.load(config, load_from_dict)
+            self.load(config)
 
     def find_container(self, container_name):
         """Returns container
@@ -537,7 +537,7 @@ class Configuration:
 
                 return True
 
-    def load(self, config, as_json):
+    def load(self, config):
         """Loads config"""
         self.windows_list = []
         self.windows = {}

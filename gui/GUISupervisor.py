@@ -254,7 +254,7 @@ class GUISupervisor(QtImport.QWidget):
                     try:
                         self.splash_screen.set_message("Building GUI configuration...")
                         self.splash_screen.set_progress_value(20)
-                        config = Configuration.Configuration(raw_config, load_from_dict)
+                        config = Configuration.Configuration(raw_config)
                     except BaseException:
                         logging.getLogger("GUI").exception(failed_msg)
                         QtImport.QMessageBox.warning(

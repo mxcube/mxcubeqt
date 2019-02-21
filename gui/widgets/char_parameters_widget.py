@@ -24,12 +24,6 @@ from gui.widgets.char_type_widget import CharTypeWidget
 from gui.widgets.optimisation_parameters_widget_layout import (
     OptimisationParametersWidgetLayout,
 )
-from gui.widgets.radiation_damage_model_widget_layout import (
-    RadiationDamageModelWidgetLayout,
-)
-from gui.widgets.vertical_crystal_dimension_widget_layout import (
-    VerticalCrystalDimensionWidgetLayout,
-)
 
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,

@@ -26,7 +26,6 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
 
 
 __credits__ = ["MXCuBE collaboration"]

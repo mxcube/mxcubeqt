@@ -223,10 +223,6 @@ class CreateTaskBase(QtImport.QWidget):
     def set_tree_brick(self, brick):
         self._tree_brick = brick
 
-    @abc.abstractmethod
-    def set_energies(self):
-        pass
-
     def get_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):
             return item

@@ -241,7 +241,7 @@ class FormatStringProperty(Property):
             format_str = format_str[1:]
         elif format_str.startswith(" "):
             prefix = ""
-            format_Str = format_str[1:]
+            format_str = format_str[1:]
         else:
             prefix = ""
 

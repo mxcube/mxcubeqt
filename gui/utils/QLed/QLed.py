@@ -1,3 +1,5 @@
+#pylint: skip-file
+
 from gui.utils import QtImport
 from gui.utils.QLedfrom import qled_resources
 

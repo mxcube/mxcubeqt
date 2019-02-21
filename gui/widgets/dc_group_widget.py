@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from gui.utils import Colors, Icons, queue_item, QtImport
+from gui.utils import Colors, queue_item, QtImport
 from gui.widgets.matplot_widget import PolarScaterWidget
 
 
@@ -97,7 +97,6 @@ class DCGroupWidget(QtImport.QWidget):
 
     def populate_widget(self, item):
         dcg_queue_item = item.get_queue_entry()
-        dcg_data_model = item.get_model()
 
         dcg_child_list = []
         sw_list = []

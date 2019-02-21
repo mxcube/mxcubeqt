@@ -21,30 +21,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from gui.utils import Colors, QtImport
+from gui.utils import QtImport
 
 if QtImport.qt_variant == "PyQt5":
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-
-    try:
-        from matplotlib.backends.backend_qt5agg import (
-            NavigationToolbar2QTAgg as NavigationToolbar,
-        )
-    except BaseException:
-        from matplotlib.backends.backend_qt5agg import (
-            NavigationToolbar2QT as NavigationToolbar,
-        )
 else:
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
-    try:
-        from matplotlib.backends.backend_qt4agg import (
-            NavigationToolbar2QTAgg as NavigationToolbar,
-        )
-    except BaseException:
-        from matplotlib.backends.backend_qt4agg import (
-            NavigationToolbar2QT as NavigationToolbar,
-        )
 
 
 __credits__ = ["MXCuBE collaboration"]

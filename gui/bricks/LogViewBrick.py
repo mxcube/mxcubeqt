@@ -103,7 +103,7 @@ class CustomTreeWidget(QtImport.QTreeWidget):
         info_str_list.append(record.getLevelName())
         info_str_list.append(record.getDate())
         info_str_list.append(record.getTime())
-        info_str_list.append(record.getMessage())
+        info_str_list.append(msg)
         new_item = QtImport.QTreeWidgetItem(info_str_list)
         self.addTopLevelItem(new_item)
         if self.topLevelItemCount() % 10 == 0:

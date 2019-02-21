@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import logging
 
 import api
@@ -24,6 +25,9 @@ from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons, QtImport
 
 from HardwareRepository.HardwareObjects import queue_model_objects
+
+if sys.version_info[0] == 3:
+    unicode = str
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -153,8 +157,8 @@ class HutchMenuBrick(BaseWidget):
 
     def save_snapshot_clicked(self):
         formats = [
-            "*.%s" % unicode(format).lower()
-            for format in QtImport.QImageWriter.supportedImageFormats()
+            "*.%s" % unicode(image_format).lower()
+            for image_format in QtImport.QImageWriter.supportedImageFormats()
         ]
 
         current_file_name = "%s/%s_%d.%s" % (

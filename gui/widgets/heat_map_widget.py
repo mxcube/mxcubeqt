@@ -190,7 +190,7 @@ class HeatMapWidget(QtImport.QWidget):
         self.continues_display_action.setChecked(True)
 
         self._heat_map_popup_menu.addSeparator()
-        options_menu = self._heat_map_popup_menu.addMenu("Options")
+        #options_menu = self._heat_map_popup_menu.addMenu("Options")
 
         self._heat_map_plot.contextMenuEvent = self.open_heat_map_popup_menu
 

@@ -283,12 +283,6 @@ class CameraBrick(BaseWidget):
                 hide_msg=False,
             )
 
-    """
-    def set_expert_mode(self, is_expert_mode):
-        self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
-        self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
-    """
-
     def set_info_msg(self, msg):
         self.info_label.setText(msg)
 

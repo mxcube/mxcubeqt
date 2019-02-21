@@ -25,3 +25,4 @@ install:
   - cd ..
 script:
   - python -m pytest
+  - pylint gui

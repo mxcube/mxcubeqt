@@ -134,7 +134,6 @@ class VialNumberView(QtImport.QLabel):
 
     def set_vial(self, vial_state):
         """Sets vial state"""
-        state = vial_state[0]
         try:
             code = vial_state[1]
         except BaseException:
@@ -374,11 +373,6 @@ class BasketView(QtImport.QWidget):
 
     def set_matrices(self, vial_states):
         self.samples_view.set_matrices(vial_states)
-
-    """
-    def setLoadedVial(self,vial_index=None):
-        self.samples_view.setLoadedVial(vial_index)
-    """
 
     def set_current_vial(self, location=None):
         self.samples_view.set_current_vial(location)

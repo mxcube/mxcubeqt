@@ -18,7 +18,6 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import Icons, QtImport
-from gui.utils.sample_changer_helper import SampleChanger
 
 
 __credits__ = ["MXCuBE collaboration"]

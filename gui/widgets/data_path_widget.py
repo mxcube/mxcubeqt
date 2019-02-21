@@ -114,7 +114,7 @@ class DataPathWidget(QtImport.QWidget):
                 self, "Select a directory", self._base_image_dir
             )
         )
-        selecte_dir = os.path.dirname(selected_dir)
+        selected_dir = os.path.dirname(selected_dir)
 
         if selected_dir is not None and len(selected_dir) > 0:
             self.set_directory(selected_dir)
