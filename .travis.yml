@@ -23,8 +23,10 @@ install:
 #  - make -j 2
 #  - sudo make install
   - cd
-script:
+before_script:
   - cd
   - cd mxcube/mxcube
+
+script:
 #  - python -m pytest
   - pylint -E gui
