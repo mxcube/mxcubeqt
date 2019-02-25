@@ -5,8 +5,7 @@ from collections import namedtuple
 
 import queue_model_enumerables_v1 as enumerables
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+import QtImport
 from widgets.Qt4_widget_utils import DataModelInputBinder
 from HardwareRepository import HardwareRepository
 from HardwareRepository.dispatcher import dispatcher
@@ -30,11 +29,11 @@ class GphlAcquisitionData(object):
     Attributes are set in the GphlAcquisitionWidget"""
     pass
 
-class GphlSetupWidget(QtGui.QWidget):
+class GphlSetupWidget(QtImport.QWidget):
     """Superclass for GPhL interface widgets"""
 
     def __init__(self, parent=None, name='gphl_setup_widget'):
-        QtGui.QWidget.__init__(self,parent)
+        QtImport.QWidget.__init__(self,parent)
         if name is not None:
             self.setObjectName(name)
 
@@ -55,13 +54,13 @@ class GphlSetupWidget(QtGui.QWidget):
         self._parameter_mib = DataModelInputBinder(self._data_object)
 
         # Graphic elements ----------------------------------------------------
-        _parameters_widget = self._parameters_widget = QtGui.QWidget(self)
-        QtGui.QGridLayout(_parameters_widget)
+        _parameters_widget = self._parameters_widget = QtImport.QWidget(self)
+        QtImport.QGridLayout(_parameters_widget)
         _parameters_widget.layout().setColumnStretch(2, 1)
 
         # Layout --------------------------------------------------------------
         # This seems to be necessary to make widget visible
-        _main_vlayout = QtGui.QVBoxLayout(self)
+        _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(_parameters_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -97,7 +96,7 @@ class GphlSetupWidget(QtGui.QWidget):
         for field_name, tags in self._pulldowns.items():
             widget = self._widget_data[field_name][0]
             widget.clear()
-            widget.addItems(list(QtCore.QString(tag) for tag in tags))
+            widget.addItems(list(QtImport.QString(tag) for tag in tags))
             widget.setCurrentIndex(0)
 
     def set_parameter_value(self, name, value):
@@ -174,10 +173,10 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         field_name = 'test_crystal'
         label_name = self._get_label_name(field_name)
         label_str = "Test Crystal :"
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtGui.QComboBox()
+        widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
         self._pulldowns[field_name] = list(self.test_crystals)
@@ -185,12 +184,12 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         row += 1
         label_name = 'test_crystal_spacegroup'
         label_str = " "
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
         label_name = 'test_crystal_parameters'
         label_str = " "
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 1)
         self._widget_data[label_name] = (label, str, None, label_str)
 
@@ -198,14 +197,14 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         field_name = 'expected_resolution'
         label_name = self._get_label_name(field_name)
         label_str = "Expected resolution (A) :"
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtGui.QLineEdit()
-        widget.setAlignment(QtCore.Qt.AlignLeft)
+        widget = QtImport.QLineEdit()
+        widget.setAlignment(QtImport.Qt.AlignLeft)
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (
-            widget, float, QtGui.QDoubleValidator(0.01, 20, 2, self), 0.0
+            widget, float, QtImport.QDoubleValidator(0.01, 20, 2, self), 0.0
         )
 
     def populate_widget(self, **kw):
@@ -244,10 +243,10 @@ class GphlDiffractcalWidget(GphlSetupWidget):
             else:
                 label_str1 = label_str2 = ' '
             label = self._widget_data['test_crystal_spacegroup'][0]
-            label.setText(QtCore.QString(label_str1))
+            label.setText(QtImport.QString(label_str1))
 
             label = self._widget_data['test_crystal_parameters'][0]
-            label.setText(QtCore.QString(label_str2))
+            label.setText(QtImport.QString(label_str2))
 
 class GphlAcquisitionWidget(GphlSetupWidget):
     """Input widget for GPhL data collection setup"""
@@ -284,10 +283,10 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         field_name = 'crystal_system'
         label_name = self._get_label_name(field_name)
         label_str = "Crystal system :"
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtGui.QComboBox()
+        widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
         self._pulldowns[field_name] = list(self._CRYSTAL_SYSTEM_DATA)
@@ -296,10 +295,10 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         field_name = 'space_group'
         label_name = self._get_label_name(field_name)
         label_str = "Space group :"
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtGui.QComboBox()
+        widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
 
@@ -307,14 +306,14 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         field_name = 'expected_resolution'
         label_name = self._get_label_name(field_name)
         label_str = "Expected resolution (A) :"
-        label=QtGui.QLabel(label_str, _parameters_widget)
+        label=QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtGui.QLineEdit()
-        widget.setAlignment(QtCore.Qt.AlignLeft)
+        widget = QtImport.QLineEdit()
+        widget.setAlignment(QtImport.Qt.AlignLeft)
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (
-            widget, float, QtGui.QDoubleValidator(0.01, 20, 2, self), 0.0
+            widget, float, QtImport.QDoubleValidator(0.01, 20, 2, self), 0.0
         )
 
 
@@ -361,7 +360,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
 
             widget = self._widget_data['space_group'][0]
             widget.clear()
-            widget.addItems(list(QtCore.QString(tag) for tag in ll))
+            widget.addItems(list(QtImport.QString(tag) for tag in ll))
             self._data_object.space_group = 0
             # widget.setCurrentIndex(0)
             # self._parameter_mib._update_widget('space_group', None)
