@@ -149,7 +149,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         """
         Descript. :
         """
-        CreateTaskBase.init_models(self)
+        # CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
