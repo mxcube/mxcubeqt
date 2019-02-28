@@ -8,3 +8,4 @@ scipy
 matplotlib
 pymca
 enum34
+lxml
