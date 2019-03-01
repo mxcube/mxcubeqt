@@ -24,4 +24,4 @@ install:
   - cd ..
 script:
   - python -m pytest
-  - pylint -E gui --extension-pkg-whitelist=PyQt5,PyQt4
+  - pylint -E gui
