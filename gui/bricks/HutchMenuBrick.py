@@ -209,10 +209,8 @@ class HutchMenuBrick(BaseWidget):
 
     def centring_snapshots(self, state):
         if state is None:
-            self.is_shooting = True
             self.setEnabled(False)
         else:
-            self.is_shooting = False
             self.setEnabled(True)
 
     def centring_started(self):

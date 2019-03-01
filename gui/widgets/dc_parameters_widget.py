@@ -47,6 +47,7 @@ class DCParametersWidget(QtImport.QWidget):
         # Internal variables --------------------------------------------------
         self._data_collection = None
         self._tree_view_item = None
+        self._acquisition_mib = None
 
         # Graphic elements ----------------------------------------------------
         _dc_parameters_widget = QtImport.QWidget(self)

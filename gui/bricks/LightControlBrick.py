@@ -20,7 +20,6 @@
 import logging
 
 from gui.utils import Icons, QtImport
-from gui.BaseComponents import BaseWidget
 from gui.bricks import MotorSpinBoxBrick
 
 """

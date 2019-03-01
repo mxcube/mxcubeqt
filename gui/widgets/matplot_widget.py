@@ -177,6 +177,7 @@ class MplCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
         self.single_curve = None
+        self.real_time = None
         self._axis_x_array = np.empty(0)
         self._axis_y_array = np.empty(0)
         self._axis_x_limits = [None, None]

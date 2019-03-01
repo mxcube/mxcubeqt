@@ -40,6 +40,8 @@ class CameraBrick(BaseWidget):
         # self.graphics_camera_frame = None
         self.fixed_size = None
         self.display_beam = None
+        self.display_scale = None
+        self.image_scale_list = []
 
         # Properties ----------------------------------------------------------
         self.add_property("mnemonic", "string", "/graphics")

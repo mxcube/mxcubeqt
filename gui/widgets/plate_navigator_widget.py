@@ -31,6 +31,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
+        self.plate_manipulator_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.__current_location = None

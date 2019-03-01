@@ -149,6 +149,9 @@ class SampleBox(QtImport.QWidget):
     def __init__(self, *args):
         QtImport.QWidget.__init__(self, *args)
         self.selected = False
+        self.basket_index = None
+        self.vial_index = None
+
         self.setMouseTracking(True)
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.setSpacing(0)

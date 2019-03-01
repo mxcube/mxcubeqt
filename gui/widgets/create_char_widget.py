@@ -49,6 +49,7 @@ class CreateCharWidget(CreateTaskBase):
         # Internal variables --------------------------------------------------
         self._vertical_dimension_widget = None
         self._current_selected_item = None
+        self._char_params = None
         self.init_models()
         self._char_params_mib = DataModelInputBinder(self._char_params)
 

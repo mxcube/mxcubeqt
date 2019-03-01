@@ -60,6 +60,7 @@ class CustomMenuBar(QtImport.QMenuBar):
         self.execution_mode = None
         self.menu_items = []
         self.original_style = None
+        self.preview_windows = {}
 
         # Graphic elements ----------------------------------------------------
         # self.menubar = QtGui.QMenuBar(self)

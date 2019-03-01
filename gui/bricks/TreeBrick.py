@@ -99,7 +99,6 @@ class TreeBrick(BaseWidget):
         self.add_property("enableQueueAutoSave", "boolean", True)
 
         # Properties to initialize hardware objects --------------------------
-        self.add_property("hwobj_unittest", "string", "")
         self.add_property("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
@@ -143,6 +142,9 @@ class TreeBrick(BaseWidget):
         self.define_slot("set_requested_tree_brick", ())
 
         # Graphic elements ----------------------------------------------------
+        self.tools_menu = None
+        self.queue_sync_action = None
+
         self.sample_changer_widget = QtImport.load_ui_file(
             "sample_changer_widget_layout.ui"
         )
@@ -392,8 +394,6 @@ class TreeBrick(BaseWidget):
             )
         elif property_name == "redis_client":
             self.redis_client_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == "hwobj_unittest":
-            self.unittest_hwobj = self.get_hardware_object(new_value, optional=True)
         elif property_name == "scOneName":
             self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == "scTwoName":
