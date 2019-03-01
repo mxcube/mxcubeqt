@@ -6,8 +6,8 @@ install:
   - pip install pytest==4.0.1 pytest-xvfb PyYAML pylint
   - sudo apt-get install libyaml-dev
   - sudo apt-get install python-yaml
+
 # Build and install qt
-  - cd ..
   - curl -L -O http://sourceforge.net/projects/pyqt/files/sip/sip-4.14.1/sip-4.14.1.tar.gz
   - tar -xf sip-4.14.1.tar.gz
   - cd sip-4.14.1
