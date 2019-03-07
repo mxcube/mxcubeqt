@@ -7,11 +7,16 @@
     <!-- default image width selection  if None are given by the workflow-->
     <!-- First value is the default; values are sorted before use -->
     <default_image_widths> 0.1 0.05 0.2</default_image_widths>
+
+    <!-- NBNB COMMENT OUT boolean properties to set them to False -->
     <!-- Collect snapshots after centring -->
     <!-- NB this will NOT be active if you use the [Collect Now] button -->
-    <collect_centring_snapshots>True</collect_centring_snapshots>
-    <!-- NB Adds a sample centrein bewfore eacj wedge. BAD if you interleave! -->
-    <!--<centre_before_sweep>True</centre_before_sweep>-->
+    <!--<collect_centring_snapshots>True</collect_centring_snapshots>-->
+    <!-- NB Adds a sample centring at first acquisition for each orientation -->
+    <!-- May not work well if you interleave! -->
+    <centre_before_sweep>True</centre_before_sweep>
+    <!-- Centre all orientations before acquisition start -->
+    <!--<centre_at_start>True</centre_at_start>-->
 
     <!-- Describes the test crystals used for diffractometer calibration -->
     <test_crystals>

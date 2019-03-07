@@ -54,6 +54,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         data_path_layout.file_name_value_label.hide()
         data_path_layout.run_number_label.hide()
         data_path_layout.run_number_ledit.hide()
+        data_path_layout.prefix_ledit.setReadOnly(True)
+        data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = QtImport.QVBoxLayout(self._workflow_type_widget)
@@ -109,9 +111,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         parameters = self._workflow_hwobj.get_available_workflows()[name]
         strategy_type = parameters.get('strategy_type')
-        if strategy_type == 'transcal':
+        if strategy_type.startswith('transcal'):
             self._gphl_acq_widget.hide()
-        elif strategy_type == 'diffractcal':
+        elif strategy_type.startswith('diffractcal'):
             # TODO update this
             self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()

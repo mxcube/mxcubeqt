@@ -4,10 +4,10 @@
     - file names below are set as file_name.format(directory_locations) -->
     <directory_locations>
         <!-- Wrapper scripts for GPhL programs - must be reachable from workflow and procesing -->
-        <!--<GPHL_SETUP>/archive/rhfogh/mxcube</GPHL_SETUP>-->
-        <!--<GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>-->
-        <GPHL_SETUP>/mnt/scratch/rhfogh/mxcube_setup/</GPHL_SETUP>
-        <GPHL_RELEASE>/mnt/scratch/rhfogh/gphl_release/latest</GPHL_RELEASE>
+        <GPHL_SETUP>/archive/rhfogh/mxcube</GPHL_SETUP>
+        <GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>
+        <!--<GPHL_SETUP>/mnt/scratch/rhfogh/mxcube_setup/</GPHL_SETUP>-->
+        <!--<GPHL_RELEASE>/mnt/scratch/rhfogh/gphl_release/latest</GPHL_RELEASE>-->
     </directory_locations>
 
     <!-- If set, run workflow through ssh with selected options -->
@@ -57,8 +57,8 @@
         <co.gphl.wf.bdg_licence_dir>{GPHL_RELEASE}</co.gphl.wf.bdg_licence_dir>
 
         <!-- Location of executable XDS binary. Mandatory-->
-        <!--<co.gphl.wf.xds.bin>/public/xtal/Xds/XDS-INTEL64_Linux_x86_64/xds_par</co.gphl.wf.xds.bin>-->
-        <co.gphl.wf.xds.bin>/mnt/scratch/rhfogh/gphl_release/XDS/xds_par</co.gphl.wf.xds.bin>
+        <co.gphl.wf.xds.bin>/public/xtal/Xds/XDS-INTEL64_Linux_x86_64/xds_par</co.gphl.wf.xds.bin>
+        <!--<co.gphl.wf.xds.bin>/mnt/scratch/rhfogh/gphl_release/XDS/xds_par</co.gphl.wf.xds.bin>-->
 
         <!-- <Location of individual binaries are optional. -->
         <!-- They default to within GPHL_INSTALLATION -->
