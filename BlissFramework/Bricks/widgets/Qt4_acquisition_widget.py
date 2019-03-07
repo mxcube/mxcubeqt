@@ -148,8 +148,11 @@ class AcquisitionWidget(QWidget):
              -0.0001, 10000, 4, self.acq_widget_layout.osc_total_range_ledit)
         self.kappa_validator = QDoubleValidator(\
              -0.01, 360, 4, self.acq_widget_layout.kappa_ledit)
-        self.kappa_phi_validator = QDoubleValidator(\
-             0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
+        # self.kappa_phi_validator = QDoubleValidator( \
+        #     0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
+        # The contrrol spin box accepts -360-360, and values < 0 invalidate Collect-Now
+        self.kappa_phi_validator = QDoubleValidator( \
+            -360, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
         self.energy_validator = QDoubleValidator(\
              4, 25, 4, self.acq_widget_layout.energy_ledit)
         self.resolution_validator = QDoubleValidator(\
