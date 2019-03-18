@@ -17,9 +17,6 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import logging
-
 import api
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder

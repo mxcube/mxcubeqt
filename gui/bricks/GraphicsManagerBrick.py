@@ -317,7 +317,6 @@ class GraphicsManagerBrick(BaseWidget):
         self.move_selected_grids("down")
 
     def move_selected_grids(self, direction):
-        spacing = self.get_spacing()
         for grid_treewidget_item in self.manager_widget.grid_treewidget.selectedItems():
             grid_item = self.__grid_map.keys()[
                 self.__grid_map.values().index(grid_treewidget_item)

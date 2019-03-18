@@ -169,6 +169,7 @@ class WindowCfg(ContainerCfg):
 class TabCfg(ContainerCfg):
     def __init__(self, *args):
         ContainerCfg.__init__(self, *args)
+        self.widget = None
 
         self.properties.add_property("fontSize", "integer", 0)
         self.signals.update({"notebookPageChanged": "pageName"})

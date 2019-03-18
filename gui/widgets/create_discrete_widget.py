@@ -172,35 +172,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-
-        try:
-            # This is very EMBL specific and soon will be removed
-            if api.detector.get_roi_mode_name() == "16M":
-                file_size = 18.0
-                total_num_of_images = 14400
-            else:
-                file_size = 18.0 / 4
-                total_num_of_images = 14400 * 4
-
-            num_images = float(
-                self._acq_widget.acq_widget_layout.num_images_ledit.text()
-            )
-            total, free, perc = (
-                api.machine_info.get_ramdisk_size()
-            )
-            free_mb = free / (2 ** 20)
-
-            if num_images > total_num_of_images * free_mb / (125.8 * 1024):
-                msg = (
-                    "Ramdisk size (%d GB) is not enough to run the collection with "
-                    % (free_mb / 1024)
-                )
-                msg += "%d frames." % num_images
-                logging.getLogger("GUI").error(msg)
-                result = False
-        except BaseException:
-            pass
-
         return result
 
     # Called by the owning widget (task_toolbox_widget) to create
@@ -293,21 +264,4 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         api.collect.collect(
             queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list
-        )
-
-    def set_max_osc_total_range_clicked(self):
-        num_images = int(self._acq_widget.acq_widget_layout.num_images_ledit.text())
-        (lower, upper), exp_time = self._acq_widget.update_osc_total_range_limits()
-        self._acq_widget.acq_widget_layout.osc_start_ledit.setText(
-            "%.3f" % (lower + 0.001)
-        )
-        self._acq_widget.acq_widget_layout.osc_total_range_ledit.setText(
-            "%.3f" % abs(upper - lower)
-        )
-        self._acq_widget.acq_widget_layout.num_images_ledit.setText(
-            "%d"
-            % (
-                abs(upper - lower)
-                / float(self._acq_widget.acq_widget_layout.osc_range_ledit.text())
-            )
         )

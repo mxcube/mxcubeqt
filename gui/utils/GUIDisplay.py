@@ -18,7 +18,6 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import sys
 import time
 import types
 import logging
@@ -61,6 +60,7 @@ class CustomMenuBar(QtImport.QMenuBar):
         self.execution_mode = None
         self.menu_items = []
         self.original_style = None
+        self.preview_windows = {}
 
         # Graphic elements ----------------------------------------------------
         # self.menubar = QtGui.QMenuBar(self)

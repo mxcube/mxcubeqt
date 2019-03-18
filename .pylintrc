@@ -9,7 +9,7 @@
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS,gui.utils.QtImport,gui.utils.QLed
+ignore=CVS,gui.utils.QtImport,gui.utils.QLed.QLed,QtImport
 
 
 # Pickle collected data for later comparisons.
@@ -29,7 +29,7 @@ unsafe-load-any-extension=yes
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code
-extension-pkg-whitelist=
+#extension-pkg-whitelist=PyQt5,PyQt4,PyQt,QtImport,QWidget
 
 # Allow optimization of some AST trees. This will activate a peephole AST
 # optimizer, which will apply various small optimizations. For instance, it can
@@ -234,7 +234,7 @@ callbacks=cb_,_cb
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=80
+max-line-length=88
 
 # Regexp for a line that is allowed to be longer than the limit.
 ignore-long-lines=^\s*(# )?<?https?://\S+>?$
@@ -273,7 +273,7 @@ ignore-mixin-members=yes
 # (useful for modules/projects where namespaces are manipulated during runtime
 # and thus existing member attributes cannot be deduced by static analysis. It
 # supports qualified module names, as well as Unix pattern matching.
-ignored-modules=gui.utils.QtImport,api,email,numpy,PyMca4,PyMca5,HardwareRepository
+ignored-modules=gui.utils.QtImport,api,email,numpy,matplotlib,PyMca,PyMca5,pyqtgraph,mpl_toolkits,HardwareRepository,QtImport,PyQt4,PyQt5
 
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamically set). This supports can work

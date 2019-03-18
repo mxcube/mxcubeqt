@@ -66,7 +66,7 @@ class MotorSpinBoxBrick(BaseWidget):
 
         # Internal values -----------------------------------------------------
         self.step_editor = None
-        self.move_step = None
+        self.move_step = 1
         self.demand_move = 0
         self.in_expert_mode = None
 
@@ -304,10 +304,10 @@ class MotorSpinBoxBrick(BaseWidget):
             and self.motor_hwobj.GUIstep is not None
         ):
             step = self.motor_hwobj.GUIstep
-        elif self["delta"] != "":
+        elif self["delta"] != "" and self["delta"] is not None:
             step = float(self["delta"])
 
-        if self.motor_hwobj.is_ready():
+        if self.motor_hwobj.is_ready() and step:
             self.set_position_spinbox_color(self.motor_hwobj.motor_states.READY)
             self.motor_hwobj.move_relative(-step)
 

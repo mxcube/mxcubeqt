@@ -296,7 +296,6 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         
         #TODO move this to hwobj
         config_path = selected_filename.replace("mnt/beegfs/P14", "data/ispyb/p14")[:-4] + "json"
-        print config_path
         
         if os.path.exists(config_path):
             self.results_widget.config_path_ledit.setText(config_path)

@@ -153,8 +153,8 @@ class HutchMenuBrick(BaseWidget):
 
     def save_snapshot_clicked(self):
         formats = [
-            "*.%s" % unicode(format).lower()
-            for format in QtImport.QImageWriter.supportedImageFormats()
+            "*.%s" % image_format.lower()
+            for image_format in QtImport.QImageWriter.supportedImageFormats()
         ]
 
         current_file_name = "%s/%s_%d.%s" % (
@@ -209,10 +209,8 @@ class HutchMenuBrick(BaseWidget):
 
     def centring_snapshots(self, state):
         if state is None:
-            self.is_shooting = True
             self.setEnabled(False)
         else:
-            self.is_shooting = False
             self.setEnabled(True)
 
     def centring_started(self):

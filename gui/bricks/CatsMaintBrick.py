@@ -20,7 +20,6 @@
 import string
 import logging
 import time
-import traceback
 import sys
 import os
 
