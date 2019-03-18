@@ -1,3 +1,5 @@
+#pylint: skip-file
+
 import sys
 from gui.utils import QtImport
 

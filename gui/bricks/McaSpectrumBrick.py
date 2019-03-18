@@ -21,11 +21,18 @@
 import logging
 import numpy.oldnumeric as Numeric
 
-from PyMca import McaAdvancedFit
-from PyMca import ConfigDict
-
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
+
+try:
+    if QtImport.qt_variant == "PyQt5":
+        from PyMca5.PyMca import McaAdvancedFit
+        from PyMca5.PyMca import ConfigDict
+    else:
+        from PyMca import McaAdvancedFit
+        from PyMca import ConfigDict
+except BaseException:
+    pass
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -60,17 +67,8 @@ class McaSpectrumBrick(BaseWidget):
             data = Numeric.array(data)
             x = Numeric.array(data[:, 0]).astype(Numeric.Float)
             y = Numeric.array(data[:, 1]).astype(Numeric.Float)
-            xmin = float(config["min"])
-            xmax = float(config["max"])
-            # self.mcafit.refreshWidgets()
             calib = Numeric.ravel(calib).tolist()
-            """kw = {}
-            kw.update(config)
-            kw['xmin'] = xmin
-            kw['xmax'] = xmax
-            kw['calibration'] = calib"""
             self.mcafit.setdata(x, y)
-            # elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax, calibration=calib)
             self.mcafit._energyAxis = False
             self.mcafit.toggleEnergyAxis()
             result = self._fit()

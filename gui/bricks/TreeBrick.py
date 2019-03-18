@@ -21,7 +21,7 @@ import logging
 from collections import namedtuple
 
 from gui.BaseComponents import BaseWidget
-from gui.utils import queue_item, Icons, Colors, QtImport
+from gui.utils import queue_item, Colors, QtImport
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from gui.widgets.dc_tree_widget import DataCollectTree
 
@@ -99,7 +99,6 @@ class TreeBrick(BaseWidget):
         self.add_property("enableQueueAutoSave", "boolean", True)
 
         # Properties to initialize hardware objects --------------------------
-        self.add_property("hwobj_unittest", "string", "")
         self.add_property("hwobj_state_machine", "string", "")
 
         # Signals ------------------------------------------------------------
@@ -143,6 +142,9 @@ class TreeBrick(BaseWidget):
         self.define_slot("set_requested_tree_brick", ())
 
         # Graphic elements ----------------------------------------------------
+        self.tools_menu = None
+        self.queue_sync_action = None
+
         self.sample_changer_widget = QtImport.load_ui_file(
             "sample_changer_widget_layout.ui"
         )
@@ -392,8 +394,6 @@ class TreeBrick(BaseWidget):
             )
         elif property_name == "redis_client":
             self.redis_client_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == "hwobj_unittest":
-            self.unittest_hwobj = self.get_hardware_object(new_value, optional=True)
         elif property_name == "scOneName":
             self.sample_changer_widget.filter_cbox.setItemText(1, new_value)
         elif property_name == "scTwoName":
@@ -605,7 +605,7 @@ class TreeBrick(BaseWidget):
         l_samples = dict()
 
         # TODO: add test for sample changer type, here code is for Robodiff only
-        for location, l_sample in location_samples.iteritems():
+        for location, l_sample in location_samples.items():
             if l_sample.lims_location != (None, None):
                 basket, sample = l_sample.lims_location
                 cell = int(round((basket + 0.5) / 3.0))

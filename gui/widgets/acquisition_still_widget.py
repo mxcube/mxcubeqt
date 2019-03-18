@@ -206,7 +206,6 @@ class AcquisitionStillWidget(QtImport.QWidget):
             self.resolution_validator,
         )
 
-        has_shutter_less = api.beamline_setup.detector_has_shutterless()
         self.init_detector_roi_modes()
 
     def exposure_time_ledit_changed(self, new_values):

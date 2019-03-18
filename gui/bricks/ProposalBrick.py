@@ -192,9 +192,6 @@ class ProposalBrick(BaseWidget):
         self.user_group_ledit.textChanged.connect(self.user_group_changed)
 
         # Other ---------------------------------------------------------------
-        """Colors.set_widget_color(self.proposal_type_combox,
-                                           Colors.LIGHT_RED,
-                                           QtGui.QPalette.Window)"""
         Colors.set_widget_color(
             self.proposal_number_ledit, Colors.LIGHT_RED, QtImport.QPalette.Base
         )
@@ -360,7 +357,6 @@ class ProposalBrick(BaseWidget):
                 "Using local login: the data collected won't be stored in the database"
             )
             api.lims.disable()
-            expiration_time = 0
             self.loggedIn.emit(False)
         else:
             msg = "Results in ISPyB will be stored under proposal %s%s - '%s'" % (
@@ -401,21 +397,8 @@ class ProposalBrick(BaseWidget):
                 end_time = session["endDate"].split()[1]
                 end_date_list = end_date.split("-")
                 end_time_list = end_time.split(":")
-                expiration_time = time.mktime(
-                    (
-                        int(end_date_list[0]),
-                        int(end_date_list[1]),
-                        int(end_date_list[2]),
-                        23,
-                        59,
-                        59,
-                        0,
-                        0,
-                        0,
-                    )
-                )
             except (TypeError, IndexError, ValueError):
-                expiration_time = 0
+                pass
 
             self.loggedIn.emit(True)
 

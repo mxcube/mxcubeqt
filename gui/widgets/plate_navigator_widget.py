@@ -18,7 +18,6 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import Icons, QtImport
-from gui.utils.sample_changer_helper import SampleChanger
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -32,6 +31,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
+        self.plate_manipulator_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.__current_location = None

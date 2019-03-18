@@ -38,6 +38,7 @@ class AdvancedParametersWidget(QtImport.QWidget):
         # Internal values -----------------------------------------------------
         self._data_collection = None
         self._tree_view_item = None
+        self._acquisition_mib = None
 
         # Properties ----------------------------------------------------------
 

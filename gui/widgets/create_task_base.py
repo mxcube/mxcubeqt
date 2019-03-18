@@ -58,6 +58,8 @@ class CreateTaskBase(QtImport.QWidget):
 
         self._tree_brick = None
         self._task_node_name = task_node_name
+        self._acquisition_parameters = None
+        self._processing_parameters = None
 
         # Centred positons that currently are selected in the parent
         # widget, position_history_brick.
@@ -222,10 +224,6 @@ class CreateTaskBase(QtImport.QWidget):
 
     def set_tree_brick(self, brick):
         self._tree_brick = brick
-
-    @abc.abstractmethod
-    def set_energies(self):
-        pass
 
     def get_sample_item(self, item):
         if isinstance(item, queue_item.SampleQueueItem):

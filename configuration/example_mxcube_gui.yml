@@ -46,7 +46,7 @@
             - {comment: '', default_value: '', hidden: false, name: instanceServer,
               old_value: '', type: string, value: /instanceconnection}
             - {comment: '', default_value: '', hidden: false, name: localLogin, old_value: '',
-              type: string, value: /locallogin}
+              type: string, value: ''}
             - {comment: '', default_value: '', hidden: false, name: secondaryProposals,
               old_value: '', type: string, value: ''}
             - {comment: '', default_value: 500, hidden: false, name: serverStartDelay,

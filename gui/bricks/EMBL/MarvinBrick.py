@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import api
-from gui.utils import Colors, Icons, QtImport
+from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE colaboration"]

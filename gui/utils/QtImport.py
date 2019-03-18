@@ -139,7 +139,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
     try:
        from PyQt5.QtSvg import * 
     except BaseException:
-       print("QtSvg is not imported. It maybe needs to be installed")
+       pass
 #
 # PyQt4
 #

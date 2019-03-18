@@ -40,6 +40,8 @@ class CameraBrick(BaseWidget):
         # self.graphics_camera_frame = None
         self.fixed_size = None
         self.display_beam = None
+        self.display_scale = None
+        self.image_scale_list = []
 
         # Properties ----------------------------------------------------------
         self.add_property("mnemonic", "string", "/graphics")
@@ -282,12 +284,6 @@ class CameraBrick(BaseWidget):
                 ],
                 hide_msg=False,
             )
-
-    """
-    def set_expert_mode(self, is_expert_mode):
-        self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
-        self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
-    """
 
     def set_info_msg(self, msg):
         self.info_label.setText(msg)
