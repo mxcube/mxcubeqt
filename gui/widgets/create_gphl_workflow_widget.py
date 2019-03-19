@@ -93,7 +93,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._workflow_cbox.currentIndexChanged[str].connect(self.workflow_selected)
+        self._workflow_cbox.currentIndexChanged.connect(self.workflow_selected)
 
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
@@ -119,7 +119,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def workflow_selected(self, name):
         # necessary as this comes in as a QString object
-        name = str(name)
+        name = str(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
         xx = self._workflow_cbox
         xx.setCurrentIndex(xx.findText(name))
