@@ -196,6 +196,9 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def select_line_with_cpos(self, start_cpos, end_cpos, num_images):
+        """Selects graphical line which contains two cpositions
+           Adds number of frames next to the graphical line
+        """
         self._lines_widget.overlay_slider.setEnabled(False)
         self._lines_widget.overlay_cbox.setEnabled(False)
 
