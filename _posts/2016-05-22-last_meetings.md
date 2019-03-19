@@ -27,7 +27,7 @@ fa-icon: users
 
 - [MxCuBE for time-resolved SSX at T-REXX](doc/meetings_2019_MAXIV/trexx-max4.pdf)
 - [MXCuBE implementations for automated multiple in situ crystals scanning in microfluidic chips on the PROXIMA-1 beamline](doc/meetings_2019_MAXIV/file_do_not_exist)
-- [New Science at BioMAX & MicroMAX](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [New Science at BioMAX & MicroMAX](doc/meetings_2019_MAXIV/newscience_Thomas_Ursby.pdf)
 - [New science at ID29](doc/meetings_2019_MAXIV/file_do_not_exist)
 - [Braggi - The new diffraction image viewer](doc/meetings_2019_MAXIV/file_do_not_exist)
 
