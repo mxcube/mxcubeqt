@@ -232,20 +232,20 @@ class FormatStringProperty(Property):
 
         self.type = "formatString"
 
-    def set_value(self, format_str):
+    def set_value(self, property_value):
         self.old_value = self.value
-        self.value = str(format_str)
+        self.value = str(property_value)
 
-        if format_str.startswith("+"):
+        if property_value.startswith("+"):
             prefix = "+"
-            format_str = format_str[1:]
-        elif format_str.startswith(" "):
+            property_value = property_value[1:]
+        elif property_value.startswith(" "):
             prefix = ""
-            format_str = format_str[1:]
+            property_value = property_value[1:]
         else:
             prefix = ""
 
-        parts = format_str.split(".")
+        parts = property_value.split(".")
 
         if len(parts) == 2:
             self.format_string = (

@@ -221,11 +221,11 @@ class GraphicsToolsBrick(BaseWidget):
                     self.image_scale_list[index], action.isChecked()
                 )
 
-    def set_expert_mode(self, is_expert_mode):
+    def set_expert_mode(self, expert):
         if self.move_beam_mark_manual_action:
-            self.move_beam_mark_manual_action.setEnabled(is_expert_mode)
+            self.move_beam_mark_manual_action.setEnabled(expert)
         if self.move_beam_mark_auto_action:
-            self.move_beam_mark_auto_action.setEnabled(is_expert_mode)
+            self.move_beam_mark_auto_action.setEnabled(expert)
 
     def measure_distance_clicked(self):
         api.graphics.start_measure_distance(wait_click=True)

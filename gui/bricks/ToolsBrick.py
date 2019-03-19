@@ -71,14 +71,14 @@ class ToolsBrick(BaseWidget):
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
-    def set_expert_mode(self, is_expert_mode):
+    def set_expert_mode(self, expert):
         """Enables/Disables action if in/not in export mode and
            action has expertMode=True
         """
         for key in self.action_dict.keys():
             tool = self.action_dict[key]
             if tool.get("expertMode") is not None:
-                key.setEnabled(is_expert_mode)
+                key.setEnabled(expert)
 
     def init_tools(self):
         """Gets available methods and populates menubar with methods

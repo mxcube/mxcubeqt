@@ -115,7 +115,7 @@ class CatsSimpleBrick(SampleChangerBrick):
         self.reset_baskets_samples_button.hide()
         self.double_click_loads_cbox.hide()
 
-    def property_changed(self, property_name, oldValue, newValue):
+    def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
             if self.sample_changer_hwobj is not None:
                 self.disconnect(
@@ -125,7 +125,7 @@ class CatsSimpleBrick(SampleChangerBrick):
                     self.device, "powerStateChanged", self._updatePowerState
                 )
 
-        SampleChangerBrick.property_changed(self, property_name, oldValue, newValue)
+        SampleChangerBrick.property_changed(self, property_name, old_value, new_value)
 
         if property_name == "mnemonic":
             # load the new hardware object
@@ -152,7 +152,7 @@ class CatsSimpleBrick(SampleChangerBrick):
             if self.has_basket_HT:
                 self.add_basket_HT()
         elif property_name == "use_basket_HT":
-            if newValue:
+            if new_value:
                 if self.basket_count is not None:
                     self.has_basket_HT = True
                     self.add_basket_HT()
