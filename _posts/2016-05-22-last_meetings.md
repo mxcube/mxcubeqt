@@ -5,6 +5,45 @@ color: white
 fa-icon: users
 ---
 
+# 14th. MXCuBE meeting @ MAXIV  (Lund, Sweeden), 12-14 March 2019
+[more info](https://indico.maxiv.lu.se/event/966/)
+
+![group photo](img/2019-maxiv-group.jpg)
+
+## Full list of presentations
+
+### Status reports
+
+- [ESRF](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [EMBL Hamburg](doc/meetings_2019_MAXIV/mxcube_status_maxiv_karpics.pdf)
+- [MAX IV](doc/meetings_2019_MAXIV/201903_BioMAX_Status_Report_JN.pdf)
+- [Soleil](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [ALBA](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [HZB](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [Elettra](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [GPhL](doc/meetings_2019_MAXIV/file_do_not_exist)
+
+### New science
+
+- [MxCuBE for time-resolved SSX at T-REXX](doc/meetings_2019_MAXIV/trexx-max4.pdf)
+- [MXCuBE implementations for automated multiple in situ crystals scanning in microfluidic chips on the PROXIMA-1 beamline](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [New Science at BioMAX & MicroMAX](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [New science at ID29](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [Braggi - The new diffraction image viewer](doc/meetings_2019_MAXIV/file_do_not_exist)
+
+### Other presentation
+
+- [MX at SLS](doc/meetings_2019_MAXIV/JAW_Lund_2019_SHORT_02.pdf)
+- [Report and actions from previous developers meeting](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [The MXCuBE project: Introduction to new developers and partners](doc/meetings_2019_MAXIV/MXCuBE_2019_intro.pdf)
+- [Developers meeting](doc/meetings_2019_MAXIV/Developers_meeting.pdf)
+- [Hands on MXCuBE session](doc/meetings_2019_MAXIV/hands_on_mxcube.pdf)
+
+### Minutes and reports
+- [Developers' Committee summary - DRAFT](http://mxcube.github.io/mxcube/doc/developers_meetings/Minutes20190313.pdf)
+- [Scientific Committee summary - DRAFT](doc/meetings_2019_MAXIV/file_do_not_exist)
+
+
 # 13th. MXCuBE meeting @ Elettra (Trieste, Italy), 11-13 September 2018
 [more info](http://www.elettra.eu/Conferences/2018/MXCuBE-ISPyB/)
 
@@ -37,9 +76,9 @@ fa-icon: users
 - [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
 
 ### Minutes and reports
-- [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary_v1.pdf)
-- [Scientific Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
-- [MXCuBE-ISPyB joint dicussion - DRAFT](doc/meetings_2018_Elettra/Trieste_2018_ISPyB_MXCuBE.pdf) Autoprocessing and metrics.
+- [Developers' Committee summary](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary_v1.pdf)
+- [Scientific Committee summary](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
+- [MXCuBE-ISPyB joint dicussion](doc/meetings_2018_Elettra/Trieste_2018_ISPyB_MXCuBE.pdf) Autoprocessing and metrics.
 - Steering committee meeting summary not available - please contribute
 
 
