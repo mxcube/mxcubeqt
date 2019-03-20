@@ -17,7 +17,7 @@ fa-icon: users
 - [ESRF](doc/meetings_2019_MAXIV/file_do_not_exist)
 - [EMBL Hamburg](doc/meetings_2019_MAXIV/mxcube_status_maxiv_karpics.pdf)
 - [MAX IV](doc/meetings_2019_MAXIV/201903_BioMAX_Status_Report_JN.pdf)
-- [Soleil](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [Soleil](doc/meetings_2019_MAXIV/MXCuBE_status_at_SOLEIL_March_2019.pdf)
 - [ALBA](doc/meetings_2019_MAXIV/file_do_not_exist)
 - [HZB](doc/meetings_2019_MAXIV/file_do_not_exist)
 - [Elettra](doc/meetings_2019_MAXIV/file_do_not_exist)
