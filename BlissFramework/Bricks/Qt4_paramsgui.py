@@ -9,116 +9,6 @@ import os.path
 import logging
 import sys
 
-# To be replaced with DoubleSpinbox
-# # copied from the motor brick
-# # can display decimal places
-# class SpinBox(QtGui.QSpinBox):
-#     CHANGED_COLOR = QtGui.QColor(255,165,0)
-#     def __init__(self, parent, options):
-#         QtGui.QSpinBox.__init__(self,parent)
-#         self.decimalPlaces=1
-#         self.colorGroupDict={}
-#         self.setValidator(QtGui.QDoubleValidator(self))
-#         self.editor().setAlignment(QtGui.QWidget.AlignLeft)
-#         qt.QObject.connect(self.editor(),qt.SIGNAL('textChanged(const QString &)'),self.inputFieldChanged)
-#         self.__name = options['variableName']
-#         if options.has_key('unit'):
-#             QtGui.QSpinBox.setSuffix(self, ' ' + options['unit'])
-#         if options.has_key('defaultValue'):
-#             val = float(options['defaultValue'])
-#             self.setValue(int(val * float(10**self.decimalPlaces)))
-#         if options.has_key('upperBound'):
-#             self.setMaxValue(float(options['upperBound']))
-#         else:
-#             QtGui.QSpinBox.setMaxValue(self, sys.maxint)
-#         if options.has_key('lowerBound'):
-#             self.setMinimum(float(options['lowerBound']))
-#         if options.has_key('tooltip'):
-#             QtGui.QToolTip.add(self, options['tooltip'])
-#
-#     def inputFieldChanged(self,text):
-#         self.setEditorBackgroundColor(SpinBox.CHANGED_COLOR)
-#     def setDecimalPlaces(self,places):
-#         current_val=float(self.value())/float(10**self.decimalPlaces)
-#         current_step=self.lineStep()
-#         current_min=float(self.minValue())/float(10**self.decimalPlaces)
-#         current_max=float(self.maxValue())/float(10**self.decimalPlaces)
-#         self.decimalPlaces=places
-#         self.blockSignals(True)
-#         self.setMinValue(current_min)
-#         self.setMaxValue(current_max)
-#         self.setValue(current_val)
-#         self.blockSignals(False)
-#         self.setLineStep(current_step)
-#     def decimalPlaces(self):
-#         return self.decimalPlaces
-#     def setMinValue(self,value):
-#         try:
-#             QtGui.QSpinBox.setMinValue(self,int(value*(10**self.decimalPlaces)))
-#         except (TypeError,ValueError):
-#             logging.getLogger().error("MotorSpinBoxBrick: error setting minimum value (%d)" % value)
-#     def setMaxValue(self,value):
-#         try:
-#             QtGui.QSpinBox.setMaxValue(self,int(value*(10**self.decimalPlaces)))
-#         except (TypeError,ValueError):
-#             logging.getLogger().error("MotorSpinBoxBrick: error setting maximum value (%d)" % value)
-#     def mapValueToText(self,value):
-#         f=float(value)/float(10**self.decimalPlaces)
-#         return QtGui.QString(str(f))
-#     def mapTextToValue(self):
-#         t = str(self.text())
-#         try:
-#             ret = int(float(t)*(10**self.decimalPlaces))
-#         except:
-#             return (0, False)
-#         else:
-#             return (ret, True)
-#     def setValue(self,value):
-#         if type(value)==type(0.0):
-#             value=int(value*(10**self.decimalPlaces))
-#         self.editor().blockSignals(True)
-#         QtGui.QSpinBox.setValue(self,value)
-#         self.editor().blockSignals(False)
-#     def lineStep(self):
-#         step=float(QtGui.QSpinBox.lineStep(self))/(10**self.decimalPlaces)
-#         return step
-#     def setLineStep(self,step):
-#         if type(step)==type(0.0):
-#             s=int(step*(10**self.decimalPlaces))
-#         else:
-#             s=step
-#         try:
-#             QtGui.QSpinBox.setLineStep(self,s)
-#         except (TypeError,ValueError):
-#             logging.getLogger().error("MotorSpinBoxBrick: error setting step value (%d)" % step)
-#     def eventFilter(self,obj,ev):
-#         if isinstance(ev,QtGui.QContextMenuEvent):
-#             self.emit(qt.PYSIGNAL("contextMenu"),())
-#             return True
-#         else:
-#             return QtGui.QSpinBox.eventFilter(self,obj,ev)
-#     def setEditorBackgroundColor(self,color):
-#         #print "SpinBox.setEditorBackgroundColor",color
-#         editor=self.editor()
-#         editor.setPaletteBackgroundColor(color)
-#         spinbox_palette=editor.palette()
-#         try:
-#             cg=self.colorGroupDict[color.rgb()]
-#         except KeyError:
-#             cg=QtGui.QColorGroup(spinbox_palette.disabled())
-#             cg.setColor(cg.Background,color)
-#             self.colorGroupDict[color.rgb()]=cg
-#         spinbox_palette.setDisabled(cg)
-#
-#     def set_value(self, value):
-#         val = float(value)
-#         self.setValue(val)
-#     def get_value(self):
-#         val=float(self.value())/float(10**self.decimalPlaces)
-#         return str(val)
-#     def get_name(self):
-#         return self.__name
-
 class LineEdit(QtGui.QLineEdit):
     def __init__(self, parent, options):
         QtGui.QLineEdit.__init__(self, parent)
@@ -298,7 +188,23 @@ class Message(QtGui.QWidget):
     def set_value(self, value):
         pass
         
-        
+class CheckBox(QtGui.QCheckBox):
+    def __init__(self, parent, options):
+        QtGui.QCheckBox.__init__(self, options.get('uiLabel','CheckBox'), parent)
+        # self.setAlignment(QtCore.Qt.AlignLeft)
+        self.__name = options['variableName']
+        state = (QtCore.Qt.Checked if options.get('defaultValue')
+                 else QtCore.Qt.Unchecked)
+        self.setCheckState(state)
+        # self.setAlignment(QtCore.Qt.AlignRight)
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                           QtGui.QSizePolicy.Expanding)
+    def set_value(self, value):
+        self.setChecked(value)
+    def get_name(self):
+        return self.__name
+    def get_value(self):
+        return self.isChecked()
 
 WIDGET_CLASSES = {
     'combo': Combo,
@@ -306,6 +212,7 @@ WIDGET_CLASSES = {
     'text': LineEdit,
     'file': File,
     'message': Message,
+    'boolean' : CheckBox,
 
     'float':DoubleSpinBox,
     'textarea':TextEdit
@@ -316,6 +223,7 @@ def make_widget(parent, options):
 
 
 class FieldsWidget(QtGui.QWidget):
+
     def __init__(self, fields, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.field_widgets = list()
@@ -332,6 +240,8 @@ class FieldsWidget(QtGui.QWidget):
                            QtGui.QSizePolicy.Expanding)
 
         current_row = 0
+        col_incr = 0
+        pad = ''
         for field in fields:
             # should not happen but lets just skip them
             if field['type'] != 'message' and not field.has_key('uiLabel'):
@@ -340,6 +250,7 @@ class FieldsWidget(QtGui.QWidget):
             # hack until the 'real' xml gets implemented server side
             # and this mess gets rewritten
             if field['type'] == 'message':
+                # NBNB This will NOT work with NEW_COLUMN
                 logging.debug('creating widget with options: %s', field)
                 w = make_widget(self, field)
                 # message will be alone in the layout
@@ -347,7 +258,6 @@ class FieldsWidget(QtGui.QWidget):
                 self.layout().addWidget(w, current_row, current_row,
                                                  0, 1)
             else:
-                label = QtGui.QLabel(field['uiLabel'], self)
                 logging.debug('creating widget with options: %s', field)
                 w = make_widget(self, field)
                 # Temporary (like this brick ...) hack to get a nicer UI
@@ -358,10 +268,22 @@ class FieldsWidget(QtGui.QWidget):
                     w.setSizePolicy(QtGui.QSizePolicy.Fixed,
                                     QtGui.QSizePolicy.Fixed)
                 self.field_widgets.append(w)
-                self.layout().addWidget(label, current_row, 0, QtCore.Qt.AlignLeft)
-                self.layout().addWidget(w, current_row, 1, QtCore.Qt.AlignLeft)
+                if field['type'] == 'boolean':
+                    self.layout().addWidget(w, current_row, 0 + col_incr, 1, 2,
+                                            QtCore.Qt.AlignLeft)
+                else:
+                    label = QtGui.QLabel(pad + field['uiLabel'], self)
+                    self.layout().addWidget(label, current_row, 0 + col_incr,
+                                            QtCore.Qt.AlignLeft)
+                    self.layout().addWidget(w, current_row, 1 + col_incr,
+                                            QtCore.Qt.AlignLeft)
         
             current_row += 1
+            if field.pop('NEW_COLUMN', False):
+                # Increment column
+                col_incr += 2
+                current_row = 0
+                pad = ' ' * 5
 
 #        ok_button = qt.QPushButton("OK", self)
 #        cancel_button = qt.QPushButton('Cancel', self)

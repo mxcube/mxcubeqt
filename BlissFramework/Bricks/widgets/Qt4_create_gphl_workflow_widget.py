@@ -74,7 +74,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._workflow_cbox.currentIndexChanged[str].connect(
+        self._workflow_cbox.currentIndexChanged.connect(
             self.workflow_selected
         )
 
@@ -96,13 +96,13 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._workflow_cbox.clear()
             for workflow_name in workflow_names:
                 self._workflow_cbox.addItem(workflow_name)
-            self.workflow_selected(workflow_names[0])
+            self.workflow_selected()
             workflow_hwobj.connect('gphlParametersNeeded',
                                    self.gphl_data_dialog.open_dialog)
 
-    def workflow_selected(self, name):
+    def workflow_selected(self):
         # necessary as this comes in as a QString object
-        name = str(name)
+        name = str(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
         xx = self._workflow_cbox
         xx.setCurrentIndex(xx.findText(name))
