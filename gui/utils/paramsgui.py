@@ -235,7 +235,27 @@ class Message(QtImport.QWidget):
 
     def set_value(self, value):
         pass
+        
+class CheckBox(QtImport.QCheckBox):
 
+    def __init__(self, parent, options):
+        QtImport.QCheckBox.__init__(self, options.get("uiLabel", "CheckBox"), parent)
+        # self.setAlignment(QtImport.AlignLeft)
+        self.__name = options["variableName"]
+        state = (QtImport.Checked if options.get("defaultValue") else QtImport.Unchecked)
+        self.setCheckState(state)
+        # self.setAlignment(QtImport.AlignRight)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
+                           QtImport.QSizePolicy.Expanding)
+
+    def set_value(self, value):
+        self.setChecked(value)
+
+    def get_name(self):
+        return self.__name
+
+    def get_value(self):
+        return self.isChecked()
 
 WIDGET_CLASSES = {
     "combo": Combo,
@@ -243,6 +263,7 @@ WIDGET_CLASSES = {
     "text": LineEdit,
     "file": File,
     "message": Message,
+    "boolean" : CheckBox,
     "float": DoubleSpinBox,
     "textarea": TextEdit,
 }
@@ -257,16 +278,9 @@ class FieldsWidget(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent)
         self.field_widgets = list()
 
-        #        qt.QVBoxLayout(self)
-        #        grid = qt.QGridLayout()
-        QtImport.QGridLayout(self)
-        #        button_box = qt.QHBoxLayout()
-        #         # We're trying to pack everything together on the lower left corner
-        #         self.setSizePolicy(QtImport.QSizePolicy.Fixed,
-        #                            QtImport.QSizePolicy.Fixed)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
-
         current_row = 0
+        col_incr = 0
+        pad = ''
         for field in fields:
             # should not happen but lets just skip them
             if field["type"] != "message" and "uiLabel" not in field:
@@ -281,33 +295,38 @@ class FieldsWidget(QtImport.QWidget):
                 # so that will not fsck up the layout
                 self.layout().addWidget(w, current_row, current_row, 0, 1)
             else:
-                label = QtImport.QLabel(field["uiLabel"], self)
                 logging.debug("creating widget with options: %s", field)
                 w = make_widget(self, field)
                 # Temporary (like this brick ...) hack to get a nicer UI
                 if isinstance(w, TextEdit):
                     w.setSizePolicy(
-                        QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Minimum
+                        QtImport.QSizePolicy.MinimumExpanding,
+                        QtImport.QSizePolicy.Minimum
                     )
                 else:
-                    w.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
+                    w.setSizePolicy(
+                        QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
+                    )
                 self.field_widgets.append(w)
-                self.layout().addWidget(label, current_row, 0, QtImport.Qt.AlignLeft)
-                self.layout().addWidget(w, current_row, 1, QtImport.Qt.AlignLeft)
-
+                if field['type'] == 'boolean':
+                    self.layout().addWidget(
+                        w, current_row, 0 + col_incr, 1, 2, QtImport.AlignLeft
+                    )
+                else:
+                    label = QtGui.QLabel(pad + field['uiLabel'], self)
+                    self.layout().addWidget(
+                        label, current_row, 0 + col_incr, QtImport.AlignLeft
+                    )
+                    self.layout().addWidget(
+                        w, current_row, 1 + col_incr, QtImport.AlignLeft
+                    )
+        
             current_row += 1
-
-    #        ok_button = qt.QPushButton("OK", self)
-    #        cancel_button = qt.QPushButton('Cancel', self)
-    #
-    #        #XXX:testing
-    #        qt.QObject.connect(ok_button, qt.SIGNAL('clicked()'),
-    #                           self.__print_xml)
-    #
-    #        button_box.addWidget(ok_button)
-    #        button_box.addWidget(cancel_button)
-
-    #        self.layout().addLayout(button_box)
+            if field.pop("NEW_COLUMN", False):
+                # Increment column
+                col_incr += 2
+                current_row = 0
+                pad = ' ' * 5
 
     def set_values(self, values):
         for field in self.field_widgets:
@@ -338,7 +357,3 @@ class FieldsWidget(QtImport.QWidget):
     def get_parameters_map(self):
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
 
-        # ret = dict()
-        # for w in self.field_widgets:
-        #    ret[w.get_name()] = w.get_value()
-        # return ret
