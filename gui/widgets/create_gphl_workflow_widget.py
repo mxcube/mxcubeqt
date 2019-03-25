@@ -55,6 +55,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         self.init_models()
 
+
+    def _initialize_graphics(self, workflow_hwobj):
         # Graphic elements ----------------------------------------------------
         self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
 
@@ -64,7 +66,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
         self._gphl_diffractcal_widget = GphlDiffractcalWidget(
-            self._gphl_acq_widget, "gphl_diffractcal_widget"
+            self._gphl_acq_widget, "gphl_diffractcal_widget",
+            workflow_object=workflow_hwobj
         )
 
         self._data_path_widget = DataPathWidget(
@@ -75,6 +78,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         data_path_layout.file_name_value_label.hide()
         data_path_layout.run_number_label.hide()
         data_path_layout.run_number_ledit.hide()
+        data_path_layout.prefix_ledit.setReadOnly(True)
+        data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = QtImport.QVBoxLayout(self._workflow_type_widget)
@@ -93,7 +98,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._workflow_cbox.currentIndexChanged[str].connect(self.workflow_selected)
+        self._workflow_cbox.currentIndexChanged.connect(
+            self.workflow_selected
+        )
 
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
@@ -102,30 +109,32 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # self.connect(self.gphl_data_dialog, qt.PYSIGNAL("continue_clicked"),
         #              self.data_acquired)
 
-    def initialise_workflows(self, workflow_hwobj):
+    def initialise_workflows(self, workflow_hwobj, beamline_setup_hwobj):
         self._workflow_hwobj = workflow_hwobj
-        self._workflow_cbox.clear()
         # self._gphl_parameters_widget.set_workflow(workflow_hwobj)
 
         if self._workflow_hwobj is not None:
+            workflow_hwobj.setup_workflow_object(beamline_setup_hwobj)
             workflow_names = list(workflow_hwobj.get_available_workflows())
+            self._initialize_graphics(workflow_hwobj)
+            self._workflow_cbox.clear()
             for workflow_name in workflow_names:
                 self._workflow_cbox.addItem(workflow_name)
-            self.workflow_selected(workflow_names[0])
-
+            self.workflow_selected()
             workflow_hwobj.connect(
                 "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
             )
 
-    def workflow_selected(self, name):
+    def workflow_selected(self):
         # necessary as this comes in as a QString object
-        name = str(name)
+        name = str(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
         xx = self._workflow_cbox
         xx.setCurrentIndex(xx.findText(name))
+        self.init_models()
+        self._data_path_widget.update_data_model(self._path_template)
 
         parameters = self._workflow_hwobj.get_available_workflows()[name]
-        beam_energies = parameters.get("beam_energies", {})
         strategy_type = parameters.get("strategy_type")
         if strategy_type == "transcal":
             self._gphl_acq_widget.hide()
@@ -137,7 +146,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
-            self._gphl_acq_param_widget.populate_widget(beam_energies=beam_energies)
+            self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.show()
@@ -154,8 +163,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         wf_model = tree_item.get_model()
 
-        if not isinstance(tree_item, queue_item.SampleQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
+            self.init_models()
 
+        else:
             if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
                 if tree_item.get_model().is_executed():
                     self.setDisabled(True)
@@ -224,12 +235,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         strategy_type = wf_parameters.get("strategy_type")
         wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
         if strategy_type.startswith("transcal"):
-            expected_resolution = None
+            pass
 
         elif strategy_type.startswith("diffractcal"):
-            expected_resolution = self._gphl_diffractcal_widget.get_parameter_value(
-                "expected_resolution"
-            )
             ss = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
             crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss)
             wf.set_space_group(crystal_data.space_group)
@@ -241,12 +249,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
         else:
             # Coulds be native_... phasing_... etc.
-            expected_resolution = self._gphl_acq_param_widget.get_parameter_value(
-                "expected_resolution"
-            )
-
-            dd = self._gphl_acq_param_widget.get_energy_dict()
-            wf.set_beam_energies(dd)
 
             wf.set_space_group(
                 self._gphl_acq_param_widget.get_parameter_value("space_group")
@@ -262,8 +264,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
-        wf.set_expected_resolution(expected_resolution)
-
+            wf.set_beam_energies(wf_parameters['beam_energies'])
+        
         tasks.append(wf)
 
         return tasks

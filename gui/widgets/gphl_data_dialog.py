@@ -149,6 +149,9 @@ class GphlDataDialog(QtImport.QDialog):
         self.cplx_gbox = QtImport.QGroupBox("Indexing solution", self)
         QtImport.QVBoxLayout(self.cplx_gbox)
         main_layout.addWidget(self.cplx_gbox)
+        self.cplx_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
         self.cplx_widget = None
 
         # Parameter box
