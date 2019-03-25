@@ -21,7 +21,7 @@ fa-icon: users
 - [ALBA](doc/meetings_2019_MAXIV/190312-MXCuBE-Lund-ALBA_status_report.pdf)
 - [HZB](doc/meetings_2019_MAXIV/mxcube_meeting_bessy2_status_2019-03-12.pdf)
 - [Elettra](doc/meetings_2019_MAXIV/file_do_not_exist)
-- [GPhL](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [GPhL](doc/meetings_2019_MAXIV/Global_Phasing_MXCuBE_2019_MAX_IV.pdf)
 
 ### New science
 
