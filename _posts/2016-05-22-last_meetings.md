@@ -44,6 +44,9 @@ fa-icon: users
 - [Scientific Committee summary - DRAFT](doc/meetings_2019_MAXIV/file_do_not_exist)
 
 
+---
+
+
 # 13th. MXCuBE meeting @ Elettra (Trieste, Italy), 11-13 September 2018
 [more info](http://www.elettra.eu/Conferences/2018/MXCuBE-ISPyB/)
 
@@ -80,6 +83,9 @@ fa-icon: users
 - [Scientific Committee summary](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
 - [MXCuBE-ISPyB joint dicussion](doc/meetings_2018_Elettra/Trieste_2018_ISPyB_MXCuBE.pdf) Autoprocessing and metrics.
 - Steering committee meeting summary not available - please contribute
+
+
+---
 
 
 # 12th. MXCuBE meeting
@@ -143,10 +149,6 @@ This time the meeting was organised on different lines to previous years, as pro
 ___
 
 
-___
-
-
-
 # 11th. MXCuBE meeting @ SOLEIL (Saint-Aubin, France), 12<sup>th</sup>-14<sup>th</sup> of June, 2017
 
 ![group photo](img/soleil-group-062017.jpg)
@@ -180,10 +182,6 @@ ___
 - Ivars Karpics - Embedding state persistence and user guidance in MXCuBE
 
 ___
-
-
-___
-
 
 
 # 10th. MXCuBE meeting @ ESRF (Grenoble, France), 16<sup>th</sup>-18<sup>th</sup> of January, 2017
@@ -234,12 +232,6 @@ ___
 ___
 
 
-___
-
-
-
-
-
 # 9th. MXCuBE meeting @ EMBL (Hamburg, Germany), 27<sup>th</sup>-29<sup>th</sup> of June, 2016
 
 ![embl group photo](img/2016-embl-meeting-group.jpg)
@@ -288,11 +280,6 @@ Photo credit: Alejandro De Maria Antolinos (ESRF)
 ___
 
 
-___
-
-
-
-
 # 8th. MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
 ![alba group photo](img/alba-meeting-group.jpg)
@@ -327,12 +314,7 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [MXCuBE and Qt4](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_03_qt4.pdf)
 - [Advanced methods and abstraction](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_02_advanced.pdf)
 
-
 ___
-
-
-___
-
 
 
 # 7th. MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015
