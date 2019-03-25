@@ -5,6 +5,48 @@ color: white
 fa-icon: users
 ---
 
+# 14th. MXCuBE meeting @ MAXIV  (Lund, Sweeden), 12-14 March 2019
+[more info](https://indico.maxiv.lu.se/event/966/)
+
+![group photo](img/2019-maxiv-group.jpg)
+
+## Full list of presentations
+
+### Status reports
+
+- [ESRF](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [EMBL Hamburg](doc/meetings_2019_MAXIV/mxcube_status_maxiv_karpics.pdf)
+- [MAX IV](doc/meetings_2019_MAXIV/201903_BioMAX_Status_Report_JN.pdf)
+- [Soleil](doc/meetings_2019_MAXIV/MXCuBE_status_at_SOLEIL_March_2019.pdf)
+- [ALBA](doc/meetings_2019_MAXIV/190312-MXCuBE-Lund-ALBA_status_report.pdf)
+- [HZB](doc/meetings_2019_MAXIV/mxcube_meeting_bessy2_status_2019-03-12.pdf)
+- [Elettra](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [GPhL](doc/meetings_2019_MAXIV/file_do_not_exist)
+
+### New science
+
+- [MxCuBE for time-resolved SSX at T-REXX](doc/meetings_2019_MAXIV/trexx-max4.pdf)
+- [MXCuBE implementations for automated multiple in situ crystals scanning in microfluidic chips on the PROXIMA-1 beamline](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [New Science at BioMAX & MicroMAX](doc/meetings_2019_MAXIV/newscience_Thomas_Ursby.pdf)
+- [New science at ID29](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [Braggi - The new diffraction image viewer](doc/meetings_2019_MAXIV/file_do_not_exist)
+
+### Other presentation
+
+- [MX at SLS](doc/meetings_2019_MAXIV/JAW_Lund_2019_SHORT_02.pdf)
+- [Report and actions from previous developers meeting](doc/meetings_2019_MAXIV/file_do_not_exist)
+- [The MXCuBE project: Introduction to new developers and partners](doc/meetings_2019_MAXIV/MXCuBE_2019_intro.pdf)
+- [Developers meeting](doc/meetings_2019_MAXIV/Developers_meeting.pdf)
+- [Hands on MXCuBE session](doc/meetings_2019_MAXIV/hands_on_mxcube.pdf)
+
+### Minutes and reports
+- [Developers' Committee summary - DRAFT](http://mxcube.github.io/mxcube/doc/developers_meetings/Minutes20190313.pdf)
+- [Scientific Committee summary - DRAFT](doc/meetings_2019_MAXIV/file_do_not_exist)
+
+
+---
+
+
 # 13th. MXCuBE meeting @ Elettra (Trieste, Italy), 11-13 September 2018
 [more info](http://www.elettra.eu/Conferences/2018/MXCuBE-ISPyB/)
 
@@ -37,10 +79,13 @@ fa-icon: users
 - [Refactoring Qt version of MXCuBE: structural improvements and new API ](doc/meetings_2018_Elettra/elettra_qt_api_karpics.pdf)
 
 ### Minutes and reports
-- [Developers' Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary_v1.pdf)
-- [Scientific Committee summary - DRAFT](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
-- [MXCuBE-ISPyB joint dicussion - DRAFT](doc/meetings_2018_Elettra/Trieste_2018_ISPyB_MXCuBE.pdf) Autoprocessing and metrics.
+- [Developers' Committee summary](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_developers_summary_v1.pdf)
+- [Scientific Committee summary](doc/meetings_2018_Elettra/MXCuBE_Trieste_2018_scientific_summary.docx)
+- [MXCuBE-ISPyB joint dicussion](doc/meetings_2018_Elettra/Trieste_2018_ISPyB_MXCuBE.pdf) Autoprocessing and metrics.
 - Steering committee meeting summary not available - please contribute
+
+
+---
 
 
 # 12th. MXCuBE meeting
@@ -104,10 +149,6 @@ This time the meeting was organised on different lines to previous years, as pro
 ___
 
 
-___
-
-
-
 # 11th. MXCuBE meeting @ SOLEIL (Saint-Aubin, France), 12<sup>th</sup>-14<sup>th</sup> of June, 2017
 
 ![group photo](img/soleil-group-062017.jpg)
@@ -141,10 +182,6 @@ ___
 - Ivars Karpics - Embedding state persistence and user guidance in MXCuBE
 
 ___
-
-
-___
-
 
 
 # 10th. MXCuBE meeting @ ESRF (Grenoble, France), 16<sup>th</sup>-18<sup>th</sup> of January, 2017
@@ -195,12 +232,6 @@ ___
 ___
 
 
-___
-
-
-
-
-
 # 9th. MXCuBE meeting @ EMBL (Hamburg, Germany), 27<sup>th</sup>-29<sup>th</sup> of June, 2016
 
 ![embl group photo](img/2016-embl-meeting-group.jpg)
@@ -249,11 +280,6 @@ Photo credit: Alejandro De Maria Antolinos (ESRF)
 ___
 
 
-___
-
-
-
-
 # 8th. MXCuBE meeting @ ALBA (Barcelona), 1<sup>st</sup>-2<sup>nd</sup> of December, 2015
 
 ![alba group photo](img/alba-meeting-group.jpg)
@@ -288,12 +314,7 @@ Article about MXCuBE on the ESRF newsletter can be found [here](http://mag.digit
 - [MXCuBE and Qt4](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_03_qt4.pdf)
 - [Advanced methods and abstraction](doc/meetings_2015_ALBA/2015_mxcube_alba_karpics_02_advanced.pdf)
 
-
 ___
-
-
-___
-
 
 
 # 7th. MXCuBE meeting @ HZB (Berlin), 1st-2nd June 2015
