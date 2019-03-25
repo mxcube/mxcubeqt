@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+# encoding: utf-8
 #
 #  Project: MXCuBE
 #  https://github.com/mxcube
@@ -32,9 +34,9 @@ from gui.widgets.gphl_data_dialog import GphlDataDialog
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import States
 
-
-__credits__ = ["MXCuBE collaboration"]
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
 
 
 class CreateGphlWorkflowWidget(CreateTaskBase):

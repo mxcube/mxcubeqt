@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+# encoding: utf-8
 #
 #  Project: MXCuBE
 #  https://github.com/mxcube
@@ -27,9 +29,9 @@ except ImportError:
 from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
-
-__credits__ = ["MXCuBE collaboration"]
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
 
 
 class ParameterDialogWidget(QtImport.QWidget):

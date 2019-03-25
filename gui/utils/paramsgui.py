@@ -240,11 +240,11 @@ class CheckBox(QtImport.QCheckBox):
 
     def __init__(self, parent, options):
         QtImport.QCheckBox.__init__(self, options.get("uiLabel", "CheckBox"), parent)
-        # self.setAlignment(QtImport.AlignLeft)
+        # self.setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
-        state = (QtImport.Checked if options.get("defaultValue") else QtImport.Unchecked)
+        state = (QtImport.Qt.Checked if options.get("defaultValue") else QtImport.Qt.Unchecked)
         self.setCheckState(state)
-        # self.setAlignment(QtImport.AlignRight)
+        # self.setAlignment(QtImport.Qt.AlignRight)
         self.setSizePolicy(QtImport.QSizePolicy.Expanding,
                            QtImport.QSizePolicy.Expanding)
 
@@ -310,15 +310,15 @@ class FieldsWidget(QtImport.QWidget):
                 self.field_widgets.append(w)
                 if field['type'] == 'boolean':
                     self.layout().addWidget(
-                        w, current_row, 0 + col_incr, 1, 2, QtImport.AlignLeft
+                        w, current_row, 0 + col_incr, 1, 2, QtImport.Qt.AlignLeft
                     )
                 else:
-                    label = QtGui.QLabel(pad + field['uiLabel'], self)
+                    label = QtImport.QLabel(pad + field['uiLabel'], self)
                     self.layout().addWidget(
-                        label, current_row, 0 + col_incr, QtImport.AlignLeft
+                        label, current_row, 0 + col_incr, QtImport.Qt.AlignLeft
                     )
                     self.layout().addWidget(
-                        w, current_row, 1 + col_incr, QtImport.AlignLeft
+                        w, current_row, 1 + col_incr, QtImport.Qt.AlignLeft
                     )
         
             current_row += 1

@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+# encoding: utf-8
 #
 #  Project: MXCuBE
 #  https://github.com/mxcube
@@ -35,6 +37,10 @@ from HardwareRepository.dispatcher import dispatcher
 
 __category__ = "TaskToolbox_Tabs"
 
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
+__license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
+
 CrystalSystemData = namedtuple("CrystalSystemData", ("crystal_system", "point_groups"))
 CrystalData = namedtuple(
     "CrystalData", ("name", "space_group", "a", "b", "c", "alpha", "beta", "gamma")
@@ -45,7 +51,9 @@ class GphlAcquisitionData(object):
     """Dummy container class for global phasing acquisition data
 
     Attributes are set in the GphlAcquisitionWidget"""
+
     pass
+
 
 class GphlSetupWidget(QtImport.QWidget):
     """Superclass for GPhL interface widgets"""
@@ -166,8 +174,9 @@ class GphlSetupWidget(QtImport.QWidget):
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
 
-    def __init__(self, parent=None, name="gphl_acquisition_widget",
-                 workflow_object=None):
+    def __init__(
+            self, parent=None, name="gphl_acquisition_widget", workflow_object=None
+        ):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
@@ -246,6 +255,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
             label = self._widget_data["test_crystal_parameters"][0]
             label.setText(QtImport.QString(label_str2))
+
 
 class GphlAcquisitionWidget(GphlSetupWidget):
     """Input widget for GPhL data collection setup"""

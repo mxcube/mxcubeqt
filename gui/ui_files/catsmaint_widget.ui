@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>555</width>
+    <width>539</width>
     <height>928</height>
    </rect>
   </property>
@@ -114,7 +114,19 @@
        <property name="title">
         <string>LN2 Regulation</string>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <layout class="QHBoxLayout">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item>
          <widget class="QLabel" name="lblRegulationState">
           <property name="sizePolicy">
@@ -154,15 +166,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btRegulationOff">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Regulation Off</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -559,13 +565,6 @@ color: #009;</string>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btRecoverFailure">
-              <property name="text">
-               <string>Recover Fail</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="btResetMotion">
               <property name="text">
                <string>Reset Motion</string>
@@ -573,14 +572,14 @@ color: #009;</string>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btMemClear">
+             <widget class="QPushButton" name="btClear">
               <property name="text">
                <string>Clear Memory</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btClear">
+             <widget class="QPushButton" name="btMemClear">
               <property name="text">
                <string>Clear</string>
               </property>
