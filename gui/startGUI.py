@@ -254,11 +254,10 @@ def run(gui_config_file=None):
         else:
             parser.error("Too many arguments.")
             sys.exit(1)
-
     if (
         len(
             os.popen(
-                "ps -aef | grep 'python' -i | grep 'hardwareRepository'  | grep -v 'grep' | awk '{ print $3 }'"
+                "/bin/ps -aef | /bin/grep 'python' -i | /bin/grep 'hardwareRepository'  | /bin/grep -v 'grep' | /bin/awk '{ print $3 }'"
             )
             .read()
             .strip()

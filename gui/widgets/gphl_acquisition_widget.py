@@ -32,7 +32,7 @@ except ImportError:
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository.HardwareObjects import queue_model_enumerables as enumerables
+from HardwareRepository.HardwareObjects import queue_model_enumerables
 from HardwareRepository.dispatcher import dispatcher
 
 __category__ = "TaskToolbox_Tabs"
@@ -356,12 +356,12 @@ class GphlAcquisitionWidget(GphlSetupWidget):
                 ll.extend(
                     [
                         x.name
-                        for x in enumerables.SPACEGROUP_DATA
+                        for x in queue_model_enumerables.SPACEGROUP_DATA
                         if x.point_group in data.point_groups
                     ]
                 )
             else:
-                ll.extend(enumerables.XTAL_SPACEGROUPS)
+                ll.extend(queue_model_enumerables.XTAL_SPACEGROUPS)
 
             widget = self._widget_data["space_group"][0]
             widget.clear()

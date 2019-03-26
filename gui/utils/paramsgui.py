@@ -278,6 +278,9 @@ class FieldsWidget(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent)
         self.field_widgets = list()
 
+        QtImport.QGridLayout(self)
+        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
+
         current_row = 0
         col_incr = 0
         pad = ''

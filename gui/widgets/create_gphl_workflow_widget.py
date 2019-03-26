@@ -23,6 +23,7 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+import api
 
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
@@ -50,7 +51,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self.setObjectName("create_gphl_workflow_widget")
 
         # Hardware objects ----------------------------------------------------
-        self._workflow_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.current_prefix = None
@@ -58,7 +58,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.init_models()
 
 
-    def _initialize_graphics(self, workflow_hwobj):
+    def _initialize_graphics(self):
         # Graphic elements ----------------------------------------------------
         self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
 
@@ -69,7 +69,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
         self._gphl_diffractcal_widget = GphlDiffractcalWidget(
             self._gphl_acq_widget, "gphl_diffractcal_widget",
-            workflow_object=workflow_hwobj
+            workflow_object=api.gphl_workflow
         )
 
         self._data_path_widget = DataPathWidget(
@@ -111,14 +111,13 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # self.connect(self.gphl_data_dialog, qt.PYSIGNAL("continue_clicked"),
         #              self.data_acquired)
 
-    def initialise_workflows(self, workflow_hwobj, beamline_setup_hwobj):
-        self._workflow_hwobj = workflow_hwobj
-        # self._gphl_parameters_widget.set_workflow(workflow_hwobj)
+    def initialise_workflows(self):
 
-        if self._workflow_hwobj is not None:
-            workflow_hwobj.setup_workflow_object(beamline_setup_hwobj)
+        workflow_hwobj = api.gphl_workflow
+        if workflow_hwobj is not None:
+            workflow_hwobj.setup_workflow_object()
             workflow_names = list(workflow_hwobj.get_available_workflows())
-            self._initialize_graphics(workflow_hwobj)
+            self._initialize_graphics()
             self._workflow_cbox.clear()
             for workflow_name in workflow_names:
                 self._workflow_cbox.addItem(workflow_name)
@@ -136,7 +135,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.init_models()
         self._data_path_widget.update_data_model(self._path_template)
 
-        parameters = self._workflow_hwobj.get_available_workflows()[name]
+        parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
         if strategy_type == "transcal":
             self._gphl_acq_widget.hide()
@@ -212,10 +211,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template.num_files = 0
         path_template.compression = False
 
-        ho = self._workflow_hwobj
-        if ho.get_state() == States.OFF:
+        workflow_hwobj = api.gphl_workflow
+        if workflow_hwobj.get_state() == States.OFF:
             # We will be setting up the connection now - time to connect to quit
-            QtImport.QApplication.instance().aboutToQuit.connect(ho.shutdown)
+            QtImport.QApplication.instance().aboutToQuit.connect(
+                workflow_hwobj.shutdown
+            )
 
             tree_brick = self._tree_brick
             if tree_brick:
@@ -223,7 +224,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     self.continue_button_click
                 )
 
-        wf = queue_model_objects.GphlWorkflow(self._workflow_hwobj)
+        wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
         wf_type = str(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
@@ -233,7 +234,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf.set_name(wf.path_template.get_prefix())
         wf.set_number(wf.path_template.run_number)
 
-        wf_parameters = ho.get_available_workflows()[wf_type]
+        wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
         strategy_type = wf_parameters.get("strategy_type")
         wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
         if strategy_type.startswith("transcal"):

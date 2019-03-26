@@ -188,15 +188,8 @@ class TaskToolBoxWidget(QtImport.QWidget):
             self.hide_task(self.xray_imaging_page)
             logging.getLogger("HWR").info("Xray Imaging task not available")
 
-        has_gphl_workflow = False
-        if hasattr(api.beamline_setup, "gphl_connection_hwobj"):
-            if api.beamline_setup.gphl_connection_hwobj:
-                has_gphl_workflow = True
-
-        if has_gphl_workflow:
-            self.gphl_workflow_page.initialise_workflows(
-                api.beamline_setup.gphl_workflow_hwobj
-            )
+        if api.gphl_connection and api.gphl_workflow:
+            self.gphl_workflow_page.initialise_workflows()
         else:
             logging.getLogger("HWR").info("GPhL workflow task not available")
 

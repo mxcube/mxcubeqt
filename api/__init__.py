@@ -67,7 +67,10 @@ HWOBJ_ROLES = ("transmission",
 
                "data_analysis",
                "auto_processing",
-               "parallel_processing")
+               "parallel_processing",
+
+               "gphl_workflow",
+               "gphl_connection",)
 
 def init(hwr_path):
     hwr = HardwareRepository.getHardwareRepository(hwr_path)
