@@ -21,7 +21,6 @@
 
 """GPhL runtime-set parameter input widget. """
 
-from collections import OrderedDict
 from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 

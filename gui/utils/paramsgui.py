@@ -66,7 +66,9 @@ class TextEdit(QtImport.QTextEdit):
         if options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
     def set_value(self, value):
         self.setText(value)
@@ -235,18 +237,23 @@ class Message(QtImport.QWidget):
 
     def set_value(self, value):
         pass
-        
-class CheckBox(QtImport.QCheckBox):
 
+
+class CheckBox(QtImport.QCheckBox):
     def __init__(self, parent, options):
         QtImport.QCheckBox.__init__(self, options.get("uiLabel", "CheckBox"), parent)
         # self.setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
-        state = (QtImport.Qt.Checked if options.get("defaultValue") else QtImport.Qt.Unchecked)
+        state = (
+            QtImport.Qt.Checked
+            if options.get("defaultValue")
+            else QtImport.Qt.Unchecked
+        )
         self.setCheckState(state)
         # self.setAlignment(QtImport.Qt.AlignRight)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                           QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
     def set_value(self, value):
         self.setChecked(value)
@@ -257,13 +264,14 @@ class CheckBox(QtImport.QCheckBox):
     def get_value(self):
         return self.isChecked()
 
+
 WIDGET_CLASSES = {
     "combo": Combo,
     "spinbox": IntSpinBox,
     "text": LineEdit,
     "file": File,
     "message": Message,
-    "boolean" : CheckBox,
+    "boolean": CheckBox,
     "float": DoubleSpinBox,
     "textarea": TextEdit,
 }
@@ -279,11 +287,13 @@ class FieldsWidget(QtImport.QWidget):
         self.field_widgets = list()
 
         QtImport.QGridLayout(self)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
         current_row = 0
         col_incr = 0
-        pad = ''
+        pad = ""
         for field in fields:
             # should not happen but lets just skip them
             if field["type"] != "message" and "uiLabel" not in field:
@@ -304,32 +314,32 @@ class FieldsWidget(QtImport.QWidget):
                 if isinstance(w, TextEdit):
                     w.setSizePolicy(
                         QtImport.QSizePolicy.MinimumExpanding,
-                        QtImport.QSizePolicy.Minimum
+                        QtImport.QSizePolicy.Minimum,
                     )
                 else:
                     w.setSizePolicy(
                         QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
                     )
                 self.field_widgets.append(w)
-                if field['type'] == 'boolean':
+                if field["type"] == "boolean":
                     self.layout().addWidget(
                         w, current_row, 0 + col_incr, 1, 2, QtImport.Qt.AlignLeft
                     )
                 else:
-                    label = QtImport.QLabel(pad + field['uiLabel'], self)
+                    label = QtImport.QLabel(pad + field["uiLabel"], self)
                     self.layout().addWidget(
                         label, current_row, 0 + col_incr, QtImport.Qt.AlignLeft
                     )
                     self.layout().addWidget(
                         w, current_row, 1 + col_incr, QtImport.Qt.AlignLeft
                     )
-        
+
             current_row += 1
             if field.pop("NEW_COLUMN", False):
                 # Increment column
                 col_incr += 2
                 current_row = 0
-                pad = ' ' * 5
+                pad = " " * 5
 
     def set_values(self, values):
         for field in self.field_widgets:
@@ -341,6 +351,7 @@ class FieldsWidget(QtImport.QWidget):
 
     def get_xml(self, olof=False):
         from lxml import etree
+
         root = etree.Element("parameters")
         for w in self.field_widgets:
             name = w.get_name()
@@ -359,4 +370,3 @@ class FieldsWidget(QtImport.QWidget):
 
     def get_parameters_map(self):
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
-

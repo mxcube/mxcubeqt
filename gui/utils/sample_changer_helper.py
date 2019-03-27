@@ -20,8 +20,6 @@
 from gui.utils import Colors
 from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import (
     SampleChangerState,
-    SampleChangerMode,
-    SampleChanger,
 )
 
 

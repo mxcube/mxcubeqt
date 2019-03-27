@@ -53,7 +53,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         self.init_models()
 
-
     def _initialize_graphics(self):
         # Graphic elements ----------------------------------------------------
         self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
@@ -64,8 +63,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
         self._gphl_diffractcal_widget = GphlDiffractcalWidget(
-            self._gphl_acq_widget, "gphl_diffractcal_widget",
-            workflow_object=api.gphl_workflow
+            self._gphl_acq_widget,
+            "gphl_diffractcal_widget",
+            workflow_object=api.gphl_workflow,
         )
 
         self._data_path_widget = DataPathWidget(
@@ -96,9 +96,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._workflow_cbox.currentIndexChanged.connect(
-            self.workflow_selected
-        )
+        self._workflow_cbox.currentIndexChanged.connect(self.workflow_selected)
 
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
@@ -263,8 +261,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
-            wf.set_beam_energies(wf_parameters['beam_energies'])
-        
+            wf.set_beam_energies(wf_parameters["beam_energies"])
+
         tasks.append(wf)
 
         return tasks

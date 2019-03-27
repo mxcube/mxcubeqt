@@ -171,8 +171,8 @@ class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
 
     def __init__(
-            self, parent=None, name="gphl_acquisition_widget", workflow_object=None
-        ):
+        self, parent=None, name="gphl_acquisition_widget", workflow_object=None
+    ):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
@@ -181,9 +181,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        xx = next(
-            workflow_object.getObjects("test_crystals")
-        )
+        xx = next(workflow_object.getObjects("test_crystals"))
         for test_crystal in xx.getObjects("test_crystal"):
             dd = test_crystal.getProperties()
             self.test_crystals[dd["name"]] = CrystalData(**dd)
@@ -311,7 +309,6 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
 
-
     def populate_widget(self, **kw):
         GphlSetupWidget.populate_widget(self, **kw)
 
@@ -337,7 +334,6 @@ class GphlAcquisitionWidget(GphlSetupWidget):
 
         # Must be redone here, after values and bindings are set
         self._parameter_mib.set_model(data_object)
-
 
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""
