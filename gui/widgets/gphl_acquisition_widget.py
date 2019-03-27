@@ -23,11 +23,7 @@
 
 import logging
 from collections import namedtuple
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
+from collections import OrderedDict
 
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
@@ -285,8 +281,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         )
     )
 
-    def __init__(self, parent=None, name="gphl_acquisition_widget",
-                 workflow_object=None):
+    def __init__(self, parent=None, name="gphl_acquisition_widget"):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         # Internal variables -------------------------------------------------
