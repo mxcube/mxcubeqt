@@ -744,7 +744,7 @@ class CreateTaskBase(QtImport.QWidget):
         return tasks
 
     @abc.abstractmethod
-    def _create_task(self, task_node, shape):
+    def _create_task(self, sample, shape):
         pass
 
     def _create_path_template(self, sample, path_template):

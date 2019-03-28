@@ -17,6 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Module contains classes defining graphical objects in MXCuBE"""
+
 from gui.utils import PropertyBag, QtImport
 
 DEFAULT_MARGIN = 2
@@ -28,6 +30,8 @@ __license__ = "LGPLv3+"
 
 
 class _CfgItem:
+    """Configuration item base class"""
+
     def __init__(self, name=None, item_type=""):
         self.name = name
         self.type = item_type
@@ -104,6 +108,8 @@ class _CfgItem:
 
 
 class ContainerCfg(_CfgItem):
+    """Container configuration"""
+
     def __init__(self, *args):
         _CfgItem.__init__(self, *args)
 
@@ -145,8 +151,10 @@ class ContainerCfg(_CfgItem):
 
 
 class WindowCfg(ContainerCfg):
+    """Window configuration item. Contains extra properties to customize window"""
+
     def __init__(self, *args):
-        _CfgItem.__init__(self, *args)
+        ContainerCfg.__init__(self, *args)
 
         self.type = "window"
         self.properties.add_property("caption", "string", "")

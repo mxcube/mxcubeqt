@@ -78,8 +78,8 @@ class TaskToolBoxBrick(BaseWidget):
         # Other ---------------------------------------------------------------
         # self.setEnabled(self.ispyb_logged_in)
 
-    def set_expert_mode(self, state):
-        self.task_tool_box_widget.set_expert_mode(state)
+    def set_expert_mode(self, expert):
+        self.task_tool_box_widget.set_expert_mode(expert)
 
     def run(self):
         if api.session.session_id:

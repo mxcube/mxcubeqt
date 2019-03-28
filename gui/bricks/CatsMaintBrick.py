@@ -100,9 +100,8 @@ class CatsMaintBrick(BaseWidget):
 
         self.update_buttons()
 
-    def property_changed(self, property, oldValue, newValue):
-
-        if property == "mnemonic":
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "mnemonic":
             if self.device is not None:
                 self.disconnect(self.device, "lid1StateChanged", self.update_lid1_state)
                 self.disconnect(self.device, "lid2StateChanged", self.update_lid2_state)
@@ -125,7 +124,7 @@ class CatsMaintBrick(BaseWidget):
                 )
 
             # load the new hardware object
-            self.device = self.get_hardware_object(newValue)
+            self.device = self.get_hardware_object(new_value)
             if self.device is not None:
                 self.connect(
                     self.device, "regulationStateChanged", self.update_regulation
@@ -146,12 +145,8 @@ class CatsMaintBrick(BaseWidget):
                     self.device, sample_changer_helper.SampleChanger.STATE_CHANGED_EVENT, self.update_state
                 )
 
-    def setExpertMode(self, mode):
-        if mode:
-            self.expert_mode = True
-        else:
-            self.expert_mode = False
-
+    def set_expert_mode(self, expert):
+        self.expert_mode = bool(expert)
         self.update_buttons()
 
     def update_state(self, state):

@@ -174,9 +174,9 @@ class MultipleMotorsBrick(BaseWidget):
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
-    def set_expert_mode(self, is_expert_mode):
+    def set_expert_mode(self, expert):
         if self["inExpertMode"]:
-            self.setEnabled(is_expert_mode)
+            self.setEnabled(expert)
 
     def predefined_position_clicked(self, predefined_position):
         for motor in self.motor_hwobj_list:
