@@ -102,8 +102,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
         self.gphl_data_dialog.continueClickedSignal.connect(self.data_acquired)
-        # self.connect(self.gphl_data_dialog, qt.PYSIGNAL("continue_clicked"),
-        #              self.data_acquired)
 
     def initialise_workflows(self):
 
