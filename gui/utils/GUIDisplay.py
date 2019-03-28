@@ -27,7 +27,6 @@ import webbrowser
 import collections
 from functools import partial
 
-from gui import Configuration
 from gui.utils import Icons, Colors, PropertyEditor, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
@@ -899,6 +898,33 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._statusbar = QtImport.QStatusBar(self)
         self._statusbar.hide()
 
+        self._statusbar_user_label = QtImport.QLabel("-")
+        self._statusbar_state_label = QtImport.QLabel(" <b>State: -</b>")
+        self._statusbar_diffractometer_label = QtImport.QLabel(
+            " <b>Diffractometer: -</b>"
+        )
+        self._statusbar_sc_label = QtImport.QLabel(" <b>Sample changer: -</b>")
+        self._statusbar_last_collect_label = QtImport.QLabel(" <b>Last collect: -</b>")
+        self._progress_bar = QtImport.QProgressBar()
+        # TODO make it via property
+        self._progress_bar.setEnabled(False)
+        self._progress_bar.setVisible(False)
+
+        self._file_system_status_label = QtImport.QLabel("File system")
+        self._edna_status_label = QtImport.QLabel("EDNA")
+        self._ispyb_status_label = QtImport.QLabel("ISPyB")
+
+        self._statusbar.addWidget(self._statusbar_user_label)
+        self._statusbar.addWidget(self._statusbar_state_label)
+        self._statusbar.addWidget(self._statusbar_diffractometer_label)
+        self._statusbar.addWidget(self._statusbar_sc_label)
+        self._statusbar.addWidget(self._progress_bar)
+        self._statusbar.addWidget(self._statusbar_last_collect_label)
+
+        self._statusbar.addPermanentWidget(self._file_system_status_label)
+        self._statusbar.addPermanentWidget(self._edna_status_label)
+        self._statusbar.addPermanentWidget(self._ispyb_status_label)
+
         self._progress_dialog = QtImport.QProgressDialog(self)
         self._progress_dialog.setWindowFlags(
             QtImport.Qt.Window
@@ -953,36 +979,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         BaseWidget._menubar = self._menubar
         BaseWidget._toolbar = self._toolbar
 
-    def set_statusbar(self):
+    def show_statusbar(self):
         """Sets statusbar"""
-
-        self._statusbar_user_label = QtImport.QLabel("-")
-        self._statusbar_state_label = QtImport.QLabel(" <b>State: -</b>")
-        self._statusbar_diffractometer_label = QtImport.QLabel(
-            " <b>Diffractometer: -</b>"
-        )
-        self._statusbar_sc_label = QtImport.QLabel(" <b>Sample changer: -</b>")
-        self._statusbar_last_collect_label = QtImport.QLabel(" <b>Last collect: -</b>")
-        self._progress_bar = QtImport.QProgressBar()
-        # TODO make it via property
-        self._progress_bar.setEnabled(False)
-        self._progress_bar.setVisible(False)
-
-        self._file_system_status_label = QtImport.QLabel("File system")
-        self._edna_status_label = QtImport.QLabel("EDNA")
-        self._ispyb_status_label = QtImport.QLabel("ISPyB")
-
-        self._statusbar.addWidget(self._statusbar_user_label)
-        self._statusbar.addWidget(self._statusbar_state_label)
-        self._statusbar.addWidget(self._statusbar_diffractometer_label)
-        self._statusbar.addWidget(self._statusbar_sc_label)
-        self._statusbar.addWidget(self._progress_bar)
-        self._statusbar.addWidget(self._statusbar_last_collect_label)
-
-        self._statusbar.addPermanentWidget(self._file_system_status_label)
-        self._statusbar.addPermanentWidget(self._edna_status_label)
-        self._statusbar.addPermanentWidget(self._ispyb_status_label)
-
         self._statusbar.show()
         BaseWidget._statusbar = self._statusbar
 
@@ -1354,7 +1352,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         if isinstance(container_cfg, WindowCfg):
             if container_cfg.properties["statusbar"]:
-                self.set_statusbar()
+                self.show_statusbar()
 
         self.set_progress_dialog()
 

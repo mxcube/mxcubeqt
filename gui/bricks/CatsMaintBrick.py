@@ -146,7 +146,7 @@ class CatsMaintBrick(BaseWidget):
                 )
 
     def set_expert_mode(self, expert):
-        self.expert_mode = expert
+        self.expert_mode = bool(expert)
         self.update_buttons()
 
     def update_state(self, state):

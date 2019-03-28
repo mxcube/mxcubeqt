@@ -195,9 +195,9 @@ class MotorSpinBoxBrick(BaseWidget):
         self.instance_synchronize("position_spinbox", "step_combo")
 
     def set_expert_mode(self, expert):
-        self.in_expert_mode = expert
+        self.in_expert_mode = bool(expert)
         if self["hideInUser"]:
-            if expert:
+            if self.in_expert_mode:
                 self.main_gbox.show()
             else:
                 self.main_gbox.hide()
