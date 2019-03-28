@@ -165,9 +165,11 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
                 pass
         """
 
-        from PyQt4.QtCore import *
-        from PyQt4.QtGui import *
-        from PyQt4.uic import *
+        from PyQt4.QtCore import PYQT_VERSION_STR, QPoint, QRect, QT_VERSION_STR, QTimer, pyqtSignal, pyqtSlot, Qt, QObject, QEvent, SIGNAL, QRectF, QEventLoop, QRegExp
+        from PyQt4.QtGui import qApp, QAction, QApplication, QBrush, QCheckBox, QComboBox, QCursor, QDial, QDialog, QDoubleSpinBox, QDoubleValidator, QFileDialog, QFont, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QHeaderView, QIcon, QImage, QLabel, QLineEdit, QLinearGradient, QListView, QListWidget, QListWidgetItem, QMainWindow, QMenu, QMenuBar, QMessageBox, QPainter, QPen, QPixmap, QPolygon, QPrintDialog, QProgressBar, QProgressDialog, QPushButton
+        from PyQt4.QtGui import QScrollArea, QScrollBar, QSizePolicy, QSlider, QSpacerItem, QSpinBox, QSplashScreen, QSplitter, QStatusBar, QTabWidget, QTableView, QTableWidget, QTableWidgetItem, QTextEdit, QToolBar, QToolBox, QToolTip, QTreeView, QTreeWidget, QTreeWidgetItem, QPalette, QWidget, QToolButton, QVBoxLayout, QRadioButton, QGraphicsItem, QIntValidator, QStackedWidget, QAbstractItemView
+        from PyQt4.QtGui import QColor, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QTextBrowser, QButtonGroup, QTreeWidgetItemIterator, QDesktopWidget, QLayout, QPainterPath, QRegExpValidator
+        from PyQt4.uic import loadUi
 
         def getQApp():
             return qApp
@@ -182,7 +184,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
         pass
 
     try:
-        from PyQt4.QtWebKit import * 
+        from PyQt4.QtWebKit import QWebPage
     except ImportError:
         pass
 
