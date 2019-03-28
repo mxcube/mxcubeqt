@@ -25,6 +25,8 @@ import logging
 from collections import namedtuple
 from collections import OrderedDict
 
+import api
+
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
@@ -171,8 +173,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
 
     def __init__(
-        self, parent=None, name="gphl_acquisition_widget", workflow_object=None
-    ):
+        self, parent=None, name="gphl_acquisition_widget"):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
@@ -181,7 +182,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        xx = next(workflow_object.getObjects("test_crystals"))
+        xx = next(api.gphl_workflow.getObjects("test_crystals"))
         for test_crystal in xx.getObjects("test_crystal"):
             dd = test_crystal.getProperties()
             self.test_crystals[dd["name"]] = CrystalData(**dd)
