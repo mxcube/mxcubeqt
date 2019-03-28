@@ -22,7 +22,7 @@ import numpy as np
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
-from widgets.matplot_widget import TwoDimenisonalPlotWidget
+from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
 
