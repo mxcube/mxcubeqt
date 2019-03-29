@@ -96,7 +96,7 @@ def init(hwr_path):
         if hasattr(beamline_setup, "%s_hwobj" % role):
             setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
         else:
-            setattr(sys.modules[__name__], role, None) 
+            setattr(sys.modules[__name__], role, None)
 
 
     if error_count == 0:
