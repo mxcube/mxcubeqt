@@ -40,37 +40,34 @@ beamline_setup = None
 queue_model = None
 queue_manager = None
 
-HWOBJ_ROLES = ("transmission",
-               "resolution",
-               "energy",
-               "flux",
-               "beam_info",
-               "omega_axis",
-               "kappa_axis",
-               "kappa_phi_axis",
-               "detector",
-               "detector_distance",
-               "door_interlock",
-               "fast_shutter",
-               "safety_shutter",
-               "machine_info",
-               "session",
-               "diffractometer",
+CORE_HWOBJ_ROLES = ("transmission",
+                    "resolution",
+                    "energy",
+                    "flux",
+                    "beam_info",
+                    "omega_axis",
+                    "kappa_axis",
+                    "kappa_phi_axis",
+                    "detector",
+                    "detector_distance",
+                    "door_interlock",
+                    "fast_shutter",
+                    "safety_shutter",
+                    "machine_info",
+                    "session",
+                    "diffractometer",
+                    "collect")
 
-               "sample_changer",
-               "plate_manipulator",
-
-               "collect",
-               "energyscan",
-               "xrf_spectrum",
-               "xray_imaging",
-
-               "data_analysis",
-               "auto_processing",
-               "parallel_processing",
-
-               "gphl_workflow",
-               "gphl_connection",)
+ADDITIONAL_HWOBJ_ROLES = ("sample_changer",
+                          "plate_manipulator",
+                          "energyscan",
+                          "xrf_spectrum",
+                          "xray_imaging",
+                          "data_analysis",
+                          "auto_processing",
+                          "parallel_processing",
+                          "gphl_workflow",
+                          "gphl_connection",)
 
 def init(hwr_path):
     hwr = HardwareRepository.getHardwareRepository(hwr_path)
@@ -87,13 +84,20 @@ def init(hwr_path):
     logging.getLogger("API").debug("Initializing API...")
     error_count = 0
 
-    for role in HWOBJ_ROLES:
+    for role in CORE_HWOBJ_ROLES:
         if hasattr(beamline_setup, "%s_hwobj" % role):
             setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
         else:
             setattr(sys.modules[__name__], role, None)
             logging.getLogger("HWR").warning("API: %s role is not defined in the beamline_setup" % role)
             error_count += 1
+
+    for role in ADDITIONAL_HWOBJ_ROLES:
+        if hasattr(beamline_setup, "%s_hwobj" % role):
+            setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
+        else:
+            setattr(sys.modules[__name__], role, None) 
+
 
     if error_count == 0:
         logging.getLogger("HWR").info("Initializing of API done")
