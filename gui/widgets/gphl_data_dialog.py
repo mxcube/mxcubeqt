@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+# encoding: utf-8
 #
 #  Project: MXCuBE
 #  https://github.com/mxcube
@@ -19,17 +21,12 @@
 
 """GPhL runtime-set parameter input widget. """
 
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
 from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
-
-__credits__ = ["MXCuBE collaboration"]
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
 
 
 class ParameterDialogWidget(QtImport.QWidget):
@@ -149,6 +146,9 @@ class GphlDataDialog(QtImport.QDialog):
         self.cplx_gbox = QtImport.QGroupBox("Indexing solution", self)
         QtImport.QVBoxLayout(self.cplx_gbox)
         main_layout.addWidget(self.cplx_gbox)
+        self.cplx_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
         self.cplx_widget = None
 
         # Parameter box

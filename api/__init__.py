@@ -23,7 +23,7 @@ import logging
 from HardwareRepository import HardwareRepository
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
@@ -67,7 +67,10 @@ HWOBJ_ROLES = ("transmission",
 
                "data_analysis",
                "auto_processing",
-               "parallel_processing")
+               "parallel_processing",
+
+               "gphl_workflow",
+               "gphl_connection",)
 
 def init(hwr_path):
     hwr = HardwareRepository.getHardwareRepository(hwr_path)

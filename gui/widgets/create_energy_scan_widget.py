@@ -26,12 +26,7 @@ from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.queue_model_enumerables import (
-    EXPERIMENT_TYPE,
-    COLLECTION_ORIGIN,
-)
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -112,13 +107,9 @@ class CreateEnergyScanWidget(CreateTaskBase):
         CreateTaskBase.init_api(self)
 
         try:
-            self._periodic_table_widget.set_elements(
-                api.energyscan.getElements()
-            )
+            self._periodic_table_widget.set_elements(api.energyscan.getElements())
 
-            max_transmission_value = (
-                api.energyscan.get_max_transmission_value()
-            )
+            max_transmission_value = api.energyscan.get_max_transmission_value()
 
             self._adjust_transmission_cbox.setEnabled(True)
             self._adjust_transmission_cbox.setChecked(True)
@@ -222,8 +213,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
     def max_transmission_value_changed(self, value):
         try:
             max_transmission = float(value)
-            api.energyscan.set_max_transmission(
-                max_transmission
-            )
+            api.energyscan.set_max_transmission(max_transmission)
         except BaseException:
             pass

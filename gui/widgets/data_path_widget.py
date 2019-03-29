@@ -170,7 +170,7 @@ class DataPathWidget(QtImport.QWidget):
             if self.enable_macros:
                 available_chars += "%"
             new_value = "".join(i for i in str(new_value) if i in available_chars)
-            new_value = new_value.replace("\\", "")
+            # new_value = new_value.replace("\\", "")
 
         new_sub_dir = str(new_value).strip(" ")
         self.data_path_layout.folder_ledit.setText(new_value)

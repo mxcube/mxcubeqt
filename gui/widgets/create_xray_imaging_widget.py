@@ -27,10 +27,7 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-from HardwareRepository.HardwareObjects import (
-    queue_model_objects,
-    queue_model_enumerables,
-)
+from HardwareRepository.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]

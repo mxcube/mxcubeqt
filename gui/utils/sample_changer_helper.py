@@ -23,6 +23,9 @@ from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import (
     SampleChangerMode,
     SampleChanger,
 )
+# NBNB SampleChangerMode and SampleChanger are not use here but are REIMPORTED elsewhere
+# This is generally bad practice, but there are pragmatic reasons.
+# Do NOT remove these imports without checking all uses of this file
 
 
 __credits__ = ["MXCuBE collaboration"]

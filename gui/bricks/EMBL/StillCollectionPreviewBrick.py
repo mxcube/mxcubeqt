@@ -22,12 +22,12 @@ import numpy as np
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
-from widgets.matplot_widget import TwoDimenisonalPlotWidget
+from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "EMBL"
 

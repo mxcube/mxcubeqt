@@ -1,4 +1,4 @@
-#pylint: skip-file
+# pylint: skip-file
 """
 
 Description
@@ -137,9 +137,9 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
         pass
 
     try:
-       from PyQt5.QtSvg import * 
+        from PyQt5.QtSvg import *
     except BaseException:
-       pass
+        pass
 #
 # PyQt4
 #
@@ -165,10 +165,104 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
                 pass
         """
 
-        from PyQt4.QtCore import PYQT_VERSION_STR, QPoint, QRect, QT_VERSION_STR, QTimer, pyqtSignal, pyqtSlot, Qt, QObject, QEvent, SIGNAL, QRectF, QEventLoop, QRegExp
-        from PyQt4.QtGui import qApp, QAction, QApplication, QBrush, QCheckBox, QComboBox, QCursor, QDial, QDialog, QDoubleSpinBox, QDoubleValidator, QFileDialog, QFont, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QHeaderView, QIcon, QImage, QLabel, QLineEdit, QLinearGradient, QListView, QListWidget, QListWidgetItem, QMainWindow, QMenu, QMenuBar, QMessageBox, QPainter, QPen, QPixmap, QPolygon, QPrintDialog, QProgressBar, QProgressDialog, QPushButton
-        from PyQt4.QtGui import QScrollArea, QScrollBar, QSizePolicy, QSlider, QSpacerItem, QSpinBox, QSplashScreen, QSplitter, QStatusBar, QTabWidget, QTableView, QTableWidget, QTableWidgetItem, QTextEdit, QToolBar, QToolBox, QToolTip, QTreeView, QTreeWidget, QTreeWidgetItem, QPalette, QWidget, QToolButton, QVBoxLayout, QRadioButton, QGraphicsItem, QIntValidator, QStackedWidget, QAbstractItemView
-        from PyQt4.QtGui import QColor, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QTextBrowser, QButtonGroup, QTreeWidgetItemIterator, QDesktopWidget, QLayout, QPainterPath, QRegExpValidator
+        from PyQt4.QtCore import (
+            pyqtSignal,
+            pyqtSlot,
+            PYQT_VERSION_STR,
+            Qt,
+            QEvent,
+            QEventLoop,
+            QObject,
+            QPoint,
+            QPointF,
+            QRect,
+            QRectF,
+            QRegExp,
+            QSize,
+            QT_VERSION_STR,
+            QTimer,
+            SIGNAL,
+        )
+        from PyQt4.QtGui import (
+            qApp,
+            QAbstractItemView,
+            QAction,
+            QApplication,
+            QBrush,
+            QButtonGroup,
+            QCheckBox,
+            QColor,
+            QComboBox,
+            QCursor,
+            QDesktopWidget,
+            QDial,
+            QDialog,
+            QDoubleSpinBox,
+            QDoubleValidator,
+            QFileDialog,
+            QFont,
+            QFrame,
+            QGraphicsItem,
+            QGraphicsPixmapItem,
+            QGraphicsScene,
+            QGraphicsView,
+            QGridLayout,
+            QGroupBox,
+            QHBoxLayout,
+            QHeaderView,
+            QIcon,
+            QImage,
+            QIntValidator,
+            QLabel,
+            QLayout,
+            QLineEdit,
+            QLinearGradient,
+            QListView,
+            QListWidget,
+            QListWidgetItem,
+            QMainWindow,
+            QMenu,
+            QMenuBar,
+            QMessageBox,
+            QPainter,
+            QPainterPath,
+            QPalette,
+            QPen,
+            QPixmap,
+            QPolygon,
+            QPrintDialog,
+            QProgressBar,
+            QProgressDialog,
+            QPushButton,
+            QRadioButton,
+            QRegExpValidator,
+            QScrollArea,
+            QScrollBar,
+            QSizePolicy,
+            QSlider,
+            QSpacerItem,
+            QSpinBox,
+            QSplashScreen,
+            QSplitter,
+            QStackedWidget,
+            QStatusBar,
+            QTabWidget,
+            QTableView,
+            QTableWidget,
+            QTableWidgetItem,
+            QTextBrowser,
+            QTextEdit,
+            QToolBar,
+            QToolBox,
+            QToolButton,
+            QToolTip,
+            QTreeView,
+            QTreeWidget,
+            QTreeWidgetItem,
+            QTreeWidgetItemIterator,
+            QVBoxLayout,
+            QWidget,
+        )
         from PyQt4.uic import loadUi
 
         def getQApp():

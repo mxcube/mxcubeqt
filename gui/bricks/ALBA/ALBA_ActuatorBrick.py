@@ -23,7 +23,7 @@ from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
 
-__credits__ = ["MXCuBE colaboration"]
+__credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "ALBA"
 
@@ -70,9 +70,7 @@ class ALBA_ActuatorBrick(BaseWidget):
         self.add_property("out_cmd_name", "string", "")
 
         # Graphic elements ----------------------------------------------------
-        self.widget = QtImport.load_ui_file(
-            "alba_actuator.ui")
-        )
+        self.widget = QtImport.load_ui_file( "alba_actuator.ui")
 
         QtImport.QHBoxLayout(self)
 
