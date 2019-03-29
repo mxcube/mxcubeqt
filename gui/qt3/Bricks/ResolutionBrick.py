@@ -337,9 +337,9 @@ class ResolutionBrick(BlissWidget):
             elif unit == "mm":
                 if self.detectorLimits is not None:
                     if val >= self.detectorLimits[0] and val <= self.detectorLimits[1]:
-                        param_dict["detdistance"] = val
+                        param_dict["detector_distance"] = val
                 else:
-                    param_dict["detdistance"] = val
+                    param_dict["detector_distance"] = val
 
         try:
             curr_resolution = float(self.currentResolutionValue)
