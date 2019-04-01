@@ -22,10 +22,11 @@
 import os
 import stat
 import json
-import yaml
 import pickle
 import logging
 import collections
+
+import yaml
 
 from gui import set_splash_screen
 from gui import Configuration, GUIBuilder
@@ -47,7 +48,7 @@ class SplashScreen(QtImport.QSplashScreen):
     """Splash screen when mxcube is loading"""
 
     def __init__(self, pixmap):
-        """init"""
+        """Builds a splash screen with a image and a progressbar"""
 
         QtImport.QSplashScreen.__init__(self, pixmap)
 
@@ -58,7 +59,7 @@ class SplashScreen(QtImport.QSplashScreen):
         self.top_y = 430
         self.right_x = 390
         self.pxsize = 11
-       
+
         self.progress_bar = QtImport.QProgressBar(self)
 
         new_palette = QtImport.QPalette()
@@ -66,7 +67,7 @@ class SplashScreen(QtImport.QSplashScreen):
         self.progress_bar.setPalette(new_palette)
 
         _vlayout = QtImport.QVBoxLayout(self)
-        _vlayout.addWidget(self.progress_bar)        
+        _vlayout.addWidget(self.progress_bar)
 
         self.repaint()
 
@@ -79,13 +80,16 @@ class SplashScreen(QtImport.QSplashScreen):
         self.repaint()
 
     def set_message(self, message):
+        """Adds a message to the splash screen and redraws the canvas"""
         self._message = message
         self.repaint()
 
     def set_progress_value(self, value):
+        """Sets the progress bar value"""
         self.progress_bar.setValue(value)
 
     def inc_progress_value(self):
+        """Increments progressbar value by 1"""
         self.progress_bar.setValue(self.progress_bar.value() + 1)
 
     def drawContents(self, painter):
@@ -97,7 +101,8 @@ class SplashScreen(QtImport.QSplashScreen):
         painter.setPen(QtImport.QPen(QtImport.Qt.black))
         painter.drawText(
             QtImport.QRect(
-                QtImport.QPoint(self.top_x, self.top_y), QtImport.QPoint(self.right_x, bot_y)
+                QtImport.QPoint(self.top_x, self.top_y),
+                QtImport.QPoint(self.right_x, bot_y)
             ),
             QtImport.Qt.AlignLeft | QtImport.Qt.AlignTop,
             "Starting MXCuBE. Please wait...",
@@ -109,7 +114,8 @@ class SplashScreen(QtImport.QSplashScreen):
         bot_y += 2 + painter.fontMetrics().height()
         painter.drawText(
             QtImport.QRect(
-                QtImport.QPoint(self.top_x, top_y), QtImport.QPoint(self.right_x, bot_y)
+                QtImport.QPoint(self.top_x, top_y),
+                QtImport.QPoint(self.right_x, bot_y)
             ),
             QtImport.Qt.AlignLeft | QtImport.Qt.AlignBottom,
             self._message,
@@ -123,7 +129,7 @@ class GUISupervisor(QtImport.QWidget):
     tabChangedSignal = QtImport.pyqtSignal(str, int)
 
     def __init__(self, design_mode=False, show_maximized=False, no_border=False):
-        """init"""
+        """Main mxcube gui widget"""
 
         QtImport.QWidget.__init__(self)
 
@@ -147,6 +153,7 @@ class GUISupervisor(QtImport.QWidget):
         self.time_stamp = 0
 
     def set_user_file_directory(self, user_file_directory):
+        """Sets user file directory"""
         self.user_file_dir = user_file_directory
         BaseWidget.set_user_file_directory(user_file_directory)
 
@@ -199,7 +206,6 @@ class GUISupervisor(QtImport.QWidget):
                                         props = item["properties"]
                                     else:
                                         props = pickle.loads(item["properties"])
-                                    # props = pickle.loads(item["properties"].encode('utf8'))
                                 except BaseException:
                                     logging.getLogger().exception(
                                         "Could not load properties for %s"
@@ -214,7 +220,7 @@ class GUISupervisor(QtImport.QWidget):
                                             else:
                                                 prop_value = prop.getValue()
                                             if isinstance(
-                                                prop_value, type("")
+                                                    prop_value, type("")
                                             ) and prop_value.startswith("/"):
                                                 mne_list.append(prop_value)
                                     except BaseException:
@@ -319,6 +325,7 @@ class GUISupervisor(QtImport.QWidget):
         return self.framework
 
     def display(self):
+        """Shows all defined windows"""
         self.windows = []
         for window in self.configuration.windows_list:
             display = GUIDisplay.WindowDisplayWidget(
@@ -447,7 +454,7 @@ class GUISupervisor(QtImport.QWidget):
 
         self.save_size()
 
-    def save_size(self, configuration_suffix=""):
+    def save_size(self):
         """Saves window size and coordinates in the gui file"""
         display_config_list = []
 
@@ -496,15 +503,15 @@ class GUISupervisor(QtImport.QWidget):
                     % str(self.hardware_repository.serverAddress).split(":")[0]
                 )
                 if (
-                    QtImport.QMessageBox.warning(
-                        self,
-                        "Cannot connect to Hardware Repository",
-                        message,
-                        QtImport.QMessageBox.Retry
-                        | QtImport.QMessageBox.Cancel
-                        | QtImport.QMessageBox.NoButton,
-                    )
-                    == QtImport.QMessageBox.Cancel
+                        QtImport.QMessageBox.warning(
+                            self,
+                            "Cannot connect to Hardware Repository",
+                            message,
+                            QtImport.QMessageBox.Retry
+                            | QtImport.QMessageBox.Cancel
+                            | QtImport.QMessageBox.NoButton,
+                        )
+                        == QtImport.QMessageBox.Cancel
                 ):
                     logging.getLogger().warning(
                         "Gave up trying to " + "connect to Hardware Repository server."
