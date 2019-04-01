@@ -122,7 +122,6 @@ class CustomMenuBar(QtImport.QMenuBar):
         self.bricks_properties_editor.propertyEditedSignal.connect(self.property_edited)
 
         # Other ---------------------------------------------------------------
-        self.expert_mode_checkboxStdColor = None
         self.menu_items = [self.file_menu, self.view_menu, self.help_menu]
         # self.setwindowIcon(Icons.load_icon("desktop_icon"))
         for widget in QtImport.QApplication.allWidgets():
@@ -353,7 +352,7 @@ class CustomMenuBar(QtImport.QMenuBar):
             self.preview_windows = {}
             for window in windows_list:
                 self.preview_windows[window.base_caption] = window
-                temp_menu = self.view_windows_menu.addAction(
+                self.view_windows_menu.addAction(
                     window.base_caption, partial(self.view_window, window.base_caption)
                 )
 
@@ -398,47 +397,47 @@ class CustomGroupBox(QtImport.QGroupBox):
     def set_checked(self, state):
         for child in self.children():
             if hasattr(child, "setVisible"):
-                child.setVisible(state == True)
+                child.setVisible(state)
 
-def verticalSpacer(*args, **kwargs):
+def get_vertical_spacer(*args, **kwargs):
     """Vertical spacer"""
     kwargs["orientation"] = "vertical"
     return WindowDisplayWidget.Spacer(*args, **kwargs)
 
-def horizontalSpacer(*args, **kwargs):
+def get_horizontal_spacer(*args, **kwargs):
     """Horizontal spacer"""
 
     kwargs["orientation"] = "horizontal"
     return WindowDisplayWidget.Spacer(*args, **kwargs)
 
-def horizontalSplitter(*args, **kwargs):
+def get_horizontal_splitter(*args, **kwargs):
     """Horizontal splitter"""
 
     return QtImport.QSplitter(QtImport.Qt.Horizontal, *args)
 
-def verticalSplitter(*args, **kwargs):
+def get_vertical_splitter(*args, **kwargs):
     """Vertical splitter"""
 
     return QtImport.QSplitter(QtImport.Qt.Vertical, *args)
 
-def verticalBox(*args, **kwargs):
+def get_vertical_box(*args, **kwargs):
     """Vertical box"""
     kwargs["layout"] = "vertical"
     return WindowDisplayWidget.CustomFrame(*args, **kwargs)
 
-def horizontalBox(*args, **kwargs):
+def get_horizontal_box(*args, **kwargs):
     """Horizontal box"""
 
     kwargs["layout"] = "horizontal"
     return WindowDisplayWidget.CustomFrame(*args, **kwargs)
 
-def horizontalGroupBox(*args, **kwargs):
+def get_horizontal_groupbox(*args, **kwargs):
     """Horizontal group box"""
 
     kwargs["layout"] = "horizontal"
     return CustomGroupBox(*args, **kwargs)
 
-def verticalGroupBox(*args, **kwargs):
+def get_vertical_groupbox(*args, **kwargs):
     """Vertical group box"""
 
     kwargs["layout"] = "vertical"
@@ -598,7 +597,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.pinned = True
 
             # self.tab_widgets = []
-            self.countChanged = {}
+            self.count_changed = {}
             self.setSizePolicy(
                 QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
             )
@@ -611,7 +610,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             """Page changed event"""
 
             page = self.widget(index)
-            self.countChanged[index] = False
+            self.count_changed[index] = False
 
             tab_label = str(self.tabText(index))
             label_list = tab_label.split()
@@ -629,11 +628,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         pass
             except BaseException:
                 pass
-            if found:
-                orig_label = " ".join(label_list[0:-1])
-            else:
-                orig_label = " ".join(label_list)
-            # self.notebookPageChangedSignal.emit(orig_label)
             self.tabChangedSignal.emit(index, page)
 
             tab_name = self.objectName()
@@ -741,7 +735,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'tab reset count' slot
             slot_name = "resetTabCount_%s" % label
 
-            def tab_reset_count_slot(self, erase_count, page_index=self.indexOf(scroll_area)):
+            def tab_reset_count_slot(self, erase_count,
+                                     page_index=self.indexOf(scroll_area)):
                 tab_label = str(self.tabLabel(self.page(page_index)))
                 label_list = tab_label.split()
                 found = False
@@ -767,13 +762,13 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         new_label = " ".join(label_list[0:-1])
                         if not erase_count:
                             new_label += " (0)"
-                        self.countChanged[page_index] = False
+                        self.count_changed[page_index] = False
                         self.setTabLabel(self.page(page_index), new_label)
                 else:
                     if not erase_count:
                         new_label = " ".join(label_list)
                         new_label += " (0)"
-                        self.countChanged[page_index] = False
+                        self.count_changed[page_index] = False
                         self.setTabLabel(self.page(page_index), new_label)
 
             try:
@@ -817,12 +812,12 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     else:
                         new_label = " ".join(label_list[0:-1])
                         new_label += " (%d)" % (num + delta)
-                        self.countChanged[page_index] = True
+                        self.count_changed[page_index] = True
                         self.setTabLabel(self.page(page_index), new_label)
                 else:
                     new_label = " ".join(label_list)
                     new_label += " (%d)" % delta
-                    self.countChanged[page_index] = True
+                    self.count_changed[page_index] = True
                     self.setTabLabel(self.page(page_index), new_label)
 
             try:
@@ -838,7 +833,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # that's the real page
             return scroll_area
 
-    class label(QtImport.QLabel):
+    class CustomLabel(QtImport.QLabel):
         """Label"""
 
         def __init__(self, *args, **kwargs):
@@ -848,17 +843,17 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
 
     items = {
-        "vbox": verticalBox,
-        "hbox": horizontalBox,
-        "vgroupbox": verticalGroupBox,
-        "hgroupbox": horizontalGroupBox,
-        "vspacer": verticalSpacer,
-        "hspacer": horizontalSpacer,
-        "icon": label,
-        "label": label,
+        "vbox": get_vertical_box,
+        "hbox": get_horizontal_box,
+        "vgroupbox": get_vertical_groupbox,
+        "hgroupbox": get_horizontal_groupbox,
+        "vspacer": get_vertical_spacer,
+        "hspacer": get_horizontal_spacer,
+        "icon": CustomLabel,
+        "label": CustomLabel,
         "tab": CustomTabWidget,
-        "hsplitter": horizontalSplitter,
-        "vsplitter": verticalSplitter,
+        "hsplitter": get_horizontal_splitter,
+        "vsplitter": get_vertical_splitter,
     }
 
     brickChangedSignal = QtImport.pyqtSignal(str, str, str, tuple, bool)
@@ -1119,7 +1114,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         """Adds item to the gui"""
 
         item_type = item_cfg["type"]
-        item_name = item_cfg["name"]
         new_item = None
 
         try:
@@ -1241,9 +1235,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
     def make_item(self, item_cfg, parent):
         """Make item"""
-
-        if isinstance(item_cfg, ContainerCfg):
-            self.container_num += 1
         for child in item_cfg["children"]:
             try:
                 new_item = self.add_item(child, parent)
@@ -1306,9 +1297,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                         layout.addWidget(new_item, stretch)
             self.make_item(child, new_item)
 
-    def draw_preview(
-        self, container_cfg, window_id, container_ids=[], selected_item=""
-    ):
+    def draw_preview(self, container_cfg, window_id):
         """Draw preview"""
 
         for (window, m) in self.additional_windows.values():
@@ -1327,7 +1316,6 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self.central_widget.show()
 
         self.current_window = window_id
-        self.container_num = -1
 
         parent = self.central_widget
 
@@ -1376,7 +1364,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         """Add widget"""
 
         if parent is None:
-            self.draw_preview(child, 0, [])
+            self.draw_preview(child, 0)
         else:
             for item in self.preview_items:
                 if item.objectName() == parent.name:
@@ -1414,9 +1402,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 parent_layout.removeWidget(item)
                 parent_layout.insertWidget(new_index, item)
 
-    def update_preview(
-        self, container_cfg, window_id, container_ids=[], selected_item=""
-    ):
+    def update_preview(self, selected_item):
         """Method selects a widget in the gui"""
 
         if isinstance(self.__put_back_colors, collections.Callable):

@@ -18,20 +18,19 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
 
-import gevent
+import os
+import sys
 import fcntl
 import tempfile
-import sys
-import os
 import logging
 import platform
-
-import gevent.monkey
-gevent.monkey.patch_all(thread=False)
 from optparse import OptionParser
 
-import api
+import gevent
+import gevent.monkey
+gevent.monkey.patch_all(thread=False)
 
 import gui
 from gui import GUISupervisor
@@ -44,9 +43,9 @@ __license__ = "LGPLv3+"
 __version__ = 2
 
 
-_logger = logging.getLogger()
-_GUIhdlr = GUILogHandler.GUILogHandler()
-_logger.addHandler(_GUIhdlr)
+logger = logging.getLogger()
+gui_log_handler = GUILogHandler.GUILogHandler()
+logger.addHandler(gui_log_handler)
 
 
 def do_gevent():
@@ -256,15 +255,16 @@ def run(gui_config_file=None):
             sys.exit(1)
 
     if (
-        len(
-            os.popen(
-                "ps -aef | grep 'python' -i | grep 'hardwareRepository'  | grep -v 'grep' | awk '{ print $3 }'"
+            len(
+                os.popen(
+                    "ps -aef | grep 'python' -i | grep 'hardwareRepository'" +\
+                    "  | grep -v 'grep' | awk '{ print $3 }'"
+                )
+                .read()
+                .strip()
+                .split("\n")
             )
-            .read()
-            .strip()
-            .split("\n")
-        )
-        > 1
+            > 1
     ):
         QtImport.QMessageBox.warning(
             None,
@@ -286,7 +286,7 @@ def run(gui_config_file=None):
     if len(log_file) > 0:
         if gui_config_file:
             gui.set_logging_name(os.path.basename(gui_config_file), log_template)
- 
+
         log_lock_filename = os.path.join(
             tempfile.gettempdir(), ".%s.lock" % os.path.basename(log_file)
         )
@@ -348,7 +348,7 @@ def run(gui_config_file=None):
     logging.getLogger().setLevel(log_level)
     # logging.getLogger().info("\n\n\n\n")
     logging.getLogger("HWR").info(
-        "================================================================================="
+        "=============================================================================="
     )
     logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
     logging.getLogger("HWR").info("GUI file: %s" % (gui_config_file or "unnamed"))
@@ -375,7 +375,7 @@ def run(gui_config_file=None):
     else:
         logging.getLogger("HWR").info("    - Matplotlib not available")
     logging.getLogger("HWR").info(
-        "---------------------------------------------------------------------------------"
+        "------------------------------------------------------------------------------"
     )
 
     QtImport.QApplication.setDesktopSettingsAware(False)

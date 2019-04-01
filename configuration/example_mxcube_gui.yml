@@ -149,8 +149,6 @@
               old_value: 0, type: boolean, value: 0}
             - {comment: '', default_value: '', hidden: false, name: hwobj_state_machine,
               old_value: '', type: string, value: ''}
-            - {comment: '', default_value: '', hidden: false, name: hwobj_unittest,
-              old_value: '', type: string, value: ''}
             - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
               name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
@@ -672,9 +670,8 @@
                       - {comment: Allow to control brick in slave mode, default_value: 0,
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
-                      - {comment: '', default_value: /graphics, hidden: false,
-                        name: mnemonic, old_value: /graphics, type: string,
-                        value: /graphics}
+                      - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
+                        old_value: /graphics, type: string, value: /graphics}
                       type: CameraBrick
                     - children: []
                       connections: []
@@ -716,8 +713,6 @@
                       - {comment: Allow to control brick in slave mode, default_value: 0,
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
-                      - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                        old_value: '', type: string, value: /graphics}
                       type: GraphicsManagerBrick
                     connections: []
                     name: vbox1
@@ -802,8 +797,6 @@
                       old_value: '11', type: string, value: '9'}
                     - {comment: Draw a frame around the widget, default_value: 0,
                       hidden: false, name: frame, old_value: 0, type: boolean, value: 0}
-                    - {comment: '', default_value: '', hidden: false, name: graphicsManager,
-                      old_value: '', type: string, value: /graphics}
                     - {comment: Hide widget, default_value: 0, hidden: false, name: hide,
                       old_value: 0, type: boolean, value: 0}
                     - {comment: Allow to control brick in all modes, default_value: 0,
@@ -919,8 +912,6 @@
                     - {comment: Allow to control brick in slave mode, default_value: 0,
                       hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                       value: 0}
-                    - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /beam-info}
                     type: BeamSizeBrick
                   - brick: {class: SlitsBrick, name: slits_brick}
                     children: []
@@ -1013,8 +1004,6 @@
                     - {comment: Allow to control brick in slave mode, default_value: 0,
                       hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                       value: 0}
-                    - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /mini-diff-mockup}
                     type: PhaseBrick
                   connections: []
                   name: beam_def_hbox
@@ -1141,8 +1130,6 @@
                   slot: set_requested_tree_brick}
                 name: task_tollbox_brick
                 properties:
-                - {comment: '', default_value: /beamline-setup, hidden: false, name: beamline_setup,
-                  old_value: /beamline-setup, type: string, value: /beamline-setup}
                 - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
                   name: fixedHeight, old_value: -1, type: integer, value: -1}
                 - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -1159,20 +1146,18 @@
                 - {comment: Allow to control brick in slave mode, default_value: 0,
                   hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                   value: 0}
-                - {comment: '', default_value: /queue-model, hidden: false, name: queue_model,
-                  old_value: /queue-model, type: string, value: /queue-model}
                 - {comment: '', default_value: 1, hidden: false, name: showAdvancedTask,
-                  old_value: null, type: boolean, value: 1}
+                  old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showCharTask,
-                  old_value: null, type: boolean, value: 1}
+                  old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 0, hidden: false, name: showCollectNowButton,
                   old_value: 0, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showDiscreetTask,
-                  old_value: null, type: boolean, value: 1}
+                  old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showHelicalTask,
-                  old_value: null, type: boolean, value: 1}
+                  old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 0, hidden: false, name: showStillScanTask,
-                  old_value: null, type: boolean, value: 0}
+                  old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: useCompression,
                   old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: useOscStartCbox,
@@ -1302,8 +1287,6 @@
               connections: []
               name: dc_parameters_brick
               properties:
-              - {comment: '', default_value: /beamline-setup, hidden: false, name: beamline_setup,
-                old_value: /beamline-setup, type: string, value: /beamline-setup}
               - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
                 name: fixedHeight, old_value: -1, type: integer, value: -1}
               - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -1319,8 +1302,6 @@
               - {comment: Allow to control brick in slave mode, default_value: 0,
                 hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                 value: 0}
-              - {comment: '', default_value: /queue-model, hidden: false, name: queue-model,
-                old_value: /queue-model, type: string, value: /queue-model}
               - {comment: '', default_value: 1, hidden: false, name: useImageTracking,
                 old_value: 1, type: boolean, value: 1}
               type: DCParametersBrick
@@ -1646,8 +1627,6 @@
               connections: []
               name: char_parameters_brick
               properties:
-              - {comment: '', default_value: /beamline-setup, hidden: false, name: beamline_setup,
-                old_value: /beamline-setup, type: string, value: /beamline-setup}
               - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
                 name: fixedHeight, old_value: -1, type: integer, value: -1}
               - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -1663,8 +1642,6 @@
               - {comment: Allow to control brick in slave mode, default_value: 0,
                 hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                 value: 0}
-              - {comment: '', default_value: /session, hidden: false, name: session,
-                old_value: /session, type: string, value: /session}
               - {comment: '', default_value: 1, hidden: false, name: tunable-energy,
                 old_value: 1, type: boolean, value: 1}
               type: CharParametersBrick
@@ -1814,8 +1791,6 @@
               connections: []
               name: energy_scan_brick
               properties:
-              - {comment: '', default_value: /energy-scan, hidden: false, name: energy-scan,
-                old_value: /energy-scan, type: string, value: /energyscan-mockup}
               - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
                 name: fixedHeight, old_value: -1, type: integer, value: -1}
               - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -1831,8 +1806,6 @@
               - {comment: Allow to control brick in slave mode, default_value: 0,
                 hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                 value: 0}
-              - {comment: '', default_value: /session, hidden: false, name: session,
-                old_value: /session, type: string, value: /session}
               type: EnergyScanParametersBrick
             connections: []
             name: energy_scan_tab
@@ -1914,10 +1887,6 @@
               - {comment: Allow to control brick in slave mode, default_value: 0,
                 hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                 value: 0}
-              - {comment: '', default_value: /session, hidden: false, name: session,
-                old_value: /session, type: string, value: /session}
-              - {comment: '', default_value: '', hidden: false, name: xrf-spectrum,
-                old_value: '', type: string, value: /xrf-spectrum-mockup}
               type: XRFSpectrumParametersBrick
             connections: []
             name: xrf_spectrum_tab
@@ -2577,8 +2546,6 @@
         connections: []
         name: mach_info_brick
         properties:
-        - {comment: Disk threshold, default_value: 200.0, hidden: false, name: diskThreshold,
-          old_value: 200.0, type: float, value: 200.0}
         - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
           name: fixedHeight, old_value: -1, type: integer, value: -1}
         - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
@@ -2589,8 +2556,6 @@
           name: frame, old_value: 0, type: boolean, value: 1}
         - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
           type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: hwobj_mach_info, old_value: '',
-          type: string, value: /mach-info-mockup}
         - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
@@ -2635,8 +2600,6 @@
         - {comment: '', default_value: '##.####', format_string: '%3.4f', format_string_length: 8,
           hidden: false, name: kevFormatString, old_value: '##.####', type: formatString,
           value: '###.####'}
-        - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-          type: string, value: /energy-mockup}
         type: EnergyBrick
       - brick: {class: AttenuatorsBrick, name: attenuators_brick}
         children: []
@@ -2660,10 +2623,6 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-          type: string, value: /attenuators-mockup}
-        - {comment: '', default_value: '', hidden: false, name: mockup_mnemonic, old_value: '',
-          type: string, value: ''}
         type: AttenuatorsBrick
       - brick: {class: ResolutionBrick, name: resolution_brick}
         children: []
@@ -2681,12 +2640,6 @@
           old_value: Ang
           type: combo
           value: Ang
-        - {comment: '', default_value: '', hidden: false, name: detectorDistance,
-          old_value: '', type: string, value: /detector-distance-mockup}
-        - {comment: '', default_value: '', hidden: false, name: doorInterlock, old_value: '',
-          type: string, value: /door-interlock-mockup}
-        - {comment: '', default_value: '', hidden: false, name: energy, old_value: '',
-          type: string, value: /energy-mockup}
         - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
           name: fixedHeight, old_value: -1, type: integer, value: -1}
         - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
@@ -2704,8 +2657,6 @@
         - {comment: '', default_value: '###.##', format_string: '%3.2f', format_string_length: 6,
           hidden: false, name: mmFormatString, old_value: '###.##', type: formatString,
           value: '###.##'}
-        - {comment: '', default_value: '', hidden: false, name: resolution, old_value: '',
-          type: string, value: /resolution-mockup}
         type: ResolutionBrick
       - children: []
         connections: []
@@ -2744,8 +2695,6 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-          type: string, value: /door-interlock-mockup}
         type: DoorInterlockBrick
       - brick: {class: DuoStateBrick, name: shutter_brick}
         children: []
@@ -2774,8 +2723,8 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-          type: string, value: /safshut}
+        - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: /safshut,
+          type: string, value: /shutter-mockup}
         - {comment: '', default_value: out, hidden: false, name: out, old_value: out,
           type: string, value: out}
         - {comment: '', default_value: Set in, hidden: false, name: setin, old_value: Set
@@ -2956,8 +2905,6 @@
       name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
     - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
       name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-    - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
-      old_value: /graphics, type: string, value: /graphics}
     - choices: [menuBar, toolBar, both]
       comment: ''
       default_value: menuBar
@@ -3091,10 +3038,38 @@
     type: string, value: MXCuBE}
   - {comment: '', default_value: 1, hidden: false, name: closeOnExit, old_value: null,
     type: boolean, value: 1}
+  - {comment: '', default_value: null, hidden: false, name: color, old_value: null,
+    type: color, value: null}
   - {comment: '', default_value: '123', hidden: false, name: expertPwd, old_value: null,
     type: string, value: '123'}
+  - {comment: '', default_value: -1, hidden: false, name: fixedheight, old_value: null,
+    type: integer, value: -1}
+  - {comment: '', default_value: -1, hidden: false, name: fixedwidth, old_value: null,
+    type: integer, value: -1}
   - {comment: '', default_value: 12, hidden: false, name: fontSize, old_value: null,
     type: integer, value: 12}
+  - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: frameshape
+    old_value: null
+    type: combo
+    value: default
+  - choices: [fixed, expanding, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: hsizepolicy
+    old_value: null
+    type: combo
+    value: default
+  - {comment: '', default_value: '', hidden: false, name: icon, old_value: null, type: string,
+    value: ''}
+  - {comment: '', default_value: '', hidden: false, name: label, old_value: null,
+    type: string, value: ''}
+  - {comment: '', default_value: 2, hidden: false, name: margin, old_value: null,
+    type: integer, value: 2}
   - {comment: '', default_value: 1, hidden: false, name: menubar, old_value: null,
     type: boolean, value: 1}
   - comment: ''
@@ -3104,10 +3079,28 @@
     old_value: null
     type: undefined
     value: *id001
+  - choices: [plain, raised, sunken, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: shadowstyle
+    old_value: null
+    type: combo
+    value: default
   - {comment: '', default_value: 1, hidden: false, name: show, old_value: null, type: boolean,
     value: 1}
+  - {comment: '', default_value: 2, hidden: false, name: spacing, old_value: null,
+    type: integer, value: 2}
   - {comment: '', default_value: 1, hidden: false, name: statusbar, old_value: null,
     type: boolean, value: 1}
+  - choices: [fixed, expanding, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: vsizepolicy
+    old_value: null
+    type: combo
+    value: default
   signals:
     enableExpertMode: !!python/tuple []
     isHidden: !!python/tuple []
@@ -3227,10 +3220,38 @@
     type: string, value: Sample changer}
   - {comment: '', default_value: 0, hidden: false, name: closeOnExit, old_value: null,
     type: boolean, value: 0}
+  - {comment: '', default_value: null, hidden: false, name: color, old_value: null,
+    type: color, value: null}
   - {comment: '', default_value: tonic, hidden: false, name: expertPwd, old_value: null,
     type: string, value: tonic}
+  - {comment: '', default_value: -1, hidden: false, name: fixedheight, old_value: null,
+    type: integer, value: -1}
+  - {comment: '', default_value: -1, hidden: false, name: fixedwidth, old_value: null,
+    type: integer, value: -1}
   - {comment: '', default_value: 12, hidden: false, name: fontSize, old_value: null,
     type: integer, value: 12}
+  - choices: [Box, Panel, StyledPanel, HLine, VLine, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: frameshape
+    old_value: null
+    type: combo
+    value: default
+  - choices: [fixed, expanding, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: hsizepolicy
+    old_value: null
+    type: combo
+    value: default
+  - {comment: '', default_value: '', hidden: false, name: icon, old_value: null, type: string,
+    value: ''}
+  - {comment: '', default_value: '', hidden: false, name: label, old_value: null,
+    type: string, value: ''}
+  - {comment: '', default_value: 2, hidden: false, name: margin, old_value: null,
+    type: integer, value: 2}
   - {comment: '', default_value: 0, hidden: false, name: menubar, old_value: null,
     type: boolean, value: 0}
   - comment: ''
@@ -3240,10 +3261,28 @@
     old_value: null
     type: undefined
     value: *id002
+  - choices: [plain, raised, sunken, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: shadowstyle
+    old_value: null
+    type: combo
+    value: default
   - {comment: '', default_value: 0, hidden: false, name: show, old_value: null, type: boolean,
     value: 0}
+  - {comment: '', default_value: 2, hidden: false, name: spacing, old_value: null,
+    type: integer, value: 2}
   - {comment: '', default_value: 0, hidden: false, name: statusbar, old_value: null,
     type: boolean, value: 0}
+  - choices: [fixed, expanding, default]
+    comment: ''
+    default_value: default
+    hidden: false
+    name: vsizepolicy
+    old_value: null
+    type: combo
+    value: default
   signals:
     enableExpertMode: !!python/tuple []
     isHidden: !!python/tuple []

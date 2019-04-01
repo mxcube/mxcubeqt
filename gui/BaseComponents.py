@@ -147,6 +147,8 @@ class SignalSlotFilter:
 
 
 class BaseWidget(Connectable.Connectable, QtImport.QFrame):
+    """Base class for MXCuBE bricks"""
+
     (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
      INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
     (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
@@ -241,16 +243,12 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         BaseWidget._instance_mode = mode
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
-                # try:
-                if True:
-                    widget._instance_mode_changed(mode)
-                    if widget['instanceAllowAlways']:
-                        widget.setEnabled(True)
-                    else:
-                        widget.setEnabled(
-                            mode == BaseWidget.INSTANCE_MODE_MASTER)
-                # except:
-                #    pass
+                widget._instance_mode_changed(mode)
+                if widget['instanceAllowAlways']:
+                    widget.setEnabled(True)
+                else:
+                    widget.setEnabled(
+                        mode == BaseWidget.INSTANCE_MODE_MASTER)
         if BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER:
             if BaseWidget._filter_installed:
                 QtImport.QApplication.instance().removeEventFilter(
@@ -550,7 +548,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                                 master_sync)
 
     @staticmethod
-    def widget_combobox_activated(brick_name, widget_name, widget, master_sync, index):
+    def widget_combobox_activated(brick_name, widget_name, widget, master_sync, item_index):
         lines = []
         if widget.isEditable():
             for index in range(widget.count()):
@@ -558,7 +556,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         BaseWidget.update_widget(brick_name,
                                  widget_name,
                                  "setCurrentIndex",
-                                 (index, ),
+                                 (item_index, ),
                                  master_sync)
 
     @staticmethod
@@ -960,15 +958,15 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             self.readProperties()  # force to read properties
 
     def get_hardware_objects_info(self):
-        d = {}
+        info_dict = {}
         for ho_name in self.__loaded_hardware_objects:
             info = HardwareRepository.getHardwareRepository().getInfo(ho_name)
 
             if len(info) > 0:
-                d[ho_name] = info
+                info_dict[ho_name] = info
 
-        if len(d):
-            return "Hardware Objects:\n\n%s" % pprint.pformat(d)
+        if len(info_dict):
+            return "Hardware Objects:\n\n%s" % pprint.pformat(info_dict)
         else:
             return ""
 
