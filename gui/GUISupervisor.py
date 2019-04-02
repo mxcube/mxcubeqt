@@ -503,15 +503,15 @@ class GUISupervisor(QtImport.QWidget):
                     % str(self.hardware_repository.serverAddress).split(":")[0]
                 )
                 if (
-                        QtImport.QMessageBox.warning(
-                            self,
-                            "Cannot connect to Hardware Repository",
-                            message,
-                            QtImport.QMessageBox.Retry
-                            | QtImport.QMessageBox.Cancel
-                            | QtImport.QMessageBox.NoButton,
-                        )
-                        == QtImport.QMessageBox.Cancel
+                    QtImport.QMessageBox.warning(
+                        self,
+                        "Cannot connect to Hardware Repository",
+                        message,
+                        QtImport.QMessageBox.Retry
+                        | QtImport.QMessageBox.Cancel
+                        | QtImport.QMessageBox.NoButton,
+                    )
+                    == QtImport.QMessageBox.Cancel
                 ):
                     logging.getLogger().warning(
                         "Gave up trying to " + "connect to Hardware Repository server."

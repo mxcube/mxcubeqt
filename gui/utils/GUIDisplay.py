@@ -735,8 +735,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             # add 'tab reset count' slot
             slot_name = "resetTabCount_%s" % label
 
-            def tab_reset_count_slot(self, erase_count,
-                                     page_index=self.indexOf(scroll_area)):
+            def tab_reset_count_slot(
+                self, erase_count, page_index=self.indexOf(scroll_area)
+            ):
                 tab_label = str(self.tabLabel(self.page(page_index)))
                 label_list = tab_label.split()
                 found = False
