@@ -261,6 +261,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QTreeWidget,
             QTreeWidgetItem,
             QTreeWidgetItemIterator,
+            QValidator,
             QVBoxLayout,
             QWidget,
         )
