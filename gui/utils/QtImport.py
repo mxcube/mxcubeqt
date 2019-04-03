@@ -179,6 +179,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QRectF,
             QRegExp,
             QSize,
+            QStringList,
             QT_VERSION_STR,
             QTimer,
             SIGNAL,
