@@ -1,4 +1,3 @@
-#
 #  Project: MXCuBE
 #  https://github.com/mxcube
 #
@@ -37,6 +36,7 @@ try:
 except ImportError:
     from pydispatch import dispatcher
     from pydispatch import saferef
+
     saferef.safe_ref = saferef.safeRef
 
 
@@ -44,7 +44,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-_emitterCache = weakref.WeakKeyDictionary()
+_emitter_cache = weakref.WeakKeyDictionary()
 
 
 class _QObject(QtImport.QObject):
@@ -62,13 +62,12 @@ def emitter(ob):
        This function enables you to connect to and emit signals
        from (almost) any python object with having to subclass QObject.
     """
-    if ob not in _emitterCache:
-        _emitterCache[ob] = _QObject(ho=ob)
-    return _emitterCache[ob]
+    if ob not in _emitter_cache:
+        _emitter_cache[ob] = _QObject(ho=ob)
+    return _emitter_cache[ob]
 
 
 class InstanceEventFilter(QtImport.QObject):
-
     def eventFilter(self, widget, event):
         obj = widget
         while obj is not None:
@@ -81,8 +80,7 @@ class InstanceEventFilter(QtImport.QObject):
                         return True
                     elif obj.should_filter_event():
                         return True
-                elif isinstance(event, QtImport.QKeyEvent) \
-                        or isinstance(event, QtImport.QFocusEvent):
+                elif isinstance(event, (QtImport.QKeyEvent, QtImport.QFocusEvent)):
                     if obj.should_filter_event():
                         return True
 
@@ -95,7 +93,6 @@ class InstanceEventFilter(QtImport.QObject):
 
 
 class WeakMethodBound:
-
     def __init__(self, f):
         self.f = weakref.ref(f.__func__)
         self.c = weakref.ref(f.__self__)
@@ -110,7 +107,6 @@ class WeakMethodBound:
 
 
 class WeakMethodFree:
-
     def __init__(self, f):
         self.f = weakref.ref(f)
 
@@ -127,18 +123,18 @@ def WeakMethod(f):
 
 
 class SignalSlotFilter:
-
     def __init__(self, signal, slot, should_cache):
         self.signal = signal
         self.slot = WeakMethod(slot)
         self.should_cache = should_cache
 
     def __call__(self, *args):
-        if BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_SLAVE and \
-                BaseWidget._instance_mirror == BaseWidget.INSTANCE_MIRROR_PREVENT:
+        if (
+                BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_SLAVE
+                and BaseWidget._instance_mirror == BaseWidget.INSTANCE_MIRROR_PREVENT
+           ):
             if self.should_cache:
-                BaseWidget._events_cache[self.slot] = \
-                    (time.time(), self.slot, args)
+                BaseWidget._events_cache[self.slot] = (time.time(), self.slot, args)
                 return
 
         s = self.slot()
@@ -147,15 +143,34 @@ class SignalSlotFilter:
 
 
 class BaseWidget(Connectable.Connectable, QtImport.QFrame):
-    (INSTANCE_ROLE_UNKNOWN, INSTANCE_ROLE_SERVER, INSTANCE_ROLE_SERVERSTARTING,
-     INSTANCE_ROLE_CLIENT, INSTANCE_ROLE_CLIENTCONNECTING) = (0, 1, 2, 3, 4)
+    """Base class for MXCuBE bricks"""
+
+    (
+        INSTANCE_ROLE_UNKNOWN,
+        INSTANCE_ROLE_SERVER,
+        INSTANCE_ROLE_SERVERSTARTING,
+        INSTANCE_ROLE_CLIENT,
+        INSTANCE_ROLE_CLIENTCONNECTING,
+    ) = (0, 1, 2, 3, 4)
     (INSTANCE_MODE_UNKNOWN, INSTANCE_MODE_MASTER, INSTANCE_MODE_SLAVE) = (0, 1, 2)
-    (INSTANCE_LOCATION_UNKNOWN, INSTANCE_LOCATION_LOCAL,
-     INSTANCE_LOCATION_INHOUSE, INSTANCE_LOCATION_INSITE,
-     INSTANCE_LOCATION_EXTERNAL) = (0, 1, 2, 3, 4)
-    (INSTANCE_USERID_UNKNOWN, INSTANCE_USERID_LOGGED, INSTANCE_USERID_INHOUSE,
-     INSTANCE_USERID_IMPERSONATE) = (0, 1, 2, 3)
-    (INSTANCE_MIRROR_UNKNOWN, INSTANCE_MIRROR_ALLOW, INSTANCE_MIRROR_PREVENT) = (0, 1, 2)
+    (
+        INSTANCE_LOCATION_UNKNOWN,
+        INSTANCE_LOCATION_LOCAL,
+        INSTANCE_LOCATION_INHOUSE,
+        INSTANCE_LOCATION_INSITE,
+        INSTANCE_LOCATION_EXTERNAL,
+    ) = (0, 1, 2, 3, 4)
+    (
+        INSTANCE_USERID_UNKNOWN,
+        INSTANCE_USERID_LOGGED,
+        INSTANCE_USERID_INHOUSE,
+        INSTANCE_USERID_IMPERSONATE,
+    ) = (0, 1, 2, 3)
+    (INSTANCE_MIRROR_UNKNOWN, INSTANCE_MIRROR_ALLOW, INSTANCE_MIRROR_PREVENT) = (
+        0,
+        1,
+        2,
+    )
 
     _run_mode = False
     _instance_role = INSTANCE_ROLE_UNKNOWN
@@ -187,7 +202,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                         widget.set_expert_mode(False)
                     except BaseException:
                         logging.getLogger().exception(
-                            "Could not set %s to user mode", widget.name())
+                            "Could not set %s to user mode", widget.name()
+                        )
 
         else:
             BaseWidget._run_mode = False
@@ -198,8 +214,9 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                         widget.set_expert_mode(True)
                     except Exception as ex:
                         logging.getLogger().exception(
-                            "Could not set %s to expert mode: %s" %
-                            (str(widget), str(ex)))
+                            "Could not set %s to expert mode: %s"
+                            % (str(widget), str(ex))
+                        )
 
     @staticmethod
     def is_running():
@@ -213,22 +230,24 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         color = None
         if BaseWidget._menubar is not None:
             BaseWidget._menubar.parent.update_instance_caption("")
-            if BaseWidget._instance_mode == \
-               BaseWidget.INSTANCE_MODE_MASTER:
-                if BaseWidget._instance_user_id == \
-                   BaseWidget.INSTANCE_USERID_IMPERSONATE:
+            if BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER:
+                if (
+                    BaseWidget._instance_user_id
+                    == BaseWidget.INSTANCE_USERID_IMPERSONATE
+                ):
                     color = "lightBlue"
                 else:
                     color = "rgb(204,255,204)"
-            elif BaseWidget._instance_mode == \
-                    BaseWidget.INSTANCE_MODE_SLAVE:
+            elif BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_SLAVE:
                 BaseWidget._menubar.parent.update_instance_caption(
-                    " : slave instance (all controls are disabled)")
-                if BaseWidget._instance_role == \
-                   BaseWidget.INSTANCE_ROLE_CLIENTCONNECTING:
+                    " : slave instance (all controls are disabled)"
+                )
+                if (
+                    BaseWidget._instance_role
+                    == BaseWidget.INSTANCE_ROLE_CLIENTCONNECTING
+                ):
                     color = "rgb(255,204,204)"
-                elif BaseWidget._instance_user_id == \
-                        BaseWidget.INSTANCE_USERID_UNKNOWN:
+                elif BaseWidget._instance_user_id == BaseWidget.INSTANCE_USERID_UNKNOWN:
                     color = "rgb(255, 165, 0)"
                 else:
                     color = "yellow"
@@ -241,43 +260,44 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         BaseWidget._instance_mode = mode
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
-                # try:
-                if True:
-                    widget._instance_mode_changed(mode)
-                    if widget['instanceAllowAlways']:
-                        widget.setEnabled(True)
-                    else:
-                        widget.setEnabled(
-                            mode == BaseWidget.INSTANCE_MODE_MASTER)
-                # except:
-                #    pass
+                widget._instance_mode_changed(mode)
+                if widget["instanceAllowAlways"]:
+                    widget.setEnabled(True)
+                else:
+                    widget.setEnabled(mode == BaseWidget.INSTANCE_MODE_MASTER)
         if BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER:
             if BaseWidget._filter_installed:
                 QtImport.QApplication.instance().removeEventFilter(
-                    BaseWidget._application_event_filter)
+                    BaseWidget._application_event_filter
+                )
                 BaseWidget._filter_installed = False
                 BaseWidget.synchronize_with_cache()  # why?
         else:
             if not BaseWidget._filter_installed:
                 QtImport.QApplication.instance().installEventFilter(
-                    BaseWidget._application_event_filter)
+                    BaseWidget._application_event_filter
+                )
                 BaseWidget._filter_installed = True
 
-        BaseWidget.update_menu_bar_color(BaseWidget._instance_mode ==
-                                         BaseWidget.INSTANCE_MODE_MASTER)
+        BaseWidget.update_menu_bar_color(
+            BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER
+        )
 
     @staticmethod
     def set_status_info(info_type, info_message, info_status=""):
         """Updates status bar"""
         if BaseWidget._statusbar:
             BaseWidget._statusbar.parent().update_status_info(
-                info_type, info_message, info_status)
+                info_type, info_message, info_status
+            )
 
     @staticmethod
     def init_progress_bar(progress_type, number_of_steps):
         """Updates status bar"""
         if BaseWidget._statusbar:
-            BaseWidget._statusbar.parent().init_progress_bar(progress_type, number_of_steps)
+            BaseWidget._statusbar.parent().init_progress_bar(
+                progress_type, number_of_steps
+            )
 
     @staticmethod
     def set_progress_bar_step(step):
@@ -314,18 +334,19 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         if BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER:
             return False
         try:
-            allow_always = self['instanceAllowAlways']
+            allow_always = self["instanceAllowAlways"]
         except KeyError:
             return False
         if not allow_always:
             try:
-                allow_connected = self['instanceAllowConnected']
+                allow_connected = self["instanceAllowConnected"]
             except KeyError:
                 return False
 
             connected = BaseWidget._instance_role in (
                 BaseWidget.INSTANCE_ROLE_SERVER,
-                BaseWidget.INSTANCE_ROLE_CLIENT)
+                BaseWidget.INSTANCE_ROLE_CLIENT,
+            )
             if allow_connected and connected:
                 return False
             return True
@@ -334,40 +355,51 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     def connect_group_box(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
-        widget.toggled.connect(lambda
-                               s: BaseWidget.widget_groupbox_toggled(brick_name,
-                                                                     widget_name, master_sync, s))
+        widget.toggled.connect(
+            lambda s: BaseWidget.widget_groupbox_toggled(
+                brick_name, widget_name, master_sync, s
+            )
+        )
 
     def connect_combobox(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
         widget.activated.connect(
-            lambda
-            i: BaseWidget.widget_combobox_activated(brick_name,
-                                                    widget_name, widget, master_sync, i))
+            lambda i: BaseWidget.widget_combobox_activated(
+                brick_name, widget_name, widget, master_sync, i
+            )
+        )
 
     def connect_line_edit(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
-        widget.textChanged.connect(lambda
-                                   t: BaseWidget.widget_line_edit_text_changed(
-                                       brick_name, widget_name, master_sync, t))
+        widget.textChanged.connect(
+            lambda t: BaseWidget.widget_line_edit_text_changed(
+                brick_name, widget_name, master_sync, t
+            )
+        )
 
     def connect_spinbox(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
-        widget.valueChanged.connect(lambda
-                                    t: BaseWidget.widget_spinbox_value_changed(
-                                        brick_name, widget_name, master_sync, t))
+        widget.valueChanged.connect(
+            lambda t: BaseWidget.widget_spinbox_value_changed(
+                brick_name, widget_name, master_sync, t
+            )
+        )
 
     def connect_double_spinbox(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
-        widget.valueChanged.connect(lambda
-                                    t: BaseWidget.widget_double_spinbox_value_changed(
-                                        brick_name, widget_name, master_sync, t))
+        widget.valueChanged.connect(
+            lambda t: BaseWidget.widget_double_spinbox_value_changed(
+                brick_name, widget_name, master_sync, t
+            )
+        )
 
     def connect_generic_widget(self, widget, widget_name, master_sync):
         brick_name = self.objectName()
-        widget.widgetSynchronize.connect(lambda
-                                         state: BaseWidget.widget_generic_changed(brick_name, widget_name,
-                                                                                master_sync, state))
+        widget.widgetSynchronize.connect(
+            lambda state: BaseWidget.widget_generic_changed(
+                brick_name, widget_name, master_sync, state
+            )
+        )
 
     def _instance_mode_changed(self, mode):
         for widget, widget_name, master_sync in self._widget_events:
@@ -393,43 +425,35 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     @staticmethod
     def is_instance_mode_master():
-        return BaseWidget._instance_mode == \
-            BaseWidget.INSTANCE_MODE_MASTER
+        return BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER
 
     @staticmethod
     def is_instance_mode_slave():
-        return BaseWidget._instance_mode == \
-            BaseWidget.INSTANCE_MODE_SLAVE
+        return BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_SLAVE
 
     @staticmethod
     def is_istance_role_unknown():
-        return BaseWidget._instance_role == \
-            BaseWidget.INSTANCE_ROLE_UNKNOWN
+        return BaseWidget._instance_role == BaseWidget.INSTANCE_ROLE_UNKNOWN
 
     @staticmethod
     def is_instance_role_client():
-        return BaseWidget._instance_role == \
-            BaseWidget.INSTANCE_ROLE_CLIENT
+        return BaseWidget._instance_role == BaseWidget.INSTANCE_ROLE_CLIENT
 
     @staticmethod
     def is_instance_role_server():
-        return BaseWidget._instance_role == \
-            BaseWidget.INSTANCE_ROLE_SERVER
+        return BaseWidget._instance_role == BaseWidget.INSTANCE_ROLE_SERVER
 
     @staticmethod
     def is_instance_user_id_unknown():
-        return BaseWidget._instance_user_id == \
-            BaseWidget.INSTANCE_USERID_UNKNOWN
+        return BaseWidget._instance_user_id == BaseWidget.INSTANCE_USERID_UNKNOWN
 
     @staticmethod
     def is_instance_user_id_logged():
-        return BaseWidget._instance_user_id == \
-            BaseWidget.INSTANCE_USERID_LOGGED
+        return BaseWidget._instance_user_id == BaseWidget.INSTANCE_USERID_LOGGED
 
     @staticmethod
     def is_instance_user_id_inhouse():
-        return BaseWidget._instance_user_id == \
-            BaseWidget.INSTANCE_USERID_INHOUSE
+        return BaseWidget._instance_user_id == BaseWidget.INSTANCE_USERID_INHOUSE
 
     @staticmethod
     def set_instance_role(role):
@@ -490,18 +514,15 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     @staticmethod
     def is_instance_location_unknown():
-        return BaseWidget._instance_location == \
-            BaseWidget.INSTANCE_LOCATION_UNKNOWN
+        return BaseWidget._instance_location == BaseWidget.INSTANCE_LOCATION_UNKNOWN
 
     @staticmethod
     def is_instance_location_local():
-        return BaseWidget._instance_location == \
-            BaseWidget.INSTANCE_LOCATION_LOCAL
+        return BaseWidget._instance_location == BaseWidget.INSTANCE_LOCATION_LOCAL
 
     @staticmethod
     def is_instance_mirror_allow():
-        return BaseWidget._instance_mirror == \
-            BaseWidget.INSTANCE_MIRROR_ALLOW
+        return BaseWidget._instance_mirror == BaseWidget.INSTANCE_MIRROR_ALLOW
 
     def instance_user_id_changed(self, user_id):
         pass
@@ -513,26 +534,27 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def update_whats_this():
         for widget in QtImport.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
-                msg = "%s (%s)\n%s" % (widget.objectName(),
-                                       widget.__class__.__name__,
-                                       widget.get_hardware_objects_info())
+                msg = "%s (%s)\n%s" % (
+                    widget.objectName(),
+                    widget.__class__.__name__,
+                    widget.get_hardware_objects_info(),
+                )
                 widget.setWhatsThis(msg)
         QtImport.QWhatsThis.enterWhatsThisMode()
 
     @staticmethod
-    def update_widget(brick_name, widget_name, method_name,
-                      method_args, master_sync):
+    def update_widget(brick_name, widget_name, method_name, method_args, master_sync):
         for widget in QtImport.QApplication.allWidgets():
             if hasattr(widget, "configuration"):
                 top_level_widget = widget
                 break
-        if not master_sync or BaseWidget._instance_mode == \
-                BaseWidget.INSTANCE_MODE_MASTER:
-            top_level_widget.brickChangedSignal.emit(brick_name,
-                                                     widget_name,
-                                                     method_name,
-                                                     method_args,
-                                                     master_sync)
+        if (
+            not master_sync
+            or BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER
+        ):
+            top_level_widget.brickChangedSignal.emit(
+                brick_name, widget_name, method_name, method_args, master_sync
+            )
 
     @staticmethod
     def update_tab_widget(tab_name, tab_index):
@@ -543,55 +565,45 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     @staticmethod
     def widget_groupbox_toggled(brick_name, widget_name, master_sync, state):
-        BaseWidget.update_widget(brick_name,
-                                widget_name,
-                                "setChecked",
-                                (state,),
-                                master_sync)
+        BaseWidget.update_widget(
+            brick_name, widget_name, "setChecked", (state,), master_sync
+        )
 
     @staticmethod
-    def widget_combobox_activated(brick_name, widget_name, widget, master_sync, index):
+    def widget_combobox_activated(
+        brick_name, widget_name, widget, master_sync, item_index
+    ):
         lines = []
         if widget.isEditable():
             for index in range(widget.count()):
                 lines.append(str(widget.itemText(index)))
-        BaseWidget.update_widget(brick_name,
-                                 widget_name,
-                                 "setCurrentIndex",
-                                 (index, ),
-                                 master_sync)
+        BaseWidget.update_widget(
+            brick_name, widget_name, "setCurrentIndex", (item_index,), master_sync
+        )
 
     @staticmethod
     def widget_line_edit_text_changed(brick_name, widget_name, master_sync, text):
-        BaseWidget.update_widget(brick_name,
-                                 widget_name,
-                                 "setText",
-                                 (text, ),
-                                 master_sync)
+        BaseWidget.update_widget(
+            brick_name, widget_name, "setText", (text,), master_sync
+        )
 
     @staticmethod
     def widget_spinbox_value_changed(brick_name, widget_name, master_sync, text):
-        BaseWidget.update_widget(brick_name,
-                                 widget_name,
-                                 "setValue",
-                                 (int(text), ),
-                                 master_sync)
+        BaseWidget.update_widget(
+            brick_name, widget_name, "setValue", (int(text),), master_sync
+        )
 
     @staticmethod
     def widget_double_spinbox_value_changed(brick_name, widget_name, master_sync, text):
-        BaseWidget.update_widget(brick_name,
-                                 widget_name,
-                                 "setValue",
-                                 (float(text), ),
-                                 master_sync)
+        BaseWidget.update_widget(
+            brick_name, widget_name, "setValue", (float(text),), master_sync
+        )
 
     @staticmethod
     def widget_generic_changed(brick_name, widget_name, master_sync, state):
-        BaseWidget.update_widget(brick_name,
-                                 widget_name,
-                                 "widget_synchronize",
-                                 (state,),
-                                 master_sync)
+        BaseWidget.update_widget(
+            brick_name, widget_name, "widget_synchronize", (state,), master_sync
+        )
 
     def instance_forward_events(self, widget_name, master_sync):
         if widget_name == "":
@@ -602,13 +614,11 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     def instance_synchronize(self, *args, **kwargs):
         for widget_name in args:
-            self.instance_forward_events(widget_name,
-                                         kwargs.get("master_sync", True))
+            self.instance_forward_events(widget_name, kwargs.get("master_sync", True))
 
     @staticmethod
     def should_run_event():
-        return BaseWidget._instance_mirror == \
-            BaseWidget.INSTANCE_MIRROR_ALLOW
+        return BaseWidget._instance_mirror == BaseWidget.INSTANCE_MIRROR_ALLOW
 
     @staticmethod
     def add_event_to_cache(timestamp, method, *args):
@@ -637,7 +647,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             if isinstance(widget, BaseWidget):
                 widget.setEnabled(enabled)
 
-    def __init__(self, parent=None, widget_name=''):
+    def __init__(self, parent=None, widget_name=""):
 
         Connectable.Connectable.__init__(self)
         QtImport.QFrame.__init__(self, parent)
@@ -653,58 +663,57 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
         self.setWhatsThis("%s (%s)\n" % (widget_name, self.__class__.__name__))
 
-        self.add_property('fontSize',
-                          'string',
-                          str(self.font().pointSize()))
-        self.add_property('frame',
-                          'boolean',
-                          False,
-                          comment="Draw a frame around the widget")
-        self.add_property('instanceAllowAlways',
-                          'boolean',
-                          False,
-                          comment="Allow to control brick in all modes")
-        self.add_property('instanceAllowConnected',
-                          'boolean',
-                          False,
-                          comment="Allow to control brick in slave mode")
-        self.add_property('fixedWidth',
-                          'integer',
-                          '-1',
-                          comment="Set fixed width in pixels")
-        self.add_property('fixedHeight',
-                          'integer',
-                          '-1',
-                          comment="Set fixed height in pixels")
-        self.add_property('hide',
-                          'boolean',
-                          False,
-                          comment="Hide widget")
+        self.add_property("fontSize", "string", str(self.font().pointSize()))
+        self.add_property(
+            "frame", "boolean", False, comment="Draw a frame around the widget"
+        )
+        self.add_property(
+            "instanceAllowAlways",
+            "boolean",
+            False,
+            comment="Allow to control brick in all modes",
+        )
+        self.add_property(
+            "instanceAllowConnected",
+            "boolean",
+            False,
+            comment="Allow to control brick in slave mode",
+        )
+        self.add_property(
+            "fixedWidth", "integer", "-1", comment="Set fixed width in pixels"
+        )
+        self.add_property(
+            "fixedHeight", "integer", "-1", comment="Set fixed height in pixels"
+        )
+        self.add_property("hide", "boolean", False, comment="Hide widget")
 
-        dispatcher.connect(self.__hardware_object_discarded,
-                           'hardwareObjectDiscarded',
-                           HardwareRepository.getHardwareRepository())
-        self.define_slot('enable_widget', ())
-        self.define_slot('disable_widget', ())
+        dispatcher.connect(
+            self.__hardware_object_discarded,
+            "hardwareObjectDiscarded",
+            HardwareRepository.getHardwareRepository(),
+        )
+        self.define_slot("enable_widget", ())
+        self.define_slot("disable_widget", ())
 
         # If PySide used then connect method was not overriden
         # This solution of redirecting methods works...
 
         self.connect = self.connect_hwobj
         self.diconnect = self.disconnect_hwobj
-        #self.run_mode = QPushButton("Run mode", self)
+        # self.run_mode = QPushButton("Run mode", self)
 
     def __run(self):
         self.setAcceptDrops(False)
         self.blockSignals(False)
         self.setEnabled(self.__enabled_state)
-        #self.run_mode_pushbutton = QPushButton("Simulation", self)
+        # self.run_mode_pushbutton = QPushButton("Simulation", self)
 
         try:
             self.run()
         except BaseException:
             logging.getLogger().exception(
-                "Could not set %s to run mode", self.objectName())
+                "Could not set %s to run mode", self.objectName()
+            )
 
     def __stop(self):
         self.blockSignals(True)
@@ -712,8 +721,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         try:
             self.stop()
         except BaseException:
-            logging.getLogger().exception(
-                "Could not stop %s", self.objectName())
+            logging.getLogger().exception("Could not stop %s", self.objectName())
 
         # self.setAcceptDrops(True)
         self.__enabled_state = self.isEnabled()
@@ -728,18 +736,18 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         self._signal_slot_filters[uid] = signal_slot_filter
 
         signal.connect(signal_slot_filter)
-        #QtImport.QObject.connect(sender, signal, signal_slot_filter)
+        # QtImport.QObject.connect(sender, signal, signal_slot_filter)
 
-    def connect_hwobj(self, sender, signal, slot,
-                      instance_filter=False, should_cache=True):
+    def connect_hwobj(
+        self, sender, signal, slot, instance_filter=False, should_cache=True
+    ):
         if sys.version_info > (3, 0):
-            signal = str(signal.decode('utf8') if
-                         isinstance(signal, bytes) else signal)
+            signal = str(signal.decode("utf8") if isinstance(signal, bytes) else signal)
         else:
             signal = str(signal)
 
         if signal[0].isdigit():
-            pysignal = signal[0] == '9'
+            pysignal = signal[0] == "9"
             signal = signal[1:]
         else:
             pysignal = True
@@ -754,11 +762,12 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             _sender = sender
 
         if instance_filter:
-            self.connect_signal_slot_filter(_sender,
-                                            pysignal and
-                                            QtImport.pyqtSignal(signal) or
-                                            QtImport.pyqtSignal(signal),
-                                            slot, should_cache)
+            self.connect_signal_slot_filter(
+                _sender,
+                pysignal and QtImport.pyqtSignal(signal) or QtImport.pyqtSignal(signal),
+                slot,
+                should_cache,
+            )
         else:
             # Porting to Qt5
             getattr(_sender, signal).connect(slot)
@@ -776,7 +785,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def disconnect_hwobj(self, sender, signal, slot):
         signal = str(signal)
         if signal[0].isdigit():
-            pysignal = signal[0] == '9'
+            pysignal = signal[0] == "9"
             signal = signal[1:]
         else:
             pysignal = True
@@ -793,19 +802,24 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             sender = emitter(sender)
 
             try:
-                uid = (sender, pysignal and QtImport.QtCore.SIGNAL(signal) or
-                       QtImport.QtCore.SIGNAL(signal), hash(slot))
+                uid = (
+                    sender,
+                    pysignal
+                    and QtImport.QtCore.SIGNAL(signal)
+                    or QtImport.QtCore.SIGNAL(signal),
+                    hash(slot),
+                )
                 signal_slot_filter = self._signal_slot_filters[uid]
             except KeyError:
                 getattr(sender, signal).disconnect(slot)
-                #QtImport.QObject.disconnect(sender,
+                # QtImport.QObject.disconnect(sender,
                 #                            pysignal and
                 #                            QtImport.QtCore.SIGNAL(signal) or
                 #                            QtImport.QtCore.SIGNAL(signal),
                 #                            slot)
             else:
                 getattr(sender, signal).disconnect(signal_slot_filter)
-                #QtImport.QObject.disconnect(sender,
+                # QtImport.QObject.disconnect(sender,
                 #                            pysignal and
                 #                            QtImport.SIGNAL(signal) or
                 #                            QtImport.SIGNAL(signal),
@@ -813,7 +827,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 del self._signal_slot_filters[uid]
         else:
             getattr(sender, signal).disconnect(signal_slot_filter)
-            #QtImport.QObject.disconnect(sender,
+            # QtImport.QObject.disconnect(sender,
             #                            pysignal and
             #                            QtImport.SIGNAL(signal) or
             #                            QtImport.SIGNAL(signal),
@@ -842,8 +856,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         self.run()
 
     def load_ui_file(self, filename):
-        for path in [gui.get_base_bricks_path()] + \
-                gui.get_custom_bricks_dirs():
+        for path in [gui.get_base_bricks_path()] + gui.get_custom_bricks_dirs():
             if os.path.exists(os.path.join(path, filename)):
                 return QtImport.QWidgetFactory.create(os.path.join(path, filename))
 
@@ -866,14 +879,16 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             for prop in persistent_property_bag:
                 if hasattr(prop, "get_name"):
                     if prop.get_name() in self.property_bag.properties:
-                        self.property_bag.get_property(prop.get_name()).\
-                            set_value(prop.get_user_value())
+                        self.property_bag.get_property(prop.get_name()).set_value(
+                            prop.get_user_value()
+                        )
                     elif prop.hidden:
                         self.property_bag[prop.get_name()] = prop
                 else:
                     if prop["name"] in self.property_bag.properties:
-                        self.property_bag.get_property(prop["name"]).\
-                            set_value(prop["value"])
+                        self.property_bag.get_property(prop["name"]).set_value(
+                            prop["value"]
+                        )
                     elif prop["hidden"]:
                         self.property_bag[prop["name"]] = prop
 
@@ -902,36 +917,29 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         splash_screen = gui.get_splash_screen()
         if splash_screen:
             splash_screen.set_message(
-                "Loading hardware object defined in %s.xml" %
-                hardware_object_name)
+                "Loading hardware object defined in %s.xml" % hardware_object_name
+            )
 
         if not hardware_object_name in self.__loaded_hardware_objects:
             if splash_screen:
                 splash_screen.inc_progress_value()
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        hwobj = HardwareRepository.getHardwareRepository().\
-            getHardwareObject(hardware_object_name)
+        hwobj = HardwareRepository.getHardwareRepository().getHardwareObject(
+            hardware_object_name
+        )
 
         if hwobj is not None:
-            self.connect(hwobj,
-                         "progressInit",
-                         self.progress_init)
-            self.connect(hwobj,
-                         'progressStep',
-                         self.progress_step)
-            self.connect(hwobj,
-                         'progressStop',
-                         self.progress_stop)
-            self.connect(hwobj,
-                         'statusMessage',
-                         self.status_message_changed)
+            self.connect(hwobj, "progressInit", self.progress_init)
+            self.connect(hwobj, "progressStep", self.progress_step)
+            self.connect(hwobj, "progressStop", self.progress_stop)
+            self.connect(hwobj, "statusMessage", self.status_message_changed)
 
         if hwobj is None and not optional:
             logging.getLogger("GUI").error(
-                "%s: Unable to initialize hardware object defined in %s.xml" %
-                (self.objectName(),
-                 hardware_object_name[1:]))
+                "%s: Unable to initialize hardware object defined in %s.xml"
+                % (self.objectName(), hardware_object_name[1:])
+            )
             self.set_background_color(Colors.LIGHT_RED)
             self.__failed_to_load_hwobj = True
             self.setDisabled(True)
@@ -960,15 +968,15 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             self.readProperties()  # force to read properties
 
     def get_hardware_objects_info(self):
-        d = {}
+        info_dict = {}
         for ho_name in self.__loaded_hardware_objects:
             info = HardwareRepository.getHardwareRepository().getInfo(ho_name)
 
             if len(info) > 0:
-                d[ho_name] = info
+                info_dict[ho_name] = info
 
-        if len(d):
-            return "Hardware Objects:\n\n%s" % pprint.pformat(d)
+        if len(info_dict):
+            return "Hardware Objects:\n\n%s" % pprint.pformat(info_dict)
         else:
             return ""
 
@@ -980,16 +988,14 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         old_value = property_bag.get_value()
         property_bag.set_value(value)
 
-        self._property_changed(property_name,
-                               old_value,
-                               property_bag.get_user_value())
+        self._property_changed(property_name, old_value, property_bag.get_user_value())
 
     def _property_changed(self, property_name, old_value, new_value):
-        if property_name == 'fontSize':
+        if property_name == "fontSize":
             try:
                 font_size = int(new_value)
             except BaseException:
-                self.get_property('fontSize').set_value(self.font().pointSize())
+                self.get_property("fontSize").set_value(self.font().pointSize())
             else:
                 font = self.font()
                 font.setPointSize(font_size)
@@ -999,7 +1005,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                     if isinstance(brick, BaseWidget):
                         brick["fontSize"] = font_size
                 self.update()
-        elif property_name == 'frame':
+        elif property_name == "frame":
             try:
                 if new_value:
                     self.setFrameStyle(QtImport.QFrame.StyledPanel)
@@ -1008,13 +1014,13 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             except BaseException:
                 pass
             self.update()
-        elif property_name == 'fixedWidth':
+        elif property_name == "fixedWidth":
             if new_value > -1:
                 self.setFixedWidth(new_value)
-        elif property_name == 'fixedHeight':
+        elif property_name == "fixedHeight":
             if new_value > -1:
                 self.setFixedHeight(new_value)
-        elif property_name == 'hide':
+        elif property_name == "hide":
             if new_value:
                 self.setHidden(True)
         else:
@@ -1022,8 +1028,9 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 self.property_changed(property_name, old_value, new_value)
             except BaseException:
                 logging.getLogger().exception(
-                    "Error while setting property %s " % property_name +
-                    "for %s (details in log file)." % str(self.objectName()))
+                    "Error while setting property %s " % property_name
+                    + "for %s (details in log file)." % str(self.objectName())
+                )
 
     def property_changed(self, property_name, old_value, new_value):
         pass
@@ -1055,13 +1062,10 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 return widget
 
     def set_background_color(self, color):
-        Colors.set_widget_color(self,
-                                color,
-                                QtImport.QPalette.Background)
+        Colors.set_widget_color(self, color, QtImport.QPalette.Background)
 
 
 class NullBrick(BaseWidget):
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -1085,34 +1089,3 @@ class NullBrick(BaseWidget):
             painter.setPen(QtImport.QPen(QtImport.Qt.black, 1))
             painter.drawLine(0, 0, self.width(), self.height())
             painter.drawLine(0, self.height(), self.width(), 0)
-
-
-def ComboBoxActivated(self, index, lines):
-
-    if self.editable():
-        # lines=state[1]
-        last = self.count()
-        if index >= last:
-            i = index
-            while True:
-                try:
-                    line = lines[i]
-                except BaseException:
-                    break
-                else:
-                    self.insertItem(line)
-                    self.setCurrentItem(i)
-                    self.activated[str].emit(line)
-                    self.activated[int].emit(i)
-                i += 1
-    self.setCurrentItem(index)
-    self.activated[str].emit(self.currentText())
-    self.activated[int].emit(index)
-
-
-def SpinBoxEditorTextChanged(self, text):
-    self.editorTextChanged.emit(str(text))
-
-
-def SpinBoxSetEditorText(self, text):
-    self.editor().setText(text)

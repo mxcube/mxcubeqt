@@ -20,12 +20,13 @@
 """Configuration
 """
 
-import json
-import yaml
-import logging
 import imp
+import logging
 import pprint
 import pickle
+
+import json
+import yaml
 
 from gui import BaseLayoutItems
 from gui.utils import PropertyBag

@@ -1196,9 +1196,7 @@ class GUIPreviewWindow(QtImport.QWidget):
                 "Window preview: %s%s" % (container_cfg["name"], title)
             )
 
-        self.window_preview.draw_preview(
-            container_cfg, window_id, container_ids, selected_item
-        )
+        self.window_preview.draw_preview(container_cfg, window_id)
 
     def update_window(self, container_cfg, window_id, container_ids, selected_item):
         """Updates gui"""
@@ -1209,10 +1207,7 @@ class GUIPreviewWindow(QtImport.QWidget):
             self.window_preview_box.setTitle(
                 "Window preview: %s%s" % (container_cfg["name"], title)
             )
-
-        self.window_preview.update_preview(
-            container_cfg, window_id, container_ids, selected_item
-        )
+        self.window_preview.update_preview(selected_item)
 
     def add_window_widget(self, window_cfg):
         """Refresh preview after adding a window"""

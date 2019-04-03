@@ -59,21 +59,20 @@ class DataModelInputBinder(object):
             self.__validated(
                 field_name, validator, self.bindings[field_name][0], new_value
             )
-            if True:
-                if isinstance(widget, QtImport.QLineEdit):
-                    if type_fn is float and validator:
-                        widget.setText(
-                            "{:g}".format(
-                                round(float(origin_value), validator.decimals())
-                            )
+            if isinstance(widget, QtImport.QLineEdit):
+                if type_fn is float and validator:
+                    widget.setText(
+                        "{:g}".format(
+                            round(float(origin_value), validator.decimals())
                         )
-                try:
-                    setattr(self.__model, field_name, type_fn(origin_value))
-                except ValueError:
-                    if origin_value != "":
-                        raise
-                else:
-                    dispatcher.send("model_update", self.__model, field_name, self)
+                    )
+            try:
+                setattr(self.__model, field_name, type_fn(origin_value))
+            except ValueError:
+                if origin_value != "":
+                    raise
+            else:
+                dispatcher.send("model_update", self.__model, field_name, self)
 
     def __ledit_text_edited(self, field_name, widget, new_value, type_fn, validator):
         self.bindings[field_name][3] = True
@@ -237,16 +236,15 @@ class DataModelInputBinder(object):
             validator = item[1][1]
 
             # if validator:
-            if True:
-                if isinstance(widget, QtImport.QLineEdit):
-                    if not self.__validated(key, validator, widget, widget.text()):
-                        result.append(key)
-                elif isinstance(widget, QtImport.QComboBox):
-                    pass
-                elif isinstance(widget, QtImport.QCheckBox) or isinstance(
-                    widget, QtImport.QRadioButton
-                ):
-                    pass
+            if isinstance(widget, QtImport.QLineEdit):
+                if not self.__validated(key, validator, widget, widget.text()):
+                    result.append(key)
+            elif isinstance(widget, QtImport.QComboBox):
+                pass
+            elif isinstance(widget, QtImport.QCheckBox) or isinstance(
+                widget, QtImport.QRadioButton
+            ):
+                pass
         return result
 
     def clear_edit(self):
