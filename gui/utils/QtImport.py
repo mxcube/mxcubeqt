@@ -170,6 +170,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             pyqtSlot,
             PYQT_VERSION_STR,
             Qt,
+            QDir,
             QEvent,
             QEventLoop,
             QObject,
