@@ -2696,44 +2696,28 @@
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
         type: DoorInterlockBrick
-      - brick: {class: DuoStateBrick, name: shutter_brick}
+      - brick: {class: ShutterBrick, name: shutter_brick}
         children: []
         connections: []
         name: shutter_brick
         properties:
-        - {comment: '', default_value: 0, hidden: false, name: expertModeControlOnly,
-          old_value: 0, type: boolean, value: 0}
         - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
           name: fixedHeight, old_value: -1, type: integer, value: -1}
         - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
           old_value: -1, type: integer, value: -1}
         - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',
-          type: string, value: '9'}
-        - {comment: '', default_value: 0, hidden: false, name: forceNoControl, old_value: 0,
-          type: boolean, value: 0}
+          type: string, value: '11'}
         - {comment: Draw a frame around the widget, default_value: 0, hidden: false,
-          name: frame, old_value: 0, type: boolean, value: 1}
+          name: frame, old_value: 0, type: boolean, value: 0}
         - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
           type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: icons, old_value: '',
-          type: string, value: ''}
-        - {comment: '', default_value: in, hidden: false, name: in, old_value: in,
-          type: string, value: in}
+        - {comment: '', default_value: '', hidden: false, name: hwobj_shutter, old_value: '',
+          type: string, value: /shutter-mockup}
         - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: /safshut,
-          type: string, value: /shutter-mockup}
-        - {comment: '', default_value: out, hidden: false, name: out, old_value: out,
-          type: string, value: out}
-        - {comment: '', default_value: Set in, hidden: false, name: setin, old_value: Set
-            in, type: string, value: Set in}
-        - {comment: '', default_value: Set out, hidden: false, name: setout, old_value: Set
-            out, type: string, value: Set out}
-        - {comment: '', default_value: '', hidden: false, name: username, old_value: '',
-          type: string, value: Safety shutter}
-        type: DuoStateBrick
+        type: ShutterBrick
       - brick: {class: InstanceListBrick, name: instance_list_brick}
         children: []
         connections: []
