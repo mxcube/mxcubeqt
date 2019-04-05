@@ -1,13 +1,22 @@
 language: python
 python:
   - "2.7"
+  - "3.6"
 install:
-  - pip install -r requirements.txt 
-  - pip install pytest==4.0.1 pytest-xvfb PyYAML pylint
+  install:
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then
+       travis_retry 
+       pip install -r requirements.txt;
+       pip install -r requirements.txt;
+       pip install pytest==4.0.1 pytest-xvfb PyYAML pylint
+    fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then
+       travis_retry
+       pip3 install -r requirements.txt;
+    fi
   - sudo apt-get install libyaml-dev
   - sudo apt-get install python-yaml
 
-# Build and install qt
   - curl -L -O http://sourceforge.net/projects/pyqt/files/sip/sip-4.14.1/sip-4.14.1.tar.gz
   - tar -xf sip-4.14.1.tar.gz
   - cd sip-4.14.1
@@ -24,4 +33,5 @@ install:
   - cd ..
 script:
   - python -m pytest
+  - python3 -m pytest
   - pylint -E gui --extension-pkg-whitelist=PyQt5,PyQt4
