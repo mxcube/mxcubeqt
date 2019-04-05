@@ -3,15 +3,11 @@ python:
   - "2.7"
 install:
   - pip install -r requirements.txt 
-<<<<<<< HEAD
-  - cd ..
-=======
   - pip install pytest==4.0.1 pytest-xvfb PyYAML pylint
   - sudo apt-get install libyaml-dev
   - sudo apt-get install python-yaml
 
 # Build and install qt
->>>>>>> upstream/master
   - curl -L -O http://sourceforge.net/projects/pyqt/files/sip/sip-4.14.1/sip-4.14.1.tar.gz
   - tar -xf sip-4.14.1.tar.gz
   - cd sip-4.14.1
@@ -26,15 +22,6 @@ install:
   - make -j 2
   - sudo make install
   - cd ..
-<<<<<<< HEAD
-  - pip install pytest-xvfb 
-#  - sudo apt-get install python-qt4
-  - sudo apt-get install libyaml-dev
-  - sudo apt-get install python-yaml
-script:
-  - python -m pytest -vs
-=======
 script:
   - python -m pytest
   - pylint -E gui --extension-pkg-whitelist=PyQt5,PyQt4
->>>>>>> upstream/master
