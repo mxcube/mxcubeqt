@@ -1,7 +1,7 @@
 ## How to contribute to MXCuBE
 
-Before submiting the code to the repository please read these contributing guidlines.
-The aim of these guidlines is to help the developers community to maintain the code stable and reusable.
+Before submiting the code to the repository please read these contributing guidelines.
+The aim of these guidelines is to help the developers community to maintain the code stable and reusable.
 
 ### Reporting bugs
 
@@ -66,9 +66,9 @@ Pull request (PR) is the most convinient way of submitting a new code to the rep
 * The last reviewer to review the PR have the responsibility of merging it.
 * A PR that has no reviewer can be approved and merged by anyone. 
 
-### Coding style guidlines
+### Coding style guidelines
 
-It is very important to write a clean and readable code. Therefore we follow the [PEP8 guidlines](https://www.python.org/dev/peps/pep-0008/). Minimal required guidlines are:
+It is very important to write a clean and readable code. Therefore we follow the [PEP8 guidelines](https://www.python.org/dev/peps/pep-0008/). Minimal required guidelines are:
 * Maximum 88 characters per line.
 * Use 4 spaces (not a tab) per identation level.
 * Do not use wild (star) imports.

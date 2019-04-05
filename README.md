@@ -1,6 +1,8 @@
 # MXCuBE
 
 [![Build Status](https://travis-ci.org/mxcube/mxcube.svg?branch=master)](https://travis-ci.org/mxcube/mxcube)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ace26bd8ba8d41ce80afa50b8b51e04c)](https://www.codacy.com/app/IvarsKarpics/mxcube?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mxcube/mxcube&amp;utm_campaign=Badge_Grade)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 MXCuBE stands for Macromolecular Xtallography Customized Beamline Environment.
 The project started in 2005 at [ESRF](http://www.esrf.eu), since then it has
@@ -23,6 +25,7 @@ Latest information about the MXCuBE project can be found in the
 
 * [How to install and run Qt version](https://github.com/mxcube/mxcube/blob/master/docs/source/installation_instructions_qt4.rst)
 * [How to install and run Web version](https://github.com/mxcube/mxcube3/wiki/Installing-MXCuBE3)
+* [Contributing guidelines](https://github.com/mxcube/mxcube/blob/master/CONTRIBUTING.md)
 
 More detailed information is available in the [docs directory](https://github.com/mxcube/mxcube/tree/master/docs). Use [sphinx](http://sphinx-doc.org/) to build the documentation.
 
@@ -36,3 +39,16 @@ More detailed information is available in the [docs directory](https://github.co
 ```
 Gabadinho, J. et al. (2010). MxCuBE: a synchrotron beamline control environment customized for macromolecular crystallography experiments. J. Synchrotron Rad. 17, 700-707
 ```
+
+MXCuBE is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MXCuBE is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with MXCuBE. If not, see <https://www.gnu.org/licenses/>.

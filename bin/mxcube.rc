@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-export INSTITUTE=
-export MXCUBE_ROOT=/MXCuBE/mxcube
-export MXCUBE_XML_PATH=$MXCUBE_ROOT/../HardwareObjects.xml
-export MXCUBE_GUI_PATH=$MXCUBE_ROOT/../guis
-export MXCUBE_LOG_PATH=$MXCUBE_ROOT/../log

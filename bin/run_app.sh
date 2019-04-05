@@ -46,9 +46,9 @@
 ##########################################################################
 
 # Define MXCuBE defaults
-MXCUBE_BRICKS_PATH=$MXCUBE_ROOT/BlissFramework/Bricks # (This could be exported from python script)
+MXCUBE_BRICKS_PATH=$MXCUBE_ROOT/gui/bricks # (This could be exported from python script)
 MXCUBE_HWOBJS_PATH=$MXCUBE_ROOT/HardwareRepository/HardwareObjects # (This could be exported from python script)
-MXCUBE_DEFAULT_GUI_FILE=$MXCUBE_ROOT/configuration/example_mxcube_qt4.yml
+MXCUBE_DEFAULT_GUI_FILE=$MXCUBE_ROOT/configuration/example_mxcube_gui.yml
 MXCUBE_DEFAULT_XML_PATH=$MXCUBE_ROOT/HardwareRepository/configuration/xml-qt
 
 export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT

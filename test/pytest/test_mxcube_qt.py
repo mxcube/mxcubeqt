@@ -1,17 +1,24 @@
+#!/usr/bin/env python
 import sys
 import os
-import pytest
-import QtImport
+import gevent
 
-def test_mxcube_qt(mxcube_root):
-    sys.path.insert(0, mxcube_root)
-    gui_file = os.path.join(mxcube_root,
-                            "configuration/example_mxcube_qt4.yml")
-    hr_server = os.path.join(mxcube_root,
-                             "HardwareRepository/configuration/xml-qt")
-    os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
-    from BlissFramework import Qt4_startTestGUI
- 
-    print("GUI file: %s" % gui_file)
+MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
 
-    Qt4_startTestGUI.run_test(gui_file)
+print("MXCuBE root: %s" % MXCUBE_ROOT)
+
+sys.path.insert(0, MXCUBE_ROOT)
+MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT,
+                               "configuration/example_mxcube_gui.yml")
+hr_server = os.path.join(MXCUBE_ROOT,
+                         "HardwareRepository/configuration/xml-qt")
+os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
+
+def close_app():
+    sys.exit(0)
+
+gevent.spawn_later(30, close_app)
+
+from gui import startGUI
+startGUI.run(MXCUBE_GUI_FILE)
+
