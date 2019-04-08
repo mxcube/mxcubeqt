@@ -5,12 +5,12 @@ python:
   - "3.6"
 
 before_install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then bash bin/install_qt4.sh; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then bash bin/install_qt5.sh; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then bash bin/install_pyqt4.sh; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then bash bin/install_pyqt5.sh; fi
 
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pip install -r requirements_python2.txt pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then pip3 install -r requirements_python3.txt pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry pip install -r requirements_python2.txt pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
   - sudo apt-get install libyaml-dev
   - sudo apt-get install python-yaml
 
