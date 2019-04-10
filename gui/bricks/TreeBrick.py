@@ -88,7 +88,7 @@ class TreeBrick(BaseWidget):
         self.add_property("queue", "string", "/queue")
         self.add_property("queue_model", "string", "/queue-model")
         self.add_property("xml_rpc_server", "string", "/xml_rpc_server")
-        self.add_property("redis_client", "string", "/redis")
+        self.add_property("redis_client", "string", "")
         self.add_property("useFilterWidget", "boolean", True)
         self.add_property("useSampleWidget", "boolean", True)
         self.add_property("scOneName", "string", "Sample changer")
