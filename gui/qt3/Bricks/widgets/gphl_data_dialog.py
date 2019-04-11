@@ -127,15 +127,15 @@ class GphlDataDialog(qt.QDialog):
         parameters = []
         info = None
         cplx = None
-        for dd in field_list:
-            if info is None and dd.get("variableName") == "_info":
+        for dd0 in field_list:
+            if info is None and dd0.get("variableName") == "_info":
                 # Info text - goes to info_gbox
-                info = dd
-            elif cplx is None and dd.get("variableName") == "_cplx":
+                info = dd0
+            elif cplx is None and dd0.get("variableName") == "_cplx":
                 # Complex parameter - goes to cplx_gbox
-                cplx = dd
+                cplx = dd0
             else:
-                parameters.append(dd)
+                parameters.append(dd0)
 
         # Info box
         if info is None:
@@ -180,11 +180,11 @@ class GphlDataDialog(qt.QDialog):
             )
 
             values = {}
-            for dd in field_list:
-                name = dd["variableName"]
-                value = dd.get("defaultValue")
+            for dd0 in field_list:
+                name = dd0["variableName"]
+                value = dd0.get("defaultValue")
                 if value is not None:
-                    dd[name] = value
+                    dd0[name] = value
             self.params_widget.set_values(values)
             self.parameter_gbox.show()
         else:
