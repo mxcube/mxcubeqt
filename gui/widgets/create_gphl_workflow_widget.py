@@ -18,6 +18,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
 
 import api
 
@@ -120,8 +122,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # necessary as this comes in as a QString object
         name = str(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
-        xx = self._workflow_cbox
-        xx.setCurrentIndex(xx.findText(name))
+        xx0 = self._workflow_cbox
+        xx0.setCurrentIndex(xx0.findText(name))
         self.init_models()
         self._data_path_widget.update_data_model(self._path_template)
 
@@ -189,8 +191,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 model = item.get_model()
                 if isinstance(model, queue_model_objects.GphlWorkflow):
                     dialog = tree_brick.dc_tree_widget.confirm_dialog
-                    ss = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
-                    model.set_snapshot_count(int(ss) if ss else 0)
+                    ss0 = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
+                    model.set_snapshot_count(int(ss0) if ss0 else 0)
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
@@ -231,8 +233,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             pass
 
         elif strategy_type.startswith("diffractcal"):
-            ss = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
-            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss)
+            ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
+            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
             wf.set_space_group(crystal_data.space_group)
             wf.set_cell_parameters(
                 tuple(
