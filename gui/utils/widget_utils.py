@@ -20,6 +20,7 @@
 
 from gui.utils import Colors, QtImport
 from HardwareRepository.dispatcher import dispatcher
+from HardwareRepository.ConvertUtils import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -52,7 +53,7 @@ class DataModelInputBinder(object):
                 new_value = pattern % float(new_value)
 
             # fix validation if PyQt4 and sipapi 1 is used
-            if isinstance(new_value, str):
+            if isinstance(new_value, string_types):
                 if "QString" in globals():
                     new_value = QtImport.QString(new_value)
 
