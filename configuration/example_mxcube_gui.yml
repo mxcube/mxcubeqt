@@ -157,8 +157,8 @@
               type: string, value: /queue}
             - {comment: '', default_value: /queue-model, hidden: false, name: queue_model,
               old_value: /queue-model, type: string, value: /queue-model}
-            - {comment: '', default_value: /redis, hidden: false, name: redis_client,
-              old_value: /redis, type: string, value: /redis}
+            - {comment: '', default_value: '', hidden: false, name: redis_client,
+              old_value: '', type: string, value: ''}
             - {comment: '', default_value: Sample changer, hidden: false, name: scOneName,
               old_value: Sample changer, type: string, value: Sample changer}
             - {comment: '', default_value: Plate, hidden: false, name: scTwoName,
