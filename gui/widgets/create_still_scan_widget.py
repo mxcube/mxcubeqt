@@ -17,9 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""CreateStillScanWidget allows to create a ssx acquisition method"""
+
 import copy
 
 import api
+
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.acquisition_still_widget import AcquisitionStillWidget
@@ -37,9 +40,10 @@ __license__ = "LGPLv3+"
 
 
 class CreateStillScanWidget(CreateTaskBase):
-    def __init__(self, parent=None, name=None, fl=0):
+    def __init__(self, parent=None, name=None, flags=0):
+
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(fl), "Still"
+            self, parent, name, QtImport.Qt.WindowFlags(flags), "Still"
         )
 
         if not name:
@@ -82,7 +86,9 @@ class CreateStillScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
+        self._acq_widget.acqParametersChangedSignal.connect(
+            self.acq_parameters_changed
+        )
         self._data_path_widget.pathTemplateChangedSignal.connect(
             self.path_template_changed
         )
@@ -92,16 +98,29 @@ class CreateStillScanWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
         self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-                api.beamline_setup._get_run_processing_parallel()
+            api.beamline_setup._get_run_processing_parallel()
         )
 
     def use_osc_start(self, status):
-        pass
+        """
+        Enables osc start QLineEdit
+        :param status: boolean
+        :return:
+        """
+        return
 
-    def update_exp_time_limits(self, status):
-        pass
+    def update_exp_time_limits(self):
+        """
+        Updates exposure time limits
+        :return:
+        """
+        return
 
     def init_models(self):
+        """
+        Inits data model
+        :return: None
+        """
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
@@ -115,9 +134,19 @@ class CreateStillScanWidget(CreateTaskBase):
         self._acquisition_parameters.num_images_per_trigger = 1
 
     def set_tunable_energy(self, state):
+        """
+        Sets tunable energy
+        :param state: boolean
+        :return: None
+        """
         self._acq_widget.set_tunable_energy(state)
 
     def update_processing_parameters(self, crystal):
+        """
+        Updates processing parameters
+        :param crystal: Crystal
+        :return:
+        """
         self._processing_parameters.space_group = crystal.space_group
         self._processing_parameters.cell_a = crystal.cell_a
         self._processing_parameters.cell_alpha = crystal.cell_alpha
@@ -128,6 +157,11 @@ class CreateStillScanWidget(CreateTaskBase):
         self._processing_widget.update_data_model(self._processing_parameters)
 
     def single_item_selection(self, tree_item):
+        """
+        Method called when a queue item in the tree is selected
+        :param tree_item: queue_item
+        :return: None
+        """
         CreateTaskBase.single_item_selection(self, tree_item)
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
@@ -138,11 +172,11 @@ class CreateStillScanWidget(CreateTaskBase):
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            dc = tree_item.get_model()
+            dc_model = tree_item.get_model()
             self._acq_widget.use_kappa(False)
 
-            if not dc.is_helical():
-                if dc.is_executed():
+            if not dc_model.is_helical():
+                if dc_model.is_executed():
                     self.setDisabled(True)
                 else:
                     self.setDisabled(False)
@@ -153,20 +187,20 @@ class CreateStillScanWidget(CreateTaskBase):
 
                 # self._acq_widget.disable_inverse_beam(True)
 
-                self._path_template = dc.get_path_template()
+                self._path_template = dc_model.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
 
-                self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
+                self._acquisition_parameters = dc_model.acquisitions[0].acquisition_parameters
                 self._acq_widget.update_data_model(
                     self._acquisition_parameters, self._path_template
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
-                if len(dc.acquisitions) == 1:
+                if len(dc_model.acquisitions) == 1:
                     self.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
-                self._processing_parameters = dc.processing_parameters
+                self._processing_parameters = dc_model.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
             else:
                 self.setDisabled(True)
@@ -174,6 +208,12 @@ class CreateStillScanWidget(CreateTaskBase):
             self.setDisabled(True)
 
     def _create_task(self, sample, shape):
+        """
+        Creates a new Still scan task
+        :param sample: sample node
+        :param shape: centering point
+        :return: Acquisition item
+        """
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
@@ -195,6 +235,18 @@ class CreateStillScanWidget(CreateTaskBase):
         cpos=None,
         inverse_beam=False,
     ):
+        """
+        Creates a new data collection item
+        :param sample: Sample
+        :param run_number: int
+        :param start_image: int
+        :param num_images: int
+        :param osc_start: float
+        :param sc:
+        :param cpos: centered position
+        :param inverse_beam: boolean
+        :return:
+        """
         tasks = []
 
         # Acquisition for start position
@@ -220,21 +272,20 @@ class CreateStillScanWidget(CreateTaskBase):
         acq.acquisition_parameters.centred_position = cpos
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
-        dc = queue_model_objects.DataCollection(
+        data_collection = queue_model_objects.DataCollection(
             [acq], sample.crystals[0], processing_parameters
         )
-        dc.set_name(acq.path_template.get_prefix())
-        dc.set_number(acq.path_template.run_number)
-        dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
-        dc.run_processing_after = (
-            self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
-        )
-        if (
-            self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked()
-        ):
-            dc.run_processing_parallel = "Still"
-        dc.set_requires_centring(False)
+        data_collection.set_name(acq.path_template.get_prefix())
+        data_collection.set_number(acq.path_template.run_number)
+        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
+        run_processing_after, run_processing_parallel = \
+            self._processing_widget.get_processing_state()
+        
+        data_collection.run_processing_after = run_processing_after
+        if run_processing_parallel:
+            data_collection.run_processing_parallel = "Still"
+        data_collection.set_requires_centring(False)
 
-        tasks.append(dc)
+        tasks.append(data_collection)
 
         return tasks

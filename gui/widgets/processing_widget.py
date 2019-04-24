@@ -126,3 +126,7 @@ class ProcessingWidget(QtImport.QWidget):
             self.processing_widget.run_processing_after_cbox.isChecked(),
             self.processing_widget.run_processing_parallel_cbox.isChecked(),
         )
+
+    def get_processing_state(self):
+        return self.processing_widget.run_processing_after_cbox.isChecked(), \
+               self.processing_widget.run_processing_parallel_cbox.isChecked()

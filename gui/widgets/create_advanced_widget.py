@@ -160,6 +160,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._advanced_methods_widget.method_combo.addItem(method)
         else:
             self.setEnabled(False)
+        self._acq_widget.init_api()
 
     def enable_widgets(self, state):
         return
@@ -287,9 +288,6 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self.setDisabled(False)
 
             if data_collection.is_mesh():
-                # sample_data_model = self.get_sample_item(tree_item).get_model()
-                # self._acq_widget.disable_inverse_beam(True)
-                # api.graphics.de_select_all()
                 api.graphics.select_shape(data_collection.grid)
                 self._advanced_methods_widget.grid_treewidget.setCurrentItem(
                     self._grid_map[data_collection.grid]
@@ -346,6 +344,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         :param shape_type: type of the object (point, line, grid)
         :type shape_type: str
         """
+
         if shape_type == "Grid":
             self._advanced_methods_widget.grid_treewidget.clearSelection()
             grid_properties = shape.get_properties()
@@ -361,7 +360,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 )
                 self._acq_widget.acq_widget_layout.exp_time_ledit.setText(
                     "%.6f" % exp_time
-                )
+                ) 
 
             grid_treewidget_item = QtImport.QTreeWidgetItem(
                 self._advanced_methods_widget.grid_treewidget, info_str_list

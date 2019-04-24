@@ -115,6 +115,8 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
+        self.init_api()
+
     def update_osc_total_range(self):
         pass
 

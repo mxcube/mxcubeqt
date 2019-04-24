@@ -15,10 +15,9 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 import copy
-import logging
 
 import api
 from gui.utils import queue_item, QtImport
@@ -46,8 +45,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         if not name:
             self.setObjectName("create_discrete_widget")
-
-        # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
         self.init_models()
@@ -95,21 +92,21 @@ class CreateDiscreteWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
-        self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-             api.beamline_setup._get_run_processing_parallel()
-        )
+        self._processing_widget.processing_widget.run_processing_parallel_cbox.\
+            setChecked(api.beamline_setup._get_run_processing_parallel())
+        self._acq_widget.init_api()
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        # self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         has_shutter_less = api.beamline_setup.detector_has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
-        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
-            "default_acquisition_values"
-        )
+        self._acquisition_parameters = \
+            api.beamline_setup.get_default_acquisition_parameters(
+                "default_acquisition_values"
+            )
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -135,11 +132,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            dc = tree_item.get_model()
+            dc_model = tree_item.get_model()
             self._acq_widget.use_kappa(False)
 
-            if not dc.is_helical():
-                if dc.is_executed():
+            if not dc_model.is_helical():
+                if dc_model.is_executed():
                     self.setDisabled(True)
                 else:
                     self.setDisabled(False)
@@ -150,20 +147,22 @@ class CreateDiscreteWidget(CreateTaskBase):
 
                 # self._acq_widget.disable_inverse_beam(True)
 
-                self._path_template = dc.get_path_template()
+                self._path_template = dc_model.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
 
-                self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
+                self._acquisition_parameters =\
+                    dc_model.acquisitions[0].acquisition_parameters
+
                 self._acq_widget.update_data_model(
                     self._acquisition_parameters, self._path_template
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
-                if len(dc.acquisitions) == 1:
+                if len(dc_model.acquisitions) == 1:
                     self.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
-                self._processing_parameters = dc.processing_parameters
+                self._processing_parameters = dc_model.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
             else:
                 self.setDisabled(True)
@@ -174,20 +173,25 @@ class CreateDiscreteWidget(CreateTaskBase):
         result = CreateTaskBase.approve_creation(self)
         return result
 
-    # Called by the owning widget (task_toolbox_widget) to create
-    # a collection. When a data collection group is selected.
-    def _create_task(self, sample, shape):
+    def _create_task(self, task_node, shape):
+        """
+        Called by the owning widget (task_toolbox_widget) to create
+        a collection. When a data collection group is selected.
+        :param task_node:
+        :param shape:
+        :return:
+        """
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = api.graphics.get_scene_snapshot(shape)
+            snapshot = api.graphics.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = api.graphics.get_scene_snapshot()
+            cpos.snapshot_image = api.graphics.get_snapshot()
 
-        tasks.extend(self.create_dc(sample, cpos=cpos))
+        tasks.extend(self.create_dc(task_node, cpos=cpos))
         self._path_template.run_number += 1
 
         return tasks
@@ -228,40 +232,19 @@ class CreateDiscreteWidget(CreateTaskBase):
         acq.acquisition_parameters.centred_position = cpos
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
-        dc = queue_model_objects.DataCollection(
+        data_collection = queue_model_objects.DataCollection(
             [acq], sample.crystals[0], processing_parameters
         )
-        dc.set_name(acq.path_template.get_prefix())
-        dc.set_number(acq.path_template.run_number)
-        dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
-        dc.run_processing_after = (
-            self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
-        )
-        if (
-            self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked()
-        ):
-            dc.run_processing_parallel = "Undefined"
+        data_collection.set_name(acq.path_template.get_prefix())
+        data_collection.set_number(acq.path_template.run_number)
+        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
 
-        tasks.append(dc)
+        run_processing_after, run_processing_parallel = \
+            self._processing_widget.get_processing_state()
+        data_collection.run_processing_after = run_processing_after
+        if run_processing_parallel:
+            data_collection.run_processing_parallel = "Undefined"
+
+        tasks.append(data_collection)
 
         return tasks
-
-    def execute_task(self, sample):
-        # All this should be in queue_entry level
-        group_data = {
-            "sessionId": api.session.session_id,
-            "experimentType": "OSC",
-        }
-        gid = api.lims._store_data_collection_group(group_data)
-        sample.lims_group_id = gid
-
-        task_list = self._create_task(sample, None)
-        task_list[0].lims_group_id = gid
-
-        param_list = queue_model_objects.to_collect_dict(
-            task_list[0], api.session, sample, None
-        )
-
-        api.collect.collect(
-            queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list
-        )

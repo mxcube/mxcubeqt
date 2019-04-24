@@ -104,7 +104,7 @@ class CreateTaskBase(QtImport.QWidget):
 
     def init_acq_model(self):
         if self._acq_widget:
-            self._acq_widget.init_api()
+            #self._acq_widget.init_api()
             def_acq_parameters = api.beamline_setup.get_default_acquisition_parameters()
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
             if api.diffractometer.in_plate_mode():
@@ -121,10 +121,10 @@ class CreateTaskBase(QtImport.QWidget):
         # Initialize the path_template of the widget to default
         # values read from the beamline setup
         if self._data_path_widget:
-            self._data_path_widget._base_image_dir = (
+            self._data_path_widget.set_base_image_directory(
                 api.session.get_base_image_directory()
             )
-            self._data_path_widget._base_process_dir = (
+            self._data_path_widget.set_base_process_directory(
                 api.session.get_base_process_directory()
             )
 
@@ -500,7 +500,7 @@ class CreateTaskBase(QtImport.QWidget):
         omega = api.beamline_setup._get_omega_axis_position()
         kappa = api.beamline_setup._get_kappa_axis_position()
         kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
-        energy = api.beamline_setup._get_energy()
+        energy = api.energy.get_current_energy()
         transmission = api.beamline_setup._get_transmission()
         resolution = api.beamline_setup._get_resolution()
 
@@ -756,8 +756,6 @@ class CreateTaskBase(QtImport.QWidget):
            %s : sample name
         """
 
-        api.beamline_setup = api.beamline_setup
-
         acq_path_template = deepcopy(path_template)
 
         if "<sample_name>" in acq_path_template.directory:
@@ -829,7 +827,6 @@ class CreateTaskBase(QtImport.QWidget):
         parameters = self._acquisition_parameters
         path_template = self._path_template
         processing_parameters = self._processing_parameters
-        api.beamline_setup = api.beamline_setup
 
         acq = queue_model_objects.Acquisition()
 
@@ -935,7 +932,7 @@ class CreateTaskBase(QtImport.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if api.diffractometer.in_plate_mode():
+        if api.diffractometer.in_plate_mode() and self._acq_widget:
             set_max_range = False
 
             if num_images is None:

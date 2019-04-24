@@ -124,9 +124,6 @@ class AdvancedParametersWidget(QtImport.QWidget):
         # on that both models upto date, we need to refactor this part
         # so that both models are set before taking ceratin actions.
         # This workaround, works for the time beeing.
-        self._data_path_widget._data_model = self._data_collection.acquisitions[
-            0
-        ].path_template
         self._data_path_widget.update_data_model(
             self._data_collection.acquisitions[0].path_template
         )

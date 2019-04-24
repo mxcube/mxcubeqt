@@ -85,7 +85,7 @@ class DataPathWidget(QtImport.QWidget):
         self.data_path_layout.folder_ledit.textChanged.connect(
             self._folder_ledit_change
         )
-        self.data_path_layout.compression_cbox.toggled.connect(
+        self.data_path_layout.compression_cbox.clicked.connect(
             self._compression_toggled
         )
 
@@ -195,6 +195,8 @@ class DataPathWidget(QtImport.QWidget):
         if hasattr(self.parent, "_tree_brick"):
             if self.parent._tree_brick:
                 self.parent._tree_brick.compression_state = state
+
+        queue_model_objects.Characterisation.set_char_compression(state)
         self._data_model.compression = state
         self.update_file_name()
         self.pathTemplateChangedSignal.emit()
@@ -241,13 +243,6 @@ class DataPathWidget(QtImport.QWidget):
 
         self.data_path_layout.base_path_ledit.setText(self._base_image_dir)
 
-    # def set_run_number(self, run_number):
-    #    """
-    #    Descript. :
-    #    """
-    #    self._data_model.run_number = int(run_number)
-    #    self.data_path_layout.run_number_ledit.setText(str(run_number))
-
     def set_prefix(self, base_prefix):
         self._data_model.base_prefix = str(base_prefix)
         self.data_path_layout.prefix_ledit.setText(str(base_prefix))
@@ -257,6 +252,12 @@ class DataPathWidget(QtImport.QWidget):
             int(self._data_model.precision) * "#",
         )
         self.data_path_layout.file_name_value_label.setText(file_name)
+
+    def set_base_image_directory(self, base_image_dir):
+        self._base_image_dir = base_image_dir
+
+    def set_base_process_directory(self, base_process_dir):
+        self._base_process_dir = base_process_dir
 
     def update_data_model(self, data_model):
         self._data_model = data_model

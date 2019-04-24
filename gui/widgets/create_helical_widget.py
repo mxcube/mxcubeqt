@@ -121,6 +121,7 @@ class CreateHelicalWidget(CreateTaskBase):
             api.beamline_setup._get_run_processing_parallel()
         )
         self.enable_widgets(False)
+        self._acq_widget.init_api()
 
     def enable_widgets(self, state):
         self._acq_widget.setEnabled(state)

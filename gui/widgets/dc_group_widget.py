@@ -49,7 +49,6 @@ class DCGroupWidget(QtImport.QWidget):
         _subwedge_widget = QtImport.QGroupBox("Summary", self)
         self.polar_scater_widget = PolarScaterWidget()
         self.subwedge_table = QtImport.QTableWidget(_subwedge_widget)
-        _snapshot_widget = QtImport.QWidget(self)
         self.position_widget = QtImport.load_ui_file("snapshot_widget_layout.ui")
 
         # Layout --------------------------------------------------------------
@@ -92,8 +91,6 @@ class DCGroupWidget(QtImport.QWidget):
             self.subwedge_table.setHorizontalHeaderItem(
                 index, QtImport.QTableWidgetItem(header)
             )
-        # self.subwedge_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
-        #                                  QtGui.QSizePolicy.Fixed)
 
     def populate_widget(self, item):
         dcg_queue_item = item.get_queue_entry()
@@ -106,7 +103,7 @@ class DCGroupWidget(QtImport.QWidget):
             for child in dcg_queue_item.interleave_items:
                 dcg_child_list.append(child["data_model"])
         else:
-            for index, children in enumerate(dcg_queue_item._queue_entry_list):
+            for children in dcg_queue_item.get_queue_entry_list():
                 if isinstance(children.get_view(), queue_item.DataCollectionQueueItem):
                     dcg_child_list.append(children.get_data_model())
                     acq_par = (

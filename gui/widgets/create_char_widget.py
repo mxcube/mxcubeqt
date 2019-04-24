@@ -49,7 +49,9 @@ class CreateCharWidget(CreateTaskBase):
         # Internal variables --------------------------------------------------
         self._vertical_dimension_widget = None
         self._current_selected_item = None
+        self._char = None
         self._char_params = None
+
         self.init_models()
         self._char_params_mib = DataModelInputBinder(self._char_params)
 
@@ -152,6 +154,7 @@ class CreateCharWidget(CreateTaskBase):
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
+        self._acq_widget.init_api()
 
     def enable_compression(self, state):
         CreateTaskBase.enable_compression(self, False)

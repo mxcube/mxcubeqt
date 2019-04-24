@@ -75,10 +75,10 @@ class DCParametersBrick(BaseWidget):
         self.advance_results_widget.init_api()
 
     def populate_dc_parameter_widget(self, item):
-        self.parameters_widget._data_path_widget._base_image_dir = (
+        self.parameters_widget._data_path_widget.set_base_image_directory(
             api.session.get_base_image_directory()
         )
-        self.parameters_widget._data_path_widget._base_process_dir = (
+        self.parameters_widget._data_path_widget.set_base_process_directory(
             api.session.get_base_process_directory()
         )
 
