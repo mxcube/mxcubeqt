@@ -280,7 +280,7 @@ class CreateStillScanWidget(CreateTaskBase):
         data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
         run_processing_after, run_processing_parallel = \
             self._processing_widget.get_processing_state()
-        
+
         data_collection.run_processing_after = run_processing_after
         if run_processing_parallel:
             data_collection.run_processing_parallel = "Still"

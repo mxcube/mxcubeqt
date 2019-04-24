@@ -173,11 +173,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         result = CreateTaskBase.approve_creation(self)
         return result
 
-    def _create_task(self, task_node, shape):
+    def _create_task(self, sample, shape):
         """
         Called by the owning widget (task_toolbox_widget) to create
         a collection. When a data collection group is selected.
-        :param task_node:
+        :param sample:
         :param shape:
         :return:
         """
@@ -191,7 +191,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = api.graphics.get_snapshot()
 
-        tasks.extend(self.create_dc(task_node, cpos=cpos))
+        tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1
 
         return tasks
