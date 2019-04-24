@@ -256,7 +256,6 @@ class CatsMaintBrick(BaseWidget):
 
             ready = not self.path_running
             powered = self.powered and True or False  # handles init state None as False
-            state = self.state
 
             if not self.expert_mode:
                 self.widget.boxTools.hide()

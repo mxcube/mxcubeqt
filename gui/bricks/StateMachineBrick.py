@@ -191,7 +191,7 @@ class StateMachineBrick(BaseWidget):
                 self.cond_states_table.item(row, col).setText("")
                 self.cond_states_table.item(row, col).setIcon(QtImport.QIcon())
 
-                for index, translation in enumerate(self.trans_list):
+                for translation in self.trans_list:
                     if (
                         translation["source"] == new_state["current_state"]
                         and translation["dest"] == state["name"]

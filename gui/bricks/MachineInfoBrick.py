@@ -15,7 +15,7 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 
 import api
@@ -80,15 +80,14 @@ class MachineInfoBrick(BaseWidget):
            At first time initializes gui by adding necessary labels.
            If the gui is initialized then update labels with values
         """
-
         if self.graphics_initialized is None:
-            for item in values_list:
+            for item in values_list.values():
                 temp_widget = CustomInfoWidget(self)
                 temp_widget.init_info(item, self["maxPlotPoints"])
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
         self.graphics_initialized = True
-        for index, value in enumerate(values_list):
+        for index, value in enumerate(values_list.values()):
             self.value_label_list[index].update_info(value)
 
 

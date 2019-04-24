@@ -17,6 +17,14 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""BeamPositionBrick contains controls to
+   * control the beam position
+   * start automatic beam centering
+   * measure flux
+"""
+
+import api
+
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
@@ -28,8 +36,15 @@ __category__ = "EMBL"
 
 
 class BeamPositionBrick(BaseWidget):
+    """
+    BeamPositionBrick
+    """
 
     def __init__(self, *args):
+        """
+        Based on BaseWidget
+        :param args:
+        """
 
         BaseWidget.__init__(self, *args)
 
@@ -38,7 +53,6 @@ class BeamPositionBrick(BaseWidget):
         # Internal values -----------------------------------------------------
         self.beam_focusing_hwobj = None
         self.beamline_test_hwobj = None
-        self.diffractometer_hwobj = None
         self.unf_hor_motor = None
         self.unf_ver_motor = None
         self.double_hor_motor = None
@@ -50,7 +64,6 @@ class BeamPositionBrick(BaseWidget):
         # Properties ----------------------------------------------------------
         self.add_property("hwobj_beam_focusing", "string", "")
         self.add_property("hwobj_beamline_test", "string", "/beamline-test")
-        self.add_property("hwobj_diffractometer", "string", "/mini-diff")
         self.add_property("hwobj_motors_list", "string", "")
         self.add_property("icon_list", "string", "")
         self.add_property("defaultSteps", "string", "")
@@ -122,13 +135,35 @@ class BeamPositionBrick(BaseWidget):
         self.measure_flux_button.setToolTip("Measure flux")
         self.measure_flux_button.setIcon(Icons.load_icon("Sun"))
 
+        self.connect(api.diffractometer, "minidiffPhaseChanged", self.phase_changed)
+
+        api.diffractometer.update_values()
+        self.update_gui()
+
     def enable_widget(self, state):
+        """
+        Enables widget
+        :param state: boolean
+        :return:
+        """
         pass
 
     def disable_widget(self, state):
+        """
+        Disables widget
+        :param state: boolean
+        :return:
+        """
         pass
 
     def property_changed(self, property_name, old_value, new_value):
+        """
+        Defines the behaviour
+        :param property_name: str
+        :param old_value: value
+        :param new_value: value
+        :return:
+        """
         if property_name == "hwobj_motors_list":
             hwobj_names_list = new_value.split()
 
@@ -192,7 +227,8 @@ class BeamPositionBrick(BaseWidget):
                     "focusingModeChanged",
                     self.focus_mode_changed,
                 )
-            self.beam_focusing_hwobj = self.get_hardware_object(new_value, optional=True)
+            self.beam_focusing_hwobj = self.get_hardware_object(new_value,
+                                                                optional=True)
             if self.beam_focusing_hwobj is not None:
                 self.connect(
                     self.beam_focusing_hwobj,
@@ -202,25 +238,8 @@ class BeamPositionBrick(BaseWidget):
                 mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
                 self.focus_mode_changed(mode, beam_size)
         elif property_name == "hwobj_beamline_test":
-            self.beamline_test_hwobj = self.get_hardware_object(new_value, optional=True)
-        elif property_name == "hwobj_diffractometer":
-            if self.diffractometer_hwobj is not None:
-                self.disconnect(
-                    self.diffractometer_hwobj,
-                    "minidiffPhaseChanged",
-                    self.phase_changed,
-                )
-
-            self.diffractometer_hwobj = self.get_hardware_object(new_value)
-
-            if self.diffractometer_hwobj is not None:
-                self.connect(
-                    self.diffractometer_hwobj,
-                    "minidiffPhaseChanged",
-                    self.phase_changed,
-                )
-            self.diffractometer_hwobj.update_values()
-            self.update_gui()
+            self.beamline_test_hwobj = self.get_hardware_object(new_value,
+                                                                optional=True)
         elif property_name == "enableCenterBeam":
             self.center_beam_button.setVisible(new_value)
         elif property_name == "enableMeasureFlux":
@@ -234,13 +253,27 @@ class BeamPositionBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def run(self):
+        """
+        Updates gui
+        :return:
+        """
         self.update_gui()
 
-    def focus_mode_changed(self, new_focus_mode, beam_size):
-        self.focus_mode = new_focus_mode
+    def focus_mode_changed(self, focus_mode, beam_size):
+        """
+        Updates gui if the focus mode has been changed
+        :param focus_mode: str
+        :param beam_size: in microns (list of two floats)
+        :return:
+        """
+        self.focus_mode = focus_mode
         self.update_gui()
 
     def update_gui(self):
+        """
+        Updates gui
+        :return:
+        """
         if self.focus_mode:
             self.main_group_box.setTitle("Beam positioning (%s mode)" % self.focus_mode)
             self.unf_hor_motor_brick.setVisible(self.focus_mode != "Double")
@@ -260,27 +293,42 @@ class BeamPositionBrick(BaseWidget):
         self.double_ver_motor_brick.setEnabled(self.is_beam_location_phase)
 
     def center_beam_clicked(self):
+        """
+        Starts automatic beam centering procedure
+        :return:
+        """
         conf_msg = "This will start automatic beam centering. Continue?"
         if (
             QtImport.QMessageBox.warning(
-                None, "Question", conf_msg, QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
+                None, "Question", conf_msg,
+                QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
             )
             == QtImport.QMessageBox.Ok
         ):
             self.beamline_test_hwobj.center_beam_report()
 
     def phase_changed(self, phase):
-        self.is_beam_location_phase = phase == self.diffractometer_hwobj.PHASE_BEAM
+        """
+        Enable beam positioning controls if diffractometer is in Beam phase
+        :param phase:
+        :return:
+        """
+        self.is_beam_location_phase = phase == api.diffractometer.PHASE_BEAM
         self.update_gui()
 
     def measure_flux_clicked(self):
+        """
+        Starts measure flux procedure
+        :return:
+        """
         conf_msg = (
             "This will measure flux at 100% transmission.\n"
             + "If necessary move the sample out of beam. Continue?"
         )
         if (
             QtImport.QMessageBox.warning(
-                None, "Question", conf_msg, QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
+                None, "Question", conf_msg,
+                QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
             )
             == QtImport.QMessageBox.Ok
         ):

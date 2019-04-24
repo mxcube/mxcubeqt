@@ -346,9 +346,6 @@ class ProposalBrick(BaseWidget):
         # Store info in the brick
         self.proposal = proposal
         self.session = session
-        # self.person = person
-        # self.laboratory = laboratory
-
         code = proposal["code"].lower()
 
         if code == "":
@@ -365,58 +362,8 @@ class ProposalBrick(BaseWidget):
                 proposal["title"],
             )
             logging.getLogger("GUI").debug(msg)
-
-            codes_list = self["codes"].split()
-            if code not in codes_list:
-                codes = self["codes"] + " " + code
-                self["codes"] = codes
-
-            # Build the info for the interface
-            title = str(proposal["title"])
-            session_id = session["sessionId"]
-            start_date = session["startDate"].split()[0]
-            end_date = session["endDate"].split()[0]
-            try:
-                comments = session["comments"]
-            except KeyError:
-                comments = None
-
-            # Not implemented in REST
-            header = ""
-
-            # Set interface info and signal the new session
-            proposal_text = "%s-%s" % (proposal["code"], proposal["number"])
-            # self.title_label.setText("<nobr>   User: <b>%s</b>" % proposal_text)
-            tooltip = "\n".join([proposal_text, header, title])
-            if comments:
-                tooltip += "\n"
-                tooltip += "Comments: " + comments
-            # self.title_label.setToolTip(tooltip)
             self.user_group_widget.show()
-            try:
-                end_time = session["endDate"].split()[1]
-                end_date_list = end_date.split("-")
-                end_time_list = end_time.split(":")
-            except (TypeError, IndexError, ValueError):
-                pass
-
             self.loggedIn.emit(True)
-
-        """
-        is_inhouse = api.session.is_inhouse(proposal["code"], proposal["number"])
-        win_title = "%s (%s-%s)" % (self["titlePrefix"], \
-            api.lims.translate(proposal["code"], 'gui'), \
-            proposal["number"])
-        self.setWindowTitle.emit(win_title)
-        self.sessionSelected.emit(
-                  session_id,
-                  api.lims.translate(proposal["code"],'gui'),
-                  str(proposal["number"]),
-                  proposal["proposalId"],
-                  session["startDate"],
-                  proposal["code"],
-                  is_inhouse)
-        """
 
     def set_codes(self, codes):
         codes_list = codes.split()
@@ -453,7 +400,7 @@ class ProposalBrick(BaseWidget):
             self.loggedIn.emit(True)
             self.sessionSelected.emit(
                 api.session.session_id,
-                str(os.environ["USER"]),
+                str(os.environ["USER"].strip()),
                 0,
                 "",
                 "",
@@ -467,9 +414,9 @@ class ProposalBrick(BaseWidget):
 
             if self.login_as_user:
                 if os.getenv("SUDO_USER"):
-                    user_name = os.getenv("SUDO_USER")
+                    user_name = os.getenv("SUDO_USER").strip()
                 else:
-                    user_name = os.getenv("USER")
+                    user_name = os.getenv("USER").strip()
                 self._do_login_as_user(user_name)
 
         start_server_event = ProposalGUIEvent(self.start_servers, ())
@@ -506,8 +453,6 @@ class ProposalBrick(BaseWidget):
         self.setEnabled(True)
 
     def accept_login(self, proposal_dict, session_dict):
-        # self.setProposal(proposal_dict, person_dict, lab_dict,
-        #                 session_dict, contact_dict)
         self.set_proposal(proposal_dict, session_dict)
         self.setEnabled(True)
 
@@ -533,14 +478,7 @@ class ProposalBrick(BaseWidget):
         now = time.strftime("%Y-%m-%d %H:%M:S")
         prop_dict = {"code": "", "number": "", "title": "", "proposalId": ""}
         ses_dict = {"sessionId": "", "startDate": now, "endDate": now, "comments": ""}
-        try:
-            locallogin_person = self.local_login_hwobj.person
-        except AttributeError:
-            locallogin_person = "local user"
-        pers_dict = {"familyName": locallogin_person}
-        lab_dict = {"name": "lab"}
-        cont_dict = {"familyName": "local contact"}
-        # self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
+
         self.accept_login(prop_dict, ses_dict)
 
     # Handler for the Login button (check the password in LDAP)
@@ -575,19 +513,9 @@ class ProposalBrick(BaseWidget):
                     "endDate": now,
                     "comments": "",
                 }
-                try:
-                    locallogin_person = self.local_login_hwobj.person
-                except AttributeError:
-                    locallogin_person = "local user"
-                pers_dict = {"familyName": locallogin_person}
-                lab_dict = {"name": "local lab"}
-                cont_dict = {"familyName": "local contact"}
                 logging.getLogger().debug(
                     "ProposalBrick: local login password validated"
                 )
-
-                # return self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict,
-                # cont_dict)
                 return self.accept_login(prop_dict, ses_dict)
 
             if api.lims is None:
