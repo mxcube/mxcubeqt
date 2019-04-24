@@ -69,7 +69,6 @@ class MotorSpinBoxBrick(BaseWidget):
         self.move_step = 1
         self.demand_move = 0
         self.in_expert_mode = None
-        self.pos_history = []
 
         # Properties ----------------------------------------------------------
         self.add_property("mnemonic", "string", "")

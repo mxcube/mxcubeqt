@@ -86,17 +86,17 @@ class QueueItem(QtImport.QTreeWidgetItem):
         """
         self._previous_check_state = self.checkState(0)
         if isinstance(self, DataCollectionGroupQueueItem):
-            self.set_checkable(False)
+            self._checkable = False
             if self.childCount() == 0:
-                self.set_checkable(True)
+                self._checkable = True
             else:
                 for index in range(self.childCount()):
-                    if self.child(index).is_checkable():
-                        self.set_checkable(True)
+                    if self.child(index)._checkable:
+                        self._checkable = True
                         break
             self.parent().setCheckState(column, check_state)
 
-        if not self.is_checkable():
+        if not self._checkable:
             check_state = QtImport.Qt.Unchecked
         QtImport.QTreeWidgetItem.setCheckState(self, column, check_state)
         if self._queue_entry:
@@ -156,6 +156,11 @@ class QueueItem(QtImport.QTreeWidgetItem):
         self.setBackground(0, self.bg_brush)
         self.setBackground(1, self.bg_brush)
 
+    def restoreBackgroundColor(self):
+        self.bg_brush = self.previous_bg_brush
+        self.setBackground(0, self.bg_brush)
+        self.setBackground(1, self.bg_brush)
+
     def setFontBold(self, state):
         self._font_is_bold = state
 
@@ -171,9 +176,6 @@ class QueueItem(QtImport.QTreeWidgetItem):
         """
         if self.childCount() > 0:
             return self.child(self.childCount())
-
-    def is_checkable(self):
-        return self._checkable
 
     def set_checkable(self, state):
         self._checkable = state
@@ -224,6 +226,15 @@ class SampleQueueItem(QueueItem):
         self.mounted_style = False
 
         QueueItem.__init__(self, *args, **kwargs)
+
+    def update_pin_icon(self):
+        dc_tree_widget = self.listView().parent()
+
+        if dc_tree_widget._loaded_sample_item:
+            dc_tree_widget._loaded_sample_item.setIcon(0, QtImport.QPixmap())
+
+        dc_tree_widget._loaded_sample_item = self
+        self.setIcon(0, QtImport.QIcon(dc_tree_widget.pin_pixmap))
 
     def set_mounted_style(self, state, clear_background=False):
         self.mounted_style = state
@@ -405,12 +416,7 @@ class XrayCenteringQueueItem(TaskQueueItem):
 class XrayImagingQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
- 
-    def init_tool_tip(self):
-        pass
 
-    def init_processing_info(self):
-        pass
 
 MODEL_VIEW_MAPPINGS = {
     queue_model_objects.DataCollection: DataCollectionQueueItem,

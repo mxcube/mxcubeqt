@@ -199,6 +199,7 @@ class ResolutionBrick(BaseWidget):
             == QtImport.QValidator.Acceptable
         ):
             unit = self.units_combobox.currentText()
+            value = float()
             self.new_value_ledit.setText("")
             if unit == chr(197):
                 self.set_resolution(float(input_field_text))

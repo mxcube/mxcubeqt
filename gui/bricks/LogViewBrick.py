@@ -32,18 +32,30 @@ The LogView brick displays log messages from the application.
 |  showDebug      | boolean | set whether debug messages are shown (default: False)
 |  appearance     | combo   | "list" or " tabs"
 |  enableFeedback | boolean | adds a new tab for mail feedback feature
-|  emailAddresses | string  | list separated by spaces of email addresses
-                              for the feedback feature
-|  icons          | string  | <icon for tab 1> <icon for tab 2> ...
-                              <icon for tab n> <feedback icon>
+|  emailAddresses | string  | list separated by spaces of email addresses for the feedback feature
+|  icons          | string  | <icon for tab 1> <icon for tab 2> ... <icon for tab n> <feedback icon>
 |  maxLogLines    | integer | max. log lines, negative value : infinite log
-|  autoSwitchTabs | boolean | automatically switch to appropriate tab
-                              when a new message is logged
+|  autoSwitchTabs | boolean | automatically switch to appropriate tab when a new message is logged
 ----------------------------------------------------------------
+
+[Signals]
+
+[Slots]
+
+--------------------------------
+| Name  | Arguments | Description
+--------------------------------
+| clearLog |   |  removes all messages
+--------------------------------
 
 [HardwareObjects]
 Any brick or Hardware Object can use the logging facility (from Python
 standard library) in order to emit log messages :
+
+===
+import logging
+logging.getLogger().info("A log message !")
+===
 
 Log messages are processed by the main logger and sent to several
 handlers. The LogView brick is the GUI log handler.
@@ -52,8 +64,10 @@ The email feedback feature allows users to report any problem : an email
 is sent to the recipients specified in the emailAddresses property.
 """
 import os
+import sys
 import logging
 
+# import email.Utils
 from datetime import datetime
 import smtplib
 
@@ -124,7 +138,7 @@ class CustomTreeWidget(QtImport.QTreeWidget):
         self.copy_log()
         filename = str(
             QtImport.QFileDialog.getSaveFileName(
-                self, "Choose a filename to save under", os.path.expanduser("~")
+                self, "Choose a filename to save under", "/tmp"
             )
         )
         if len(filename) > 0:
@@ -332,7 +346,7 @@ class LogViewBrick(BaseWidget):
 
     def run(self):
         # Register to GUI log handler
-        self.tab_widget.currentChanged.connect(self.reset_unread_messages)
+        self.tab_widget.currentChanged.connect(self.resetUnreadMessages)
 
     def clearLog(self):
         self.details_log.clear()
@@ -358,6 +372,7 @@ class LogViewBrick(BaseWidget):
                 return
 
         tab = self.tab_levels[rec_level]
+        level = None
         tab.add_log_line(record)
 
         if self["appearance"] == "tabs":
@@ -371,7 +386,7 @@ class LogViewBrick(BaseWidget):
         elif self["appearance"] == "list":
             self.incUnreadMessagesSignal.emit(1, True)
 
-    def reset_unread_messages(self, tab_index):
+    def resetUnreadMessages(self, tab_index):
         selected_tab = self.tab_widget.widget(tab_index)
         selected_tab.unread_messages = 0
         self.tab_widget.setTabText(tab_index, selected_tab.tab_label)

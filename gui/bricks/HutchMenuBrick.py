@@ -18,7 +18,6 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from os.path import expanduser
 
 import api
 from gui.BaseComponents import BaseWidget
@@ -42,6 +41,7 @@ class HutchMenuBrick(BaseWidget):
 
         # Internal values -----------------------------------------------------
         self.inside_data_collection = None
+        self.directory = "/tmp"
         self.prefix = "snapshot"
         self.file_index = 1
 
@@ -100,15 +100,15 @@ class HutchMenuBrick(BaseWidget):
         self.centre_button.commandExecuteSignal.connect(self.centre_button_clicked)
         self.accept_button.clicked.connect(self.accept_clicked)
         self.reject_button.clicked.connect(self.reject_clicked)
-        self.create_line_button.clicked.connect(create_line_clicked)
-        self.draw_grid_button.clicked.connect(draw_grid_clicked)
-        self.auto_focus_button.clicked.connect(auto_focus_clicked)
+        self.create_line_button.clicked.connect(self.create_line_clicked)
+        self.draw_grid_button.clicked.connect(self.draw_grid_clicked)
+        self.auto_focus_button.clicked.connect(self.auto_focus_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
-        self.refresh_camera_button.clicked.connect(refresh_camera_clicked)
-        self.visual_align_button.clicked.connect(visual_align_clicked)
-        self.select_all_button.clicked.connect(select_all_clicked)
-        self.clear_all_button.clicked.connect(clear_all_clicked)
-        self.auto_center_button.clicked.connect(auto_center_clicked)
+        self.refresh_camera_button.clicked.connect(self.refresh_camera_clicked)
+        self.visual_align_button.clicked.connect(self.visual_align_clicked)
+        self.select_all_button.clicked.connect(self.select_all_clicked)
+        self.clear_all_button.clicked.connect(self.clear_all_clicked)
+        self.auto_center_button.clicked.connect(self.auto_center_clicked)
 
         # Other ---------------------------------------------------------------
         self.centre_button.setToolTip("3 click centring (Ctrl+1)")
@@ -153,12 +153,12 @@ class HutchMenuBrick(BaseWidget):
 
     def save_snapshot_clicked(self):
         formats = [
-            "*.%s" % str(image_format).lower()
+            "*.%s" % image_format.lower()
             for image_format in QtImport.QImageWriter.supportedImageFormats()
         ]
 
         current_file_name = "%s/%s_%d.%s" % (
-            expanduser("~"),
+            self.directory,
             self.prefix,
             self.file_index,
             "png",
@@ -178,6 +178,22 @@ class HutchMenuBrick(BaseWidget):
                 self.file_index += 1
             except BaseException:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
+
+    def refresh_camera_clicked(self):
+        if api.graphics is not None:
+            api.graphics.refresh_camera()
+
+    def visual_align_clicked(self):
+        api.graphics.start_visual_align()
+
+    def select_all_clicked(self):
+        api.graphics.select_all_points()
+
+    def clear_all_clicked(self):
+        """
+        Clears all shapes (points, lines and meshes)
+        """
+        api.graphics.clear_all()
 
     def accept_clicked(self):
         Colors.set_widget_color(self.accept_button, self.standard_color)
@@ -222,6 +238,13 @@ class HutchMenuBrick(BaseWidget):
             Colors.set_widget_color(self.reject_button, QtImport.Qt.red)
         else:
             self.reject_button.setEnabled(False)
+        # self.emit(QtCore.SIGNAL("enableMinidiff"), (True,))
+
+    def create_line_clicked(self):
+        api.graphics.create_line()
+
+    def draw_grid_clicked(self):
+        api.graphics.create_grid()
 
     def diffractometer_ready_changed(self, is_ready):
         self.setEnabled(is_ready)
@@ -241,33 +264,11 @@ class HutchMenuBrick(BaseWidget):
         self.clear_all_button.setEnabled(status)
         self.auto_center_button.setEnabled(status)
 
+    def auto_focus_clicked(self):
+        api.graphics.auto_focus()
 
-def refresh_camera_clicked():
-    api.graphics.refresh_camera()
-
-def visual_align_clicked():
-    api.graphics.start_visual_align()
-
-def select_all_clicked():
-    api.graphics.select_all_points()
-
-def clear_all_clicked():
-    """
-    Clears all shapes (points, lines and meshes)
-    """
-    api.graphics.clear_all()
-
-def auto_focus_clicked():
-    api.graphics.auto_focus()
-
-def auto_center_clicked():
-    api.graphics.start_auto_centring()
-
-def create_line_clicked():
-    api.graphics.create_line()
-
-def draw_grid_clicked():
-    api.graphics.create_grid()
+    def auto_center_clicked(self):
+        api.graphics.start_auto_centring()
 
 
 class MonoStateButton(QtImport.QToolButton):

@@ -17,12 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""StillCollectionPreviewBrick"""
-
 import os
 import numpy as np
-
-import api
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
@@ -37,14 +33,17 @@ __category__ = "EMBL"
 
 
 class StillCollectionPreviewBrick(BaseWidget):
+
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
+        self.beamline_setup_hwobj = None
+        self.parallel_processing_hwobj = None
 
         # Internal values -----------------------------------------------------
-        self.current_grid_properties = None
+        self.grid_properties = None
         self.info_dict = {"grid_cell": -1, "comp_cell": -1}
         self.params_dict = None
         self.results = None
@@ -56,6 +55,8 @@ class StillCollectionPreviewBrick(BaseWidget):
 
         # Properties ----------------------------------------------------------
         self.add_property("cell_size", "integer", 22)
+        self.add_property("hwobj_beamline_setup", "string", "/beamline-setup")
+        # self.addProperty('hwobj_parallel_processing', 'string', '/parallel-processing')
 
         # Signals ------------------------------------------------------------
 
@@ -72,7 +73,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         self.inverted_rows_cbox = QtImport.QCheckBox("Inverted rows", self.grid_widget)
         self.image_tracking_cbox = QtImport.QCheckBox("Live update", self.grid_widget)
         self.score_type_combo = QtImport.QComboBox(self.grid_widget)
-        self.show_grid_dialog_button = QtImport.QPushButton(
+        self.save_hit_plot_button = QtImport.QPushButton(
             "Full grid view", self.grid_widget
         )
 
@@ -102,7 +103,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         _grid_vlayout.addWidget(self.inverted_rows_cbox)
         _grid_vlayout.addWidget(self.image_tracking_cbox)
         _grid_vlayout.addWidget(self.score_type_combo)
-        _grid_vlayout.addWidget(self.show_grid_dialog_button)
+        _grid_vlayout.addWidget(self.save_hit_plot_button)
         _grid_vlayout.setSpacing(2)
         _grid_vlayout.setContentsMargins(2, 2, 2, 2)
 
@@ -133,7 +134,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         self.comp_table.cellEntered.connect(self.comp_cell_entered)
         self.grid_properties_combo.activated.connect(self.grid_properties_combo_changed)
         self.score_type_combo.activated.connect(self.score_type_changed)
-        self.show_grid_dialog_button.clicked.connect(self.show_grid_dialog)
+        self.save_hit_plot_button.clicked.connect(self.save_hit_plot)
         self.hit_map_plot.mouseMovedSignal.connect(self.hit_map_mouse_moved)
         self.grid_graphics_view.mouseMovedSignal.connect(self.grid_view_mouse_moved)
         self.save_grid_view_button.clicked.connect(self.save_grid_view)
@@ -152,85 +153,104 @@ class StillCollectionPreviewBrick(BaseWidget):
         for score_type in ("Score", "Resolution", "Number of spots"):
             self.score_type_combo.addItem(score_type)
 
-        api.parallel_processing.connect("processingStarted", self.processing_started)
-        api.parallel_processing.connect("processingFinished", self.processing_finished)
-        api.parallel_processing.connect("processingFailed", self.processing_failed)
-        api.parallel_processing.connect(
-            "processingFrame", self.processing_frame_changed
-        )
-        self.current_grid_properties = (
-            api.parallel_processing.get_current_grid_properties()
-        )
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "hwobj_beamline_setup":
+            if self.parallel_processing_hwobj is not None:
+                self.parallel_processing_hwobj.disconnect(
+                    "processingStarted", self.processing_started
+                )
+                self.parallel_processing_hwobj.disconnect(
+                    "processingFinished", self.processing_finished
+                )
+                self.parallel_processing_hwobj.disconnect(
+                    "processingFailed", self.processing_failed
+                )
+                self.parallel_processing_hwobj.disconnect(
+                    "processingFrame", self.processing_frame_changed
+                )
+            self.beamline_setup_hwobj = self.get_hardware_object(new_value)
+            self.parallel_processing_hwobj = (
+                self.beamline_setup_hwobj.parallel_processing_hwobj
+            )
 
-        self.grid_properties_combo.blockSignals(True)
-        for grid_property in api.parallel_processing.get_available_grid_properties():
-            self.grid_properties_combo.addItem(str(grid_property))
-        self.grid_properties_combo.setCurrentIndex(0)
-        self.grid_properties_combo.blockSignals(False)
-
-        self.init_gui()
-        self.grid_graphics_base.init_item(self.current_grid_properties)
-        self.grid_graphics_overlay.init_item(self.current_grid_properties)
+            if self.parallel_processing_hwobj is not None:
+                self.parallel_processing_hwobj.connect(
+                    "processingStarted", self.processing_started
+                )
+                self.parallel_processing_hwobj.connect(
+                    "processingFinished", self.processing_finished
+                )
+                self.parallel_processing_hwobj.connect(
+                    "processingFailed", self.processing_failed
+                )
+                self.parallel_processing_hwobj.connect(
+                    "processingFrame", self.processing_frame_changed
+                )
+                for (
+                    grid_property
+                ) in self.parallel_processing_hwobj.get_available_grid_properties():
+                    self.grid_properties_combo.addItem(str(grid_property))
+                self.grid_properties_combo.blockSignals(True)
+                self.grid_properties_combo.setCurrentIndex(0)
+                self.grid_properties_combo.blockSignals(False)
+                self.grid_properties = (
+                    self.parallel_processing_hwobj.get_current_grid_properties()
+                )
+                self.init_gui()
+                self.grid_graphics_base.init_item(self.grid_properties)
+                self.grid_graphics_overlay.init_item(self.grid_properties)
+        else:
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def init_gui(self):
-        """
-        Inits gui
-        :return: None
-        """
         self.image_tracking_cbox.setChecked(True)
-        self.inverted_rows_cbox.setChecked(
-            self.current_grid_properties["inverted_rows"]
-        )
-        self.grid_table.setColumnCount(self.current_grid_properties["grid_num_col"])
-        self.grid_table.setRowCount(self.current_grid_properties["grid_num_row"])
+        self.inverted_rows_cbox.setChecked(self.grid_properties["inverted_rows"])
+        self.grid_table.setColumnCount(self.grid_properties["grid_num_col"])
+        self.grid_table.setRowCount(self.grid_properties["grid_num_row"])
 
-        for col in range(self.current_grid_properties["grid_num_col"]):
+        for col in range(self.grid_properties["grid_num_col"]):
             temp_header_item = QtImport.QTableWidgetItem("%d" % (col + 1))
             self.grid_table.setHorizontalHeaderItem(col, temp_header_item)
             self.grid_table.setColumnWidth(col, self["cell_size"])
 
-        for row in range(self.current_grid_properties["grid_num_row"]):
+        for row in range(self.grid_properties["grid_num_row"]):
             temp_header_item = QtImport.QTableWidgetItem(chr(65 + row))
             self.grid_table.setVerticalHeaderItem(row, temp_header_item)
             self.grid_table.setRowHeight(row, self["cell_size"])
 
-        for col in range(self.current_grid_properties["grid_num_col"]):
-            for row in range(self.current_grid_properties["grid_num_row"]):
+        for col in range(self.grid_properties["grid_num_col"]):
+            for row in range(self.grid_properties["grid_num_row"]):
                 temp_item = QtImport.QTableWidgetItem()
                 self.grid_table.setItem(row, col, temp_item)
 
-        table_width = (
-            self["cell_size"] * (self.current_grid_properties["grid_num_col"] + 1) + 4
-        )
+        table_width = self["cell_size"] * (self.grid_properties["grid_num_col"] + 1) + 4
         table_height = (
-            self["cell_size"] * (self.current_grid_properties["grid_num_row"] + 1) + 4
+            self["cell_size"] * (self.grid_properties["grid_num_row"] + 1) + 4
         )
         self.grid_table.setFixedWidth(table_width)
         self.grid_table.setFixedHeight(table_height)
 
-        self.comp_table.setColumnCount(self.current_grid_properties["comp_num_col"])
-        self.comp_table.setRowCount(self.current_grid_properties["comp_num_row"])
+        self.comp_table.setColumnCount(self.grid_properties["comp_num_col"])
+        self.comp_table.setRowCount(self.grid_properties["comp_num_row"])
 
-        for col in range(self.current_grid_properties["comp_num_col"]):
+        for col in range(self.grid_properties["comp_num_col"]):
             temp_header_item = QtImport.QTableWidgetItem("%d" % (col + 1))
             self.comp_table.setHorizontalHeaderItem(col, temp_header_item)
             self.comp_table.setColumnWidth(col, self["cell_size"])
 
-        for row in range(self.current_grid_properties["comp_num_row"]):
+        for row in range(self.grid_properties["comp_num_row"]):
             temp_header_item = QtImport.QTableWidgetItem(chr(65 + row))
             self.comp_table.setVerticalHeaderItem(row, temp_header_item)
             self.comp_table.setRowHeight(row, self["cell_size"])
 
-        for col in range(self.current_grid_properties["comp_num_col"]):
-            for row in range(self.current_grid_properties["comp_num_row"]):
+        for col in range(self.grid_properties["comp_num_col"]):
+            for row in range(self.grid_properties["comp_num_row"]):
                 temp_item = QtImport.QTableWidgetItem()
                 self.comp_table.setItem(row, col, temp_item)
 
-        table_width = (
-            self["cell_size"] * (self.current_grid_properties["comp_num_col"] + 1) + 7
-        )
+        table_width = self["cell_size"] * (self.grid_properties["comp_num_col"] + 1) + 7
         table_height = (
-            self["cell_size"] * (self.current_grid_properties["comp_num_row"] + 1) + 7
+            self["cell_size"] * (self.grid_properties["comp_num_row"] + 1) + 7
         )
         self.comp_table.setFixedWidth(table_width)
         self.comp_table.setFixedHeight(table_height)
@@ -248,18 +268,10 @@ class StillCollectionPreviewBrick(BaseWidget):
         self.hit_map_plot.hide_all_curves()
         self.hit_map_plot.show_curve(self.score_type)
 
-    def show_grid_dialog(self):
-        """
-        Opens dialog with full grid view
-        :return: None
-        """
+    def save_hit_plot(self):
         self.grid_dialog.show()
 
     def save_grid_view(self):
-        """
-        Saves grid view in png file
-        :return: None
-        """
         file_types = "PNG (*.png)"
         filename = str(
             QtImport.QFileDialog.getSaveFileName(
@@ -282,24 +294,12 @@ class StillCollectionPreviewBrick(BaseWidget):
         image.save(filename)
 
     def grid_cell_clicked(self, row, col):
-        """
-        Fixes grid cell
-        :param row: int
-        :param col: int
-        :return: None
-        """
         self.grid_table_item_fixed = not self.grid_table_item_fixed
 
     def grid_cell_entered(self, row, col):
-        """
-        Updates grid view and loads image
-        :param row: int
-        :param col: int
-        :return: None
-        """
         if not self.grid_table_item_fixed:
             self.info_dict["grid_cell"] = (
-                row * self.current_grid_properties["grid_num_row"] + col
+                row * self.grid_properties["grid_num_row"] + col
             )
             self.grid_cell_label.setText(
                 "Current grid cell: %s%d" % (chr(65 + row), col + 1)
@@ -307,52 +307,37 @@ class StillCollectionPreviewBrick(BaseWidget):
             self.update_comp_table()
 
             if self.params_dict:
-                grid_cell = row * self.current_grid_properties["grid_num_row"] + col
+                grid_cell = row * self.grid_properties["grid_num_row"] + col
 
                 start_index = (
                     grid_cell
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    * self.grid_properties["comp_num_col"]
+                    * self.grid_properties["comp_num_row"]
                     * self.params_dict["num_images_per_trigger"]
                 )
                 end_index = min(
                     start_index
-                    + self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    + self.grid_properties["comp_num_col"]
+                    * self.grid_properties["comp_num_row"]
                     * self.params_dict["num_images_per_trigger"],
                     self.results[self.score_type].size - 1,
                 )
 
-                if start_index < self.results[self.score_type].size:
-                    index = start_index + np.argmax(
-                        self.results[self.score_type][start_index:end_index]
-                    )
+                index = self.results[self.score_type].max()
 
-                    filename = self.params_dict["template"] % (
-                        self.params_dict["run_number"],
-                        index + self.params_dict["first_image_num"],
-                    )
-                    try:
-                        api.beamline_setup.image_tracking_hwobj.load_image(filename)
-                    except BaseException:
-                        pass
+                filename = self.params_dict["template"] % (
+                    self.params_dict["run_number"],
+                    index,
+                )
+                try:
+                    self.beamline_setup_hwobj.image_tracking_hwobj.load_image(filename)
+                except BaseException:
+                    pass
 
     def comp_cell_clicked(self, row, col):
-        """
-        Fixes or release com table item
-        :param row: int
-        :param col: int
-        :return: None
-        """
         self.comp_table_item_fixed = not self.comp_table_item_fixed
 
     def comp_cell_entered(self, row, col):
-        """
-        Method called when compartm. cell entered
-        :param row: int
-        :param col: int
-        :return: None
-        """
         if not self.comp_table_item_fixed:
             self.comp_cell_label.setText(
                 "Current compartment cell: %s%d" % (chr(65 + row), col + 1)
@@ -361,9 +346,9 @@ class StillCollectionPreviewBrick(BaseWidget):
             if self.params_dict is not None:
                 start_index = (
                     self.info_dict["grid_cell"]
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
-                    + row * self.current_grid_properties["comp_num_row"]
+                    * self.grid_properties["comp_num_col"]
+                    * self.grid_properties["comp_num_row"]
+                    + row * self.grid_properties["comp_num_row"]
                     + col
                 ) * self.params_dict["num_images_per_trigger"]
                 end_index = min(
@@ -390,75 +375,33 @@ class StillCollectionPreviewBrick(BaseWidget):
                         )
                         self.hit_map_plot.adjust_axes(self.score_type)
 
-                        index = start_index + np.argmax(
-                            self.results[self.score_type][start_index:end_index]
-                        )
-
-                        filename = self.params_dict["template"] % (
-                            self.params_dict["run_number"],
-                            index + self.params_dict["first_image_num"],
-                        )
-                        try:
-                            api.beamline_setup.image_tracking_hwobj.load_image(filename)
-                        except BaseException:
-                            pass
-
     def grid_properties_combo_changed(self, index):
-        """
-        Redraws grid view based on the selected grid property
-        :param index: int
-        :return: None
-        """
-        api.parallel_processing.set_current_grid_index(index)
-        self.current_grid_properties = (
-            api.parallel_processing.get_current_grid_properties()
+        self.parallel_processing_hwobj.set_current_grid_index(index)
+        self.grid_properties = (
+            self.parallel_processing_hwobj.get_current_grid_properties()
         )
         self.init_gui()
-        self.grid_graphics_base.init_item(self.current_grid_properties)
-        self.grid_graphics_overlay.init_item(self.current_grid_properties)
+        self.grid_graphics_base.init_item(self.grid_properties)
+        self.grid_graphics_overlay.init_item(self.grid_properties)
 
     def score_type_changed(self, index):
-        """
-        Updates plots based on the selected score type
-        :param index: int
-        :return: None
-        """
         self.score_type = self.score_type_list[index]
 
     def hit_map_mouse_moved(self, pos_x, pos_y):
-        """
-        Loads image in ADxV based on mouse move
-        :param pos_x: float
-        :param pos_y: float
-        :return: None
-        """
         if self.params_dict is not None:
             filename = self.params_dict["template"] % (
                 self.params_dict["run_number"],
                 int(pos_x),
             )
             try:
-                api.beamline_setup.image_tracking_hwobj.load_image(filename)
+                self.beamline_setup_hwobj.image_tracking_hwobj.load_image(filename)
             except BaseException:
                 pass
 
     def grid_view_mouse_moved(self, pos_x, pos_y):
-        """
-        Not implemented yet
-        :param pos_x:
-        :param pos_y:
-        :return:
-        """
-        return
+        pass
 
     def processing_started(self, params_dict, raw_results, aligned_results):
-        """
-        Processing started event. Cleans graphs
-        :param params_dict: dict with processing parameters
-        :param raw_results: dict with one dimension numpy arrays
-        :param aligned_results: dict with multi dimensional numpy arrays
-        :return: None
-        """
         self.results = raw_results
         self.params_dict = params_dict
         self.hit_map_plot.set_x_axis_limits(
@@ -469,35 +412,19 @@ class StillCollectionPreviewBrick(BaseWidget):
         self.grid_graphics_overlay.set_results(params_dict, raw_results)
 
     def processing_finished(self):
-        """
-        Updates grid view last time
-        :return: None
-        """
+        # self.info_dict["grid_cell"] = -1
         self.info_dict["comp_cell"] = -1
         self.processing_frame_changed(self.params_dict["images_num"])
 
     def processing_failed(self):
-        """
-        Not implemented
-        :return: None
-        """
-        return
+        pass
 
     def processing_frame_changed(self, frame_num):
-        """
-        Redraws grid view
-        :param frame_num: int
-        :return: None
-        """
         self.frame_num = frame_num
         self.update_gui()
         self.grid_graphics_view.scene().update()
 
     def update_gui(self):
-        """
-        Updates gui
-        :return: None
-        """
         if not self.image_tracking_cbox.isChecked():
             return
 
@@ -508,8 +435,8 @@ class StillCollectionPreviewBrick(BaseWidget):
 
         grid_cell = (
             self.info_dict["comp_num"]
-            / self.current_grid_properties["comp_num_col"]
-            / self.current_grid_properties["comp_num_row"]
+            / self.grid_properties["comp_num_col"]
+            / self.grid_properties["comp_num_row"]
         )
 
         if self.info_dict["grid_cell"] != grid_cell:
@@ -520,8 +447,8 @@ class StillCollectionPreviewBrick(BaseWidget):
         comp_cell = (
             self.frame_num
             - grid_cell
-            * self.current_grid_properties["comp_num_col"]
-            * self.current_grid_properties["comp_num_row"]
+            * self.grid_properties["comp_num_col"]
+            * self.grid_properties["comp_num_row"]
             * self.params_dict["num_images_per_trigger"]
         ) / self.params_dict["num_images_per_trigger"]
 
@@ -529,31 +456,25 @@ class StillCollectionPreviewBrick(BaseWidget):
             self.info_dict["comp_cell"] = comp_cell
             self.update_comp_table()
 
-        self.update_stats()
-
     def update_grid_table(self):
-        """
-        Updates grid table
-        :return: None
-        """
         if self.params_dict is None:
             return
 
-        for row in range(self.current_grid_properties["grid_num_row"]):
-            for col in range(self.current_grid_properties["grid_num_col"]):
+        for row in range(self.grid_properties["grid_num_row"]):
+            for col in range(self.grid_properties["grid_num_col"]):
                 grid_table_item = self.grid_table.item(row, col)
-                grid_cell = row * self.current_grid_properties["grid_num_row"] + col
+                grid_cell = row * self.grid_properties["grid_num_row"] + col
 
                 start_index = (
                     grid_cell
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    * self.grid_properties["comp_num_col"]
+                    * self.grid_properties["comp_num_row"]
                     * self.params_dict["num_images_per_trigger"]
                 )
                 end_index = min(
                     start_index
-                    + self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    + self.grid_properties["comp_num_col"]
+                    * self.grid_properties["comp_num_row"]
                     * self.params_dict["num_images_per_trigger"],
                     self.results[self.score_type].size - 1,
                 )
@@ -569,31 +490,27 @@ class StillCollectionPreviewBrick(BaseWidget):
                 grid_table_item.setBackground(color)
 
     def update_comp_table(self):
-        """
-        Updates comp. table
-        :return: None
-        """
         if self.params_dict is None:
             return
 
-        for row in range(self.current_grid_properties["comp_num_row"]):
-            for col in range(self.current_grid_properties["comp_num_col"]):
+        for row in range(self.grid_properties["comp_num_row"]):
+            for col in range(self.grid_properties["comp_num_col"]):
 
                 if self.inverted_rows_cbox.isChecked() and row % 2:
-                    table_col = self.current_grid_properties["comp_num_col"] - col - 1
+                    table_col = self.grid_properties["comp_num_col"] - col - 1
                 else:
                     table_col = col
 
                 comp_table_item = self.comp_table.item(row, table_col)
                 start_index = (
                     self.info_dict["grid_cell"]
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    * self.grid_properties["comp_num_col"]
+                    * self.grid_properties["comp_num_row"]
                     * self.params_dict["num_images_per_trigger"]
-                    + (row * self.current_grid_properties["comp_num_row"] + col)
+                    + (row * self.grid_properties["comp_num_row"] + col)
                     * self.params_dict["num_images_per_trigger"]
                 )
-
+                # self.grid_properties["comp_num_col"]
                 end_index = min(
                     start_index + self.params_dict["num_images_per_trigger"],
                     self.results[self.score_type].size - 1,
@@ -601,7 +518,7 @@ class StillCollectionPreviewBrick(BaseWidget):
                 color = Colors.LIGHT_GRAY
                 if (
                     self.info_dict["comp_cell"]
-                    == row * self.current_grid_properties["comp_num_row"] + col
+                    == row * self.grid_properties["comp_num_row"] + col
                 ):
                     color = Colors.DARK_GREEN
                 elif start_index < self.results[self.score_type].size:
@@ -620,19 +537,14 @@ class StillCollectionPreviewBrick(BaseWidget):
                             color = Colors.WHITE
                 comp_table_item.setBackground(color)
 
-    def update_stats(self):
-        for key in self.results.keys():
-            print(key, self.results[key].min(), self.results[key].max())
-
 
 class GridViewGraphicsItem(QtImport.QGraphicsItem):
-    """
-    Class to represent full grid
-    """
-
     def __init__(self):
         """
-        Defines grid view
+        :param position_x: x coordinate in the scene
+        :type position_x: int
+        :param position_y: y coordinate in the scene
+        :type position_y: int
         """
 
         QtImport.QGraphicsItem.__init__(self)
@@ -650,16 +562,16 @@ class GridViewGraphicsItem(QtImport.QGraphicsItem):
 
         self.results = None
         self.debug_hit_limit = 1e9
-        self.num_comp_x = None
-        self.num_comp_y = None
-        self.num_holes_x = None
-        self.num_holes_y = None
+        self.no_compartments_x = None
+        self.no_compartments_y = None
+        self.no_holes_x = None
+        self.no_holes_y = None
         self.offset_hole = 2
-        self.offset_comp = 10
+        self.offset_compartment = 10
 
         self.size_hole = None
-        self.size_comp_x = None
-        self.size_comp_y = None
+        self.size_compartment_x = None
+        self.size_compartment_y = None
         self.size_chip_x = None
         self.size_chip_y = None
         self.images_per_crystal = 1
@@ -678,95 +590,81 @@ class GridViewGraphicsItem(QtImport.QGraphicsItem):
         if self.size_hole:
             self.custom_brush.setColor(QtImport.Qt.lightGray)
             painter.setBrush(self.custom_brush)
-            for comp_y in range(self.num_comp_y):
-                for comp_x in range(self.num_comp_x):
-                    for hole_y in range(1, self.num_holes_y + 1):
-                        for hole_x in range(1, self.num_holes_x + 1):
-                            # comp_y = self.num_comp_y - comp_y + 1
-                            hole_y = self.num_holes_y - hole_y + 1
+            for compartment_y in range(self.no_compartments_y):
+                for compartment_x in range(self.no_compartments_x):
+                    for hole_y in range(1, self.no_holes_y + 1):
+                        for hole_x in range(1, self.no_holes_x + 1):
+                            # compartment_y = self.no_compartments_y - compartment_y + 1
+                            hole_y = self.no_holes_y - hole_y + 1
                             corner_x = (
-                                comp_x
-                                * (self.size_comp_x + self.offset_comp)
+                                compartment_x
+                                * (self.size_compartment_x + self.offset_compartment)
                             ) + (hole_x * (self.size_hole + self.offset_hole))
                             corner_y = (
-                                comp_y
-                                * (self.size_comp_y + self.offset_comp)
+                                compartment_y
+                                * (self.size_compartment_y + self.offset_compartment)
                             ) + (hole_y * (self.size_hole + self.offset_hole))
                             painter.drawRect(
                                 corner_x, corner_y, self.size_hole, self.size_hole
                             )
 
     def init_item(self, params_dict, results=None):
-        """
-        Inits item
-        :param params_dict: configuration dict
-        :param results: None
-        :return:
-        """
         self.results = results
+        self.item_initialized = False
 
-        self.num_comp_x = params_dict["grid_num_col"]
-        self.num_comp_y = params_dict["grid_num_row"]
-        self.num_holes_x = params_dict["comp_num_row"]
-        self.num_holes_y = params_dict["comp_num_col"]
+        self.no_compartments_x = params_dict["grid_num_col"]
+        self.no_compartments_y = params_dict["grid_num_row"]
+        self.no_holes_x = params_dict["comp_num_row"]
+        self.no_holes_y = params_dict["comp_num_col"]
 
         self.size_hole = 2000 / (
-            self.num_comp_x
-            * (self.offset_comp + self.num_holes_x * self.offset_hole)
+            self.no_compartments_x
+            * (self.offset_compartment + self.no_holes_x * self.offset_hole)
         )
-        self.size_comp_x = (self.size_hole + self.offset_hole) * self.num_holes_x
-        self.size_comp_y = (self.size_hole + self.offset_hole) * self.num_holes_y
-        self.size_chip_x = (self.size_comp_x + self.offset_comp) * (
-            self.num_comp_x + 0.5
+        self.size_compartment_x = (self.size_hole + self.offset_hole) * self.no_holes_x
+        self.size_compartment_y = (self.size_hole + self.offset_hole) * self.no_holes_y
+        self.size_chip_x = (self.size_compartment_x + self.offset_compartment) * (
+            self.no_compartments_x + 0.5
         )
-        self.size_chip_y = (self.size_comp_y + self.offset_comp) * (
-            self.num_comp_y + 0.5
+        self.size_chip_y = (self.size_compartment_y + self.offset_compartment) * (
+            self.no_compartments_y + 0.5
         )
 
         self.scene().setSceneRect(0, 0, self.size_chip_x + 10, self.size_chip_y + 10)
 
     def set_results(self, params_dict, results):
-        """
-        Updates results
-        :param params_dict:
-        :param results:
-        :return:
-        """
         self.images_per_crystal = params_dict["num_images_per_trigger"]
         self.results = results
 
 
 class GridViewOverlayItem(GridViewGraphicsItem):
-    """
-    Overlay to draw fits over the grid view
-    """
+    def __init__(self):
+        GridViewGraphicsItem.__init__(self)
 
-    def calc_hole_coordinates(self, image_index):
-        """
-        Calculates hole coordinates
-        :param img_index:
-        :return:
-        """
-        image_index = int(image_index)
-        image_number = image_index // self.images_per_crystal
+    def calc_hole_coordinates(self, imgno):
+        imgno = int(imgno)
+        image_number = imgno // self.images_per_crystal
 
-        comp_serial = image_number // (self.num_holes_x * self.num_holes_y)
-        holes_serial = image_number % (self.num_holes_x * self.num_holes_y)
-        timepoint_serial = image_index % self.images_per_crystal
+        compartments_serial = image_number // (self.no_holes_x * self.no_holes_y)
+        holes_serial = image_number % (self.no_holes_x * self.no_holes_y)
+        timepoint_serial = imgno % self.images_per_crystal
 
-        comp_x = comp_serial % self.num_comp_x
-        comp_y = comp_serial // self.num_comp_x
-        hole_x = holes_serial % self.num_holes_x + 1
-        hole_y = holes_serial // self.num_holes_x + 1
+        compartment_x = compartments_serial % self.no_compartments_x
+        compartment_y = compartments_serial // self.no_compartments_x
+        hole_x = holes_serial % self.no_holes_x + 1
+        hole_y = holes_serial // self.no_holes_x + 1
         timepoint_x = timepoint_serial % 2 + 1
         timepoint_y = timepoint_serial // 2 + 1
 
         if not hole_y & 1:
-            hole_x = self.num_holes_x - hole_x + 1
+            hole_x = self.no_holes_x - hole_x + 1
 
         return (
-            comp_x,
-            comp_y,
+            compartments_serial,
+            holes_serial,
+            timepoint_serial,
+            compartment_x,
+            compartment_y,
             hole_x,
             hole_y,
             timepoint_x,
@@ -774,41 +672,24 @@ class GridViewOverlayItem(GridViewGraphicsItem):
         )
 
     def paint(self, painter, option, widget):
-        """
-        Main pain method
-        :param painter:
-        :param option:
-        :param widget:
-        :return:
-        """
         self.custom_brush.setColor(QtImport.Qt.blue)
         painter.setBrush(self.custom_brush)
 
         def draw_hole_timeseries(
-            comp_x, comp_y, hole_x, hole_y, subpixel_x, subpixel_y
+            compartment_x, compartment_y, hole_x, hole_y, subpixel_x, subpixel_y
         ):
-            """
-            Draws holes
-            :param comp_x:
-            :param comp_y:
-            :param hole_x:
-            :param hole_y:
-            :param subpixel_x:
-            :param subpixel_y:
-            :return:
-            """
-            # comp_y = self.num_comp_y - comp_y +1
-            # hole_y        = self.num_holes_y - hole_y +1
+            # compartment_y = self.no_compartments_y - compartment_y +1
+            # hole_y        = self.no_holes_y - hole_y +1
             # subpixel_y    = self.no_subpixels_y - subpixel_y +1
 
             corner_x = (
-                comp_x * (self.size_comp_x + self.offset_comp)
+                compartment_x * (self.size_compartment_x + self.offset_compartment)
                 + (hole_x * (self.size_hole + self.offset_hole))
                 + ((subpixel_x - 1) * self.size_hole)
             )
 
             corner_y = (
-                comp_y * (self.size_comp_y + self.offset_comp)
+                compartment_y * (self.size_compartment_y + self.offset_compartment)
                 + (hole_y * (self.size_hole + self.offset_hole))
                 + ((subpixel_y - 1) * self.size_hole)
             )
@@ -818,13 +699,13 @@ class GridViewOverlayItem(GridViewGraphicsItem):
         if self.results is not None:
             hitlist = np.where(self.results["score"] > 0)[0]
             for hit in hitlist:
-                comp_x, comp_y, hole_x, hole_y, timepoint_x, timepoint_y = self.calc_hole_coordinates(
+                compartments_serial, holes_serial, timepoint_serial, compartment_x, compartment_y, hole_x, hole_y, timepoint_x, timepoint_y = self.calc_hole_coordinates(
                     hit
                 )
                 if timepoint_y <= 1:
                     draw_hole_timeseries(
-                        comp_x,
-                        comp_y,
+                        compartment_x,
+                        compartment_y,
                         hole_x,
                         hole_y,
                         timepoint_x,

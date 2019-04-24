@@ -83,9 +83,6 @@ class TreeBrick(BaseWidget):
         self.filtered_lims_samples = None
         self.compression_state = True
         self.queue_autosave_action = None
-        self.queue_undo_action = None
-        self.queue_redo_action = None
-        self.queue_sync_action = None
 
         # Properties ----------------------------------------------------------
         self.add_property("queue", "string", "/queue")
@@ -203,9 +200,6 @@ class TreeBrick(BaseWidget):
         # self.sample_changer_widget.setFixedHeight(46)
         # self.dc_tree_widget.set_centring_method(1)
 
-        self.init_api()
-
-    def init_api(self):
         if not api.sample_changer:
             logging.getLogger("GUI").debug(
                 "TreeBrick: sample changer hwobj not defined."
@@ -238,7 +232,7 @@ class TreeBrick(BaseWidget):
                 SampleChanger.STATUS_CHANGED_EVENT,
                 self.sample_changer_status_changed,
             )
-            #api.sample_changer.update_values()
+            api.sample_changer.update_values()
 
         if api.plate_manipulator is not None:
             self.connect(
@@ -370,8 +364,6 @@ class TreeBrick(BaseWidget):
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
 
-        #self.init_api()
-
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "useFilterWidget":
             self.sample_changer_widget.filter_label.setVisible(new_value)
@@ -425,7 +417,7 @@ class TreeBrick(BaseWidget):
         prop_code=None,
         is_inhouse=None,
     ):
-        api.session.set_session_start_date(str(start_date))
+        api.beamline_setup.session_hwobj.set_session_start_date(str(start_date))
 
     @QtImport.pyqtSlot()
     def set_requested_tree_brick(self):
@@ -441,6 +433,7 @@ class TreeBrick(BaseWidget):
         two associated queue models.
         """
 
+        loaded_queue_index = None
         self.is_logged_in = logged_in
         # self.enable_collect(logged_in)
 
@@ -506,15 +499,13 @@ class TreeBrick(BaseWidget):
 
             if self.redis_client_hwobj is not None:
                 self.redis_client_hwobj.load_graphics()
-
-            self.load_queue()
+            loaded_queue_index = self.load_queue()
             self.dc_tree_widget.samples_initialized = True
 
         # if not self.dc_tree_widget.samples_initialized
         #    self.dc_tree_widget.sample_tree_widget_selection()
         #    self.dc_tree_widget.set_sample_pin_icon()
         # self.dc_tree_widget.scroll_to_item()
-        self.dc_tree_widget.update_basket_selection()
 
     def enable_collect(self, state):
         """
@@ -636,7 +627,7 @@ class TreeBrick(BaseWidget):
         log = logging.getLogger("user_level_log")
 
         self.lims_samples = api.lims.get_samples(
-            api.session.proposal_id, api.session.session_id
+            api.beamline_setup.session_hwobj.proposal_id, api.session.session_id
         )
 
         basket_list = []
@@ -1144,8 +1135,8 @@ class TreeBrick(BaseWidget):
             self.update_enable_collect()
 
     def shutter_state_changed(self, state, msg=None):
-        if self.enable_collect_conditions.get("shutter") != (state in ("opened", "OPEN")):
-            self.enable_collect_conditions["shutter"] = (state in ("opened", "OPEN"))
+        if self.enable_collect_conditions.get("shutter") != (state == "opened"):
+            self.enable_collect_conditions["shutter"] = state == "opened"
             self.update_enable_collect()
 
     def machine_current_changed(self, value, in_range):
