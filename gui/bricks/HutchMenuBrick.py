@@ -242,31 +242,31 @@ class HutchMenuBrick(BaseWidget):
         self.auto_center_button.setEnabled(status)
 
 
-def refresh_camera_clicked(self):
+def refresh_camera_clicked():
     api.graphics.refresh_camera()
 
-def visual_align_clicked(self):
+def visual_align_clicked():
     api.graphics.start_visual_align()
 
-def select_all_clicked(self):
+def select_all_clicked():
     api.graphics.select_all_points()
 
-def clear_all_clicked(self):
+def clear_all_clicked():
     """
     Clears all shapes (points, lines and meshes)
     """
     api.graphics.clear_all()
 
-def auto_focus_clicked(self):
+def auto_focus_clicked():
     api.graphics.auto_focus()
 
-def auto_center_clicked(self):
+def auto_center_clicked():
     api.graphics.start_auto_centring()
 
-def create_line_clicked(self):
+def create_line_clicked():
     api.graphics.create_line()
 
-def draw_grid_clicked(self):
+def draw_grid_clicked():
     api.graphics.create_grid()
 
 
