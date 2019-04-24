@@ -1135,8 +1135,12 @@ class TreeBrick(BaseWidget):
             self.update_enable_collect()
 
     def shutter_state_changed(self, state, msg=None):
-        if self.enable_collect_conditions.get("shutter") != (state == "opened"):
-            self.enable_collect_conditions["shutter"] = state == "opened"
+        # NBNB TODO HACK.
+        #  Necessary because shutter states can be both 'opened', 'OPEN'. (and more?)
+        # NBNB fixme
+        is_open = bool(state and state.lower().startswith('open'))
+        if self.enable_collect_conditions.get("shutter") != is_open:
+            self.enable_collect_conditions["shutter"] = is_open
             self.update_enable_collect()
 
     def machine_current_changed(self, value, in_range):
