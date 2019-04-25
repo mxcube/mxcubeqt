@@ -196,7 +196,6 @@ class DataPathWidget(QtImport.QWidget):
             if self.parent._tree_brick:
                 self.parent._tree_brick.compression_state = state
 
-        queue_model_objects.Characterisation.set_char_compression(state)
         self._data_model.compression = state
         self.update_file_name()
         self.pathTemplateChangedSignal.emit()

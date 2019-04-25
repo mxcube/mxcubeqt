@@ -145,7 +145,6 @@ class CreateTaskBase(QtImport.QWidget):
 
     def init_acq_model(self):
         if self._acq_widget:
-            #self._acq_widget.init_api()
             def_acq_parameters = api.beamline_setup.get_default_acquisition_parameters()
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
             if api.diffractometer.in_plate_mode():

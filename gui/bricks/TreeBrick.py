@@ -203,9 +203,6 @@ class TreeBrick(BaseWidget):
         # self.sample_changer_widget.setFixedHeight(46)
         # self.dc_tree_widget.set_centring_method(1)
 
-        self.init_api()
-
-    def init_api(self):
         if not api.sample_changer:
             logging.getLogger("GUI").debug(
                 "TreeBrick: sample changer hwobj not defined."
@@ -358,8 +355,6 @@ class TreeBrick(BaseWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
-
-        # self.init_api()
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "useFilterWidget":

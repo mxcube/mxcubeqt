@@ -117,6 +117,11 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
+        api.detector_distance.connect(
+            "positionChanged",
+            self._xray_imaging_parameters_widget.set_detector_distance,
+        )
+
     def approve_creation(self):
         return True
 
@@ -131,18 +136,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
             "default_imaging_values"
         )
         self._path_template.suffix = "tiff"
-
-    def init_api(self):
-        """
-        In plate mode osciallation is start is in the middle of grid
-        """
-        CreateTaskBase.init_api(self)
-
-        self._xray_imaging_parameters_widget.init_api()
-        api.detector_distance.connect(
-            "positionChanged",
-            self._xray_imaging_parameters_widget.set_detector_distance,
-        )
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
