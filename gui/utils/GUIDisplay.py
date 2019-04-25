@@ -612,24 +612,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             page = self.widget(index)
             self.count_changed[index] = False
 
-            tab_label = str(self.tabText(index))
-            label_list = tab_label.split()
-            found = False
-            try:
-                count = label_list[-1]
-                try:
-                    found = count[0] == "("
-                except BaseException:
-                    pass
-                else:
-                    try:
-                        found = count[-1] == ")"
-                    except BaseException:
-                        pass
-            except BaseException:
-                pass
             self.tabChangedSignal.emit(index, page)
-
             tab_name = self.objectName()
             BaseWidget.update_tab_widget(tab_name, index)
 
@@ -755,16 +738,11 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 except BaseException:
                     pass
                 if found:
-                    try:
-                        num = int(count[1:-1])
-                    except BaseException:
-                        pass
-                    else:
-                        new_label = " ".join(label_list[0:-1])
-                        if not erase_count:
-                            new_label += " (0)"
-                        self.count_changed[page_index] = False
-                        self.setTabLabel(self.page(page_index), new_label)
+                    new_label = " ".join(label_list[0:-1])
+                    if not erase_count:
+                        new_label += " (0)"
+                    self.count_changed[page_index] = False
+                    self.setTabLabel(self.page(page_index), new_label)
                 else:
                     if not erase_count:
                         new_label = " ".join(label_list)
@@ -1559,8 +1537,8 @@ class BricksPropertiesEditor(QtImport.QWidget):
         )
 
     def property_changed(self, property_name, old_value, new_value):
-        self.selected_brick._propertyChanged(property_name, old_value, new_value)
-        self.selected_brick.propertyChanged(property_name, old_value, new_value)
+        self.selected_brick._property_changed(property_name, old_value, new_value)
+        self.selected_brick.property_changed(property_name, old_value, new_value)
         self.property_edited = True
 
     def closeEvent(self, event):
