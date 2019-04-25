@@ -115,7 +115,15 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-        self.init_api()
+        self.set_tunable_energy(api.beamline_setup.tunable_wavelength())
+
+        if api.diffractometer.in_plate_mode():
+            self.acq_widget_layout.num_images_cbox.clear()
+            self.acq_widget_layout.num_images_cbox.addItem("1")
+            self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
+
+        self.init_detector_roi_modes()
+        self.init_limits()
 
     def update_osc_total_range(self):
         pass
@@ -188,7 +196,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
     def energy_selected(self, index):
         pass
 
-    def init_api(self):
+    def init_limits(self):
         limits_dict = api.beamline_setup.get_acquisition_limit_values()
 
         if "osc_range" in limits_dict:
@@ -263,15 +271,6 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             float,
             self.resolution_validator,
         )
-
-        self.set_tunable_energy(api.beamline_setup.tunable_wavelength())
-
-        if api.diffractometer.in_plate_mode():
-            self.acq_widget_layout.num_images_cbox.clear()
-            self.acq_widget_layout.num_images_cbox.addItem("1")
-            self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
-
-        self.init_detector_roi_modes()
 
     def set_energy(self, energy, wav):
         if not self.acq_widget_layout.energy_ledit.hasFocus():

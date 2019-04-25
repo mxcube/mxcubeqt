@@ -70,8 +70,6 @@ class AdvancedBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-        self.init_api()
-
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(
             api.session.get_base_image_directory()
@@ -119,9 +117,3 @@ class AdvancedBrick(BaseWidget):
             pass
 
         self.tool_box.setCurrentWidget(self.results_widget)
-
-    def init_api(self):
-        self.parameters_widget.init_api()
-        self.results_widget.init_api()
-        self.line_parameters_widget.init_api()
-        self.line_results_widget.init_api()

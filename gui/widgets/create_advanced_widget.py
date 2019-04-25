@@ -160,7 +160,25 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self._advanced_methods_widget.method_combo.addItem(method)
         else:
             self.setEnabled(False)
-        self._acq_widget.init_api()
+
+        self._acq_widget.acq_widget_layout.osc_start_label.setText(
+            "Oscillation middle:"
+        )
+
+        hor_size, ver_size = api.beam_info.get_beam_size()
+        self.spacing[0] = hor_size
+        self.spacing[1] = ver_size
+
+        self._advanced_methods_widget.hor_spacing_ledit.setText(
+            "%.1f" % (hor_size * 1000)
+        )
+        self._advanced_methods_widget.ver_spacing_ledit.setText(
+            "%.1f" % (ver_size * 1000)
+        )
+
+        api.graphics.connect("shapeCreated", self.shape_created)
+        api.graphics.connect("shapeChanged", self.shape_changed)
+        api.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def enable_widgets(self, state):
         return
@@ -187,31 +205,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
             "default_advanced_values"
         )
-
-    def init_api(self):
-        """
-        In plate mode oscillation start is in the middle of the grid
-        """
-        CreateTaskBase.init_api(self)
-
-        self._acq_widget.acq_widget_layout.osc_start_label.setText(
-            "Oscillation middle:"
-        )
-
-        hor_size, ver_size = api.beam_info.get_beam_size()
-        self.spacing[0] = hor_size
-        self.spacing[1] = ver_size
-
-        self._advanced_methods_widget.hor_spacing_ledit.setText(
-            "%.1f" % (hor_size * 1000)
-        )
-        self._advanced_methods_widget.ver_spacing_ledit.setText(
-            "%.1f" % (ver_size * 1000)
-        )
-
-        api.graphics.connect("shapeCreated", self.shape_created)
-        api.graphics.connect("shapeChanged", self.shape_changed)
-        api.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def set_beam_info(self, beam_info):
         self.spacing[0] = beam_info["size_x"]

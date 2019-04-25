@@ -94,7 +94,6 @@ class CreateDiscreteWidget(CreateTaskBase):
         # Other ---------------------------------------------------------------
         self._processing_widget.processing_widget.run_processing_parallel_cbox.\
             setChecked(api.beamline_setup._get_run_processing_parallel())
-        self._acq_widget.init_api()
 
     def init_models(self):
         CreateTaskBase.init_models(self)

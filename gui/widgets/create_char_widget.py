@@ -154,7 +154,6 @@ class CreateCharWidget(CreateTaskBase):
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
-        self._acq_widget.init_api()
 
     def enable_compression(self, state):
         CreateTaskBase.enable_compression(self, False)

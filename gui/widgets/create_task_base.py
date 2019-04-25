@@ -70,8 +70,49 @@ class CreateTaskBase(QtImport.QWidget):
         self._data_path_widget = None
         self._current_selected_items = []
         self._path_template = None
-        self._in_plate_mode = None
         self._enable_compression = None
+
+        self._in_plate_mode = api.diffractometer.in_plate_mode()
+        try:
+            api.energy.connect("energyChanged", self.set_energy)
+            api.energy.connect(
+                "energyLimitsChanged", self.set_energy_limits
+            )
+            api.transmission.connect(
+                "valueChanged", self.set_transmission
+            )
+            api.transmission.connect(
+                "limitsChanged", self.set_transmission_limits
+            )
+            api.resolution.connect(
+                "positionChanged", self.set_resolution
+            )
+            api.resolution.connect(
+                "limitsChanged", self.set_resolution_limits
+            )
+            api.omega_axis.connect(
+                "positionChanged", self.set_osc_start
+            )
+            api.kappa_axis.connect("positionChanged", self.set_kappa)
+            api.kappa_phi_axis.connect(
+                "positionChanged", self.set_kappa_phi
+            )
+            api.detector.connect(
+                "detectorRoiModeChanged", self.set_detector_roi_mode
+            )
+            api.detector.connect(
+                "expTimeLimitsChanged", self.set_detector_exp_time_limits
+            )
+            api.beam_info.connect(
+                "beamInfoChanged", self.set_beam_info
+            )
+
+            api.resolution.update_values()
+            api.detector.update_values()
+            self.set_resolution_limits(api.resolution.get_limits())
+        except AttributeError as ex:
+            msg = "Could not connect to one or more hardware objects " + str(ex)
+            logging.getLogger("HWR").warning(msg)
 
     def set_expert_mode(self, state):
         if self._acq_widget:
@@ -145,52 +186,6 @@ class CreateTaskBase(QtImport.QWidget):
         # ISPyB
         if tab_index is 0 and api.session.proposal_code:
             self.update_selection()
-
-    def init_api(self):
-        self._in_plate_mode = api.diffractometer.in_plate_mode()
-
-        try:
-            api.energy.connect("energyChanged", self.set_energy)
-            api.energy.connect(
-                "energyLimitsChanged", self.set_energy_limits
-            )
-            api.transmission.connect(
-                "valueChanged", self.set_transmission
-            )
-            api.transmission.connect(
-                "limitsChanged", self.set_transmission_limits
-            )
-            api.resolution.connect(
-                "positionChanged", self.set_resolution
-            )
-            api.resolution.connect(
-                "limitsChanged", self.set_resolution_limits
-            )
-            api.omega_axis.connect(
-                "positionChanged", self.set_osc_start
-            )
-            api.kappa_axis.connect("positionChanged", self.set_kappa)
-            api.kappa_phi_axis.connect(
-                "positionChanged", self.set_kappa_phi
-            )
-            api.detector.connect(
-                "detectorRoiModeChanged", self.set_detector_roi_mode
-            )
-            api.detector.connect(
-                "expTimeLimitsChanged", self.set_detector_exp_time_limits
-            )
-            api.beam_info.connect(
-                "beamInfoChanged", self.set_beam_info
-            )
-
-            api.resolution.update_values()
-            api.detector.update_values()
-            self.set_resolution_limits(api.resolution.get_limits())
-        except AttributeError as ex:
-            msg = "Could not connect to one or more hardware objects " + str(ex)
-            logging.getLogger("HWR").warning(msg)
-
-        self.init_models()
 
     def set_osc_start(self, new_value):
         acq_widget = self.get_acquisition_widget()

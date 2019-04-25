@@ -71,8 +71,6 @@ class DCParametersBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.parameters_widget.init_api()
-        self.advance_results_widget.init_api()
 
     def populate_dc_parameter_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(

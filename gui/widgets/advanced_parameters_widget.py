@@ -78,9 +78,6 @@ class AdvancedParametersWidget(QtImport.QWidget):
         self._acq_widget.acq_widget_layout.energies_combo.hide()
         self._acq_widget.acq_widget_layout.shutterless_cbx.hide()
 
-    def init_api(self):
-        self._acq_widget.init_api()
-
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
 

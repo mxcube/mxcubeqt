@@ -34,7 +34,6 @@ class AdvancedResultsWidget(QtImport.QWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self._initialized = None
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
@@ -53,15 +52,10 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-    def init_api(self):
-        if not self._initialized:
-            api.parallel_processing.connect(
-               "processingStarted", self.processing_started
-            )
-            api.parallel_processing.connect(
-               "processingResultsUpdate", self.update_processing_results
-            )
-            self._initialized = True
+        api.parallel_processing.connect("processingStarted", self.processing_started)
+        api.parallel_processing.connect(
+           "processingResultsUpdate", self.update_processing_results
+        )
 
     def populate_widget(self, item, data_collection):
         # if isinstance(item, queue_item.XrayCenteringQueueItem):
