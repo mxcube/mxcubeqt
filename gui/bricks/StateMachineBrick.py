@@ -88,8 +88,12 @@ class StateMachineBrick(BaseWidget):
         self.graph_graphics_view.setFixedSize(900, 600)
         self.graph_graphics_scene.setSceneRect(0, 0, 900, 600)
         self.graph_graphics_view.setScene(self.graph_graphics_scene)
-        self.graph_graphics_view.setHorizontalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
-        self.graph_graphics_view.setVerticalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
+        self.graph_graphics_view.setHorizontalScrollBarPolicy(
+            QtImport.Qt.ScrollBarAlwaysOff
+        )
+        self.graph_graphics_view.setVerticalScrollBarPolicy(
+            QtImport.Qt.ScrollBarAlwaysOff
+        )
         self.graph_graphics_view.setDragMode(QtImport.QGraphicsView.RubberBandDrag)
         self.graph_graphics_view.setRenderHint(QtImport.QPainter.Antialiasing)
         self.graph_graphics_view.setRenderHint(QtImport.QPainter.TextAntialiasing)
@@ -191,7 +195,7 @@ class StateMachineBrick(BaseWidget):
                 self.cond_states_table.item(row, col).setText("")
                 self.cond_states_table.item(row, col).setIcon(QtImport.QIcon())
 
-                for index, translation in enumerate(self.trans_list):
+                for translation in self.trans_list:
                     if (
                         translation["source"] == new_state["current_state"]
                         and translation["dest"] == state["name"]

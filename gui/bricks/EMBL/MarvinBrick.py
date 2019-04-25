@@ -17,7 +17,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+"""EMBL specific brick to control Marvin SC"""
+
 import api
+
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
@@ -27,8 +30,15 @@ __category__ = "EMBL"
 
 
 class MarvinBrick(BaseWidget):
+    """
+    MarvinBrick based on BaseWidget
+    """
 
     def __init__(self, *args):
+        """
+        Main init
+        :param args:
+        """
 
         BaseWidget.__init__(self, *args)
 
@@ -49,13 +59,19 @@ class MarvinBrick(BaseWidget):
 
         self.puck_switches_gbox = QtImport.QGroupBox("Puck switches", self)
         self.puck_switches_table = QtImport.QTableWidget(self.puck_switches_gbox)
-        self.central_puck_ledit = QtImport.QLineEdit("No center puck", self.puck_switches_gbox)
+        self.central_puck_ledit = QtImport.QLineEdit(
+            "No center puck", self.puck_switches_gbox
+        )
 
         self.control_gbox = QtImport.QGroupBox("Control", self)
         self.open_lid_button = QtImport.QPushButton("Open lid", self.control_gbox)
         self.close_lid_button = QtImport.QPushButton("Close lid", self.control_gbox)
-        self.base_to_center_button = QtImport.QPushButton("Base to center", self.control_gbox)
-        self.center_to_base_button = QtImport.QPushButton("Center to base", self.control_gbox)
+        self.base_to_center_button = QtImport.QPushButton(
+            "Base to center", self.control_gbox
+        )
+        self.center_to_base_button = QtImport.QPushButton(
+            "Center to base", self.control_gbox
+        )
         self.dry_gripper_button = QtImport.QPushButton("Dry gripper", self.control_gbox)
 
         self.status_list_gbox = QtImport.QGroupBox("Status list", self)
@@ -110,18 +126,13 @@ class MarvinBrick(BaseWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self.open_lid_button.clicked.connect(self.open_lid_clicked)
-        self.close_lid_button.clicked.connect(self.close_lid_clicked)
-        self.base_to_center_button.clicked.connect(self.base_to_center_clicked)
-        self.center_to_base_button.clicked.connect(self.center_to_base_clicked)
-        self.dry_gripper_button.clicked.connect(self.dry_gripper_clicked)
+        self.open_lid_button.clicked.connect(open_lid_clicked)
+        self.close_lid_button.clicked.connect(close_lid_clicked)
+        self.base_to_center_button.clicked.connect(base_to_center_clicked)
+        self.center_to_base_button.clicked.connect(center_to_base_clicked)
+        self.dry_gripper_button.clicked.connect(dry_gripper_clicked)
 
         # Other ---------------------------------------------------------------
-        # self.mounted_sample_ledit.setFixedWidth(100)
-        # self.sample_detected_ledit.setFixedWidth(100)
-        # self.last_command_ledit.setFixedWidth(100)
-        # self.current_command_ledit.setFixedWidth(100)
-
         self.mounted_sample_ledit.setFixedWidth(80)
         self.sample_detected_ledit.setFixedWidth(80)
         self.focus_mode_ledit.setFixedWidth(80)
@@ -147,19 +158,20 @@ class MarvinBrick(BaseWidget):
             ["Property", "Description", "Value"]
         )
 
-        self.puck_switches_gbox.setSizePolicy(QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed)
+        self.puck_switches_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed
+        )
         self.init_tables()
-        self.connect(
-             api.sample_changer,
-             "statusListChanged",
-             self.status_list_changed,
-        )
-        self.connect(
-             api.sample_changer, "infoDictChanged", self.info_dict_changed
-        )
+        self.connect(api.sample_changer, "statusListChanged", self.status_list_changed)
+        self.connect(api.sample_changer, "infoDictChanged", self.info_dict_changed)
+
         api.sample_changer.update_values()
 
     def init_tables(self):
+        """
+        Inits table with status info
+        :return:
+        """
         self.status_str_desc = api.sample_changer.get_status_str_desc()
         self.index_dict = {}
         self.status_table.setRowCount(len(self.status_str_desc))
@@ -176,6 +188,11 @@ class MarvinBrick(BaseWidget):
         self.status_table.resizeColumnToContents(1)
 
     def status_list_changed(self, status_list):
+        """
+        Updates status table
+        :param status_list: list of str
+        :return:
+        """
         for status in status_list:
             property_status_list = status.split(":")
             if len(property_status_list) < 2:
@@ -190,6 +207,11 @@ class MarvinBrick(BaseWidget):
                 )
 
     def info_dict_changed(self, info_dict):
+        """
+        Updates table with sc info
+        :param info_dict: dict
+        :return:
+        """
         self.mounted_sample_ledit.setText(
             "%s : %s" % (info_dict.get("mounted_puck"), info_dict.get("mounted_sample"))
         )
@@ -197,9 +219,7 @@ class MarvinBrick(BaseWidget):
             self.focus_mode_ledit.setText(info_dict.get("focus_mode"))
 
         for index in range(self.puck_switches_table.columnCount()):
-            self.puck_switches_table.item(0, index).setBackground(
-                Colors.LIGHT_GRAY
-            )
+            self.puck_switches_table.item(0, index).setBackground(Colors.LIGHT_GRAY)
             if info_dict.get("puck_switches", 0) & pow(2, index) > 0:
                 self.puck_switches_table.item(0, index).setBackground(
                     Colors.LIGHT_GREEN
@@ -241,21 +261,42 @@ class MarvinBrick(BaseWidget):
         self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
         self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
-        # self.sample_detected_ledit = QtImport.QLineEdit('', self)
-        # self.last_command_ledit = QtImport.QLineEdit('', self)
-        # self.current_command_ledit = QtImport.QLineEdit('', self)
 
-    def open_lid_clicked(self):
-        api.sample_changer.open_lid()
+def open_lid_clicked():
+    """
+    Opens SC lid
+    :return:
+    """
+    api.sample_changer.open_lid()
 
-    def close_lid_clicked(self):
-        api.sample_changer.close_lid()
 
-    def base_to_center_clicked(self):
-        api.sample_changer.base_to_center()
+def close_lid_clicked():
+    """
+    Closes SC lid
+    :return:
+    """
+    api.sample_changer.close_lid()
 
-    def center_to_base_clicked(self):
-        api.sample_changer.center_to_base()
 
-    def dry_gripper_clicked(self):
-        api.sample_changer.dry_gripper()
+def base_to_center_clicked():
+    """
+    Calls base-to-center function
+    :return:
+    """
+    api.sample_changer.base_to_center()
+
+
+def center_to_base_clicked():
+    """
+    Calls center-to-base function
+    :return:
+    """
+    api.sample_changer.center_to_base()
+
+
+def dry_gripper_clicked():
+    """
+    Calls dry-gripper function
+    :return:
+    """
+    api.sample_changer.dry_gripper()

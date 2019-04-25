@@ -37,6 +37,7 @@ class GraphicsToolsBrick(BaseWidget):
 
         # Internal values -----------------------------------------------------
         self.target_menu = None
+        self.image_scale_list = []
 
         # Properties ----------------------------------------------------------
         self.add_property(
@@ -59,6 +60,7 @@ class GraphicsToolsBrick(BaseWidget):
         self.display_beam_size_action = None
         self.display_grid_action = None
         self.magnification_action = None
+        self.image_scale_menu = None
 
         # Layout --------------------------------------------------------------
 

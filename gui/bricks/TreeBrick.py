@@ -83,6 +83,9 @@ class TreeBrick(BaseWidget):
         self.filtered_lims_samples = None
         self.compression_state = True
         self.queue_autosave_action = None
+        self.queue_undo_action = None
+        self.queue_redo_action = None
+        self.queue_sync_action = None
 
         # Properties ----------------------------------------------------------
         self.add_property("queue", "string", "/queue")
@@ -200,6 +203,9 @@ class TreeBrick(BaseWidget):
         # self.sample_changer_widget.setFixedHeight(46)
         # self.dc_tree_widget.set_centring_method(1)
 
+        self.init_api()
+
+    def init_api(self):
         if not api.sample_changer:
             logging.getLogger("GUI").debug(
                 "TreeBrick: sample changer hwobj not defined."
@@ -208,14 +214,14 @@ class TreeBrick(BaseWidget):
             self.dc_tree_widget.init_plate_navigator(api.plate_manipulator)
         else:
             logging.getLogger("GUI").debug(
-               "TreeBrick: plate manipulator hwobj not defined."
+                "TreeBrick: plate manipulator hwobj not defined."
             )
 
         if api.sample_changer is not None:
             self.connect(
-               api.sample_changer,
-               SampleChanger.STATE_CHANGED_EVENT,
-               self.sample_load_state_changed,
+                api.sample_changer,
+                SampleChanger.STATE_CHANGED_EVENT,
+                self.sample_load_state_changed,
             )
             self.connect(
                 api.sample_changer,
@@ -232,7 +238,7 @@ class TreeBrick(BaseWidget):
                 SampleChanger.STATUS_CHANGED_EVENT,
                 self.sample_changer_status_changed,
             )
-            api.sample_changer.update_values()
+            # api.sample_changer.update_values()
 
         if api.plate_manipulator is not None:
             self.connect(
@@ -250,15 +256,23 @@ class TreeBrick(BaseWidget):
         self.connect(api.graphics, "shapeCreated", self.dc_tree_widget.shape_created)
         self.connect(api.graphics, "shapeChanged", self.dc_tree_widget.shape_changed)
         self.connect(api.graphics, "shapeDeleted", self.dc_tree_widget.shape_deleted)
-        self.connect(api.graphics, "diffractometerReady", self.diffractometer_ready_changed)
-        self.connect(api.diffractometer, "newAutomaticCentringPoint", self.diffractometer_automatic_centring_done)
-        self.connect(api.diffractometer, "minidiffPhaseChanged", self.diffractometer_phase_changed)
+        self.connect(
+            api.graphics, "diffractometerReady", self.diffractometer_ready_changed
+        )
+        self.connect(
+            api.diffractometer,
+            "newAutomaticCentringPoint",
+            self.diffractometer_automatic_centring_done,
+        )
+        self.connect(
+            api.diffractometer,
+            "minidiffPhaseChanged",
+            self.diffractometer_phase_changed,
+        )
         self.diffractometer_phase_changed(api.diffractometer.get_current_phase())
 
         self.connect(
-            api.queue_manager,
-            "show_workflow_tab",
-            self.show_workflow_tab_from_model
+            api.queue_manager, "show_workflow_tab", self.show_workflow_tab_from_model
         )
         self.connect(
             api.queue_manager,
@@ -270,27 +284,12 @@ class TreeBrick(BaseWidget):
             "queue_entry_execute_finished",
             self.queue_entry_execution_finished,
         )
+        self.connect(api.queue_manager, "queue_paused", self.queue_paused_handler)
         self.connect(
-            api.queue_manager,
-            "queue_paused",
-            self.queue_paused_handler
+            api.queue_manager, "queue_execution_finished", self.queue_execution_finished
         )
-        self.connect(
-            api.queue_manager,
-            "queue_execution_finished",
-            self.queue_execution_finished,
-        )
-        self.connect(
-            api.queue_manager,
-            "queue_stopped",
-            self.queue_stop_handler
-        )
-        self.connect(
-            api.queue_model,
-            "child_added",
-            self.dc_tree_widget.add_to_view
-        )
-
+        self.connect(api.queue_manager, "queue_stopped", self.queue_stop_handler)
+        self.connect(api.queue_model, "child_added", self.dc_tree_widget.add_to_view)
 
         if hasattr(api.beamline_setup, "ppu_control_hwobj"):
             self.connect(
@@ -302,17 +301,13 @@ class TreeBrick(BaseWidget):
 
         if api.safety_shutter is not None:
             self.connect(
-               api.safety_shutter,
-               "shutterStateChanged",
-               self.shutter_state_changed,
+                api.safety_shutter, "shutterStateChanged", self.shutter_state_changed
             )
             api.safety_shutter.update_values()
 
         if api.machine_info is not None:
             self.connect(
-                api.machine_info,
-                "machineCurrentChanged",
-                self.machine_current_changed,
+                api.machine_info, "machineCurrentChanged", self.machine_current_changed
             )
 
         has_shutter_less = api.beamline_setup.detector_has_shutterless()
@@ -363,6 +358,8 @@ class TreeBrick(BaseWidget):
         self.hide_xrf_spectrum_tab.emit(True)
         self.hide_workflow_tab.emit(True)
         self.hide_advanced_tab.emit(True)
+
+        # self.init_api()
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "useFilterWidget":
@@ -417,7 +414,7 @@ class TreeBrick(BaseWidget):
         prop_code=None,
         is_inhouse=None,
     ):
-        api.beamline_setup.session_hwobj.set_session_start_date(str(start_date))
+        api.session.set_session_start_date(str(start_date))
 
     @QtImport.pyqtSlot()
     def set_requested_tree_brick(self):
@@ -433,7 +430,6 @@ class TreeBrick(BaseWidget):
         two associated queue models.
         """
 
-        loaded_queue_index = None
         self.is_logged_in = logged_in
         # self.enable_collect(logged_in)
 
@@ -460,10 +456,7 @@ class TreeBrick(BaseWidget):
                     )
                     self.sample_changer_widget.details_button.setText("Show SC-details")
 
-            if (
-                api.plate_manipulator is not None
-                and api.diffractometer.in_plate_mode()
-            ):
+            if api.plate_manipulator is not None and api.diffractometer.in_plate_mode():
                 if self["usePlateNavigator"]:
                     self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
@@ -499,13 +492,15 @@ class TreeBrick(BaseWidget):
 
             if self.redis_client_hwobj is not None:
                 self.redis_client_hwobj.load_graphics()
-            loaded_queue_index = self.load_queue()
+
+            self.load_queue()
             self.dc_tree_widget.samples_initialized = True
 
         # if not self.dc_tree_widget.samples_initialized
         #    self.dc_tree_widget.sample_tree_widget_selection()
         #    self.dc_tree_widget.set_sample_pin_icon()
         # self.dc_tree_widget.scroll_to_item()
+        self.dc_tree_widget.update_basket_selection()
 
     def enable_collect(self, state):
         """
@@ -627,7 +622,7 @@ class TreeBrick(BaseWidget):
         log = logging.getLogger("user_level_log")
 
         self.lims_samples = api.lims.get_samples(
-            api.beamline_setup.session_hwobj.proposal_id, api.session.session_id
+            api.session.proposal_id, api.session.session_id
         )
 
         basket_list = []
@@ -687,7 +682,8 @@ class TreeBrick(BaseWidget):
                         log.warning(
                             "The sample with the barcode (%s) exists" % sc_sample.code
                             + " in LIMS but the location does not mat"
-                            + "ch. Sample changer location: %s, LIMS " % sc_sample.location
+                            + "ch. Sample changer location: %s, LIMS "
+                            % sc_sample.location
                             + "location %s" % lims_sample.lims_location
                         )
                         sample_list.append(sc_sample)
@@ -1151,12 +1147,16 @@ class TreeBrick(BaseWidget):
 
     def update_enable_collect(self):
 
-        #Do not allow to start xray imaging from BeamLocation and DataCollection phase
+        # Do not allow to start xray imaging from BeamLocation and DataCollection phase
         self.enable_collect_conditions["imaging"] = True
         for item in self.get_selected_items():
-            if isinstance(item, queue_item.XrayImagingQueueItem) and \
-                api.diffractometer.get_current_phase() in ("BeamLocation", "DataCollection"):
-                 self.enable_collect_conditions["imaging"] = False
+            if isinstance(
+                item, queue_item.XrayImagingQueueItem
+            ) and api.diffractometer.get_current_phase() in (
+                "BeamLocation",
+                "DataCollection",
+            ):
+                self.enable_collect_conditions["imaging"] = False
 
         enable_collect = all(
             item == True for item in self.enable_collect_conditions.values()
@@ -1187,9 +1187,10 @@ class TreeBrick(BaseWidget):
                             + "(Wait till the machine current reaches 90 mA)"
                         )
                     elif key == "imaging":
-                        logging.getLogger("GUI").warning("To start an imaging collection "
+                        logging.getLogger("GUI").warning(
+                            "To start an imaging collection "
                             + "diffractometer has to be in SampleCentering or in Transfer phase"
-                            ) 
+                        )
         self.dc_tree_widget.enable_collect_condition = enable_collect
         self.dc_tree_widget.toggle_collect_button_enabled()
 
