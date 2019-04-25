@@ -71,10 +71,6 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         self.mesh_results_widget.heat_map_widget.setFixedWidth(1300)
         self.line_results_widget.heat_map_widget.setFixedWidth(1300)
 
-    def run(self):
-        self.mesh_results_widget.init_api()
-        self.line_results_widget.init_api()
-
     def populate_widget(self, item):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
