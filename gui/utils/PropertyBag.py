@@ -122,12 +122,12 @@ class IntegerProperty(Property):
 
     def set_value(self, property_value):
         try:
-            newValue = int(property_value)
+            new_value = int(property_value)
         except ValueError:
             raise ValueError("%s is not a valid integer value." % repr(property_value))
 
         self.old_value = self.value
-        self.value = newValue
+        self.value = new_value
 
 
 class BooleanProperty(Property):
@@ -165,12 +165,12 @@ class ComboProperty(Property):
         return self.choices
 
     def set_value(self, property_value):
-        strValue = str(property_value)
+        str_value = str(property_value)
 
         for choice in self.choices:
-            if strValue == choice:
+            if str_value == choice:
                 self.old_value = self.value
-                self.value = strValue
+                self.value = str_value
                 return
         raise ValueError(
             "%s is not a valid choice for combo" % repr(str(property_value))
@@ -185,12 +185,12 @@ class FloatProperty(Property):
 
     def set_value(self, property_value):
         try:
-            newValue = float(property_value)
+            new_value = float(property_value)
         except ValueError:
             raise ValueError("%s is not a valid float value" % repr(property_value))
 
         self.old_value = self.value
-        self.value = newValue
+        self.value = new_value
 
 
 class FileProperty(Property):
@@ -203,10 +203,10 @@ class FileProperty(Property):
     def set_value(self, property_value):
         import os.path
 
-        newValue = os.path.abspath(str(property_value))
+        new_value = os.path.abspath(str(property_value))
 
         self.old_value = self.value
-        self.value = newValue
+        self.value = new_value
 
     def get_filter(self):
         return self.filter
@@ -313,7 +313,7 @@ class PropertyBag:
         self.update_editor()
 
     def update_editor(self):
-        for propname, prop in self.properties.items():
+        for prop_name, prop in self.properties.items():
             if prop._editor is not None:
                 # the properties are being edited,
                 # refresh property editor
@@ -324,9 +324,9 @@ class PropertyBag:
                 break
 
     def del_property(self, property_name):
-        ed = None
-        for propname, prop in self.properties.items():
-            ed = prop._editor
+        prop_editor = None
+        for prop_name, prop in self.properties.items():
+            prop_editor = prop._editor
             break
 
         try:
@@ -335,7 +335,7 @@ class PropertyBag:
             pass
         else:
             try:
-                editor = ed()
+                editor = prop_editor()
                 if editor is not None:
                     editor.set_property_bag(self)
             except TypeError:
@@ -380,11 +380,10 @@ class PropertyBag:
     def __len__(self):
         return len(self.properties)
 
-    def __getitem__(self, propertyKey):
-        item = self.properties.get(propertyKey)
-        if item is not None:
-            return self.properties[propertyKey].get_value()
-
+    def __getitem__(self, property_key):
+        item = self.properties.get(property_key)
+        return None if item is None else item.get_value()
+ 
     def __setitem__(self, property_name, property):
         self.properties[property_name] = property
 

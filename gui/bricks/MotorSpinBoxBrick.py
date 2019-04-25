@@ -69,6 +69,7 @@ class MotorSpinBoxBrick(BaseWidget):
         self.move_step = 1
         self.demand_move = 0
         self.in_expert_mode = None
+        self.position_history = []
 
         # Properties ----------------------------------------------------------
         self.add_property("mnemonic", "string", "")
@@ -347,7 +348,7 @@ class MotorSpinBoxBrick(BaseWidget):
 
     def open_history_menu(self):
         menu = QtImport.QMenu(self)
-        for item in self.pos_history:
+        for item in self.position_history:
             menu.addAction(item, self.go_to_history_pos)
         menu.popup(QtImport.QCursor.pos())
 
@@ -356,10 +357,10 @@ class MotorSpinBoxBrick(BaseWidget):
 
     def update_history(self, pos):
         pos = str(pos)
-        if pos not in self.pos_history:
-            if len(self.pos_history) == MotorSpinBoxBrick.MAX_HISTORY:
-                del self.pos_history[-1]
-            self.pos_history.insert(0, pos)
+        if pos not in self.position_history:
+            if len(self.position_history) == MotorSpinBoxBrick.MAX_HISTORY:
+                del self.position_history[-1]
+            self.position_history.insert(0, pos)
 
     def open_step_editor(self):
         if self.isRunning():
@@ -563,7 +564,7 @@ class MotorSpinBoxBrick(BaseWidget):
                 instance_filter=True,
             )
 
-        self.pos_history = []
+        self.position_history = []
         self.update_gui()
         # self['label'] = self['label']
         # self['defaultStep']=self['defaultStep']
