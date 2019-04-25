@@ -83,7 +83,9 @@ class DoorInterlockBrick(BaseWidget):
         self.state_label.setToolTip("Shows the current door state")
         self.unlock_door_button.setToolTip("Unlocks the doors")
 
-        self.connect(api.door_interlock, "doorInterlockStateChanged", self.state_changed)
+        self.connect(
+            api.door_interlock, "doorInterlockStateChanged", self.state_changed
+        )
         api.door_interlock.update_values()
 
     def unlock_doors(self):

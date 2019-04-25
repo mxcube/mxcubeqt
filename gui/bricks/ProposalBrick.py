@@ -641,9 +641,7 @@ class ProposalBrick(BaseWidget):
                                 break
 
         if todays_session is None:
-            is_inhouse = api.session.is_inhouse(
-                proposal["code"], proposal["number"]
-            )
+            is_inhouse = api.session.is_inhouse(proposal["code"], proposal["number"])
             if not is_inhouse:
                 if BaseWidget.is_instance_role_client():
                     self.refuse_login(

@@ -382,11 +382,8 @@ class PropertyBag:
 
     def __getitem__(self, property_key):
         item = self.properties.get(property_key)
-        value = None
-        if item is not None:
-            value = self.properties[property_key].get_value()
-        return value
-
+        return None if item is None else item.get_value()
+ 
     def __setitem__(self, property_name, property):
         self.properties[property_name] = property
 

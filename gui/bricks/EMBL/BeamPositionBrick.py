@@ -227,8 +227,9 @@ class BeamPositionBrick(BaseWidget):
                     "focusingModeChanged",
                     self.focus_mode_changed,
                 )
-            self.beam_focusing_hwobj = self.get_hardware_object(new_value,
-                                                                optional=True)
+            self.beam_focusing_hwobj = self.get_hardware_object(
+                new_value, optional=True
+            )
             if self.beam_focusing_hwobj is not None:
                 self.connect(
                     self.beam_focusing_hwobj,
@@ -238,8 +239,9 @@ class BeamPositionBrick(BaseWidget):
                 mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
                 self.focus_mode_changed(mode, beam_size)
         elif property_name == "hwobj_beamline_test":
-            self.beamline_test_hwobj = self.get_hardware_object(new_value,
-                                                                optional=True)
+            self.beamline_test_hwobj = self.get_hardware_object(
+                new_value, optional=True
+            )
         elif property_name == "enableCenterBeam":
             self.center_beam_button.setVisible(new_value)
         elif property_name == "enableMeasureFlux":
@@ -300,8 +302,11 @@ class BeamPositionBrick(BaseWidget):
         conf_msg = "This will start automatic beam centering. Continue?"
         if (
             QtImport.QMessageBox.warning(
-                None, "Question", conf_msg,
-                QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
+                None,
+                "Question",
+                conf_msg,
+                QtImport.QMessageBox.Ok,
+                QtImport.QMessageBox.Cancel,
             )
             == QtImport.QMessageBox.Ok
         ):
@@ -327,8 +332,11 @@ class BeamPositionBrick(BaseWidget):
         )
         if (
             QtImport.QMessageBox.warning(
-                None, "Question", conf_msg,
-                QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
+                None,
+                "Question",
+                conf_msg,
+                QtImport.QMessageBox.Ok,
+                QtImport.QMessageBox.Cancel,
             )
             == QtImport.QMessageBox.Ok
         ):

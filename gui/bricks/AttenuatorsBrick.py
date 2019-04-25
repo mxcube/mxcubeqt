@@ -95,18 +95,14 @@ class AttenuatorsBrick(BaseWidget):
     def run(self):
         """Init api and start gui"""
         if api.transmission is not None:
-            self.connect(api.transmission,
-                         "deviceReady",
-                         self.connected)
-            self.connect(api.transmission,
-                         "deviceNotReady",
-                         self.disconnected)
-            self.connect(api.transmission,
-                         "stateChanged",
-                         self.transmission_state_changed)
-            self.connect(api.transmission,
-                         "valueChanged",
-                         self.transmission_value_changed)
+            self.connect(api.transmission, "deviceReady", self.connected)
+            self.connect(api.transmission, "deviceNotReady", self.disconnected)
+            self.connect(
+                api.transmission, "stateChanged", self.transmission_state_changed
+            )
+            self.connect(
+                api.transmission, "valueChanged", self.transmission_value_changed
+            )
             self.connected()
             api.transmission.update_values()
         else:
@@ -125,15 +121,11 @@ class AttenuatorsBrick(BaseWidget):
             == QtImport.QValidator.Acceptable
         ):
             Colors.set_widget_color(
-                self.new_value_ledit,
-                Colors.LINE_EDIT_CHANGED,
-                QtImport.QPalette.Base
+                self.new_value_ledit, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
             )
         else:
             Colors.set_widget_color(
-                self.new_value_ledit,
-                Colors.LINE_EDIT_ERROR,
-                QtImport.QPalette.Base
+                self.new_value_ledit, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
             )
 
     def current_value_changed(self):
@@ -147,9 +139,7 @@ class AttenuatorsBrick(BaseWidget):
             api.transmission.set_value(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
-                self.new_value_ledit,
-                Colors.LINE_EDIT_ACTIVE,
-                QtImport.QPalette.Base
+                self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
             )
 
     def transmission_state_changed(self, transmission_state):
@@ -157,7 +147,7 @@ class AttenuatorsBrick(BaseWidget):
         Colors.set_widget_color(
             self.new_value_ledit,
             self.STATES.get(transmission_state, Colors.LIGHT_GRAY),
-            QtImport.QPalette.Base
+            QtImport.QPalette.Base,
         )
 
     def transmission_value_changed(self, new_value):

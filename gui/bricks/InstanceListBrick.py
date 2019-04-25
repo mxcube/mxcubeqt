@@ -17,6 +17,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+from HardwareRepository.HardwareObjects import InstanceServer
+from gui.BaseComponents import BaseWidget
+from gui.utils import Colors, Icons, QtImport
 import os
 import sys
 import smtplib
@@ -29,10 +32,6 @@ if sys.version_info[0] == 3:
 else:
     from email import Utils as utils
 
-from gui.utils import Colors, Icons, QtImport
-from gui.BaseComponents import BaseWidget
-from HardwareRepository.HardwareObjects import InstanceServer
-
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -43,7 +42,6 @@ WANTS_CONTROL_EVENT = QtImport.QEvent.User
 
 
 class WantsControlEvent(QtImport.QEvent):
-
     def __init__(self, client_id):
         QtImport.QEvent.__init__(self, WANTS_CONTROL_EVENT)
         self.client_id = client_id
@@ -53,15 +51,14 @@ START_SERVER_EVENT = QtImport.QEvent.User + 1
 
 
 class StartServerEvent(QtImport.QEvent):
-
     def __init__(self):
         QtImport.QEvent.__init__(self, START_SERVER_EVENT)
+
 
 APP_BRICK_EVENT = QtImport.QEvent.User + 2
 
 
 class AppBrickEvent(QtImport.QEvent):
-
     def __init__(self, brick_name, widget_name, method_name, method_args, master_sync):
         QtImport.QEvent.__init__(self, APP_BRICK_EVENT)
         self.brick_name = brick_name
@@ -97,7 +94,6 @@ USER_INFO_DIALOG_EVENT = QtImport.QEvent.User + 5
 
 
 class UserInfoDialogEvent(QtImport.QEvent):
-
     def __init__(self, msg, fromaddrs, toaddrs, subject, is_local, font_size):
         QtImport.QEvent.__init__(self, USER_INFO_DIALOG_EVENT)
         self.msg = msg
@@ -161,7 +157,9 @@ class InstanceListBrick(BaseWidget):
         self.users_listwidget = QtImport.QListWidget(_main_gbox)
         self.users_listwidget.setFixedHeight(50)
 
-        self.give_control_chbox = QtImport.QCheckBox("Selecting gives control", _main_gbox)
+        self.give_control_chbox = QtImport.QCheckBox(
+            "Selecting gives control", _main_gbox
+        )
         self.give_control_chbox.setChecked(False)
         self.allow_timeout_control_chbox = QtImport.QCheckBox(
             "Allow timeout control", _main_gbox
@@ -171,7 +169,9 @@ class InstanceListBrick(BaseWidget):
         # self.take_control_button = QtImport.QToolButton(_main_gbox)
         # self.take_control_button.setUsesTextLabel(True)
         self.take_control_button = QtImport.QToolButton(_main_gbox)
-        self.take_control_button.setToolButtonStyle(QtImport.Qt.ToolButtonTextBesideIcon)
+        self.take_control_button.setToolButtonStyle(
+            QtImport.Qt.ToolButtonTextBesideIcon
+        )
         # self.take_control_button.setUsesTextLabel(True)
         self.take_control_button.setText("Take control")
         self.take_control_button.setEnabled(True)
@@ -226,7 +226,9 @@ class InstanceListBrick(BaseWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        self.ask_control_button.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
+        self.ask_control_button.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed
+        )
 
         # Qt signal/slot connections ------------------------------------------
         _main_gbox.toggled.connect(_main_widget.setVisible)
@@ -401,7 +403,9 @@ class InstanceListBrick(BaseWidget):
                 BaseWidget.set_instance_user_id(BaseWidget.INSTANCE_USERID_INHOUSE)
                 self.ask_control_button.hide()
                 self.take_control_button.show()
-                self.take_control_button.setEnabled(BaseWidget.is_instance_role_server())
+                self.take_control_button.setEnabled(
+                    BaseWidget.is_instance_role_server()
+                )
                 if (
                     self.hutch_trigger_hwobj is not None
                     and not BaseWidget.is_instance_mode_master()
@@ -667,7 +671,9 @@ class InstanceListBrick(BaseWidget):
 
     def new_client(self, client_id):
         client_print = self.instance_server_hwobj.idPrettyPrint(client_id)
-        item = QtImport.QListWidgetItem(self.client_icon, client_print, self.users_listwidget)
+        item = QtImport.QListWidgetItem(
+            self.client_icon, client_print, self.users_listwidget
+        )
         item.setFlags(QtImport.Qt.ItemIsEnabled)
         self.connections[client_id[0]] = (item, client_id[1])
 
@@ -742,13 +748,19 @@ class InstanceListBrick(BaseWidget):
             self.take_control_button.setEnabled(False)
             self.ask_control_button.setEnabled(False)
 
-            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.SingleSelection)
+            self.users_listwidget.setSelectionMode(
+                QtImport.QAbstractItemView.SingleSelection
+            )
             # self.users_listwidget.setSelectionModel()
             self.users_listwidget.clearSelection()
             for item_index in range(self.users_listwidget.count()):
-                self.users_listwidget.item(item_index).setFlags(QtImport.Qt.ItemIsEnabled)
+                self.users_listwidget.item(item_index).setFlags(
+                    QtImport.Qt.ItemIsEnabled
+                )
                 # tem.setFlags(QtImport.QtCore.QtImport.Qt.NoItemFlags)
-            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.NoSelection)
+            self.users_listwidget.setSelectionMode(
+                QtImport.QAbstractItemView.NoSelection
+            )
         else:
             if self.xmlrpc_server:
                 self.xmlrpc_server.close()
@@ -831,11 +843,19 @@ class InstanceListBrick(BaseWidget):
             self.users_listwidget.clearSelection()
             # item = self.users_listwidget.item(0)
             for item_index in range(self.users_listwidget.count()):
-                self.users_listwidget.item(item_index).setFlags(QtImport.Qt.ItemIsEnabled)
-            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.SingleSelection)
-            control_item.setFlags(QtImport.Qt.ItemIsEnabled | QtImport.Qt.ItemIsSelectable)
+                self.users_listwidget.item(item_index).setFlags(
+                    QtImport.Qt.ItemIsEnabled
+                )
+            self.users_listwidget.setSelectionMode(
+                QtImport.QAbstractItemView.SingleSelection
+            )
+            control_item.setFlags(
+                QtImport.Qt.ItemIsEnabled | QtImport.Qt.ItemIsSelectable
+            )
             control_item.setSelected(True)
-            self.users_listwidget.setSelectionMode(QtImport.QAbstractItemView.NoSelection)
+            self.users_listwidget.setSelectionMode(
+                QtImport.QAbstractItemView.NoSelection
+            )
             self.in_control = list(has_control_id)
             self.update_mirroring()
 
@@ -924,7 +944,9 @@ class InstanceListBrick(BaseWidget):
                     self.give_control_msgbox.setButtonText(
                         QtImport.QMessageBox.Yes, "Allow (%d secs)" % self.timeout_left
                     )
-                    self.give_control_msgbox.setButtonText(QtImport.QMessageBox.No, "Deny")
+                    self.give_control_msgbox.setButtonText(
+                        QtImport.QMessageBox.No, "Deny"
+                    )
                     self.timeout_timer.start(1000)
                     res = self.give_control_msgbox.exec_()
                     self.timeout_timer.stop()
@@ -1065,7 +1087,11 @@ class LineEditInput(QtImport.QLineEdit):
     Notes      : Returns 1/3 of the width in the sizeHint from QtGui.QLineEdit
     """
 
-    PARAMETER_STATE = {"INVALID": QtImport.Qt.red, "OK": QtImport.Qt.white, "WARNING": QtImport.Qt.yellow}
+    PARAMETER_STATE = {
+        "INVALID": QtImport.Qt.red,
+        "OK": QtImport.Qt.white,
+        "WARNING": QtImport.Qt.yellow,
+    }
 
     inputValidSignal = QtImport.pyqtSignal(bool)
 
@@ -1079,17 +1105,23 @@ class LineEditInput(QtImport.QLineEdit):
         self.palette2.setColor(
             QtImport.QPalette.Active,
             QtImport.QPalette.Base,
-            self.origPalette.brush(QtImport.QPalette.Disabled, QtImport.QPalette.Background).color(),
+            self.origPalette.brush(
+                QtImport.QPalette.Disabled, QtImport.QPalette.Background
+            ).color(),
         )
         self.palette2.setColor(
             QtImport.QPalette.Inactive,
             QtImport.QPalette.Base,
-            self.origPalette.brush(QtImport.QPalette.Disabled, QtImport.QPalette.Background).color(),
+            self.origPalette.brush(
+                QtImport.QPalette.Disabled, QtImport.QPalette.Background
+            ).color(),
         )
         self.palette2.setColor(
             QtImport.QPalette.Disabled,
             QtImport.QPalette.Base,
-            self.origPalette.brush(QtImport.QPalette.Disabled, QtImport.QPalette.Background).color(),
+            self.origPalette.brush(
+                QtImport.QPalette.Disabled, QtImport.QPalette.Background
+            ).color(),
         )
 
     def return_pressed(self):
@@ -1166,7 +1198,6 @@ class LineEditInput(QtImport.QLineEdit):
 
 
 class NickEditInput(LineEditInput):
-
     def txtChanged(self, txt):
         txt = str(txt)
         valid = None
@@ -1174,12 +1205,16 @@ class NickEditInput(LineEditInput):
             if self.hasAcceptableInput():
                 valid = True
                 Colors.set_widget_color(
-                    self, LineEditInput.PARAMETER_STATE["WARNING"], QtImport.QPalette.Base
+                    self,
+                    LineEditInput.PARAMETER_STATE["WARNING"],
+                    QtImport.QPalette.Base,
                 )
             else:
                 valid = False
                 Colors.set_widget_color(
-                    self, LineEditInput.PARAMETER_STATE["INVALID"], QtImport.QPalette.Base
+                    self,
+                    LineEditInput.PARAMETER_STATE["INVALID"],
+                    QtImport.QPalette.Base,
                 )
         self.textChanged.emit(txt)
         if valid is not None:
@@ -1192,7 +1227,6 @@ class NickEditInput(LineEditInput):
 
 
 class ExternalUserInfoDialog(QtImport.QDialog):
-
     def __init__(self):
         QtImport.QDialog.__init__(self, None)
         self.setWindowTitle("mxCuBE")
@@ -1229,7 +1263,9 @@ class ExternalUserInfoDialog(QtImport.QDialog):
         # Layout --------------------------------------------------------------
 
         # SizePolicies --------------------------------------------------------
-        self.message_box.setSizePolicy(QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed)
+        self.message_box.setSizePolicy(
+            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed
+        )
 
         # Qt signal/slot connections ------------------------------------------
 

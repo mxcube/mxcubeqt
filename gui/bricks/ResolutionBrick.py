@@ -124,9 +124,7 @@ class ResolutionBrick(BaseWidget):
     def run(self):
         if api.detector_distance is not None:
             self.connect(
-                    api.detector_distance,
-                    "deviceReady",
-                    self.detector_distance_ready,
+                api.detector_distance, "deviceReady", self.detector_distance_ready
             )
             self.connect(
                 api.detector_distance,
@@ -139,9 +137,7 @@ class ResolutionBrick(BaseWidget):
                 self.detector_distance_state_changed,
             )
             self.connect(
-                api.detector_distance,
-                "positionChanged",
-                self.detector_distance_changed,
+                api.detector_distance, "positionChanged", self.detector_distance_changed
             )
             self.connect(
                 api.detector_distance,
@@ -160,8 +156,12 @@ class ResolutionBrick(BaseWidget):
             self.connect(api.resolution, "deviceReady", self.resolution_ready)
             self.connect(api.resolution, "deviceNotReady", self.resolution_not_ready)
             self.connect(api.resolution, "stateChanged", self.resolution_state_changed)
-            self.connect(api.resolution, "positionChanged", self.resolution_value_changed)
-            self.connect(api.resolution, "limitsChanged", self.resolution_limits_changed)
+            self.connect(
+                api.resolution, "positionChanged", self.resolution_value_changed
+            )
+            self.connect(
+                api.resolution, "limitsChanged", self.resolution_limits_changed
+            )
 
             if api.resolution.is_ready():
                 api.resolution.update_values()
@@ -269,9 +269,7 @@ class ResolutionBrick(BaseWidget):
             self.get_detector_distance_limits()
             curr_detector_distance = api.detector_distance.get_position()
             self.detector_distance_changed(curr_detector_distance)
-            self.detector_distance_state_changed(
-                api.detector_distance.get_state()
-            )
+            self.detector_distance_state_changed(api.detector_distance.get_state())
             if self.units_combobox.currentText() == "mm":
                 groupbox_title = "Detector distance"
                 self.new_value_validator.setRange(
@@ -374,9 +372,7 @@ class ResolutionBrick(BaseWidget):
                 detector_ready = api.detector_distance.is_ready()
 
         if detector_ready:
-            self.detector_distance_limits_changed(
-                api.detector_distance.get_limits()
-            )
+            self.detector_distance_limits_changed(api.detector_distance.get_limits())
         else:
             self.detector_distance_limits = None
 

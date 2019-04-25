@@ -685,12 +685,10 @@ class GridViewGraphicsItem(QtImport.QGraphicsItem):
                             # comp_y = self.num_comp_y - comp_y + 1
                             hole_y = self.num_holes_y - hole_y + 1
                             corner_x = (
-                                comp_x
-                                * (self.size_comp_x + self.offset_comp)
+                                comp_x * (self.size_comp_x + self.offset_comp)
                             ) + (hole_x * (self.size_hole + self.offset_hole))
                             corner_y = (
-                                comp_y
-                                * (self.size_comp_y + self.offset_comp)
+                                comp_y * (self.size_comp_y + self.offset_comp)
                             ) + (hole_y * (self.size_hole + self.offset_hole))
                             painter.drawRect(
                                 corner_x, corner_y, self.size_hole, self.size_hole
@@ -711,8 +709,7 @@ class GridViewGraphicsItem(QtImport.QGraphicsItem):
         self.num_holes_y = params_dict["comp_num_col"]
 
         self.size_hole = 2000 / (
-            self.num_comp_x
-            * (self.offset_comp + self.num_holes_x * self.offset_hole)
+            self.num_comp_x * (self.offset_comp + self.num_holes_x * self.offset_hole)
         )
         self.size_comp_x = (self.size_hole + self.offset_hole) * self.num_holes_x
         self.size_comp_y = (self.size_hole + self.offset_hole) * self.num_holes_y
@@ -764,14 +761,7 @@ class GridViewOverlayItem(GridViewGraphicsItem):
         if not hole_y & 1:
             hole_x = self.num_holes_x - hole_x + 1
 
-        return (
-            comp_x,
-            comp_y,
-            hole_x,
-            hole_y,
-            timepoint_x,
-            timepoint_y,
-        )
+        return (comp_x, comp_y, hole_x, hole_y, timepoint_x, timepoint_y)
 
     def paint(self, painter, option, widget):
         """
@@ -823,10 +813,5 @@ class GridViewOverlayItem(GridViewGraphicsItem):
                 )
                 if timepoint_y <= 1:
                     draw_hole_timeseries(
-                        comp_x,
-                        comp_y,
-                        hole_x,
-                        hole_y,
-                        timepoint_x,
-                        timepoint_y,
+                        comp_x, comp_y, hole_x, hole_y, timepoint_x, timepoint_y
                     )

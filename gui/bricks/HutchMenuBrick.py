@@ -128,7 +128,11 @@ class HutchMenuBrick(BaseWidget):
         self.connect(api.graphics, "centringStarted", self.centring_started)
         self.connect(api.graphics, "centringFailed", self.centring_failed)
         self.connect(api.graphics, "centringSuccessful", self.centring_successful)
-        self.connect(api.graphics, "diffractometerPhaseChanged", self.diffractometer_phase_changed)
+        self.connect(
+            api.graphics,
+            "diffractometerPhaseChanged",
+            self.diffractometer_phase_changed,
+        )
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "enableAutoFocus":
@@ -245,11 +249,14 @@ class HutchMenuBrick(BaseWidget):
 def refresh_camera_clicked():
     api.graphics.refresh_camera()
 
+
 def visual_align_clicked():
     api.graphics.start_visual_align()
 
+
 def select_all_clicked():
     api.graphics.select_all_points()
+
 
 def clear_all_clicked():
     """
@@ -257,14 +264,18 @@ def clear_all_clicked():
     """
     api.graphics.clear_all()
 
+
 def auto_focus_clicked():
     api.graphics.auto_focus()
+
 
 def auto_center_clicked():
     api.graphics.start_auto_centring()
 
+
 def create_line_clicked():
     api.graphics.create_line()
+
 
 def draw_grid_clicked():
     api.graphics.create_grid()

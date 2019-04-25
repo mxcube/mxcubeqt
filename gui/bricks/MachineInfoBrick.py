@@ -75,19 +75,19 @@ class MachineInfoBrick(BaseWidget):
         else:
             self.setEnabled(False)
 
-    def set_value(self, values_list):
+    def set_value(self, values_dict):
         """Slot connected to the valuesChanged signal
            At first time initializes gui by adding necessary labels.
            If the gui is initialized then update labels with values
         """
         if self.graphics_initialized is None:
-            for item in values_list.values():
+            for item in values_dict.values():
                 temp_widget = CustomInfoWidget(self)
                 temp_widget.init_info(item, self["maxPlotPoints"])
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
         self.graphics_initialized = True
-        for index, value in enumerate(values_list.values()):
+        for index, value in enumerate(values_dict.values()):
             self.value_label_list[index].update_info(value)
 
 

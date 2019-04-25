@@ -59,18 +59,20 @@ class MarvinBrick(BaseWidget):
 
         self.puck_switches_gbox = QtImport.QGroupBox("Puck switches", self)
         self.puck_switches_table = QtImport.QTableWidget(self.puck_switches_gbox)
-        self.central_puck_ledit = QtImport.QLineEdit("No center puck",
-                                                     self.puck_switches_gbox)
+        self.central_puck_ledit = QtImport.QLineEdit(
+            "No center puck", self.puck_switches_gbox
+        )
 
         self.control_gbox = QtImport.QGroupBox("Control", self)
         self.open_lid_button = QtImport.QPushButton("Open lid", self.control_gbox)
         self.close_lid_button = QtImport.QPushButton("Close lid", self.control_gbox)
-        self.base_to_center_button = QtImport.QPushButton("Base to center",
-                                                          self.control_gbox)
-        self.center_to_base_button = QtImport.QPushButton("Center to base",
-                                                          self.control_gbox)
-        self.dry_gripper_button = QtImport.QPushButton("Dry gripper",
-                                                       self.control_gbox)
+        self.base_to_center_button = QtImport.QPushButton(
+            "Base to center", self.control_gbox
+        )
+        self.center_to_base_button = QtImport.QPushButton(
+            "Center to base", self.control_gbox
+        )
+        self.dry_gripper_button = QtImport.QPushButton("Dry gripper", self.control_gbox)
 
         self.status_list_gbox = QtImport.QGroupBox("Status list", self)
         self.status_table = QtImport.QTableWidget(self)
@@ -156,8 +158,9 @@ class MarvinBrick(BaseWidget):
             ["Property", "Description", "Value"]
         )
 
-        self.puck_switches_gbox.setSizePolicy(QtImport.QSizePolicy.Preferred,
-                                              QtImport.QSizePolicy.Fixed)
+        self.puck_switches_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed
+        )
         self.init_tables()
         self.connect(api.sample_changer, "statusListChanged", self.status_list_changed)
         self.connect(api.sample_changer, "infoDictChanged", self.info_dict_changed)
@@ -216,9 +219,7 @@ class MarvinBrick(BaseWidget):
             self.focus_mode_ledit.setText(info_dict.get("focus_mode"))
 
         for index in range(self.puck_switches_table.columnCount()):
-            self.puck_switches_table.item(0, index).setBackground(
-                Colors.LIGHT_GRAY
-            )
+            self.puck_switches_table.item(0, index).setBackground(Colors.LIGHT_GRAY)
             if info_dict.get("puck_switches", 0) & pow(2, index) > 0:
                 self.puck_switches_table.item(0, index).setBackground(
                     Colors.LIGHT_GREEN
@@ -260,12 +261,14 @@ class MarvinBrick(BaseWidget):
         self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
         self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
+
 def open_lid_clicked():
     """
     Opens SC lid
     :return:
     """
     api.sample_changer.open_lid()
+
 
 def close_lid_clicked():
     """
@@ -274,6 +277,7 @@ def close_lid_clicked():
     """
     api.sample_changer.close_lid()
 
+
 def base_to_center_clicked():
     """
     Calls base-to-center function
@@ -281,12 +285,14 @@ def base_to_center_clicked():
     """
     api.sample_changer.base_to_center()
 
+
 def center_to_base_clicked():
     """
     Calls center-to-base function
     :return:
     """
     api.sample_changer.center_to_base()
+
 
 def dry_gripper_clicked():
     """
