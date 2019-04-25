@@ -85,8 +85,6 @@ class TaskToolBoxBrick(BaseWidget):
         if api.session.session_id:
             self.setEnabled(True)
 
-        self.task_tool_box_widget.init_api()
-
         api.graphics.connect("pointSelected", self.point_selected)
 
         self.request_tree_brick.emit()

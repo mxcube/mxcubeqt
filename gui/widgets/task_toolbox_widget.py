@@ -168,9 +168,9 @@ class TaskToolBoxWidget(QtImport.QWidget):
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_expert_mode(state)
 
-    def enable_compression(self, status):
+    def enable_compression(self, state):
         for i in range(0, self.tool_box.count()):
-            self.tool_box.widget(i).enable_compression(status)
+            self.tool_box.widget(i).enable_compression(state)
 
     def set_tree_brick(self, brick):
         """Sets the tree brick of each page in the toolbox.
