@@ -66,7 +66,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        if hasattr(parent.get_hardware_object("beamline-setup"), "gphl_workflow_hwobj"):
+        if hasattr(api, "gphl_workflow") and api.gphl_workflow is not None:
             self.gphl_workflow_page = CreateGphlWorkflowWidget(
                 self.tool_box, "gphl_workflow"
             )

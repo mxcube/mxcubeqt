@@ -36,6 +36,7 @@ from gui.bricks import LogViewBrick
 from gui.BaseLayoutItems import ContainerCfg
 
 from HardwareRepository import HardwareRepository
+from HardwareRepository.ConvertUtils import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -669,7 +670,7 @@ class GUIEditorWindow(QtImport.QWidget):
         self.tree_widget.setDragEnabled(True)
         self.tree_widget.setAcceptDrops(True)
 
-        if isinstance(icon, str):
+        if isinstance(icon, string_types):
             new_treewidget_item.setIcon(0, Icons.load_icon(icon))
         self.tree_widget.setCurrentItem(new_treewidget_item)
         self.tree_widget.scrollToItem(
