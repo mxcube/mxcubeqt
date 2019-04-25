@@ -135,6 +135,28 @@ class TaskToolBoxWidget(QtImport.QWidget):
             )
 
         # Other ---------------------------------------------------------------
+        in_plate_mode = api.diffractometer.in_plate_mode()
+
+        if (
+            api.energyscan is None
+            or in_plate_mode
+            or not api.beamline_setup.tunable_wavelength()
+        ):
+            self.hide_task(self.energy_scan_page)
+            logging.getLogger("HWR").info("Energy scan task not available")
+
+        if api.xrf_spectrum is None or in_plate_mode:
+            self.hide_task(self.xrf_spectrum_page)
+            logging.getLogger("HWR").info("XRF spectrum task not available")
+
+        if not hasattr(api.beamline_setup, "xray_imaging_hwobj") or in_plate_mode:
+            self.hide_task(self.xray_imaging_page)
+            logging.getLogger("HWR").info("Xray Imaging task not available")
+
+        if api.gphl_connection and api.gphl_workflow:
+            self.gphl_workflow_page.initialise_workflows()
+        else:
+            logging.getLogger("HWR").info("GPhL workflow task not available")
 
     def adjust_width(self, width):
         # Adjust periodic table width
@@ -165,33 +187,6 @@ class TaskToolBoxWidget(QtImport.QWidget):
             acq_widget = self.tool_box.widget(i).get_acquisition_widget()
             if acq_widget:
                 acq_widget.use_osc_start(status)
-
-    def init_api(self):
-        for i in range(0, self.tool_box.count()):
-            self.tool_box.widget(i).init_api()
-
-        in_plate_mode = api.diffractometer.in_plate_mode()
-
-        if (
-            api.energyscan is None
-            or in_plate_mode
-            or not api.beamline_setup.tunable_wavelength()
-        ):
-            self.hide_task(self.energy_scan_page)
-            logging.getLogger("HWR").info("Energy scan task not available")
-
-        if api.xrf_spectrum is None or in_plate_mode:
-            self.hide_task(self.xrf_spectrum_page)
-            logging.getLogger("HWR").info("XRF spectrum task not available")
-
-        if not hasattr(api.beamline_setup, "xray_imaging_hwobj") or in_plate_mode:
-            self.hide_task(self.xray_imaging_page)
-            logging.getLogger("HWR").info("Xray Imaging task not available")
-
-        if api.gphl_connection and api.gphl_workflow:
-            self.gphl_workflow_page.initialise_workflows()
-        else:
-            logging.getLogger("HWR").info("GPhL workflow task not available")
 
     def hide_task(self, task_page):
         self.tool_box.removeItem(self.tool_box.indexOf(task_page))

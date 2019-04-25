@@ -20,6 +20,8 @@
 import copy
 import logging
 
+import api
+
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -45,6 +47,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
 
         # Internal variables --------------------------------------------------
         self.count_time = None
+        self.xrf_spectrum_model = None
 
         self.init_models()
 
@@ -146,12 +149,12 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = self._graphics_manager_hwobj.get_scene_snapshot()
+                cpos.snapshot_image = api.graphics.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = self._graphics_manager_hwobj.get_scene_snapshot(shape)
+                    snapshot = api.graphics.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot

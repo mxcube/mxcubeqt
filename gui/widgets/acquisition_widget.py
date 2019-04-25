@@ -193,6 +193,8 @@ class AcquisitionWidget(QtImport.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
+        self.init_limits()
+
     def use_max_osc_range(self, state):
         self.acq_widget_layout.max_osc_range_cbx.setEnabled(state)
 
@@ -248,7 +250,6 @@ class AcquisitionWidget(QtImport.QWidget):
             top_limit = max_osc_speed * float(
                 self.acq_widget_layout.exp_time_ledit.text()
             )
-
             self.osc_range_per_frame_validator.setTop(top_limit)
             tool_tip = (
                 "Oscillation range per frame limits 0 : "
@@ -365,7 +366,7 @@ class AcquisitionWidget(QtImport.QWidget):
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
 
-    def init_api(self):
+    def init_limits(self):
         limits_dict = api.beamline_setup.get_acquisition_limit_values()
 
         if "osc_range" in limits_dict:

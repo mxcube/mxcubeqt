@@ -849,10 +849,10 @@ class GUIEditorWindow(QtImport.QWidget):
                         self, "Cannot add item", new_item, QtImport.QMessageBox.Ok
                     )
                 else:
-                    new_item["properties"].get_property("w").set_value(
+                    new_item["properties"].getProperty("w").setValue(
                         QtImport.QApplication.desktop().width()
                     )
-                    new_item["properties"].get_property("h").set_value(
+                    new_item["properties"].getProperty("h").setValue(
                         QtImport.QApplication.desktop().height()
                     )
                     new_list_item = self.append_item(

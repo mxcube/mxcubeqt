@@ -587,9 +587,9 @@ class InstanceListBrick(BaseWidget):
         except BaseException:
             logging.getLogger().debug("Problem executing an external call")
 
-    def instance_location_changed(self, location):
+    def instance_location_changed(self, loc):
         logging.getLogger().info(
-            "Instance running in %s" % InstanceListBrick.LOCATIONS[location].lower()
+            "Instance running in %s" % InstanceListBrick.LOCATIONS[loc].lower()
         )
 
     def instance_mode_changed(self, mode):

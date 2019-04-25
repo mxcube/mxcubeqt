@@ -42,10 +42,10 @@ class XRFSpectrumParametersBrick(BaseWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
     def populate_xrf_widget(self, item):
-        self.xrf_spectrum_widget.data_path_widget._base_image_dir = (
+        self.xrf_spectrum_widget.data_path_widget.set_base_image_directory(
             api.session.get_base_image_directory()
         )
-        self.xrf_spectrum_widget.data_path_widget._base_process_dir = (
+        self.xrf_spectrum_widget.data_path_widget.set_base_process_directory(
             api.session.get_base_process_directory()
         )
         self.xrf_spectrum_widget.populate_widget(item)

@@ -89,6 +89,7 @@ class DoorInterlockBrick(BaseWidget):
         api.door_interlock.update_values()
 
     def unlock_doors(self):
+        self.unlock_door_button.setEnabled(False)
         api.door_interlock.unlock_door_interlock()
 
     def updateLabel(self, label):

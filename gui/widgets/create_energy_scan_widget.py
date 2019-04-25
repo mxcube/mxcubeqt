@@ -95,17 +95,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-    def set_expert_mode(self, state):
-        self._adjust_transmission_cbox.setEnabled(state)
-        self._max_transmission_label.setEnabled(state)
-        self._max_transmission_ledit.setEnabled(state)
-
-    def enable_compression(self, state):
-        CreateTaskBase.enable_compression(self, False)
-
-    def init_api(self):
-        CreateTaskBase.init_api(self)
-
         try:
             self._periodic_table_widget.set_elements(api.energyscan.getElements())
 
@@ -119,6 +108,14 @@ class CreateEnergyScanWidget(CreateTaskBase):
                 self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
         except BaseException:
             pass
+
+    def set_expert_mode(self, state):
+        self._adjust_transmission_cbox.setEnabled(state)
+        self._max_transmission_label.setEnabled(state)
+        self._max_transmission_ledit.setEnabled(state)
+
+    def enable_compression(self, state):
+        CreateTaskBase.enable_compression(self, False)
 
     def init_models(self):
 

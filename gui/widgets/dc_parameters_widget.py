@@ -84,9 +84,6 @@ class DCParametersWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-    def init_api(self):
-        self._acq_widget.init_api()
-
     def _prefix_ledit_change(self, new_value):
         prefix = self._data_collection.acquisitions[0].path_template.get_prefix()
         self._data_collection.set_name(prefix)

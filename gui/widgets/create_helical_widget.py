@@ -122,6 +122,14 @@ class CreateHelicalWidget(CreateTaskBase):
         )
         self.enable_widgets(False)
 
+        shapes = api.graphics.get_shapes()
+        for shape in shapes:
+            if isinstance(shape, GraphicsItemLine):
+                self.shape_created(shape, "Line")
+        api.graphics.connect("shapeCreated", self.shape_created)
+        api.graphics.connect("shapeChanged", self.shape_changed)
+        api.graphics.connect("shapeDeleted", self.shape_deleted)
+
     def enable_widgets(self, state):
         self._acq_widget.setEnabled(state)
         self._data_path_widget.setEnabled(state)
@@ -138,16 +146,6 @@ class CreateHelicalWidget(CreateTaskBase):
         self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
              "default_helical_values"
         )
-
-    def init_api(self):
-        # At startup, if scene loaded from file, then update listwidget
-        shapes = api.graphics.get_shapes()
-        for shape in shapes:
-            if isinstance(shape, GraphicsItemLine):
-                self.shape_created(shape, "Line")
-        api.graphics.connect("shapeCreated", self.shape_created)
-        api.graphics.connect("shapeChanged", self.shape_changed)
-        api.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def shape_created(self, shape, shape_type):
         if shape_type == "Line":

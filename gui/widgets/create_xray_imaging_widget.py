@@ -169,7 +169,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
             self._path_template = data_model.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
-            self._acquisition_parameters = data_model.acquisition.acquisition_parameters
+            self._acquisition_parameters = data_model.acquisitions[0].acquisition_parameters
             self._acq_widget.update_data_model(
                 self._acquisition_parameters, self._path_template
             )
@@ -202,6 +202,9 @@ class CreateXrayImagingWidget(CreateTaskBase):
         else:
             detector_distance_list.append(None)
 
+        do_it = True
+        #run_num = 1
+
         for detector_distance in detector_distance_list:
             xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)
             if detector_distance:
@@ -209,6 +212,14 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
             acq = self._create_acq(sample)
             acq.acquisition_parameters.centred_position = cpos
+            acq.path_template.base_prefix = self.get_default_prefix(sample)
+
+            if do_it:
+                do_it = False
+                self._path_template.run_number = \
+                    api.queue_model.get_next_run_number(
+                    acq.path_template)
+                acq.path_template.run_number = self._path_template.run_number
 
             dc = queue_model_objects.XrayImaging(
                 xray_imaging_parameters, acq, sample.crystals[0]
@@ -217,6 +228,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
             dc.set_number(acq.path_template.run_number)
 
             dc_list.append(dc)
-            self._path_template.run_number += 1
 
+            self._path_template.run_number += 1
         return dc_list

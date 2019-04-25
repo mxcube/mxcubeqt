@@ -161,6 +161,25 @@ class CreateAdvancedWidget(CreateTaskBase):
         else:
             self.setEnabled(False)
 
+        self._acq_widget.acq_widget_layout.osc_start_label.setText(
+            "Oscillation middle:"
+        )
+
+        hor_size, ver_size = api.beam_info.get_beam_size()
+        self.spacing[0] = hor_size
+        self.spacing[1] = ver_size
+
+        self._advanced_methods_widget.hor_spacing_ledit.setText(
+            "%.1f" % (hor_size * 1000)
+        )
+        self._advanced_methods_widget.ver_spacing_ledit.setText(
+            "%.1f" % (ver_size * 1000)
+        )
+
+        api.graphics.connect("shapeCreated", self.shape_created)
+        api.graphics.connect("shapeChanged", self.shape_changed)
+        api.graphics.connect("shapeDeleted", self.shape_deleted)
+
     def enable_widgets(self, state):
         return
         self._acq_widget.setEnabled(state)
@@ -186,31 +205,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
             "default_advanced_values"
         )
-
-    def init_api(self):
-        """
-        In plate mode oscillation start is in the middle of the grid
-        """
-        CreateTaskBase.init_api(self)
-
-        self._acq_widget.acq_widget_layout.osc_start_label.setText(
-            "Oscillation middle:"
-        )
-
-        hor_size, ver_size = api.beam_info.get_beam_size()
-        self.spacing[0] = hor_size
-        self.spacing[1] = ver_size
-
-        self._advanced_methods_widget.hor_spacing_ledit.setText(
-            "%.1f" % (hor_size * 1000)
-        )
-        self._advanced_methods_widget.ver_spacing_ledit.setText(
-            "%.1f" % (ver_size * 1000)
-        )
-
-        api.graphics.connect("shapeCreated", self.shape_created)
-        api.graphics.connect("shapeChanged", self.shape_changed)
-        api.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def set_beam_info(self, beam_info):
         self.spacing[0] = beam_info["size_x"]
@@ -287,9 +281,6 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self.setDisabled(False)
 
             if data_collection.is_mesh():
-                # sample_data_model = self.get_sample_item(tree_item).get_model()
-                # self._acq_widget.disable_inverse_beam(True)
-                # api.graphics.de_select_all()
                 api.graphics.select_shape(data_collection.grid)
                 self._advanced_methods_widget.grid_treewidget.setCurrentItem(
                     self._grid_map[data_collection.grid]
@@ -346,6 +337,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         :param shape_type: type of the object (point, line, grid)
         :type shape_type: str
         """
+
         if shape_type == "Grid":
             self._advanced_methods_widget.grid_treewidget.clearSelection()
             grid_properties = shape.get_properties()
@@ -361,7 +353,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 )
                 self._acq_widget.acq_widget_layout.exp_time_ledit.setText(
                     "%.6f" % exp_time
-                )
+                ) 
 
             grid_treewidget_item = QtImport.QTreeWidgetItem(
                 self._advanced_methods_widget.grid_treewidget, info_str_list
