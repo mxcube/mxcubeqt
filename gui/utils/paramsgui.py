@@ -153,7 +153,7 @@ class File(QtImport.QWidget):
 
         # do not allow qt to stretch us vertically
         policy = self.sizePolicy()
-        policy.setVerData(QtImport.QSizePolicy.Fixed)
+        policy.setVerticalPolicy(QtImport.QSizePolicy.Fixed)
         self.setSizePolicy(policy)
 
         QtImport.QHBoxLayout(self)
