@@ -21,7 +21,7 @@ import os.path
 import logging
 import sys
 
-from gui.utils import QtImport
+from gui.utils import QtImport, Colors
 
 
 """port of paramsgui - rhfogh Jan 2018
@@ -39,7 +39,7 @@ class LineEdit(QtImport.QLineEdit):
         self.setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
         if "defaultValue" in options:
-            self.setText(options["defaultValue"])
+            self.set_value(options["defaultValue"])
         self.setAlignment(QtImport.Qt.AlignRight)
         if options.get("readOnly"):
             self.setReadOnly(True)
@@ -54,6 +54,42 @@ class LineEdit(QtImport.QLineEdit):
     def get_value(self):
         return str(self.text())
 
+class FloatString(LineEdit):
+    def __init__(self, parent, options):
+        decimals =  options.get("decimals")
+        # NB We do NOT enforce a maximum number of decimals in edited text,
+        # ONly in set vaules.
+        if decimals is None:
+            self.formatstr = '%s'
+        else:
+            self.formatstr = '%%.%sf' % decimals
+        LineEdit.__init__(self,parent, options)
+        self.validator =QtImport.QDoubleValidator(self)
+        val = options.get("lowerBound")
+        if val is not None:
+            self.validator.setBottom(val)
+        val = options.get("upperBound")
+        if val is not None:
+            self.validator.setTop(val)
+        self.textChanged.connect(self.input_field_changed)
+
+
+    def input_field_changed(self, input_field_text):
+        if (
+            self.validator.validate(input_field_text, 0)[0]
+            == QtImport.QValidator.Acceptable
+        ):
+            Colors.set_widget_color(
+                self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+            )
+        else:
+            Colors.set_widget_color(
+                self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
+            )
+
+    def set_value(self, value):
+        self.setText(self.formatstr % value)
+
 
 class TextEdit(QtImport.QTextEdit):
     def __init__(self, parent, options):
@@ -61,7 +97,7 @@ class TextEdit(QtImport.QTextEdit):
         self.setAlignment(QtImport.Qt.AlignLeft)
         self.__name = options["variableName"]
         if "defaultValue" in options:
-            self.setText(options["defaultValue"])
+            self.set_value(options["defaultValue"])
         self.setAlignment(QtImport.Qt.AlignRight)
         if options.get("readOnly"):
             self.setReadOnly(True)
@@ -269,6 +305,7 @@ WIDGET_CLASSES = {
     "combo": Combo,
     "spinbox": IntSpinBox,
     "text": LineEdit,
+    "floatstring": FloatString,
     "file": File,
     "message": Message,
     "boolean": CheckBox,
@@ -346,27 +383,6 @@ class FieldsWidget(QtImport.QWidget):
             if field.get_name() in values:
                 field.set_value(values[field.get_name()])
 
-    def __print_xml(self):
-        print(self.get_xml(True))
-
-    def get_xml(self, olof=False):
-        from lxml import etree
-
-        root = etree.Element("parameters")
-        for w in self.field_widgets:
-            name = w.get_name()
-            value = w.get_value()
-            if not olof:
-                param = etree.SubElement(root, w.get_name())
-                param.text = w.get_value()
-            else:
-                param = etree.SubElement(root, "parameter")
-                name_tag = etree.SubElement(param, "name")
-                value_tag = etree.SubElement(param, "value")
-                name_tag.text = name
-                value_tag.text = value
-
-        return etree.tostring(root, pretty_print=True)
 
     def get_parameters_map(self):
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
