@@ -17,6 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+
+"""PyQt GUI for runtiem queries - port of paramsgui - rhfogh Jan 2018
+
+Incorporates additions for GPhL workflow code"""
+
 import os.path
 import logging
 import sys
@@ -24,16 +29,13 @@ import sys
 from gui.utils import QtImport, Colors
 
 
-"""port of paramsgui - rhfogh Jan 2018
-
-Incorporates additions for GPhL workflow code"""
-
-
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
 class LineEdit(QtImport.QLineEdit):
+    """Standard LineEdit widget"""
+
     def __init__(self, parent, options):
         QtImport.QLineEdit.__init__(self, parent)
         self.setAlignment(QtImport.Qt.AlignLeft)
@@ -54,17 +56,20 @@ class LineEdit(QtImport.QLineEdit):
     def get_value(self):
         return str(self.text())
 
+
 class FloatString(LineEdit):
+    """LineEdit widget with validators and formatting for floating point numbers"""
+
     def __init__(self, parent, options):
-        decimals =  options.get("decimals")
+        decimals = options.get("decimals")
         # NB We do NOT enforce a maximum number of decimals in edited text,
         # ONly in set vaules.
         if decimals is None:
-            self.formatstr = '%s'
+            self.formatstr = "%s"
         else:
-            self.formatstr = '%%.%sf' % decimals
-        LineEdit.__init__(self,parent, options)
-        self.validator =QtImport.QDoubleValidator(self)
+            self.formatstr = "%%.%sf" % decimals
+        LineEdit.__init__(self, parent, options)
+        self.validator = QtImport.QDoubleValidator(self)
         val = options.get("lowerBound")
         if val is not None:
             self.validator.setBottom(val)
@@ -73,8 +78,8 @@ class FloatString(LineEdit):
             self.validator.setTop(val)
         self.textChanged.connect(self.input_field_changed)
 
-
     def input_field_changed(self, input_field_text):
+        """UI update function triggered by field value changes"""
         if (
             self.validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
@@ -92,6 +97,8 @@ class FloatString(LineEdit):
 
 
 class TextEdit(QtImport.QTextEdit):
+    """Standard text edit widget (multiline text)"""
+
     def __init__(self, parent, options):
         QtImport.QTextEdit.__init__(self, parent)
         self.setAlignment(QtImport.Qt.AlignLeft)
@@ -117,6 +124,8 @@ class TextEdit(QtImport.QTextEdit):
 
 
 class Combo(QtImport.QComboBox):
+    """STandard ComboBox (pulldown) widget"""
+
     def __init__(self, parent, options):
         QtImport.QComboBox.__init__(self, parent)
         self.__name = options["variableName"]
@@ -137,13 +146,15 @@ class Combo(QtImport.QComboBox):
 
 
 class File(QtImport.QWidget):
+    """Standard file selection widget"""
+
     def __init__(self, parent, options):
         QtImport.QWidget.__init__(self, parent)
 
         # do not allow qt to stretch us vertically
-        sp = self.sizePolicy()
-        sp.setVerData(QtImport.QSizePolicy.Fixed)
-        self.setSizePolicy(sp)
+        policy = self.sizePolicy()
+        policy.setVerData(QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(policy)
 
         QtImport.QHBoxLayout(self)
         self.__name = options["variableName"]
@@ -176,6 +187,8 @@ class File(QtImport.QWidget):
 
 
 class IntSpinBox(QtImport.QSpinBox):
+    """Standard integer (spinbox) widget"""
+
     CHANGED_COLOR = QtImport.QColor(255, 165, 0)
 
     def __init__(self, parent, options):
@@ -208,7 +221,9 @@ class IntSpinBox(QtImport.QSpinBox):
 
 
 class DoubleSpinBox(QtImport.QDoubleSpinBox):
-    CHANGED_COLOR = QtImport.QColor(255, 165, 0)
+    """Standard float/double (spinbox) widget"""
+
+    CHANGED_COLOR = Colors.LINE_EDIT_CHANGED
 
     def __init__(self, parent, options):
         QtImport.QDoubleSpinBox.__init__(self, parent)
@@ -240,6 +255,8 @@ class DoubleSpinBox(QtImport.QDoubleSpinBox):
 
 
 class Message(QtImport.QWidget):
+    """Message display widget"""
+
     def __init__(self, parent, options):
         QtImport.QWidget.__init__(self, parent)
         logging.debug("making message with options %r", options)
@@ -276,6 +293,8 @@ class Message(QtImport.QWidget):
 
 
 class CheckBox(QtImport.QCheckBox):
+    """Standard Boolean (CheckBox) widget"""
+
     def __init__(self, parent, options):
         QtImport.QCheckBox.__init__(self, options.get("uiLabel", "CheckBox"), parent)
         # self.setAlignment(QtImport.Qt.AlignLeft)
@@ -301,6 +320,7 @@ class CheckBox(QtImport.QCheckBox):
         return self.isChecked()
 
 
+# Mapping of type fields to Classes
 WIDGET_CLASSES = {
     "combo": Combo,
     "spinbox": IntSpinBox,
@@ -319,6 +339,8 @@ def make_widget(parent, options):
 
 
 class FieldsWidget(QtImport.QWidget):
+    """Collection-of-widgets widget for parameter query"""
+
     def __init__(self, fields, parent=None):
         QtImport.QWidget.__init__(self, parent)
         self.field_widgets = list()
@@ -340,27 +362,27 @@ class FieldsWidget(QtImport.QWidget):
             # and this mess gets rewritten
             if field["type"] == "message":
                 logging.debug("creating widget with options: %s", field)
-                w = make_widget(self, field)
+                widget = make_widget(self, field)
                 # message will be alone in the layout
                 # so that will not fsck up the layout
-                self.layout().addWidget(w, current_row, current_row, 0, 1)
+                self.layout().addWidget(widget, current_row, current_row, 0, 1)
             else:
                 logging.debug("creating widget with options: %s", field)
-                w = make_widget(self, field)
+                widget = make_widget(self, field)
                 # Temporary (like this brick ...) hack to get a nicer UI
-                if isinstance(w, TextEdit):
-                    w.setSizePolicy(
+                if isinstance(widget, TextEdit):
+                    widget.setSizePolicy(
                         QtImport.QSizePolicy.MinimumExpanding,
                         QtImport.QSizePolicy.Minimum,
                     )
                 else:
-                    w.setSizePolicy(
+                    widget.setSizePolicy(
                         QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
                     )
-                self.field_widgets.append(w)
+                self.field_widgets.append(widget)
                 if field["type"] == "boolean":
                     self.layout().addWidget(
-                        w, current_row, 0 + col_incr, 1, 2, QtImport.Qt.AlignLeft
+                        widget, current_row, 0 + col_incr, 1, 2, QtImport.Qt.AlignLeft
                     )
                 else:
                     label = QtImport.QLabel(pad + field["uiLabel"], self)
@@ -368,7 +390,7 @@ class FieldsWidget(QtImport.QWidget):
                         label, current_row, 0 + col_incr, QtImport.Qt.AlignLeft
                     )
                     self.layout().addWidget(
-                        w, current_row, 1 + col_incr, QtImport.Qt.AlignLeft
+                        widget, current_row, 1 + col_incr, QtImport.Qt.AlignLeft
                     )
 
             current_row += 1
@@ -379,9 +401,11 @@ class FieldsWidget(QtImport.QWidget):
                 pad = " " * 5
 
     def set_values(self, values):
+        """Set values for all fields from values dictionary"""
         for field in self.field_widgets:
             if field.get_name() in values:
                 field.set_value(values[field.get_name()])
 
     def get_parameters_map(self):
+        """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)

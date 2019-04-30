@@ -174,8 +174,7 @@ class GphlSetupWidget(QtImport.QWidget):
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
 
-    def __init__(
-        self, parent=None, name="gphl_acquisition_widget"):
+    def __init__(self, parent=None, name="gphl_acquisition_widget"):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget

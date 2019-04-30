@@ -65,7 +65,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
         self._gphl_diffractcal_widget = GphlDiffractcalWidget(
-            self._gphl_acq_widget, "gphl_diffractcal_widget",
+            self._gphl_acq_widget, "gphl_diffractcal_widget"
         )
 
         self._data_path_widget = DataPathWidget(
