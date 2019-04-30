@@ -383,6 +383,5 @@ class FieldsWidget(QtImport.QWidget):
             if field.get_name() in values:
                 field.set_value(values[field.get_name()])
 
-
     def get_parameters_map(self):
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
