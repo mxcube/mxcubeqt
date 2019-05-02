@@ -31,32 +31,6 @@ __license__ = "LGPLv3+"
 __author__ = "Rasmus H Fogh"
 
 
-class ParameterDialogWidget(QtImport.QWidget):
-    def __init__(self, parent=None, name="gphl_parameter_dialog_widget"):
-        QtImport.QWidget.__init__(self, parent)
-        if name is not None:
-            self.setObjectName(name)
-
-        # Properties ----------------------------------------------------------
-
-        # Signals ------------------------------------------------------------
-
-        # Slots ---------------------------------------------------------------
-
-        # Hardware objects ----------------------------------------------------
-
-        # Internal variables -------------------------------------------------
-
-        # Graphic elements ----------------------------------------------------
-
-    def get_parameters_map(self):
-        """Get key:value dictionary of parameter values"""
-        pass
-
-    def set_values(self, values_dict):
-        """set parameter values from input dictionary"""
-
-
 class SelectionTable(QtImport.QTableWidget):
     """Read-only table for data display and selection"""
 
