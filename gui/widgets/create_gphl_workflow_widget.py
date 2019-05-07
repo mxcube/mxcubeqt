@@ -246,6 +246,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     for tag in ("a", "b", "c", "alpha", "beta", "gamma")
                 )
             )
+            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
+            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
         else:
             # Coulds be native_... phasing_... etc.
 
@@ -264,6 +266,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
             wf.set_beam_energies(wf_parameters["beam_energies"])
+            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
+            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
 
         tasks.append(wf)
 
