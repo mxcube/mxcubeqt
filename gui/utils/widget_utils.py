@@ -191,7 +191,7 @@ class DataModelInputBinder(object):
             )
             if type_fn is float and validator:
                 pattern = "%." + str(validator.decimals()) + "f"
-                if getattr(self.__model, field_name) is not None: 
+                if getattr(self.__model, field_name) is not None:
                     widget.setText(pattern % float(getattr(self.__model, field_name)))
             else:
                 widget.setText(str(getattr(self.__model, field_name)))
