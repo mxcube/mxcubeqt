@@ -194,6 +194,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QTreeWidgetItem,
             QTreeWidgetItemIterator,
             QVBoxLayout,
+            QWhatsThis,
             QWidget,
         )
         from PyQt5.QtGui import (
