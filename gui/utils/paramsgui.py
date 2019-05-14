@@ -21,10 +21,14 @@
 """PyQt GUI for runtiem queries - port of paramsgui - rhfogh Jan 2018
 
 Incorporates additions for GPhL workflow code"""
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
 
 import os.path
 import logging
 import sys
+
+from HardwareRepository import ConvertUtils
 
 from gui.utils import QtImport, Colors
 
@@ -54,7 +58,7 @@ class LineEdit(QtImport.QLineEdit):
         return self.__name
 
     def get_value(self):
-        return str(self.text())
+        return ConvertUtils.text_type(self.text())
 
 
 class FloatString(LineEdit):
@@ -120,7 +124,7 @@ class TextEdit(QtImport.QTextEdit):
         return self.__name
 
     def get_value(self):
-        return str(self.text())
+        return ConvertUtils.text_type(self.text())
 
 
 class Combo(QtImport.QComboBox):
@@ -139,7 +143,7 @@ class Combo(QtImport.QComboBox):
         self.setCurrentIndex(self.findText(value))
 
     def get_value(self):
-        return str(self.currentText())
+        return ConvertUtils.text_type(self.currentText())
 
     def get_name(self):
         return self.__name
@@ -172,13 +176,13 @@ class File(QtImport.QWidget):
         self.filepath.setText(value)
 
     def get_value(self):
-        return str(self.filepath.text())
+        return ConvertUtils.text_type(self.filepath.text())
 
     def get_name(self):
         return self.__name
 
     def open_file_dialog(self):
-        start_path = os.path.dirname(str(self.filepath.text()))
+        start_path = os.path.dirname(ConvertUtils.text_type(self.filepath.text()))
         if not os.path.exists(start_path):
             start_path = ""
         path = QtImport.QFileDialog(self).getOpenFileName(directory=start_path)
@@ -214,7 +218,7 @@ class IntSpinBox(QtImport.QSpinBox):
 
     def get_value(self):
         val = int(self.value())
-        return str(val)
+        return ConvertUtils.text_type(val)
 
     def get_name(self):
         return self.__name
@@ -248,7 +252,7 @@ class DoubleSpinBox(QtImport.QDoubleSpinBox):
 
     def get_value(self):
         val = int(self.value())
-        return str(val)
+        return ConvertUtils.text_type(val)
 
     def get_name(self):
         return self.__name

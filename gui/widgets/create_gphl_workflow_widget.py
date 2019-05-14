@@ -30,6 +30,7 @@ from gui.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
 from gui.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from gui.widgets.gphl_data_dialog import GphlDataDialog
 
+from HardwareRepository import ConvertUtils
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import States
 
@@ -76,7 +77,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         data_path_layout.file_name_value_label.hide()
         data_path_layout.run_number_label.hide()
         data_path_layout.run_number_ledit.hide()
-        data_path_layout.prefix_ledit.setReadOnly(True)
         data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
@@ -120,7 +120,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def workflow_selected(self):
         # necessary as this comes in as a QString object
-        name = str(self._workflow_cbox.currentText())
+        name = ConvertUtils.text_type(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
@@ -130,15 +130,19 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
         if strategy_type == "transcal":
+            # NB Once we do not have to set unique prefixes, this should be readOnly
+            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_acq_widget.hide()
         elif strategy_type == "diffractcal":
             # TODO update this
+            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.show()
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
+            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
@@ -217,7 +221,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 )
 
         wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
-        wf_type = str(self._workflow_cbox.currentText())
+        wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
         if self.current_prefix:
