@@ -614,20 +614,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
             tab_label = str(self.tabText(index))
             label_list = tab_label.split()
-            found = False
-            try:
-                count = label_list[-1]
-                try:
-                    found = count[0] == "("
-                except BaseException:
-                    pass
-                else:
-                    try:
-                        found = count[-1] == ")"
-                    except BaseException:
-                        pass
-            except BaseException:
-                pass
+
             self.tabChangedSignal.emit(index, page)
 
             tab_name = self.objectName()
@@ -756,7 +743,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     pass
                 if found:
                     try:
-                        num = int(count[1:-1])
+                        int(count[1:-1])
                     except BaseException:
                         pass
                     else:
