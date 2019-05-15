@@ -23,6 +23,8 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
+from HardwareRepository import ConvertUtils
+
 from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
@@ -68,7 +70,7 @@ class SelectionTable(QtImport.QTableWidget):
             wdg = QtImport.QLineEdit(self)
             wdg.setFont(QtImport.QFont("Courier"))
             wdg.setReadOnly(True)
-            wdg.setText(str(text))
+            wdg.setText(ConvertUtils.text_type(text))
             if colours:
                 colour = colours[rowNum]
                 if colour:
