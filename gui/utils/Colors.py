@@ -84,7 +84,7 @@ def get_random_hex(alpha=255):
     )
 
 
-def get_random_numpy_color(alpha=255):
+def get_random_numpy_color():
     return (uniform(0, 1),
             uniform(0, 1),
             uniform(0, 1))

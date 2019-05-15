@@ -451,8 +451,6 @@ class Configuration:
             for prop in window_cfg.properties:
                 window_cfg_dict["properties"].append(prop.__getstate__())
 
-            children = []
-
             def add_children(item_cfg):
                 children = []
 
@@ -488,7 +486,6 @@ class Configuration:
 
             wl.append(window_cfg_dict)
         return wl
-        # pprint.pprint(wl)
 
     def save(self, filename):
         """Saves config"""

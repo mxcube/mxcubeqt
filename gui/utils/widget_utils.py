@@ -153,10 +153,11 @@ class DataModelInputBinder(object):
 
             if isinstance(widget, QtImport.QLineEdit): 
                 if type_fn is float and validator:
-                    value = float(getattr(self.__model, field_name))
-                    widget.setText(
-                        "{:g}".format(round(float(value), validator.decimals()))
-                    )
+                    if getattr(self.__model, field_name) is not None:
+                        value = float(getattr(self.__model, field_name))
+                        widget.setText(
+                            "{:g}".format(round(float(value), validator.decimals()))
+                        )
                 elif type_fn is int and validator:
                     value = int(getattr(self.__model, field_name))
                     widget.setText("%d" % value)
@@ -190,7 +191,8 @@ class DataModelInputBinder(object):
             )
             if type_fn is float and validator:
                 pattern = "%." + str(validator.decimals()) + "f"
-                widget.setText(pattern % float(getattr(self.__model, field_name)))
+                if getattr(self.__model, field_name) is not None:
+                    widget.setText(pattern % float(getattr(self.__model, field_name)))
             else:
                 widget.setText(str(getattr(self.__model, field_name)))
 

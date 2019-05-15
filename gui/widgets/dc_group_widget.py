@@ -121,7 +121,7 @@ class DCGroupWidget(QtImport.QWidget):
                     )
 
         for sw in sw_list:
-            color = Colors.get_random_numpy_color(alpha=50)
+            color = Colors.get_random_numpy_color()
             sw.append(color)
 
         self.subwedge_table.setRowCount(0)

@@ -154,6 +154,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QGroupBox, 
             QHBoxLayout,
             QHeaderView,
+            QInputDialog,
             QLabel,
             QLayout,
             QLineEdit,
@@ -193,6 +194,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QTreeWidgetItem,
             QTreeWidgetItemIterator,
             QVBoxLayout,
+            QWhatsThis,
             QWidget,
         )
         from PyQt5.QtGui import (
@@ -297,6 +299,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QKeySequence,
             QIcon,
             QImage,
+            QInputDialog,
             QIntValidator,
             QLabel,
             QLayout,
@@ -347,6 +350,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QValidator,
             QVBoxLayout,
             QWidget,
+            QWhatsThis,
         )
         from PyQt4.uic import loadUi
 
