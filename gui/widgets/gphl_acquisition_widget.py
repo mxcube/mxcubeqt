@@ -76,6 +76,7 @@ class GphlSetupWidget(QtImport.QWidget):
         self._widget_data = OrderedDict()
         self._data_object = GphlAcquisitionData()
         self._pulldowns = {}
+        self._pulldown_defaults = {}
         self._parameter_mib = DataModelInputBinder(self._data_object)
 
         # Graphic elements ----------------------------------------------------
@@ -120,7 +121,14 @@ class GphlSetupWidget(QtImport.QWidget):
             widget = self._widget_data[field_name][0]
             widget.clear()
             widget.addItems(list(QtImport.QString(tag) for tag in tags))
-            widget.setCurrentIndex(0)
+            default_label = self._pulldown_defaults.get(field_name)
+            if default_label is None:
+                widget.setCurrentIndex(0)
+                self._data_object.space_group = 0
+
+            else:
+                widget.setCurrentIndex(widget.findText(default_label))
+
 
     def set_parameter_value(self, name, value):
         """Set value - NB ComboBoxes are set by text, not index"""
@@ -221,8 +229,22 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
-        self._widget_data[field_name] = (widget, str, None, 0)
         self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
+        self._pulldown_defaults[field_name] = (api.gphl_workflow.default_dose_budget_label)
+        indx = self._pulldowns[field_name].index(api.gphl_workflow.default_dose_budget_label)
+        self._widget_data[field_name] = (widget, str, None, indx)
+
+        row += 1
+        field_name = "relative_rad_sensitivity"
+        label_name = self._get_label_name(field_name)
+        label_str = "Rel. radiation sensitivity"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QLineEdit()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        self._widget_data[field_name] = (widget, float, validator, 1.0)
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)
@@ -324,6 +346,21 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         self._widget_data[field_name] = (widget, str, None, 0)
 
         row += 1
+        field_name = "characterisation_strategy"
+        label_name = self._get_label_name(field_name)
+        label_str = "Characterisation strategy :"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QComboBox()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        self._widget_data[field_name] = (widget, str, None, 0)
+        strategy_names = (
+            api.gphl_workflow.getProperty("characterisation_strategies").split()
+        )
+        self._pulldowns[field_name] = strategy_names
+
+        row += 1
         field_name = "dose_budget"
         label_name = self._get_label_name(field_name)
         label_str = "Dose budget (MGy) :"
@@ -334,6 +371,21 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
         self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
+        self._pulldown_defaults[field_name] = (api.gphl_workflow.default_dose_budget_label)
+        indx = self._pulldowns[field_name].index(api.gphl_workflow.default_dose_budget_label)
+        self._widget_data[field_name] = (widget, str, None, indx)
+
+        row += 1
+        field_name = "relative_rad_sensitivity"
+        label_name = self._get_label_name(field_name)
+        label_str = "Rel. radiation sensitivity"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QLineEdit()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        self._widget_data[field_name] = (widget, float, validator, 1.0)
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)

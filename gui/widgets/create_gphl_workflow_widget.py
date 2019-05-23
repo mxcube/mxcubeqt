@@ -248,11 +248,16 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
             tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
             wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            # The entire strategy runs as a 'characterisation'
+            wf.set_characterisation_budget_fraction(1.0)
         else:
             # Coulds be native_... phasing_... etc.
 
             wf.set_space_group(
                 self._gphl_acq_param_widget.get_parameter_value("space_group")
+            )
+            wf.set_characterisation_strategy(
+                self._gphl_acq_param_widget.get_parameter_value("characterisation_strategy")
             )
             tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
@@ -268,6 +273,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_beam_energies(wf_parameters["beam_energies"])
             tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
             wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            val = self._gphl_acq_param_widget.get_parameter_value(
+                "relative_rad_sensitivity"
+            )
+            wf.set_relative_rad_sensitivity(val)
+            wf.set_characterisation_budget_fraction(
+                api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
+                / 100.0
+            )
 
         tasks.append(wf)
 
