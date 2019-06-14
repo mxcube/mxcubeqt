@@ -15,16 +15,15 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 from os.path import expanduser
 
 import api
+
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons, QtImport
-
-from HardwareRepository.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]

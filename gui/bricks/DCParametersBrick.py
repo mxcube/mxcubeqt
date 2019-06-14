@@ -82,11 +82,6 @@ class DCParametersBrick(BaseWidget):
 
         data_collection = item.get_model()
 
-        # if data_collection.is_helical():
-        #    self.advance_results_widget.show()
-        # else:
-        #    self.advance_results_widget.hide()
-
         self.snapshot_widget.display_snapshot(
             data_collection.acquisitions[
                 0

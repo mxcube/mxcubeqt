@@ -199,20 +199,6 @@ class TreeBrick(BaseWidget):
         # Other ---------------------------------------------------------------
         self.enable_collect(True)
         self.sample_changer_widget.synch_ispyb_button.setEnabled(False)
-        # self.setFixedWidth(315)
-        # self.sample_changer_widget.setFixedHeight(46)
-        # self.dc_tree_widget.set_centring_method(1)
-
-        if not api.sample_changer:
-            logging.getLogger("GUI").debug(
-                "TreeBrick: sample changer hwobj not defined."
-            )
-        if api.plate_manipulator is not None:
-            self.dc_tree_widget.init_plate_navigator(api.plate_manipulator)
-        else:
-            logging.getLogger("GUI").debug(
-                "TreeBrick: plate manipulator hwobj not defined."
-            )
 
         if api.sample_changer is not None:
             self.connect(
@@ -235,7 +221,10 @@ class TreeBrick(BaseWidget):
                 SampleChanger.STATUS_CHANGED_EVENT,
                 self.sample_changer_status_changed,
             )
-            # api.sample_changer.update_values()
+        else:
+            logging.getLogger("HWR").debug(
+                "TreeBrick: Sample changer not available."
+            )
 
         if api.plate_manipulator is not None:
             self.connect(
@@ -249,6 +238,10 @@ class TreeBrick(BaseWidget):
                 self.plate_info_changed,
             )
             api.plate_manipulator.update_values()
+        else:
+            logging.getLogger("GUI").debug(
+                "TreeBrick: plate manipulator hwobj not defined."
+            )
 
         self.connect(api.graphics, "shapeCreated", self.dc_tree_widget.shape_created)
         self.connect(api.graphics, "shapeChanged", self.dc_tree_widget.shape_changed)
@@ -741,16 +734,13 @@ class TreeBrick(BaseWidget):
 
         for basket in api.sample_changer.getBasketList():
             basket_index = basket.getIndex()
-            basket_code = basket.getID() or ""
             basket_name = basket.getName()
-            is_present = basket.isPresent()
             sc_basket_content.append((basket_index + 1, basket, basket_name))
 
         for sample in api.sample_changer.getSampleList():
             matrix = sample.getID() or ""
             basket_index = sample.getContainer().getIndex()
             sample_index = sample.getIndex()
-            basket_code = sample.getContainer().getID() or ""
             sample_name = sample.getName()
             sc_sample_content.append(
                 (matrix, basket_index + 1, sample_index + 1, sample_name)
@@ -765,19 +755,14 @@ class TreeBrick(BaseWidget):
 
         for row in api.plate_manipulator.getBasketList():
             row_index = row.getIndex()
-            row_code = row.getID() or ""
             row_name = row.getName()
-            is_present = row.isPresent()
             plate_row_content.append((row_index, row, row_name))
 
         for sample in api.plate_manipulator.getSampleList():
             row_index = sample.getCell().getRowIndex()
-            col_index = sample.getCell().getCol()
-            drop_index = sample.getDrop().getWellNo()
             sample_name = sample.getName()
             coords = sample.getCoords()
             matrix = sample.getID() or ""
-            # vial_index = ":".join(map(str, coords[1:]))
             plate_sample_content.append((matrix, coords[0], coords[1], sample_name))
 
         return plate_row_content, plate_sample_content
@@ -942,6 +927,7 @@ class TreeBrick(BaseWidget):
             self.hide_sample_tab.emit(True)
 
     def selection_changed_cb(self, items):
+        print items
         if len(items) == 1:
             item = items[0]
             if isinstance(item, queue_item.SampleQueueItem):

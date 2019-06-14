@@ -30,8 +30,13 @@ __category__ = "Beam definition"
 
 
 class CRLBrick(BaseWidget):
+<<<<<<< .mine
+||||||| .r5538
+
+=======
     """Inherited from BaseWidget"""
 
+>>>>>>> .r5556
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -58,8 +63,16 @@ class CRLBrick(BaseWidget):
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtImport.QGroupBox("CRL", self)
         self.mode_combo = QtImport.QComboBox(self.main_gbox)
+<<<<<<< .mine
+        self.set_according_to_energy_button = QtImport.QPushButton(
+            "Set", self.main_gbox
+        )
+||||||| .r5538
+        self.set_according_to_energy_button = QtImport.QPushButton("Set", self.main_gbox)
+=======
         self.set_according_to_energy_button = QtImport.QPushButton(
             "Set", self.main_gbox)
+>>>>>>> .r5556
         self.set_out_button = QtImport.QPushButton("Out", self.main_gbox)
         # self.align_beam_button = QtImport.QtGui.QPushButton("Align", self.main_gbox)
 

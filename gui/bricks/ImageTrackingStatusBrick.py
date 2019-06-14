@@ -15,7 +15,7 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
@@ -33,7 +33,6 @@ class ImageTrackingStatusBrick(BaseWidget):
         "tracking": Colors.LIGHT_GREEN,
         "disabled": Colors.LIGHT_GRAY,
         "error": Colors.LIGHT_RED,
-        "tracking": Colors.LIGHT_GREEN,
         "ready": Colors.LIGHT_BLUE,
     }
 
@@ -106,6 +105,12 @@ class ImageTrackingStatusBrick(BaseWidget):
                 self.image_tracking_cbox.setChecked(
                     self.image_tracking_hwobj.is_tracking_enabled() == True
                 )
+                self.filter_frames_cbox.setEnabled(
+                    self.image_tracking_hwobj.is_tracking_enabled()
+                )
+                self.spot_list_cbox.setEnabled(
+                    self.image_tracking_hwobj.is_tracking_enabled()
+                )
                 self.image_tracking_cbox.blockSignals(False)
                 self.connect(
                     self.image_tracking_hwobj,
@@ -125,6 +130,8 @@ class ImageTrackingStatusBrick(BaseWidget):
 
     def image_tracking_cbox_toggled(self, state):
         self.image_tracking_hwobj.set_image_tracking_state(state)
+        self.filter_frames_cbox.setEnabled(state)
+        self.spot_list_cbox.setEnabled(state)
 
     def filter_frames_cbox_toggled(self, state):
         self.image_tracking_hwobj.set_filter_frames_state(state)
@@ -140,9 +147,6 @@ class ImageTrackingStatusBrick(BaseWidget):
         except KeyError:
             state = "unknown"
             color = self.STATES[state]
-        # if color is None:
-        #    color = qt.QWidget.paletteBackgroundColor(self)
-
         if color:
             Colors.set_widget_color(self.state_label, color)
         if state_label is not None:

@@ -44,13 +44,15 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         self.define_slot("populate_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.mesh_results_widget = AdvancedResultsWidget(self, allow_adjust_size=True)
-        self.line_results_widget = AdvancedResultsWidget(self, allow_adjust_size=True)
+        self.show_raw_results_cbox = QtImport.QCheckBox("Raw results", self)
+        self.show_aligned_results_cbox = QtImport.QCheckBox("Aligned results", self)
+        self.raw_results_widget = AdvancedResultsWidget(self, show_aligned_results=False)
+        self.aligned_results_widget = AdvancedResultsWidget(self, show_aligned_results=True)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QHBoxLayout(self)
-        _main_vlayout.addWidget(self.mesh_results_widget)
-        _main_vlayout.addWidget(self.line_results_widget)
+        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout.addWidget(self.raw_results_widget)
+        _main_vlayout.addWidget(self.aligned_results_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -62,29 +64,26 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.line_results_widget.setHidden(True)
-        self.line_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
-        self.line_results_widget.heat_map_widget._summary_gbox.setHidden(True)
-        self.mesh_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
-        self.mesh_results_widget.heat_map_widget._summary_gbox.setHidden(True)
+        self.raw_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
+        self.raw_results_widget.heat_map_widget._summary_gbox.setHidden(True)
+        self.aligned_results_widget.setHidden(True)
+        self.aligned_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
+        self.aligned_results_widget.heat_map_widget._summary_gbox.setHidden(True)
 
-        self.mesh_results_widget.heat_map_widget.setFixedWidth(1300)
-        self.line_results_widget.heat_map_widget.setFixedWidth(1300)
+        self.aligned_results_widget.heat_map_widget.setFixedWidth(1300)
+        self.raw_results_widget.heat_map_widget.setFixedWidth(1300)
+
+        print "raw  ", self.raw_results_widget.heat_map_widget
+        print "aligned ", self.aligned_results_widget.heat_map_widget
 
     def populate_widget(self, item):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
             self.results_widget.populate_widget(item, data_collection)
-            self.line_results_widget.populate_widget(
+            self.raw_results_widget.populate_widget(
                 item, item.get_model().line_collection
             )
         else:
             data_collection = item.get_model()
-            if data_collection.is_mesh():
-                self.mesh_results_widget.setHidden(False)
-                self.line_results_widget.setHidden(True)
-                self.mesh_results_widget.populate_widget(item, data_collection)
-            else:
-                self.mesh_results_widget.setHidden(True)
-                self.line_results_widget.setHidden(False)
-                self.line_results_widget.populate_widget(item, data_collection)
+            self.raw_results_widget.populate_widget(item, data_collection)
+            self.aligned_results_widget.populate_widget(item, data_collection)

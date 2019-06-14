@@ -101,6 +101,13 @@ class CreateStillScanWidget(CreateTaskBase):
             api.beamline_setup._get_run_processing_parallel()
         )
 
+        #Rename to self._processing_widget.layout
+        self._processing_widget.processing_widget.resolution_cutoff_label.setHidden(False)
+        self._processing_widget.processing_widget.resolution_cutoff_ledit.setHidden(False)
+        self._processing_widget.processing_widget.pdb_file_label.setHidden(False)
+        self._processing_widget.processing_widget.pdb_file_ledit.setHidden(False)
+        self._processing_widget.processing_widget.pdb_file_browse_button.setHidden(False)
+
     def use_osc_start(self, status):
         """
         Enables osc start QLineEdit

@@ -419,13 +419,15 @@ class WrapperHO(QtImport.QObject):
     def __setstate__(self, dict):
         self.__dict__ = dict.copy()
         try:
-            #Python2 
+            # Python2
             import new
+
             self.setIn = new.instancemethod(lambda self: None, self)
             self.setOut = self.setIn
             self.getState = new.instancemethod(lambda self: "unknown", self)
-        except:
+        except BaseException:
             import types
+
             self.setIn = types.MethodType(lambda self: None, self)
             self.setOut = self.setIn
             self.getState = types.MethodType(lambda self: "unknown", self)

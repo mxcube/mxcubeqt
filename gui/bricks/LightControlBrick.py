@@ -14,8 +14,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU LesserGeneral Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
@@ -25,6 +25,7 @@ from gui.bricks import MotorSpinBoxBrick
 """
 Controls both the light on/off (light_actuator) and intensity (motor)
 """
+
 __category__ = "General"
 
 STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
@@ -38,7 +39,6 @@ STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
 
 
 class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
-
     def __init__(self, *args):
 
         MotorSpinBoxBrick.MotorSpinBoxBrick.__init__(self, *args)
@@ -67,8 +67,12 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
             "Switches on the light and sets the intensity back to the previous setting"
         )
 
-        self.light_off_button.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum)
-        self.light_on_button.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum)
+        self.light_off_button.setSizePolicy(
+            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum
+        )
+        self.light_on_button.setSizePolicy(
+            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum
+        )
 
     # Light off pressed: switch off lamp and set out the wago
 

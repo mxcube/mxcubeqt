@@ -15,10 +15,10 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 from gui.BaseComponents import BaseWidget
-from gui.utils import Icons, QtImport
+from gui.utils import QtImport
 from gui.utils.sample_changer_helper import SampleChanger
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 
@@ -154,10 +154,7 @@ class PlateManipulatorBrick(BaseWidget):
         )
         root_item.setExpanded(True)
         for xtal in self.plate_content.plate.xtal_list:
-            xtal_address = "%s:%d" % (xtal.row, xtal.column + 1)
             cell_treewidget_item = None
-            # cell_treewidget_item = self.plate_widget.xtal_treewidget.\
-            #    findItems(xtal_address, QtCore.Qt.MatchExactly, 0)[0]
             if not cell_treewidget_item:
                 cell_treewidget_item = root_item
 

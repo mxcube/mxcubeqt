@@ -29,7 +29,6 @@ __category__ = "General"
 
 
 class EnergyBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -144,7 +143,7 @@ class EnergyBrick(BaseWidget):
                 self.disconnected()
         else:
             self.disconnected()
- 
+
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "defaultMode":
             if new_value == "keV":

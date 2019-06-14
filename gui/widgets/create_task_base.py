@@ -79,7 +79,7 @@ class CreateTaskBase(QtImport.QWidget):
                 "energyLimitsChanged", self.set_energy_limits
             )
             api.transmission.connect(
-                "valueChanged", self.set_transmission
+                "transmissionChanged", self.set_transmission
             )
             api.transmission.connect(
                 "limitsChanged", self.set_transmission_limits
@@ -268,7 +268,7 @@ class CreateTaskBase(QtImport.QWidget):
         return result
 
     def set_energy(self, energy, wavelength):
-        if not self._item_is_dc() and energy:
+        if not self._item_is_dc() and energy is not None:
             acq_widget = self.get_acquisition_widget()
 
             if acq_widget:
@@ -276,16 +276,18 @@ class CreateTaskBase(QtImport.QWidget):
                 acq_widget.update_energy(energy, wavelength)
 
     def set_transmission(self, trans):
-        acq_widget = self.get_acquisition_widget()
+        if trans is not None:
+            acq_widget = self.get_acquisition_widget()
 
-        if not self._item_is_dc() and acq_widget:
-            acq_widget.update_transmission(trans)
+            if not self._item_is_dc() and acq_widget:
+                acq_widget.update_transmission(trans)
 
     def set_resolution(self, res):
-        acq_widget = self.get_acquisition_widget()
+        if res is not None:
+            acq_widget = self.get_acquisition_widget()
 
-        if not self._item_is_dc() and acq_widget:
-            acq_widget.update_resolution(res)
+            if not self._item_is_dc() and acq_widget:
+                acq_widget.update_resolution(res)
 
     def set_detector_roi_mode(self, detector_roi_mode):
         acq_widget = self.get_acquisition_widget()

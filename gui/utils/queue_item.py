@@ -417,6 +417,8 @@ class XrayImagingQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
+    def init_tool_tip(self):
+        return
 
 MODEL_VIEW_MAPPINGS = {
     queue_model_objects.DataCollection: DataCollectionQueueItem,

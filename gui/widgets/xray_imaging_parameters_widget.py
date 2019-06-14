@@ -15,9 +15,9 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from gui.utils import Colors, QtImport
+from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
 

@@ -64,7 +64,6 @@ The email feedback feature allows users to report any problem : an email
 is sent to the recipients specified in the emailAddresses property.
 """
 import os
-import sys
 import logging
 
 # import email.Utils

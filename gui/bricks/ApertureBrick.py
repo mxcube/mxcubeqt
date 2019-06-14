@@ -47,7 +47,7 @@ Apertures are allowed according the bam focusing mode.
 
 try:
     uni_chr = unichr
-except:
+except BaseException:
     uni_chr = chr
 
 from gui.utils import Colors, QtImport

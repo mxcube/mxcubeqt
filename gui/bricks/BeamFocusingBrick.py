@@ -27,7 +27,6 @@ __category__ = "Beam definition"
 
 
 class BeamFocusingBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -108,7 +107,11 @@ class BeamFocusingBrick(BaseWidget):
 
         if len(txt) > 0:
             confDialog = QtImport.QMessageBox.warning(
-                None, "Focus mode", txt, QtImport.QMessageBox.Ok, QtImport.QMessageBox.Cancel
+                None,
+                "Focus mode",
+                txt,
+                QtImport.QMessageBox.Ok,
+                QtImport.QMessageBox.Cancel,
             )
             if confDialog == QtImport.QMessageBox.Ok:
                 self.beam_focusing_combo.setCurrentIndex(-1)

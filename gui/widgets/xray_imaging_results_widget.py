@@ -15,9 +15,11 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+
+import api
 
 from gui.utils import Icons, QtImport
 from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
@@ -35,8 +37,6 @@ class XrayImagingResultsWidget(QtImport.QWidget):
             self.setObjectName(name)
 
         # Hardware objects ----------------------------------------------------
-        self.beamline_setup_hwobj = None
-        self.xray_imaging_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.current_image_num = 0
@@ -139,7 +139,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
             self.load_button_clicked
         )
         self.results_widget.first_image_button.clicked.connect(
-            self.first_image_button_clicked
+            first_image_button_clicked
         )
         self.results_widget.prev_image_button.clicked.connect(
             self.prev_image_button_clicked
@@ -157,28 +157,26 @@ class XrayImagingResultsWidget(QtImport.QWidget):
             self.last_image_button_clicked
         )
         self.results_widget.plus_quarter_button.clicked.connect(
-            self.plus_quater_button_clicked
+            plus_quater_button_clicked
         )
 
         self.results_widget.image_dial.valueChanged.connect(
-            self.dial_value_changed
+            dial_value_changed
         )
-        #self.results_widget.image_slider.valueChanged.connect(
-        #    self.slider_value_changed
-        #)
+
         self.results_widget.image_spinbox.valueChanged.connect(
-            self.spinbox_value_changed
+            spinbox_value_changed
         )
 
         self.results_widget.play_button.clicked.connect(self.play_button_clicked)
-        self.results_widget.stop_button.clicked.connect(self.stop_button_clicked)
-        self.results_widget.repeat_cbox.stateChanged.connect(self.repeat_state_changed)
+        self.results_widget.stop_button.clicked.connect(stop_button_clicked)
+        self.results_widget.repeat_cbox.stateChanged.connect(repeat_state_changed)
         self.results_widget.ff_apply_cbox.stateChanged.connect(
-            self.ff_apply_state_changed
+            ff_apply_state_changed
         )
 
-        self.start_centering_button.clicked.connect(self.start_centering_clicked)
-        self.accept_centering_button.clicked.connect(self.accept_centering_clicked)
+        self.start_centering_button.clicked.connect(start_centering_clicked)
+        self.accept_centering_button.clicked.connect(accept_centering_clicked)
 
         # Other ---------------------------------------------------------------
         self.results_widget.first_image_button.setIcon(Icons.load_icon("VCRRewind"))
@@ -194,8 +192,30 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.start_n_centering_button.setFixedSize(70, 50)
         self.accept_centering_button.setFixedSize(70, 50)
 
-        #self.results_widget.data_path_ledit.setText("/home/karpics/Downloads/data/data_1_00000.tif")
-        #self.results_widget.ff_path_ledit.setText("/home/karpics/Downloads/flatfield/ff_data_1_00000.tif")
+        if api.xray_imaging is not None:
+            api.xray_imaging.connect("imageInit", self.image_init)
+            api.xray_imaging.connect("imageLoaded", self.image_loaded)
+            api.xray_imaging.connect("measureItemChanged", self.measure_item_changed)
+
+            self.graphics_view = api.xray_imaging.get_graphics_view()
+            self._graphics_view_widget_vlayout.addWidget(self.graphics_view)
+            self.graphics_view_widget.setFixedSize(
+                self.graphics_view.scene().width(), self.graphics_view.scene().height()
+            )
+
+            self.setDisabled(False)
+        else:
+            self.setDisabled(True)
+
+    def refresh_gui(self):
+        self.results_widget.image_spinbox.blockSignals(True)
+        self.results_widget.image_spinbox.setValue(self.current_image_num)
+        self.results_widget.image_spinbox.blockSignals(False)
+
+        self.results_widget.prev_image_button.setDisabled(self.current_image_num == 0)
+        self.results_widget.next_image_button.setDisabled(
+            self.current_image_num == self.total_image_num - 1
+        )
 
     def contextMenuEvent(self, event):
         self.popup_menu.popup(QtImport.QCursor.pos())
@@ -224,28 +244,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.results_widget.config_path_ledit.setText(os.path.join(path_template.get_archive_directory(),
                                                                     config_filename))
 
-        self.xray_imaging_hwobj.set_osc_start(acq_params.osc_start)
-
-    def set_beamline_setup_hwobj(self, beamline_setup_hwobj):
-        self.beamline_setup_hwobj = beamline_setup_hwobj
-        self.xray_imaging_hwobj = beamline_setup_hwobj.xray_imaging_hwobj
-        if self.xray_imaging_hwobj is not None:
-            self.xray_imaging_hwobj.connect("imageInit", self.image_init)
-            self.xray_imaging_hwobj.connect("imageLoaded", self.image_loaded)
-            self.xray_imaging_hwobj.connect("measureItemChanged", self.measure_item_changed)
-
-            self.graphics_view = self.xray_imaging_hwobj.get_graphics_view()
-            self._graphics_view_widget_vlayout.addWidget(self.graphics_view)
-            self.graphics_view_widget.setFixedSize(
-                self.graphics_view.scene().width(), self.graphics_view.scene().height()
-            )
-
-            self.setDisabled(False)
-        else:
-            self.setDisabled(True)
-
-    def measure_distance_clicked(self):
-        self.xray_imaging_hwobj.start_measure_distance(wait_click=True)
+        api.xray_imaging.set_osc_start(acq_params.osc_start)
 
     def measure_item_changed(self, image_slice):
         self.histogram_plot.clear()
@@ -276,7 +275,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.refresh_gui()
 
     def ff_apply_state_changed(self, state):
-        self.xray_imaging_hwobj.set_ff_apply(state)
+        api.xray_imaging.set_ff_apply(state)
 
     def data_browse_button_clicked(self):
         file_dialog = QtImport.QFileDialog(self)
@@ -319,69 +318,55 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.results_widget.config_path_ledit.setText(selected_filename)
 
     def load_button_clicked(self):
-        self.xray_imaging_hwobj.load_images(
+        api.xray_imaging.load_images(
             str(self.results_widget.data_path_ledit.text()),
             str(self.results_widget.ff_path_ledit.text()),
             str(self.results_widget.config_path_ledit.text())
         )
 
-    def first_image_button_clicked(self):
-        self.xray_imaging_hwobj.display_image(0)
-
-    def prev_image_button_clicked(self):
-        self.xray_imaging_hwobj.display_image(self.current_image_num - 1)
-
-    def next_image_button_clicked(self):
-        self.xray_imaging_hwobj.display_image(self.current_image_num + 1)
-
-    def last_image_button_clicked(self):
-        self.xray_imaging_hwobj.display_image(self.total_image_num - 1)
-
-    def minus_quater_button_clicked(self):
-        self.xray_imaging_hwobj.display_relative_image(-90)
-
-    def plus_quater_button_clicked(self):
-        self.xray_imaging_hwobj.display_relative_image(90)
-
-    #def slider_value_changed(self, value):
-    #    self.xray_imaging_hwobj.display_image(value)
-
-    def dial_value_changed(self, value):
-        self.xray_imaging_hwobj.display_image(value)
-
-    def spinbox_value_changed(self, value):
-        self.xray_imaging_hwobj.display_image(value - 1)
-
     def play_button_clicked(self):
-        self.xray_imaging_hwobj.play_images(
+        api.xray_imaging.play_images(
             repeat=self.results_widget.repeat_cbox.isChecked()
         )
 
-    def stop_button_clicked(self):
-        self.xray_imaging_hwobj.stop_image_play()
+    def prev_image_button_clicked(self):
+        api.xray_imaging.display_image(self.current_image_num - 1)
 
-    def repeat_state_changed(self, state):
-        self.xray_imaging_hwobj.set_repeate_image_play(state)
+    def next_image_button_clicked(self):
+        api.xray_imaging.display_image(self.current_image_num + 1)
 
-    def start_centering_clicked(self):
-        self.xray_imaging_hwobj.start_centering()
+    def last_image_button_clicked(self):
+        api.xray_imaging.display_image(self.total_image_num - 1)
 
-    def start_n_centering_clicked(self):
-        self.xray_imaging_hwobj.start_n_centering()
+def measure_distance_clicked(self):
+    api.xray_imaging.start_measure_distance(wait_click=True)
 
-    def accept_centering_clicked(self):
-        self.beamline_setup_hwobj.shape_history_hwobj.accept_centring()
+def first_image_button_clicked():
+    api.xray_imaging.display_image(0)
 
-    def refresh_gui(self):
-        #self.results_widget.image_slider.blockSignals(True)
-        #self.results_widget.image_slider.setValue(self.current_image_num)
-        #self.results_widget.image_slider.blockSignals(False)
+def minus_quater_button_clicked(self):
+    api.xray_imaging.display_relative_image(-90)
 
-        self.results_widget.image_spinbox.blockSignals(True)
-        self.results_widget.image_spinbox.setValue(self.current_image_num)
-        self.results_widget.image_spinbox.blockSignals(False)
+def plus_quater_button_clicked():
+    api.xray_imaging.display_relative_image(90)
 
-        self.results_widget.prev_image_button.setDisabled(self.current_image_num == 0)
-        self.results_widget.next_image_button.setDisabled(
-            self.current_image_num == self.total_image_num - 1
-        )
+def dial_value_changed(value):
+    api.xray_imaging.display_image(value)
+
+def spinbox_value_changed(value):
+    api.xray_imaging.display_image(value - 1)
+
+def stop_button_clicked():
+    api.xray_imaging.stop_image_play()
+
+def repeat_state_changed(state):
+    api.xray_imaging.set_repeate_image_play(state)
+
+def start_centering_clicked():
+    api.xray_imaging.start_centering()
+
+def start_n_centering_clicked():
+    api.xray_imaging.start_n_centering()
+
+def accept_centering_clicked():
+    api.graphics.accept_centring()

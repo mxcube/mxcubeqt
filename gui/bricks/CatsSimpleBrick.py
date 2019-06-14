@@ -90,7 +90,6 @@ class CatsStatusView(QtImport.QGroupBox, BaseWidget):
 
 
 class CatsSimpleBrick(SampleChangerBrick):
-
     def __init__(self, *args):
 
         SampleChangerBrick.__init__(self, *args)
@@ -226,7 +225,10 @@ class CatsSimpleBrick(SampleChangerBrick):
     def _updateButtons(self):
         running = self._pathRunning and True or False
 
-        if self.state in [sc_helper.SampleChangerState.Ready, sc_helper.SampleChangerState.StandBy]:
+        if self.state in [
+            sc_helper.SampleChangerState.Ready,
+            sc_helper.SampleChangerState.StandBy,
+        ]:
             ready = not running
         else:
             ready = False

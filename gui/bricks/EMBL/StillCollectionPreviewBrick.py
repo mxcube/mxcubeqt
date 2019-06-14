@@ -297,7 +297,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         :param col: int
         :return: None
         """
-        if not self.grid_table_item_fixed:
+        if not self.grid_table_item_fixed and not self.image_tracking_cbox.isChecked():
             self.info_dict["grid_cell"] = (
                 row * self.current_grid_properties["grid_num_row"] + col
             )
@@ -353,7 +353,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         :param col: int
         :return: None
         """
-        if not self.comp_table_item_fixed:
+        if not self.comp_table_item_fixed and not self.image_tracking_cbox.isChecked():
             self.comp_cell_label.setText(
                 "Current compartment cell: %s%d" % (chr(65 + row), col + 1)
             )
@@ -536,7 +536,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         Updates grid table
         :return: None
         """
-        if self.params_dict is None:
+        if self.params_dict is None or not self.image_tracking_cbox.isChecked():
             return
 
         for row in range(self.current_grid_properties["grid_num_row"]):
@@ -573,7 +573,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         Updates comp. table
         :return: None
         """
-        if self.params_dict is None:
+        if self.params_dict is None or not self.image_tracking_cbox.isChecked():
             return
 
         for row in range(self.current_grid_properties["comp_num_row"]):

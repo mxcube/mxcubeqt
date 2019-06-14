@@ -28,7 +28,6 @@ __category__ = "Graphics"
 
 
 class GraphicsManagerBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -48,9 +47,7 @@ class GraphicsManagerBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QtImport.QGroupBox("Graphics items", self)
-        self.manager_widget = QtImport.load_ui_file(
-            "graphics_manager_layout.ui"
-        )
+        self.manager_widget = QtImport.load_ui_file("graphics_manager_layout.ui")
 
         # Layout --------------------------------------------------------------
         _groupbox_vlayout = QtImport.QVBoxLayout(self)
@@ -131,7 +128,9 @@ class GraphicsManagerBrick(BaseWidget):
         self.connect(api.graphics, "shapeCreated", self.shape_created)
         self.connect(api.graphics, "shapeDeleted", self.shape_deleted)
         self.connect(api.graphics, "shapeSelected", self.shape_selected)
-        self.connect(api.graphics, "centringInProgress", self.centring_in_progress_changed)
+        self.connect(
+            api.graphics, "centringInProgress", self.centring_in_progress_changed
+        )
 
     def shape_created(self, shape, shape_type):
         """
@@ -210,7 +209,9 @@ class GraphicsManagerBrick(BaseWidget):
 
     def shape_selected(self, shape, selected_state):
         if shape in self.__shape_map:
-            self.__shape_map[shape].setData(4, QtImport.Qt.DisplayRole, str(selected_state))
+            self.__shape_map[shape].setData(
+                4, QtImport.Qt.DisplayRole, str(selected_state)
+            )
             self.__shape_map[shape].setSelected(selected_state)
             if self.__point_map.get(shape):
                 self.__point_map[shape].setSelected(selected_state)
@@ -270,7 +271,7 @@ class GraphicsManagerBrick(BaseWidget):
         api.graphics.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
-        menu = QtImport.QMenu(self.manager_widget.shapes_treewidget)
+        QtImport.QMenu(self.manager_widget.shapes_treewidget)
 
     def get_spacing(self):
         spacing = [0, 0]
