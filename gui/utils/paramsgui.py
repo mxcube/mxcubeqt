@@ -67,7 +67,7 @@ class FloatString(LineEdit):
     def __init__(self, parent, options):
         decimals = options.get("decimals")
         # NB We do NOT enforce a maximum number of decimals in edited text,
-        # ONly in set vaules.
+        # Only in set values.
         if decimals is None:
             self.formatstr = "%s"
         else:
@@ -80,10 +80,14 @@ class FloatString(LineEdit):
         val = options.get("upperBound")
         if val is not None:
             self.validator.setTop(val)
+        self.update_function = options.get("update_function")
+
         self.textChanged.connect(self.input_field_changed)
 
     def input_field_changed(self, input_field_text):
         """UI update function triggered by field value changes"""
+        if self.update_function is not None:
+            self.update_function(self.parent())
         if (
             self.validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
@@ -138,6 +142,14 @@ class Combo(QtImport.QComboBox):
                 self.addItem(val)
         if "defaultValue" in options:
             self.set_value(options["defaultValue"])
+
+        self.update_function = options.get("update_function")
+        self.currentIndexChanged.connect(self.input_field_changed)
+
+    def input_field_changed(self, input_field_text):
+        """UI update function triggered by field value changes"""
+        if self.update_function is not None:
+            self.update_function(self.parent())
 
     def set_value(self, value):
         self.setCurrentIndex(self.findText(value))
@@ -403,6 +415,7 @@ class FieldsWidget(QtImport.QWidget):
                 col_incr += 2
                 current_row = 0
                 pad = " " * 5
+        self.update()
 
     def set_values(self, values):
         """Set values for all fields from values dictionary"""
@@ -413,3 +426,11 @@ class FieldsWidget(QtImport.QWidget):
     def get_parameters_map(self):
         """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
+
+    def update(self):
+        """Call update functions"""
+        for field in self.field_widgets:
+            if hasattr(field, 'update_function'):
+                update_function = field.update_function
+                if update_function:
+                    update_function(self)

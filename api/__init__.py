@@ -40,34 +40,39 @@ beamline_setup = None
 queue_model = None
 queue_manager = None
 
-CORE_HWOBJ_ROLES = ("transmission",
-                    "resolution",
-                    "energy",
-                    "flux",
-                    "beam_info",
-                    "omega_axis",
-                    "kappa_axis",
-                    "kappa_phi_axis",
-                    "detector",
-                    "detector_distance",
-                    "door_interlock",
-                    "fast_shutter",
-                    "safety_shutter",
-                    "machine_info",
-                    "session",
-                    "diffractometer",
-                    "collect")
+CORE_HWOBJ_ROLES = (
+    "transmission",
+    "resolution",
+    "energy",
+    "flux",
+    "beam_info",
+    "omega_axis",
+    "kappa_axis",
+    "kappa_phi_axis",
+    "detector",
+    "detector_distance",
+    "door_interlock",
+    "fast_shutter",
+    "safety_shutter",
+    "machine_info",
+    "session",
+    "diffractometer",
+    "collect",
+)
 
-ADDITIONAL_HWOBJ_ROLES = ("sample_changer",
-                          "plate_manipulator",
-                          "energyscan",
-                          "xrf_spectrum",
-                          "xray_imaging",
-                          "data_analysis",
-                          "auto_processing",
-                          "parallel_processing",
-                          "gphl_workflow",
-                          "gphl_connection",)
+ADDITIONAL_HWOBJ_ROLES = (
+    "sample_changer",
+    "plate_manipulator",
+    "energyscan",
+    "xrf_spectrum",
+    "xray_imaging",
+    "data_analysis",
+    "auto_processing",
+    "parallel_processing",
+    "gphl_workflow",
+    "gphl_connection",
+)
+
 
 def init(hwr_path):
     hwr = HardwareRepository.getHardwareRepository(hwr_path)
@@ -86,24 +91,35 @@ def init(hwr_path):
 
     for role in CORE_HWOBJ_ROLES:
         if hasattr(beamline_setup, "%s_hwobj" % role):
-            setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
+            setattr(
+                sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role)
+            )
         else:
             setattr(sys.modules[__name__], role, None)
-            logging.getLogger("HWR").warning("API: %s role is not defined in the beamline_setup" % role)
+            logging.getLogger("HWR").warning(
+                "API: %s role is not defined in the beamline_setup" % role
+            )
             error_count += 1
 
     for role in ADDITIONAL_HWOBJ_ROLES:
         if hasattr(beamline_setup, "%s_hwobj" % role):
-            setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
+            setattr(
+                sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role)
+            )
         else:
             setattr(sys.modules[__name__], role, None)
-
 
     if error_count == 0:
         logging.getLogger("HWR").info("Initializing of API done")
     else:
-        logging.getLogger("API").info("Initializing of API done (%d warning(s): see messages above)." % error_count)
-     
+        logging.getLogger("API").info(
+            "Initializing of API done (%d warning(s): see messages above)."
+            % error_count
+        )
 
     setattr(sys.modules[__name__], "lims", getattr(beamline_setup, "lims_client_hwobj"))
-    setattr(sys.modules[__name__], "graphics", getattr(beamline_setup, "shape_history_hwobj"))
+    setattr(
+        sys.modules[__name__],
+        "graphics",
+        getattr(beamline_setup, "shape_history_hwobj"),
+    )
