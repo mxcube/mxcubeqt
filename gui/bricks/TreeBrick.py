@@ -927,7 +927,6 @@ class TreeBrick(BaseWidget):
             self.hide_sample_tab.emit(True)
 
     def selection_changed_cb(self, items):
-        print items
         if len(items) == 1:
             item = items[0]
             if isinstance(item, queue_item.SampleQueueItem):

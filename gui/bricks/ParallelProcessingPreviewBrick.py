@@ -73,9 +73,6 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         self.aligned_results_widget.heat_map_widget.setFixedWidth(1300)
         self.raw_results_widget.heat_map_widget.setFixedWidth(1300)
 
-        print "raw  ", self.raw_results_widget.heat_map_widget
-        print "aligned ", self.aligned_results_widget.heat_map_widget
-
     def populate_widget(self, item):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection

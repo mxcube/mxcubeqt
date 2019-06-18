@@ -425,7 +425,7 @@ class WrapperHO(QtImport.QObject):
             self.setIn = new.instancemethod(lambda self: None, self)
             self.setOut = self.setIn
             self.getState = new.instancemethod(lambda self: "unknown", self)
-        except BaseException:
+        except ImportError:
             import types
 
             self.setIn = types.MethodType(lambda self: None, self)
