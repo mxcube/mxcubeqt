@@ -153,9 +153,6 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.results_widget.minus_quarter_button.clicked.connect(
             self.minus_quater_button_clicked
         )
-        self.results_widget.last_image_button.clicked.connect(
-            self.last_image_button_clicked
-        )
         self.results_widget.plus_quarter_button.clicked.connect(
             plus_quater_button_clicked
         )
@@ -274,9 +271,6 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         # self.results_widget.data_path_ledit.setText(filename)
         self.refresh_gui()
 
-    def ff_apply_state_changed(self, state):
-        api.xray_imaging.set_ff_apply(state)
-
     def data_browse_button_clicked(self):
         file_dialog = QtImport.QFileDialog(self)
        
@@ -337,6 +331,9 @@ class XrayImagingResultsWidget(QtImport.QWidget):
 
     def last_image_button_clicked(self):
         api.xray_imaging.display_image(self.total_image_num - 1)
+
+def ff_apply_state_changed(self, state):
+    api.xray_imaging.set_ff_apply(state)
 
 def measure_distance_clicked(self):
     api.xray_imaging.start_measure_distance(wait_click=True)

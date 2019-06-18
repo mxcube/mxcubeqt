@@ -40,7 +40,7 @@ class HeatMapWidget(QtImport.QWidget):
         QtImport.QWidget.__init__(self, parent)
 
         self.setObjectName("heat_map_widget")
-        self.__show_aligned_results = show_aligned_results
+        self._show_aligned_results = show_aligned_results
 
         # Properties ----------------------------------------------------------
 
@@ -254,7 +254,7 @@ class HeatMapWidget(QtImport.QWidget):
         ].acquisition_parameters
         self.__first_result = True
 
-        if not self.__show_aligned_results:
+        if not self._show_aligned_results:
             x_array = np.array([])
             y_array = np.zeros(acq_parameters.num_images)
 
@@ -327,7 +327,7 @@ class HeatMapWidget(QtImport.QWidget):
         elif score_type_index == 2:
             self.__score_key = "spots_num"
 
-        if not self.__show_aligned_results:
+        if not self._show_aligned_results:
             self._heat_map_plot.hide_all_curves()
             self._heat_map_plot.show_curve(self.__score_key)
             self.refresh()
@@ -339,7 +339,7 @@ class HeatMapWidget(QtImport.QWidget):
 
     def refresh(self):
         if self.__results_raw:
-            if not self.__show_aligned_results:
+            if not self._show_aligned_results:
                 self._heat_map_plot.adjust_axes(self.__score_key)
 
                 labels = []
@@ -441,7 +441,7 @@ class HeatMapWidget(QtImport.QWidget):
         self.__first_result = False
 
     def update_results(self, last_results):
-        if not self.__show_aligned_results:
+        if not self._show_aligned_results:
             self._heat_map_plot.update_curves(self.__results_raw)
             self.refresh()
         else:
@@ -494,7 +494,6 @@ class HeatMapWidget(QtImport.QWidget):
         Displays image in image tracker (by default adxv)
         """
         image, line, image_num, image_path = self.get_image_parameters_from_coord()
-        print image_path
         try:
             api.beamline_setup.image_tracking_hwobj.load_image(image_path)
         except BaseException:
