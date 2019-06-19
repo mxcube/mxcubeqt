@@ -19,7 +19,7 @@
 
 import logging
 
-from gui.utils import Colors, Icons, QtImport
+from gui.utils import Colors, QtImport
 from gui.utils.QLed import QLed
 from gui.BaseComponents import BaseWidget
 
@@ -52,7 +52,6 @@ STATES = {
 
 
 class ALBA_ShuttersBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)

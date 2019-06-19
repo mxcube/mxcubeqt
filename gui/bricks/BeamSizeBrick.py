@@ -48,11 +48,11 @@ Sizes are estimated by related HO
 
 try:
     uni_chr = unichr
-except:
+except BaseException:
     uni_chr = chr
 
 import api
-from gui.utils import Colors, QtImport
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 
 

@@ -15,7 +15,7 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import numpy as np
@@ -34,11 +34,13 @@ __license__ = "LGPLv3+"
 
 
 class HeatMapWidget(QtImport.QWidget):
-    def __init__(self, parent=None, allow_adjust_size=True):
+
+    def __init__(self, parent=None, show_aligned_results=False):
 
         QtImport.QWidget.__init__(self, parent)
+
         self.setObjectName("heat_map_widget")
-        self.allow_adjust_size = allow_adjust_size
+        self._show_aligned_results = show_aligned_results
 
         # Properties ----------------------------------------------------------
 
@@ -63,6 +65,7 @@ class HeatMapWidget(QtImport.QWidget):
         self.__heatmap_clicked = False
         self.__enable_continues_image_display = True
         self.__tooltip_text = None
+        self.selected_image_serial = None
 
         # Graphic elements ----------------------------------------------------
         self._heat_map_gbox = QtImport.QGroupBox("Heat map", self)
@@ -190,7 +193,6 @@ class HeatMapWidget(QtImport.QWidget):
         self.continues_display_action.setChecked(True)
 
         self._heat_map_popup_menu.addSeparator()
-        #options_menu = self._heat_map_popup_menu.addMenu("Options")
 
         self._heat_map_plot.contextMenuEvent = self.open_heat_map_popup_menu
 
@@ -200,7 +202,6 @@ class HeatMapWidget(QtImport.QWidget):
         self._score_type_cbox.setMaximumWidth(200)
         self.__score_key = "spots_resolution"
 
-        # self._threshold_slider.setTickmarks(QtGui.QSlider.Below)
         self._threshold_slider.setRange(0, 100)
         self._threshold_slider.setTickInterval(5)
         self._threshold_slider.setFixedWidth(200)
@@ -239,13 +240,12 @@ class HeatMapWidget(QtImport.QWidget):
             "Move to position", self.move_to_best_position_clicked
         )
         self._best_pos_table.contextMenuEvent = self.open_best_pos_popup_menu
-        # self._best_pos_table.setHidden(True)
 
-        screenShape = QtImport.QDesktopWidget().screenGeometry()
-        self.__heat_map_max_size = (screenShape.width() / 2, screenShape.height() / 2)
+        screen_shape = QtImport.QDesktopWidget().screenGeometry()
+        self.__heat_map_max_size = (screen_shape.width() / 2, screen_shape.height() / 2)
 
     def set_associated_data_collection(self, data_collection):
-        # self.clean_result()
+        self.clean_result()
 
         self.__associated_data_collection = data_collection
         self.__associated_grid = self.__associated_data_collection.grid
@@ -254,8 +254,7 @@ class HeatMapWidget(QtImport.QWidget):
         ].acquisition_parameters
         self.__first_result = True
 
-        if not data_collection.is_mesh():
-            # x_array = np.linspace(0, acq_parameters.num_images, acq_parameters.num_images, dtype="int16")
+        if not self._show_aligned_results:
             x_array = np.array([])
             y_array = np.zeros(acq_parameters.num_images)
 
@@ -292,24 +291,6 @@ class HeatMapWidget(QtImport.QWidget):
             self._heat_map_plot.set_x_axis_limits((0, acq_parameters.num_images))
             self._heat_map_plot.set_y_axis_limits((0, 1))
         else:
-            # if self.allow_adjust_size:
-            if False:
-                grid_size = self.__associated_grid.get_size_pix()
-
-                width = grid_size[0] * 5
-                height = grid_size[1] * 5
-                ratio = float(width) / height
-
-                if width > self.__heat_map_max_size[0]:
-                    width = self.__heat_map_max_size[0]
-                    height = width / ratio
-                if height > self.__heat_map_max_size[1]:
-                    height = self.__heat_map_max_size[1]
-                    width = height * ratio
-
-                self._heat_map_plot.setFixedWidth(width)
-                self._heat_map_plot.setFixedHeight(height)
-
             axis_range = self.__associated_grid.get_col_row_num()
             self._heat_map_plot.set_y_axis_limits((0, axis_range[1]))
             self._heat_map_plot.set_x_axis_limits((0, axis_range[0]))
@@ -321,7 +302,7 @@ class HeatMapWidget(QtImport.QWidget):
                 grid_params["steps_x"], grid_params["steps_y"]
             )
 
-            self._heat_map_plot.plot_result(empty_array)
+            self._heat_map_plot.plot_result(np.transpose(empty_array))
 
         self.refresh()
 
@@ -346,26 +327,25 @@ class HeatMapWidget(QtImport.QWidget):
         elif score_type_index == 2:
             self.__score_key = "spots_num"
 
-        if self.__results_display is not None:
-            if self.__results_display[self.__score_key].ndim == 1:
-                self._heat_map_plot.hide_all_curves()
-                self._heat_map_plot.show_curve(self.__score_key)
-                self.refresh()
-            else:
-                self._heat_map_plot.plot_result(
-                    self.__results_display[self.__score_key]
-                )
-                self._heat_map_plot.add_colorbar()
+        if not self._show_aligned_results:
+            self._heat_map_plot.hide_all_curves()
+            self._heat_map_plot.show_curve(self.__score_key)
+            self.refresh()
+        else:
+            self._heat_map_plot.plot_result(np.transpose(
+                self.__results_display[self.__score_key]
+            ))
+            self._heat_map_plot.add_colorbar()
 
     def refresh(self):
-        if self.__results_display:
-            if self.__results_display[self.__score_key].ndim == 1:
+        if self.__results_raw:
+            if not self._show_aligned_results:
                 self._heat_map_plot.adjust_axes(self.__score_key)
 
                 labels = []
                 positions = np.linspace(
-                    0, self.__results_display[self.__score_key].max(), 5
-                )
+                    0, self.__results_raw[self.__score_key].max(), 5
+                    )
 
                 if self.__score_key == "spots_resolution":
                     labels.append("inf")
@@ -461,13 +441,11 @@ class HeatMapWidget(QtImport.QWidget):
         self.__first_result = False
 
     def update_results(self, last_results):
-        if self.__results_display[self.__score_key].ndim == 1:
-            self._heat_map_plot.update_curves(self.__results_display)
+        if not self._show_aligned_results:
+            self._heat_map_plot.update_curves(self.__results_raw)
+            self.refresh()
         else:
-            self._heat_map_plot.plot_result(
-                np.transpose(self.__results_display[self.__score_key])
-            )
-        self.refresh()
+            self._heat_map_plot.plot_result(np.transpose(self.__results_display[self.__score_key]))
 
     def clean_result(self):
         """
@@ -643,14 +621,9 @@ class HeatMapWidget(QtImport.QWidget):
         api.graphics.create_auto_line()
 
     def move_to_selected_position(self):
+        """Moves to grid position x and y are positions in micrometers starting
+           from left top corner (as graphical coordinates)
         """
-        Descript. : Moves to grid position
-        Args.     : x and y are positions in micrometers starting from left
-                    top corner (as graphical coordinates)
-        """
-        osc_start = self.__associated_data_collection.acquisitions[
-            0
-        ].acquisition_parameters.osc_start
         osc_range = self.__associated_data_collection.acquisitions[
             0
         ].acquisition_parameters.osc_range
@@ -679,9 +652,7 @@ class HeatMapWidget(QtImport.QWidget):
         )
 
     def set_best_pos(self):
-        """
-        Descript. : Displays 10 (if exists) best positions, estimated
-                    by fast processing.
+        """Displays 10 (if exists) best positions
         """
         self._best_pos_table.setRowCount(
             len(self.__results_raw.get("best_positions", []))

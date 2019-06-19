@@ -15,16 +15,16 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
 import api
+
 from gui.utils import queue_item, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
-from HardwareRepository.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]

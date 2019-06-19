@@ -85,7 +85,7 @@ class ToolsBrick(BaseWidget):
            If icon name exists then adds icon
         """
         self.tools_list = self.tools_hwobj.get_tools_list()
-        for index, tool in enumerate(self.tools_list):
+        for tool in self.tools_list:
             if tool == "separator":
                 self.tools_menu.addSeparator()
             elif hasattr(tool["hwobj"], tool["method"]):

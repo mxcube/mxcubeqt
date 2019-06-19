@@ -114,7 +114,7 @@ class DataPathWidget(QtImport.QWidget):
                 self, "Select a directory", self._base_image_dir
             )
         )
-        selected_dir = os.path.dirname(selected_dir)
+        #selected_dir = os.path.dirname(selected_dir)
 
         if selected_dir is not None and len(selected_dir) > 0:
             self.set_directory(selected_dir)
@@ -257,6 +257,14 @@ class DataPathWidget(QtImport.QWidget):
 
     def set_base_process_directory(self, base_process_dir):
         self._base_process_dir = base_process_dir
+
+    def set_run_number(self, run_number):
+        """
+        Sets a run number and updates file name
+        """
+        self._data_model.run_number = run_number
+        self.update_file_name()
+        self.pathTemplateChangedSignal.emit()
 
     def update_data_model(self, data_model):
         self._data_model = data_model

@@ -96,14 +96,13 @@ class DCParametersWidget(QtImport.QWidget):
 
     def acq_parameters_changed(self):
         if self._tree_view_item is None:
-            # TODO fix this
             return
 
         # TODO  get tree view in another way
         dc_tree_widget = self._tree_view_item.listView().parent().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
-        path_conflict = api.queue_model.check_for_path_collisions(path_template)
+        api.queue_model.check_for_path_collisions(path_template)
 
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template

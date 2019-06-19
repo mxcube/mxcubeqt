@@ -28,7 +28,6 @@ __category__ = "Motor"
 
 
 class MultipleMotorsBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -65,7 +64,9 @@ class MultipleMotorsBrick(BaseWidget):
         # Graphic elements ----------------------------------------------------
         self.main_group_box = QtImport.QGroupBox(self)
         self.enable_motors_buttons = QtImport.QPushButton("Enable", self.main_group_box)
-        self.disable_motors_buttons = QtImport.QPushButton("Disable", self.main_group_box)
+        self.disable_motors_buttons = QtImport.QPushButton(
+            "Disable", self.main_group_box
+        )
 
         # Layout --------------------------------------------------------------
         if self["alignment"] == "horizontal":

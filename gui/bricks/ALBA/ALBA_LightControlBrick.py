@@ -49,7 +49,6 @@ STATES = {
 
 
 class ALBA_LightControlBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -59,9 +58,7 @@ class ALBA_LightControlBrick(BaseWidget):
         self.on_color = Colors.color_to_hexa(Colors.LIGHT_GREEN)
         self.off_color = Colors.color_to_hexa(Colors.LIGHT_GRAY)
         self.fault_color = Colors.color_to_hexa(Colors.LIGHT_RED)
-        self.unknown_color = Colors.color_to_hexa(
-            Colors.DARK_GRAY
-        )
+        self.unknown_color = Colors.color_to_hexa(Colors.DARK_GRAY)
 
         # Hardware objects ----------------------------------------------------
         self.light_ho = None

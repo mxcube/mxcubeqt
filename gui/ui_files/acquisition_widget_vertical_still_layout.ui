@@ -391,6 +391,18 @@
         </item>
         <item row="2" column="4">
          <widget class="QLineEdit" name="exp_time_total_ledit">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="enabled">
            <bool>false</bool>
           </property>

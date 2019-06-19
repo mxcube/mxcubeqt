@@ -173,7 +173,7 @@ class MotorPredefPosBrick(BaseWidget):
                 self.fill_positions()
                 if self.motor_hwobj.is_ready():
                     self.predefined_position_changed(
-                         self.motor_hwobj.get_current_position_name(), 0
+                        self.motor_hwobj.get_current_position_name(), 0
                     )
                 if self["label"] == "":
                     lbl = self.motor_hwobj.username

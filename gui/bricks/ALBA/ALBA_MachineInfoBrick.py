@@ -28,15 +28,10 @@ __license__ = "LGPLv3+"
 __category__ = "ALBA"
 
 
-STATES = {
-    "unknown": Colors.GRAY,
-    "ready": Colors.LIGHT_BLUE,
-    "error": Colors.LIGHT_RED,
-}
+STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}
 
 
 class ALBA_MachineInfoBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -113,14 +108,18 @@ class ALBA_MachineInfoBrick(BaseWidget):
         if property_name == "mnemonic":
             if self.mach_info_hwobj is not None:
                 self.disconnect(
-                    self.mach_info_hwobj, QtImport.SIGNAL("valuesChanged"), self.set_value
+                    self.mach_info_hwobj,
+                    QtImport.SIGNAL("valuesChanged"),
+                    self.set_value,
                 )
 
             self.mach_info_hwobj = self.get_hardware_object(new_value)
             if self.mach_info_hwobj is not None:
                 self.setEnabled(True)
                 self.connect(
-                    self.mach_info_hwobj, QtImport.SIGNAL("valuesChanged"), self.set_value
+                    self.mach_info_hwobj,
+                    QtImport.SIGNAL("valuesChanged"),
+                    self.set_value,
                 )
                 self.mach_info_hwobj.update_values()
             else:
@@ -151,17 +150,11 @@ class ALBA_MachineInfoBrick(BaseWidget):
 
     def set_color(self, value):
         if value.get("mach_current") is None:
-            Colors.set_widget_color(
-                self.current_value_label, STATES["unknown"]
-            )
+            Colors.set_widget_color(self.current_value_label, STATES["unknown"])
         elif value.get("mach_current"):
-            Colors.set_widget_color(
-                self.current_value_label, STATES["ready"]
-            )
+            Colors.set_widget_color(self.current_value_label, STATES["ready"])
         else:
-            Colors.set_widget_color(
-                self.current_value_label, STATES["error"]
-            )
+            Colors.set_widget_color(self.current_value_label, STATES["error"])
         Colors.set_widget_color(self.state_text_value_label, STATES["ready"])
 
 

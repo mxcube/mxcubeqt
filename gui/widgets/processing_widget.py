@@ -15,7 +15,9 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+
+from os.path import expanduser
 
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
@@ -88,6 +90,14 @@ class ProcessingWidget(QtImport.QWidget):
             "num_residues", self.processing_widget.num_residues_ledit, float, None
         )
 
+        self._model_mib.bind_value_update(
+            "resolution_cutoff", self.processing_widget.resolution_cutoff_ledit, float, None
+        )
+
+        self._model_mib.bind_value_update(
+            "pdb_file", self.processing_widget.pdb_file_ledit, str, None
+        )
+
         self.processing_widget.space_group_combo.activated.connect(
             self._space_group_change
         )
@@ -97,6 +107,13 @@ class ProcessingWidget(QtImport.QWidget):
         self.processing_widget.run_processing_parallel_cbox.stateChanged.connect(
             self._run_processing_parallel_toggled
         )
+        self.processing_widget.pdb_file_browse_button.clicked.connect(self._browse_clicked)
+
+        self.processing_widget.resolution_cutoff_label.setHidden(True)
+        self.processing_widget.resolution_cutoff_ledit.setHidden(True)
+        self.processing_widget.pdb_file_label.setHidden(True)
+        self.processing_widget.pdb_file_ledit.setHidden(True)
+        self.processing_widget.pdb_file_browse_button.setHidden(True)
 
     def _space_group_change(self, index):
         self._model.space_group = queue_model_enumerables.XTAL_SPACEGROUPS[index]
@@ -126,6 +143,17 @@ class ProcessingWidget(QtImport.QWidget):
             self.processing_widget.run_processing_after_cbox.isChecked(),
             self.processing_widget.run_processing_parallel_cbox.isChecked(),
         )
+
+    def _browse_clicked(self):
+        file_dialog = QtImport.QFileDialog(self)
+
+        pdb_filename = str(
+            file_dialog.getOpenFileName(
+                self, "Select a PDB file", expanduser("~")
+            )
+        )
+        self._model.pdb_file = pdb_filename
+        self.processing_widget.pdb_file_ledit.setText(pdb_filename)
 
     def get_processing_state(self):
         return self.processing_widget.run_processing_after_cbox.isChecked(), \

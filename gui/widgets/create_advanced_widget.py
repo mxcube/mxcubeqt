@@ -501,10 +501,6 @@ class CreateAdvancedWidget(CreateTaskBase):
 
                 treewidget_item.setText(1, str(grid_properties["num_lines"]))
                 treewidget_item.setText(2, str(grid_properties["num_images_per_line"]))
-                cell_count = (
-                    grid_properties["num_lines"]
-                    * grid_properties["num_images_per_line"]
-                )
                 self._acq_widget.acq_widget_layout.num_images_ledit.setText(
                     str(
                         grid_properties["num_lines"]

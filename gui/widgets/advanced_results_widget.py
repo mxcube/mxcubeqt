@@ -27,17 +27,16 @@ __license__ = "LGPLv3+"
 
 
 class AdvancedResultsWidget(QtImport.QWidget):
-    def __init__(self, parent=None, allow_adjust_size=True):
+    def __init__(self, parent=None, show_aligned_results=False):
         QtImport.QWidget.__init__(self, parent)
         self.setObjectName("advanced_results_widget")
 
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        self.heat_map_widget = HeatMapWidget(self, allow_adjust_size)
+        self.heat_map_widget = HeatMapWidget(self, show_aligned_results)
 
         # Layout --------------------------------------------------------------
         _main_hlayout = QtImport.QHBoxLayout(self)
@@ -52,7 +51,9 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        api.parallel_processing.connect("processingStarted", self.processing_started)
+        api.parallel_processing.connect(
+           "processingStarted", self.processing_started
+        )
         api.parallel_processing.connect(
            "processingResultsUpdate", self.update_processing_results
         )

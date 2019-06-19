@@ -1264,9 +1264,7 @@ class SampleChangerBrick(BaseWidget):
     def changeSample(self, sample_number):
         basket_index = self.sample_changer_hwobj.getSelectedComponent().getIndex()
         basket_number = basket_index + 1
-        address = Container.Pin.getSampleAddress(
-            basket_number, sample_number
-        )
+        address = Container.Pin.getSampleAddress(basket_number, sample_number)
         self.sample_changer_hwobj.select(address, wait=False)
 
     def user_select_this_sample(self, basket_index, vial_index):
@@ -1399,10 +1397,7 @@ class SampleChangerBrick(BaseWidget):
         if retval == QtImport.QDialog.Accepted:
             self.sample_changer_hwobj.resetBasketsInformation()
 
-            for (
-                basket,
-                samples,
-            ) in self.basketsSamplesSelectionDialog.result.items():
+            for (basket, samples) in self.basketsSamplesSelectionDialog.result.items():
                 for index in range(self.vials_per_basket):
                     basket_input = [basket, index + 1, 0, 0, 0]
                 for sample in samples:

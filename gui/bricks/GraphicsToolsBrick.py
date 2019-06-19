@@ -181,7 +181,6 @@ class GraphicsToolsBrick(BaseWidget):
                 BaseWidget._menubar.insert_menu(self.tools_menu, 2)
 
             if BaseWidget._toolbar is not None:
-                toolbar_actions = []
                 for action in self.tools_menu.actions():
                     BaseWidget._toolbar.addAction(action)
 

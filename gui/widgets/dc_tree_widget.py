@@ -224,10 +224,6 @@ class DataCollectTree(QtImport.QWidget):
         QtImport.QWidget.setFont(self, font)
         self.confirm_dialog.setFont(font)
 
-    def init_plate_navigator(self, plate_navigator_hwobj):
-        """Initates plate navigator"""
-        self.plate_navigator_widget.init_plate_view(plate_navigator_hwobj)
-
     def eventFilter(self, _object, event):
         """Custom event filter"""
         if event.type() == QtImport.QEvent.MouseButtonDblClick:

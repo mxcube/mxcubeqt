@@ -83,8 +83,9 @@ class AttenuatorsBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
         Colors.set_widget_color(
-            self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
+            self.new_value_ledit, Colors.LIGHT_GREEN, QtImport.QPalette.Base
         )
+
         self.new_value_validator = QtImport.QDoubleValidator(
             0, 100, 2, self.new_value_ledit
         )
@@ -92,8 +93,6 @@ class AttenuatorsBrick(BaseWidget):
 
         self.instance_synchronize("transmission_ledit", "new_value_ledit")
 
-    def run(self):
-        """Init api and start gui"""
         if api.transmission is not None:
             self.connect(api.transmission, "deviceReady", self.connected)
             self.connect(api.transmission, "deviceNotReady", self.disconnected)
@@ -101,7 +100,7 @@ class AttenuatorsBrick(BaseWidget):
                 api.transmission, "stateChanged", self.transmission_state_changed
             )
             self.connect(
-                api.transmission, "valueChanged", self.transmission_value_changed
+                api.transmission, "transmissionChanged", self.transmission_value_changed
             )
             self.connected()
             api.transmission.update_values()
@@ -136,7 +135,7 @@ class AttenuatorsBrick(BaseWidget):
             self.new_value_validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
         ):
-            api.transmission.set_value(float(input_field_text))
+            api.transmission.set_transmission(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base

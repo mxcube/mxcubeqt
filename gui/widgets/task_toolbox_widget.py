@@ -181,6 +181,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.tree_brick.dc_tree_widget.enableCollectSignal.connect(
             self.enable_collect_changed
         )
+        self.selection_changed(self.tree_brick.get_selected_items())
 
     def use_osc_start_cbox(self, status):
         for i in range(0, self.tool_box.count()):
@@ -431,6 +432,35 @@ class TaskToolBoxWidget(QtImport.QWidget):
             )
 
     def collect_now_button_click(self):
+        if not self.tree_brick.dc_tree_widget.enable_collect_condition:
+            logging.getLogger("GUI").warning("Collections are disabled")
+
+        selected_items = self.tree_brick.get_selected_items()
+        mounted_sample_item = self.tree_brick.dc_tree_widget.get_mounted_sample_item()
+        will_mount_sample = False
+
+        for item in selected_items:
+            if isinstance(item, queue_item.SampleQueueItem):
+                if item != mounted_sample_item:
+                    will_mount_sample = True
+            else:
+                sample_item = item.get_sample_view_item()
+                if sample_item != mounted_sample_item:
+                    will_mount_sample = True
+
+        if will_mount_sample:
+            conf_msg = "One or several not mounted samples are selected.\n" +\
+                       "Before collecting sample(s) will be mounted. Continue?"
+            if (
+                QtImport.QMessageBox.warning(
+                      None, "Question", conf_msg,
+                      QtImport.QMessageBox.Ok, QtImport.QMessageBox.No
+                )
+                == QtImport.QMessageBox.No
+            ):
+                return
+
+
         self.create_task_button_click()
         collect_items = []
         for item in self.tree_brick.dc_tree_widget.get_collect_items():

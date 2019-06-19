@@ -196,7 +196,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
             detector_distance_list.append(None)
 
         do_it = True
-        #run_num = 1
 
         for detector_distance in detector_distance_list:
             xray_imaging_parameters = copy.deepcopy(self._xray_imaging_parameters)

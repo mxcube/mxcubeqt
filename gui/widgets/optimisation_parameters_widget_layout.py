@@ -15,7 +15,7 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import QtImport
 
@@ -24,9 +24,14 @@ __license__ = "LGPLv3+"
 
 
 class OptimisationParametersWidgetLayout(QtImport.QWidget):
-    def __init__(self, parent=None, name=None, fl=0):
+    """
+    Widget is used to define characterisation optimization parameters like maximum
+    resolution, aimed multiplicity, and etc.
+    """
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+    def __init__(self, parent=None, name=None, window_flags=0):
+
+        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(window_flags))
 
         if not name:
             self.setObjectName("OptimisationParametersWidgetLayout")

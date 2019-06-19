@@ -37,6 +37,7 @@ class AdvancedBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
+        self._data_collection = None
 
         # Properties ----------------------------------------------------------
 
@@ -69,6 +70,10 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
+        self.connect(api.graphics,
+                     "gridClicked",
+                     self.grid_clicked
+        )
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(
@@ -85,13 +90,10 @@ class AdvancedBrick(BaseWidget):
             api.session.get_base_process_directory()
         )
 
-        # self.parameters_widget.populate_widget(item)
-        # self.results_widget.populate_widget(item)
-
         if isinstance(item, queue_item.XrayCenteringQueueItem):
-            data_collection = item.get_model().reference_image_collection
-            self.parameters_widget.populate_widget(item, data_collection)
-            self.results_widget.populate_widget(item, data_collection)
+            self._data_collection = item.get_model().reference_image_collection
+            self.parameters_widget.populate_widget(item, self._data_collection)
+            self.results_widget.populate_widget(item, self._data_collection)
 
             self.line_parameters_widget.populate_widget(
                 item, item.get_model().line_collection
@@ -100,9 +102,9 @@ class AdvancedBrick(BaseWidget):
                 item, item.get_model().line_collection
             )
         else:
-            data_collection = item.get_model()
-            self.parameters_widget.populate_widget(item, data_collection)
-            self.results_widget.populate_widget(item, data_collection)
+            self._data_collection = item.get_model()
+            self.parameters_widget.populate_widget(item, self._data_collection)
+            self.results_widget.populate_widget(item, self._data_collection)
 
         self.line_parameters_widget.setEnabled(
             isinstance(item, queue_item.XrayCenteringQueueItem)
@@ -112,8 +114,16 @@ class AdvancedBrick(BaseWidget):
         )
 
         try:
-            self.snapshot_widget.display_snapshot(data_collection.grid.get_snapshot())
+            self.snapshot_widget.display_snapshot(self._data_collection.grid.get_snapshot())
         except BaseException:
             pass
 
         self.tool_box.setCurrentWidget(self.results_widget)
+
+    def grid_clicked(self, grid, image, line, image_num):
+        if self._data_collection is not None:
+            image_path = self._data_collection.acquisitions[0].path_template.get_image_path() % image_num
+            try:
+                api.beamline_setup.image_tracking_hwobj.load_image(image_path)
+            except AttributeError:
+                pass

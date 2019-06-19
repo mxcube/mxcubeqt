@@ -30,6 +30,7 @@ __category__ = "Beam definition"
 
 
 class CRLBrick(BaseWidget):
+    """Inherited from BaseWidget"""
 
     def __init__(self, *args):
 
@@ -46,6 +47,9 @@ class CRLBrick(BaseWidget):
         self.add_property("mnemonic", "string", "")
         self.add_property("formatString", "formatString", "#.#")
         self.add_property("caption", "string", "")
+        self.add_property(
+            "style", "combo", ("table", "number"), "table"
+        )
 
         # Signals ------------------------------------------------------------
 
@@ -54,19 +58,34 @@ class CRLBrick(BaseWidget):
         # Graphic elements ----------------------------------------------------
         self.main_gbox = QtImport.QGroupBox("CRL", self)
         self.mode_combo = QtImport.QComboBox(self.main_gbox)
-        self.set_according_to_energy_button = QtImport.QPushButton("Set", self.main_gbox)
+        self.set_according_to_energy_button = QtImport.QPushButton(
+            "Set", self.main_gbox)
         self.set_out_button = QtImport.QPushButton("Out", self.main_gbox)
         # self.align_beam_button = QtImport.QtGui.QPushButton("Align", self.main_gbox)
-        self.crl_value_table = QtImport.QTableWidget(self.main_gbox)
+
+        self.crl_widget = QtImport.QWidget(self.main_gbox)
+        self.crl_value_table = QtImport.QTableWidget(self.crl_widget)
+        self.crl_lense_spinbox = QtImport.QSpinBox(self.crl_widget)
+        self.crl_lense_in_button = QtImport.QPushButton("In", self.crl_widget)
+        self.crl_lense_out_button = QtImport.QPushButton("Out", self.crl_widget)
+
         self.move_up_button = QtImport.QPushButton("", self.main_gbox)
         self.move_down_button = QtImport.QPushButton("", self.main_gbox)
 
         # Layout --------------------------------------------------------------
+        _crl_widget_hlayout = QtImport.QHBoxLayout(self.crl_widget)
+        _crl_widget_hlayout.addWidget(self.crl_value_table)
+        _crl_widget_hlayout.addWidget(self.crl_lense_spinbox)
+        _crl_widget_hlayout.addWidget(self.crl_lense_in_button)
+        _crl_widget_hlayout.addWidget(self.crl_lense_out_button)
+        _crl_widget_hlayout.setSpacing(2)
+        _crl_widget_hlayout.setContentsMargins(0, 0, 0, 0)
+
         _main_gbox_gridlayout = QtImport.QGridLayout(self.main_gbox)
         _main_gbox_gridlayout.addWidget(self.mode_combo, 0, 0)
         _main_gbox_gridlayout.addWidget(self.set_according_to_energy_button, 0, 1)
         _main_gbox_gridlayout.addWidget(self.set_out_button, 1, 1)
-        _main_gbox_gridlayout.addWidget(self.crl_value_table, 1, 0)
+        _main_gbox_gridlayout.addWidget(self.crl_widget, 1, 0)
         # _main_gbox_gridlayout.addWidget(self.align_beam_button, 1, 1)
         _main_gbox_gridlayout.addWidget(self.move_up_button, 0, 2)
         _main_gbox_gridlayout.addWidget(self.move_down_button, 1, 2)
@@ -108,7 +127,13 @@ class CRLBrick(BaseWidget):
         self.move_down_button.setIcon(Icons.load_icon("Down2"))
         self.move_down_button.setFixedWidth(25)
 
+        self.set_according_to_energy_button.setFixedWidth(30)
+        self.set_out_button.setFixedWidth(30)
+        self.crl_lense_in_button.setFixedWidth(30)
+        self.crl_lense_out_button.setFixedWidth(30)
+
     def property_changed(self, property_name, old_value, new_value):
+        """Defines gui and connects to hwobj based on the user defined properties"""
         if property_name == "mnemonic":
             if self.crl_hwobj:
                 self.disconnect(self.crl_hwobj, "crlModeChanged", self.crl_mode_changed)
@@ -135,9 +160,17 @@ class CRLBrick(BaseWidget):
                 self.crl_value_table.setColumnWidth(col_index, 20)
                 self.crl_value.append(0)
             self.crl_value_table.setFixedWidth(20 * new_value + 6)
+            self.crl_lense_spinbox.setMaximum(new_value - 1)
         elif property_name == "caption":
             if new_value:
                 self.main_gbox.setTitle(new_value)
+        elif property_name == "style":
+            self.crl_value_table.setVisible(new_value == "table")
+            self.mode_combo.setEnabled(new_value == "table")
+            self.set_according_to_energy_button.setEnabled(new_value == "table")
+            self.crl_lense_spinbox.setVisible(new_value != "table")
+            self.crl_lense_in_button.setVisible(new_value != "table")
+            self.crl_lense_out_button.setVisible(new_value != "table")
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 

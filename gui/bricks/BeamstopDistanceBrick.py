@@ -31,7 +31,6 @@ __category__ = "General"
 
 
 class BeamstopDistanceBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -79,7 +78,9 @@ class BeamstopDistanceBrick(BaseWidget):
         Colors.set_widget_color(
             self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
         )
-        self.new_value_validator = QtImport.QDoubleValidator(0, 100, 2, self.new_value_ledit)
+        self.new_value_validator = QtImport.QDoubleValidator(
+            0, 100, 2, self.new_value_ledit
+        )
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":

@@ -26,15 +26,10 @@ __license__ = "LGPLv3+"
 __category__ = "General"
 
 
-STATES = {
-    "unknown": Colors.GRAY,
-    "ready": Colors.LIGHT_BLUE,
-    "error": Colors.LIGHT_RED,
-}
+STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}
 
 
 class FluxBrick(BaseWidget):
-
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
