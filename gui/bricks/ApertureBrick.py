@@ -45,19 +45,13 @@ Apertures are allowed according the bam focusing mode.
 -----------------------------------------------------------------------
 """
 
-
-import sys
+try:
+    unichr
+except NameError:
+    unichr = chr
 
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
-
-
-PYVERSION = sys.version_info[0]
-if sys.version_info[0] == 3:
-    uni_chr = chr
-else:
-    uni_chr = unichr
-
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -156,7 +150,7 @@ class ApertureBrick(BaseWidget):
         aperture_size_list = self.aperture_hwobj.get_diameter_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
-            self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, uni_chr(956)))
+            self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))
 
         aperture_position_list = self.aperture_hwobj.get_position_list()
         self.aperture_position_combo.clear()

@@ -46,10 +46,11 @@ Sizes are estimated by related HO
 -----------------------------------------------------------------------
 """
 
+
 try:
-    uni_chr = unichr
-except BaseException:
-    uni_chr = chr
+    unichr
+except NameError:
+    unichr = chr
 
 import api
 from gui.utils import QtImport
@@ -129,10 +130,10 @@ class BeamSizeBrick(BaseWidget):
             self.hor_size_ledit.setText("")
         else:
             size_str = self["formatString"] % (hor_size * 1000)
-            self.hor_size_ledit.setText("%s %sm" % (size_str, uni_chr(956)))
+            self.hor_size_ledit.setText("%s %sm" % (size_str, unichr(956)))
         if ver_size is None:
             self.ver_size_ledit.setText("")
         else:
             # ver_size *= 1000
             size_str = self["formatString"] % (ver_size * 1000)
-            self.ver_size_ledit.setText("%s %sm" % (size_str, uni_chr(956)))
+            self.ver_size_ledit.setText("%s %sm" % (size_str, unichr(956)))
