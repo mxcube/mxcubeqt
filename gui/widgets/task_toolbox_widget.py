@@ -453,7 +453,6 @@ class TaskToolBoxWidget(QtImport.QWidget):
         if will_mount_sample:
             conf_msg = "One or several not mounted samples are selected.\n" +\
                        "Before collecting sample(s) will be mounted. Continue?"
-            print ('@~@~ Q: will_mount_sample')
             if (
                 QtImport.QMessageBox.warning(
                       None, "Question", conf_msg,
@@ -461,14 +460,12 @@ class TaskToolBoxWidget(QtImport.QWidget):
                 )
                 == QtImport.QMessageBox.No
             ):
-                print {'@~@~ returning after Q'}
                 return
 
 
         self.create_task_button_click()
         collect_items = []
         for item in self.tree_brick.dc_tree_widget.get_collect_items():
-            print ('@~@~ item in queue', item)
             if isinstance(item, queue_item.SampleCentringQueueItem):
                 item.setOn(False)
                 item.setText(1, "Skipped")
@@ -479,7 +476,6 @@ class TaskToolBoxWidget(QtImport.QWidget):
             else:
                 collect_items.append(item)
         if self.tree_brick.dc_tree_widget.enable_collect_condition:
-            print ('@~@~ enable_collect_condition')
             self.tree_brick.dc_tree_widget.collect_items(collect_items)
         else:
             logging.getLogger("GUI").warning("Collections are disabled")
