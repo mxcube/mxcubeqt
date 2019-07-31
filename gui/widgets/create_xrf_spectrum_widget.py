@@ -20,14 +20,15 @@
 import copy
 import logging
 
-import api
-
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -149,12 +150,12 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = api.graphics.get_scene_snapshot()
+                cpos.snapshot_image = beamline_object.graphics.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = api.graphics.get_scene_snapshot(shape)
+                    snapshot = beamline_object.graphics.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot

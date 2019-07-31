@@ -19,7 +19,6 @@
 
 import copy
 
-import api
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -28,6 +27,9 @@ from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidg
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from HardwareRepository.HardwareObjects import queue_model_objects
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -117,7 +119,8 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
-        api.detector_distance.connect(
+        print ('@~@~ detector', beamline_object.detector)
+        beamline_object.detector.detector_distance.connect(
             "positionChanged",
             self._xray_imaging_parameters_widget.set_detector_distance,
         )
@@ -132,8 +135,8 @@ class CreateXrayImagingWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
 
         self._xray_imaging_parameters = queue_model_objects.XrayImagingParameters()
-        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
-            "default_imaging_values"
+        self._acquisition_parameters = beamline_object.get_default_acquisition_parameters(
+            "imaging"
         )
         self._path_template.suffix = "tiff"
 
@@ -147,7 +150,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._xray_imaging_parameters
             )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                api.detector_distance.get_position()
+                beamline_object.detector.detector_distance.get_position()
             )
             self.setDisabled(False)
             self._xray_imaging_parameters_widget.enable_distance_tools(True)
@@ -179,12 +182,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = api.graphics.get_scene_snapshot(shape)
+            snapshot = beamline_object.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = api.graphics.get_scene_snapshot()
+            cpos.snapshot_image = beamline_object.graphics.get_scene_snapshot()
  
         detector_distance_list = []
         dc_list = []
@@ -209,7 +212,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
             if do_it:
                 do_it = False
                 self._path_template.run_number = \
-                    api.queue_model.get_next_run_number(
+                    beamline_object.queue_model.get_next_run_number(
                     acq.path_template)
                 acq.path_template.run_number = self._path_template.run_number
 

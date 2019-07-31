@@ -17,11 +17,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.char_parameters_widget import CharParametersWidget
 from gui.widgets.webview_widget import WebViewWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -74,10 +76,10 @@ class CharParametersBrick(BaseWidget):
 
     def populate_char_parameter_widget(self, item):
         self.parameters_widget.path_widget.set_base_image_directory(
-            api.session.get_base_image_directory()
+            beamline_object.session.get_base_image_directory()
         )
         self.parameters_widget.path_widget.set_base_process_directory(
-            api.session.get_base_process_directory()
+            beamline_object.session.get_base_process_directory()
         )
 
         char = item.get_model()

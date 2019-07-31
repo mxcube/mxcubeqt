@@ -20,7 +20,6 @@
 import copy
 import logging
 
-import api
 from gui.utils import queue_item, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.create_task_base import CreateTaskBase
@@ -32,6 +31,10 @@ from HardwareRepository.HardwareObjects import (
 )
 from HardwareRepository.HardwareObjects.queue_model_enumerables import XTAL_SPACEGROUPS
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+from HardwareRepository.HardwareObjects.abstract import AbstractDataAnalysis
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -185,11 +188,13 @@ class CreateCharWidget(CreateTaskBase):
         self._set_space_group(self._processing_parameters.space_group)
 
         self._acquisition_parameters = (
-            api.beamline_setup.get_default_char_acq_parameters()
+            beamline_object.get_default_acquisition_parameters("characterisation")
         )
 
         self._char_params = (
-            api.beamline_setup.get_default_characterisation_parameters()
+            AbstractDataAnalysis.get_default_characterisation_parameters(
+                beamline_object.data_analysis.edna_default_file
+            )
         )
         self._path_template.reference_image_prefix = "ref"
         # The num images drop down default value is 1
@@ -263,7 +268,7 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = api.graphics.get_selected_shapes()
+        selected_shapes = beamline_object.graphics.get_selected_shapes()
 
         for shape in selected_shapes:
             if isinstance(shape, GraphicsItemPoint):
@@ -277,11 +282,11 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = api.graphics.get_scene_snapshot()
+            cpos.snapshot_image = beamline_object.graphics.get_scene_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = api.graphics.get_scene_snapshot(shape)
+            snapshot = beamline_object.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 
@@ -311,7 +316,7 @@ class CreateCharWidget(CreateTaskBase):
         tasks.append(char)
         self._path_template.run_number += 1
 
-        if api.flux.get_flux() < 1e9:
+        if beamline_object.flux.get_flux() < 1e9:
             logging.getLogger("GUI").error(
                 "No flux reading is available! "
                 + "Characterisation result may be wrong. "

@@ -22,9 +22,11 @@ import os
 import time
 import logging
 
-import api
 from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -273,7 +275,7 @@ class ProposalBrick(BaseWidget):
                 proposal_code,
                 proposal_number,
                 None,
-                api.lims.beamline_name,
+                beamline_object.lims.beamline_name,
                 impersonate=True,
             )
         else:
@@ -324,18 +326,18 @@ class ProposalBrick(BaseWidget):
         self.loggedIn.emit(False)
 
     def reset_proposal(self):
-        api.session.proposal_code = None
-        api.session.session_id = None
-        api.session.proposal_id = None
-        api.session.proposal_number = None
+        beamline_object.session.proposal_code = None
+        beamline_object.session.session_id = None
+        beamline_object.session.proposal_id = None
+        beamline_object.session.proposal_number = None
 
     # Sets the current session; changes from login mode to logout mode
     def set_proposal(self, proposal, session):
-        api.lims.enable()
-        api.session.proposal_code = proposal["code"]
-        api.session.session_id = session["sessionId"]
-        api.session.proposal_id = proposal["proposalId"]
-        api.session.proposal_number = proposal["number"]
+        beamline_object.lims.enable()
+        beamline_object.session.proposal_code = proposal["code"]
+        beamline_object.session.session_id = session["sessionId"]
+        beamline_object.session.proposal_id = proposal["proposalId"]
+        beamline_object.session.proposal_number = proposal["number"]
 
         # Change mode
         if not self.login_as_user:
@@ -353,7 +355,7 @@ class ProposalBrick(BaseWidget):
             logging.getLogger().warning(
                 "Using local login: the data collected won't be stored in the database"
             )
-            api.lims.disable()
+            beamline_object.lims.disable()
             self.loggedIn.emit(False)
         else:
             msg = "Results in ISPyB will be stored under proposal %s%s - '%s'" % (
@@ -371,9 +373,9 @@ class ProposalBrick(BaseWidget):
             self.proposal_type_combox.addItem(cd)
 
     def run(self):
-        self.setEnabled(api.session is not None)
+        self.setEnabled(beamline_object.session is not None)
 
-        self.login_as_user = api.lims.get_login_type() == "user"
+        self.login_as_user = beamline_object.lims.get_login_type() == "user"
         if self.login_as_user:
             self.login_as_user_widget.show()
             self.login_as_proposal_widget.hide()
@@ -382,28 +384,28 @@ class ProposalBrick(BaseWidget):
             self.login_as_proposal_widget.show()
 
         # find if we are using dbconnection, etc. or not
-        if not api.lims:
+        if not beamline_object.lims:
             self.login_as_proposal_widget.hide()
             self.login_button.hide()
             # self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
             # self.title_label.show()
             self.user_group_widget.show()
-            api.session.proposal_code = ""
-            api.session.session_id = 1
-            api.session.proposal_id = ""
-            api.session.proposal_number = ""
+            beamline_object.session.proposal_code = ""
+            beamline_object.session.session_id = 1
+            beamline_object.session.proposal_id = ""
+            beamline_object.session.proposal_number = ""
 
             self.setWindowTitle.emit(self["titlePrefix"])
             # self.loggedIn.emit(False)
             # self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(True)
             self.sessionSelected.emit(
-                api.session.session_id,
+                beamline_object.session.session_id,
                 str(os.environ["USER"]),
                 0,
                 "",
                 "",
-                api.session.session_id,
+                beamline_object.session.session_id,
                 False,
             )
         else:
@@ -513,14 +515,17 @@ class ProposalBrick(BaseWidget):
                 }
                 return self.accept_login(prop_dict, ses_dict)
 
-            if api.lims is None:
+            if beamline_object.lims is None:
                 return self.refuse_login(
                     False,
                     "Not connected to the ISPyB database, unable to get proposal.",
                 )
 
             self._do_login_as_proposal(
-                prop_type, prop_number, prop_password, api.lims.beamline_name
+                prop_type,
+                prop_number,
+                prop_password,
+                beamline_object.lims.beamline_name
             )
 
     def pass_control(self, has_control_id):
@@ -577,7 +582,7 @@ class ProposalBrick(BaseWidget):
     ):
         # Get proposal and sessions
         logging.getLogger().debug("ProposalBrick: querying ISPyB database...")
-        prop = api.lims.getProposal(proposal_code, proposal_number)
+        prop = beamline_object.lims.getProposal(proposal_code, proposal_number)
 
         # Check if everything went ok
         prop_ok = True
@@ -599,7 +604,7 @@ class ProposalBrick(BaseWidget):
         self.select_proposal(self.proposals[item_index])
 
     def select_proposal(self, selected_proposal):
-        beamline_name = api.lims.beamline_name
+        beamline_name = beamline_object.lims.beamline_name
         proposal = selected_proposal["Proposal"]
         # person = selected_proposal['Person']
         # laboratory = selected_proposal['Laboratory']
@@ -636,7 +641,9 @@ class ProposalBrick(BaseWidget):
                                 break
 
         if todays_session is None:
-            is_inhouse = api.session.is_inhouse(proposal["code"], proposal["number"])
+            is_inhouse = beamline_object.session.is_inhouse(
+                proposal["code"], proposal["number"]
+            )
             if not is_inhouse:
                 if BaseWidget.is_instance_role_client():
                     self.refuse_login(
@@ -659,7 +666,7 @@ class ProposalBrick(BaseWidget):
             new_session_dict["scheduled"] = 0
             new_session_dict["nbShifts"] = 3
             new_session_dict["comments"] = "Session created by MXCuBE"
-            session_id = api.lims.create_session(new_session_dict)
+            session_id = beamline_object.lims.create_session(new_session_dict)
             new_session_dict["sessionId"] = session_id
 
             todays_session = new_session_dict
@@ -669,14 +676,14 @@ class ProposalBrick(BaseWidget):
             logging.getLogger().debug(
                 "ProposalBrick: getting local contact for %s" % session_id
             )
-            localcontact = api.lims.get_session_local_contact(session_id)
+            localcontact = beamline_object.lims.get_session_local_contact(session_id)
 
         self.accept_login(selected_proposal["Proposal"], todays_session)
 
     def _do_login_as_user(self, user_name):
         logging.getLogger().debug("ProposalBrick: querying ISPyB database...")
 
-        self.proposals = api.lims.get_proposals_by_user(user_name)
+        self.proposals = beamline_object.lims.get_proposals_by_user(user_name)
 
         if len(self.proposals) == 0:
             logging.getLogger("GUI").error(
@@ -716,7 +723,7 @@ class ProposalBrick(BaseWidget):
             logging.getLogger("GUI").info("ISPyB proposal: %s" % proposal_info)
 
             BaseWidget.set_status_info(
-                "user", "%s@%s" % (user_name, api.lims.beamline_name)
+                "user", "%s@%s" % (user_name, beamline_object.lims.beamline_name)
             )
             BaseWidget.set_status_info("ispyb", "ready")
 
@@ -752,7 +759,7 @@ class ProposalBrick(BaseWidget):
                             end_time = time.mktime(end_struct)
                             current_time = time.time()
                             # Check beamline name
-                            if beamline == api.lims.beamline_name:
+                            if beamline == beamline_object.lims.beamline_name:
                                 # Check date
                                 if (
                                     current_time >= start_time

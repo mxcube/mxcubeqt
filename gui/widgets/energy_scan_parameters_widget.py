@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
@@ -26,6 +25,9 @@ from gui.widgets.pymca_plot_widget import PymcaPlotWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -111,12 +113,12 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.scan_result_plot_widget.hide()
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if api.energyscan is not None:
-            api.energyscan.connect(
+        if beamline_object.energy_scan is not None:
+            beamline_object.energy_scan.connect(
                 "energyScanStarted", self.energy_scan_started
             )
-            api.energyscan.connect("scanNewPoint", self.energy_scan_new_point)
-            api.energyscan.connect("choochFinished", self.chooch_finished)
+            beamline_object.energy_scan.connect("scanNewPoint", self.energy_scan_new_point)
+            beamline_object.energy_scan.connect("choochFinished", self.chooch_finished)
 
     def _prefix_ledit_change(self, new_value):
         self.energy_scan_model.set_name(str(new_value))

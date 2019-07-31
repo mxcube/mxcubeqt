@@ -17,10 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
-
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -122,57 +123,57 @@ class ResolutionBrick(BaseWidget):
         )
 
     def run(self):
-        if api.detector_distance is not None:
+        if beamline_object.detector.detector_distance is not None:
             self.connect(
-                api.detector_distance, "deviceReady", self.detector_distance_ready
+                beamline_object.detector.detector_distance, "deviceReady", self.detector_distance_ready
             )
             self.connect(
-                api.detector_distance,
+                beamline_object.detector.detector_distance,
                 "deviceNotReady",
                 self.detector_distance_not_ready,
             )
             self.connect(
-                api.detector_distance,
+                beamline_object.detector.detector_distance,
                 "stateChanged",
                 self.detector_distance_state_changed,
             )
             self.connect(
-                api.detector_distance, "positionChanged", self.detector_distance_changed
+                beamline_object.detector.detector_distance, "positionChanged", self.detector_distance_changed
             )
             self.connect(
-                api.detector_distance,
+                beamline_object.detector.detector_distance,
                 "limitsChanged",
                 self.detector_distance_limits_changed,
             )
 
-            if api.detector_distance.is_ready():
-                api.detector_distance.update_values()
+            if beamline_object.detector.detector_distance.is_ready():
+                beamline_object.detector.detector_distance.update_values()
                 self.connected()
             else:
                 self.disconnected()
-        if api.energy is not None:
-            self.connect(api.energy, "energyChanged", self.energy_changed)
-        if api.resolution is not None:
-            self.connect(api.resolution, "deviceReady", self.resolution_ready)
-            self.connect(api.resolution, "deviceNotReady", self.resolution_not_ready)
-            self.connect(api.resolution, "stateChanged", self.resolution_state_changed)
+        if beamline_object.energy is not None:
+            self.connect(beamline_object.energy, "energyChanged", self.energy_changed)
+        if beamline_object.resolution is not None:
+            self.connect(beamline_object.resolution, "deviceReady", self.resolution_ready)
+            self.connect(beamline_object.resolution, "deviceNotReady", self.resolution_not_ready)
+            self.connect(beamline_object.resolution, "stateChanged", self.resolution_state_changed)
             self.connect(
-                api.resolution, "positionChanged", self.resolution_value_changed
+                beamline_object.resolution, "positionChanged", self.resolution_value_changed
             )
             self.connect(
-                api.resolution, "limitsChanged", self.resolution_limits_changed
+                beamline_object.resolution, "limitsChanged", self.resolution_limits_changed
             )
 
-            if api.resolution.is_ready():
-                api.resolution.update_values()
+            if beamline_object.resolution.is_ready():
+                beamline_object.resolution.update_values()
                 self.connected()
             else:
                 self.disconnected()
             self.update_gui()
 
-        if api.door_interlock is not None:
+        if beamline_object.hutch_interlock is not None:
             self.connect(
-                api.door_interlock,
+                beamline_object.hutch_interlock,
                 "doorInterlockStateChanged",
                 self.door_interlock_state_changed,
             )
@@ -256,20 +257,20 @@ class ResolutionBrick(BaseWidget):
         """
         groupbox_title = ""
 
-        if api.detector_distance is None:
+        if beamline_object.detector.detector_distance is None:
             detector_ready = False
         elif detector_ready is None:
             try:
-                if api.detector_distance.connection.isSpecConnected():
-                    detector_ready = api.detector_distance.isReady()
+                if beamline_object.detector.detector_distance.connection.isSpecConnected():
+                    detector_ready = beamline_object.detector.detector_distance.isReady()
             except AttributeError:
-                detector_ready = api.detector_distance.is_ready()
+                detector_ready = beamline_object.detector.detector_distance.is_ready()
 
         if detector_ready:
             self.get_detector_distance_limits()
-            curr_detector_distance = api.detector_distance.get_position()
+            curr_detector_distance = beamline_object.detector.detector_distance.get_position()
             self.detector_distance_changed(curr_detector_distance)
-            self.detector_distance_state_changed(api.detector_distance.get_state())
+            self.detector_distance_state_changed(beamline_object.detector.detector_distance.get_state())
             if self.units_combobox.currentText() == "mm":
                 groupbox_title = "Detector distance"
                 self.new_value_validator.setRange(
@@ -280,20 +281,20 @@ class ResolutionBrick(BaseWidget):
         else:
             self.detector_distance_state_changed(None)
 
-        if api.resolution is None:
+        if beamline_object.resolution is None:
             resolution_ready = False
         elif resolution_ready is None:
             try:
-                if api.resolution.connection.isSpecConnected():
-                    resolution_ready = api.resolution.isReady()
+                if beamline_object.resolution.connection.isSpecConnected():
+                    resolution_ready = beamline_object.resolution.isReady()
             except AttributeError:
-                resolution_ready = api.resolution.isReady()
+                resolution_ready = beamline_object.resolution.isReady()
 
         if resolution_ready:
             self.get_resolution_limits()
-            curr_resolution = api.resolution.getPosition()
+            curr_resolution = beamline_object.resolution.getPosition()
             self.resolution_value_changed(curr_resolution)
-            self.resolution_state_changed(api.resolution.getState())
+            self.resolution_state_changed(beamline_object.resolution.getState())
             if self.units_combobox.currentText() != "mm":
                 groupbox_title = "Resolution"
                 self.new_value_validator.setRange(
@@ -323,7 +324,7 @@ class ResolutionBrick(BaseWidget):
     def set_resolution(self, value):
         if self.resolution_limits is not None:
             if self.resolution_limits[0] < value < self.resolution_limits[1]:
-                api.resolution.move(value)
+                beamline_object.resolution.move(value)
 
     def set_detector_distance(self, value):
         if self.detector_distance_limits is not None:
@@ -332,7 +333,7 @@ class ResolutionBrick(BaseWidget):
                 < value
                 < self.detector_distance_limits[1]
             ):
-                api.detector_distance.move(value)
+                beamline_object.detector.detector_distance.move(value)
 
     def energy_changed(self, energy_kev, energy_wavelength):
         self.get_resolution_limits(True)
@@ -343,19 +344,19 @@ class ResolutionBrick(BaseWidget):
 
         if resolution_ready is None:
             resolution_ready = False
-            if api.resolution is not None:
+            if beamline_object.resolution is not None:
                 try:
-                    if api.resolution.connection.isSpecConnected():
-                        resolution_ready = api.resolution.isReady()
+                    if beamline_object.resolution.connection.isSpecConnected():
+                        resolution_ready = beamline_object.resolution.isReady()
                 except AttributeError:
-                    resolution_ready = api.resolution.isReady()
+                    resolution_ready = beamline_object.resolution.isReady()
 
         if resolution_ready:
             # TODO remove this check and use get_limits
-            if hasattr(api.resolution, "getLimits"):
-                self.resolution_limits_changed(api.resolution.getLimits())
+            if hasattr(beamline_object.resolution, "getLimits"):
+                self.resolution_limits_changed(beamline_object.resolution.getLimits())
             else:
-                self.resolution_limits_changed(api.resolution.get_limits())
+                self.resolution_limits_changed(beamline_object.resolution.get_limits())
         else:
             self.resolution_limits = None
 
@@ -364,15 +365,17 @@ class ResolutionBrick(BaseWidget):
             return
 
         detector_ready = False
-        if api.detector_distance is not None:
+        if beamline_object.detector.detector_distance is not None:
             try:
-                if api.detector_distance.connection.isSpecConnected():
-                    detector_ready = api.detector_distance.is_ready()
+                if (beamline_object.detector.detector_distance.connection.isSpecConnected()):
+                    detector_ready = beamline_object.detector.detector_distance.is_ready()
             except AttributeError:
-                detector_ready = api.detector_distance.is_ready()
+                detector_ready = beamline_object.detector.detector_distance.is_ready()
 
         if detector_ready:
-            self.detector_distance_limits_changed(api.detector_distance.get_limits())
+            self.detector_distance_limits_changed(
+                beamline_object.detector.detector_distance.get_limits()
+            )
         else:
             self.detector_distance_limits = None
 
@@ -387,7 +390,7 @@ class ResolutionBrick(BaseWidget):
             self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
-        if api.detector_distance is not None:
+        if beamline_object.detector.detector_distance is not None:
             if state:
                 color = ResolutionBrick.STATE_COLORS[state]
             else:
@@ -395,15 +398,21 @@ class ResolutionBrick(BaseWidget):
 
             unit = self.units_combobox.currentText()
             if unit is chr(197):
-                if state == api.detector_distance.motor_states.READY:
+                if (
+                    state
+                    == beamline_object.detector.detector_distance.motor_states.READY
+                ):
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")
                     self.new_value_ledit.blockSignals(False)
                     self.new_value_ledit.setEnabled(True)
                 else:
                     self.new_value_ledit.setEnabled(False)
-                # or state == api.detector_distance.motor_states.MOVESTARTED:
-                if state == api.detector_distance.motor_states.MOVING:
+                # or state == beamline_object.detector.detector_distance.motor_states.MOVESTARTED:
+                if (
+                    state
+                    == beamline_object.detector.detector_distance.motor_states.MOVING
+                ):
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
@@ -417,15 +426,16 @@ class ResolutionBrick(BaseWidget):
         color = ResolutionBrick.STATE_COLORS[state]
         unit = self.units_combobox.currentText()
         if unit == "mm":
-            if state == api.detector_distance.motor_states.READY:
+            if state == beamline_object.detector.detector_distance.motor_states.READY:
                 self.new_value_ledit.blockSignals(True)
                 self.new_value_ledit.setText("")
                 self.new_value_ledit.blockSignals(False)
                 self.new_value_ledit.setEnabled(True)
             else:
                 self.new_value_ledit.setEnabled(False)
-            if state == api.detector_distance.motor_states.MOVING:  # or \
-                # state == api.detector_distance.motor_states.MOVESTARTED:
+            if state == beamline_object.detector.detector_distance.motor_states.MOVING:
+                # or \
+                # state == beamline_object.detector.detector_distance.motor_states.MOVESTARTED:
                 self.stop_button.setEnabled(True)
             else:
                 self.stop_button.setEnabled(False)
@@ -435,9 +445,9 @@ class ResolutionBrick(BaseWidget):
     def stop_clicked(self):
         unit = self.units_combobox.currentText()
         if unit == chr(197):
-            api.resolution.stop()
+            beamline_object.resolution.stop()
         elif unit == "mm":
-            api.detector_distance.stop()
+            beamline_object.detector.detector_distance.stop()
 
     def door_interlock_state_changed(self, state, state_message):
         self.door_interlocked = state in ["locked_active", "locked_inactive"]

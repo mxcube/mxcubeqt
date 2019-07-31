@@ -17,10 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
-
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -93,17 +94,23 @@ class AttenuatorsBrick(BaseWidget):
 
         self.instance_synchronize("transmission_ledit", "new_value_ledit")
 
-        if api.transmission is not None:
-            self.connect(api.transmission, "deviceReady", self.connected)
-            self.connect(api.transmission, "deviceNotReady", self.disconnected)
+        if beamline_object.transmission is not None:
+            self.connect(beamline_object.transmission, "deviceReady", self.connected)
             self.connect(
-                api.transmission, "stateChanged", self.transmission_state_changed
+                beamline_object.transmission, "deviceNotReady", self.disconnected
             )
             self.connect(
-                api.transmission, "transmissionChanged", self.transmission_value_changed
+                beamline_object.transmission,
+                "stateChanged",
+                self.transmission_state_changed
+            )
+            self.connect(
+                beamline_object.transmission,
+                "transmissionChanged",
+                self.transmission_value_changed
             )
             self.connected()
-            api.transmission.update_values()
+            beamline_object.transmission.update_values()
         else:
             self.disconnected()
 
@@ -135,7 +142,7 @@ class AttenuatorsBrick(BaseWidget):
             self.new_value_validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
         ):
-            api.transmission.set_transmission(float(input_field_text))
+            beamline_object.transmission.set_transmission(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base

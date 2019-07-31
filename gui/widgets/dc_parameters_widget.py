@@ -19,12 +19,14 @@
 
 import logging
 
-import api
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.processing_widget import ProcessingWidget
 from gui.utils.widget_utils import DataModelInputBinder
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -102,7 +104,7 @@ class DCParametersWidget(QtImport.QWidget):
         dc_tree_widget = self._tree_view_item.listView().parent().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
-        api.queue_model.check_for_path_collisions(path_template)
+        beamline_object.queue_model.check_for_path_collisions(path_template)
 
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
@@ -112,7 +114,7 @@ class DCParametersWidget(QtImport.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = api.queue_model.get_next_run_number(
+        run_number = beamline_object.queue_model.get_next_run_number(
             path_template
         )
 

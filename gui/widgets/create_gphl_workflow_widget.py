@@ -21,8 +21,6 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-import api
-
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -31,8 +29,11 @@ from gui.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from gui.widgets.gphl_data_dialog import GphlDataDialog
 
 from HardwareRepository import ConvertUtils
+from HardwareRepository import HardwareRepository
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import States
+
+beamline_object = HardwareRepository.get_beamline()
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -105,7 +106,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def initialise_workflows(self):
 
-        workflow_hwobj = api.gphl_workflow
+        workflow_hwobj = beamline_object.gphl_workflow
         if workflow_hwobj is not None:
             workflow_hwobj.setup_workflow_object()
             workflow_names = list(workflow_hwobj.get_available_workflows())
@@ -127,7 +128,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.init_models()
         self._data_path_widget.update_data_model(self._path_template)
 
-        parameters = api.gphl_workflow.get_available_workflows()[name]
+        parameters = beamline_object.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
         if strategy_type == "transcal":
             # NB Once we do not have to set unique prefixes, this should be readOnly
@@ -207,7 +208,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template.num_files = 0
         path_template.compression = False
 
-        workflow_hwobj = api.gphl_workflow
+        workflow_hwobj = beamline_object.gphl_workflow
         if workflow_hwobj.get_state() == States.OFF:
             # We will be setting up the connection now - time to connect to quit
             QtImport.QApplication.instance().aboutToQuit.connect(
@@ -247,7 +248,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 )
             )
             tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
-            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            wf.set_dose_budget(beamline_object.gphl_workflow.dose_budgets.get(tag))
             # The entire strategy runs as a 'characterisation'
             wf.set_characterisation_budget_fraction(1.0)
         else:
@@ -257,7 +258,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._gphl_acq_param_widget.get_parameter_value("space_group")
             )
             wf.set_characterisation_strategy(
-                self._gphl_acq_param_widget.get_parameter_value("characterisation_strategy")
+                self._gphl_acq_param_widget.get_parameter_value(
+                    "characterisation_strategy"
+                )
             )
             tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
@@ -272,13 +275,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_crystal_system(crystal_system)
             wf.set_beam_energies(wf_parameters["beam_energies"])
             tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
-            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            wf.set_dose_budget(beamline_object.gphl_workflow.dose_budgets.get(tag))
             val = self._gphl_acq_param_widget.get_parameter_value(
                 "relative_rad_sensitivity"
             )
             wf.set_relative_rad_sensitivity(val)
             wf.set_characterisation_budget_fraction(
-                api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
+                beamline_object.gphl_workflow.getProperty(
+                    "characterisation_budget_percent", 5.0
+                )
                 / 100.0
             )
 

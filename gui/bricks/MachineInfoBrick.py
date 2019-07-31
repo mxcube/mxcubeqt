@@ -17,12 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-
-import api
-
 from gui.BaseComponents import BaseWidget
 from gui.utils import Icons, Colors, QtImport
 from gui.widgets.matplot_widget import TwoAxisPlotWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}
@@ -68,10 +68,10 @@ class MachineInfoBrick(BaseWidget):
 
     def run(self):
         """Method called when user changes a property in the gui builder"""
-        if api.machine_info is not None:
+        if beamline_object.machine_info is not None:
             self.setEnabled(True)
-            self.connect(api.machine_info, "valuesChanged", self.set_value)
-            api.machine_info.update_values()
+            self.connect(beamline_object.machine_info, "valuesChanged", self.set_value)
+            beamline_object.machine_info.update_values()
         else:
             self.setEnabled(False)
 

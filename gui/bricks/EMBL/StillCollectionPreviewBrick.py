@@ -22,13 +22,14 @@
 import os
 import numpy as np
 
-import api
-
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
 from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -152,18 +153,24 @@ class StillCollectionPreviewBrick(BaseWidget):
         for score_type in ("Score", "Resolution", "Number of spots"):
             self.score_type_combo.addItem(score_type)
 
-        api.parallel_processing.connect("processingStarted", self.processing_started)
-        api.parallel_processing.connect("processingFinished", self.processing_finished)
-        api.parallel_processing.connect("processingFailed", self.processing_failed)
-        api.parallel_processing.connect(
+        beamline_object.offline_processing.connect(
+            "processingStarted", self.processing_started
+        )
+        beamline_object.offline_processing.connect(
+            "processingFinished", self.processing_finished
+        )
+        beamline_object.offline_processing.connect(
+            "processingFailed", self.processing_failed
+        )
+        beamline_object.offline_processing.connect(
             "processingFrame", self.processing_frame_changed
         )
         self.current_grid_properties = (
-            api.parallel_processing.get_current_grid_properties()
+            beamline_object.offline_processing.get_current_grid_properties()
         )
 
         self.grid_properties_combo.blockSignals(True)
-        for grid_property in api.parallel_processing.get_available_grid_properties():
+        for grid_property in beamline_object.offline_processing.get_available_grid_properties():
             self.grid_properties_combo.addItem(str(grid_property))
         self.grid_properties_combo.setCurrentIndex(0)
         self.grid_properties_combo.blockSignals(False)
@@ -333,7 +340,7 @@ class StillCollectionPreviewBrick(BaseWidget):
                         index + self.params_dict["first_image_num"],
                     )
                     try:
-                        api.beamline_setup.image_tracking_hwobj.load_image(filename)
+                        beamline_object.image_tracking.load_image(filename)
                     except BaseException:
                         pass
 
@@ -399,7 +406,7 @@ class StillCollectionPreviewBrick(BaseWidget):
                             index + self.params_dict["first_image_num"],
                         )
                         try:
-                            api.beamline_setup.image_tracking_hwobj.load_image(filename)
+                            beamline_object.image_tracking.load_image(filename)
                         except BaseException:
                             pass
 
@@ -409,9 +416,9 @@ class StillCollectionPreviewBrick(BaseWidget):
         :param index: int
         :return: None
         """
-        api.parallel_processing.set_current_grid_index(index)
+        beamline_object.offline_processing.set_current_grid_index(index)
         self.current_grid_properties = (
-            api.parallel_processing.get_current_grid_properties()
+            beamline_object.offline_processing.get_current_grid_properties()
         )
         self.init_gui()
         self.grid_graphics_base.init_item(self.current_grid_properties)
@@ -438,7 +445,7 @@ class StillCollectionPreviewBrick(BaseWidget):
                 int(pos_x),
             )
             try:
-                api.beamline_setup.image_tracking_hwobj.load_image(filename)
+                beamline_object.image_tracking.load_image(filename)
             except BaseException:
                 pass
 

@@ -17,16 +17,17 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import numpy as np
 from copy import deepcopy
 
-import api
 from gui.utils import QtImport
 # try:
 # from widgets.Qt4_pyqtgraph_widget import TwoDimenisonalPlotWidget
 # except:
 from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -487,7 +488,7 @@ class HeatMapWidget(QtImport.QWidget):
                             self.__results_display[self.__score_key].shape[1] - row - 1
                         )
                         self.create_centring_point(col + 0.5, row + 0.5)
-        api.graphics.select_all_points()
+        beamline_object.graphics.select_all_points()
 
     def display_image_clicked(self):
         """
@@ -495,7 +496,7 @@ class HeatMapWidget(QtImport.QWidget):
         """
         image, line, image_num, image_path = self.get_image_parameters_from_coord()
         try:
-            api.beamline_setup.image_tracking_hwobj.load_image(image_path)
+            beamline_object.image_tracking.load_image(image_path)
         except BaseException:
             pass
 
@@ -601,11 +602,11 @@ class HeatMapWidget(QtImport.QWidget):
                 point_one,
                 point_two,
             ) = self.__associated_data_collection.get_centred_positions()
-            motor_pos_dict = api.diffractometer.get_point_from_line(
+            motor_pos_dict = beamline_object.diffractometer.get_point_from_line(
                 point_one, point_two, coord_x, num_images
             )
             motor_pos_dict["phi"] = omega
-        api.graphics.create_centring_point(
+        beamline_object.graphics.create_centring_point(
             True, {"motors": motor_pos_dict}
         )
 
@@ -613,12 +614,12 @@ class HeatMapWidget(QtImport.QWidget):
         motor_pos_dict = self.__associated_grid.get_motor_pos_from_col_row(
             self.__selected_x, self.__selected_y
         )
-        api.graphics.create_auto_line(motor_pos_dict)
+        beamline_object.graphics.create_auto_line(motor_pos_dict)
 
     def rotate_and_create_helical_line_clicked(self):
         self.move_to_selected_position()
-        api.diffractometer.move_omega_relative(90)
-        api.graphics.create_auto_line()
+        beamline_object.diffractometer.move_omega_relative(90)
+        beamline_object.graphics.create_auto_line()
 
     def move_to_selected_position(self):
         """Moves to grid position x and y are positions in micrometers starting
@@ -643,11 +644,11 @@ class HeatMapWidget(QtImport.QWidget):
                 point_one,
                 point_two,
             ) = self.__associated_data_collection.get_centred_positions()
-            motor_pos_dict = api.diffractometer.get_point_from_line(
+            motor_pos_dict = beamline_object.diffractometer.get_point_from_line(
                 point_one, point_two, int(self.__selected_x), num_images
             )
 
-        api.diffractometer.move_to_motors_positions(
+        beamline_object.diffractometer.move_to_motors_positions(
             motor_pos_dict, wait=True
         )
 
@@ -697,7 +698,7 @@ class HeatMapWidget(QtImport.QWidget):
         Moves diffractometer motors to the selected position
         """
         if self._best_pos_table.currentRow() > -1:
-            api.diffractometer.move_to_motors_positions(
+            beamline_object.diffractometer.move_to_motors_positions(
                 self.__results_raw["best_positions"][self._best_pos_table.currentRow()][
                     "cpos"
                 ]
@@ -709,7 +710,7 @@ class HeatMapWidget(QtImport.QWidget):
         from the table of best positions.
         """
         if self._best_pos_table.currentRow() > -1:
-            api.diffractometer.create_centring_point(
+            beamline_object.diffractometer.create_centring_point(
                 self.__results_raw["best_positions"][self._best_pos_table.currentRow()]
                 .get("cpos")
                 .as_dict()
@@ -723,13 +724,13 @@ class HeatMapWidget(QtImport.QWidget):
             image_path = self.__results_raw["best_positions"][
                 self._best_pos_table.currentRow()
             ].get("filename")
-            api.beamline_setup.image_tracking_hwobj.load_image(image_path)
+            beamline_object.image_tracking.load_image(image_path)
 
     def relaunch_processing_clicked(self):
         """
         Relaunches parallel processing
         """
         if self.__associated_data_collection and self.__associated_grid:
-            api.parallel_processing.run_processing(
+            beamline_object.offline_processing.run_processing(
                 self.__associated_data_collection
             )
