@@ -457,7 +457,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     @staticmethod
     def set_instance_role(role):
-        print ('@~@~ set_instance_role', role)
         if role == BaseWidget._instance_role:
             return
         BaseWidget._instance_role = role

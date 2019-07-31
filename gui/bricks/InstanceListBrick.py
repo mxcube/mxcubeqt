@@ -243,7 +243,6 @@ class InstanceListBrick(BaseWidget):
         _main_gbox.setChecked(False)
 
     def property_changed(self, property_name, old_value, new_value):
-        print ('@~@~ start function property_changed', property_name, old_value, new_value)
         if property_name == "hwobj_instance_connection":
             if self.instance_server_hwobj is not None:
                 self.disconnect(
@@ -292,7 +291,6 @@ class InstanceListBrick(BaseWidget):
             self.instance_server_hwobj = self.get_hardware_object(new_value)
 
             if self.instance_server_hwobj is not None:
-                print('@~@~ instanceInitializing')
                 self.connect(
                     self.instance_server_hwobj,
                     "instanceInitializing",
@@ -331,7 +329,6 @@ class InstanceListBrick(BaseWidget):
                     self.instance_server_hwobj, "clientClosed", self.client_closed
                 )
                 self.connect(self.instance_server_hwobj, "widgetCall", self.widget_call)
-                print('@~@~ endblock instanceInitializing')
         elif property_name == "hwobj_xmlrpc_server":
             self.xmlrpc_server = self.get_hardware_object(new_value)
         elif property_name == "hwobj_hutch_trigger":
@@ -349,7 +346,6 @@ class InstanceListBrick(BaseWidget):
                 )
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
-        print('@~@~ end function property_changed')
 
     def hutch_trigger_changed(self, hutch_opened):
         if hutch_opened:
@@ -444,7 +440,6 @@ class InstanceListBrick(BaseWidget):
         self.instance_server_hwobj.reconnect(quiet=True)
 
     def instance_initializing(self):
-        print ('@~@~ instance_initializing')
         if self.instance_server_hwobj.isLocal():
             local = BaseWidget.INSTANCE_LOCATION_LOCAL
         else:

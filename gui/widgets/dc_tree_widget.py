@@ -909,7 +909,6 @@ class DataCollectTree(QtImport.QWidget):
            - checks data collection parameters via beamline setup
            - calls collection method
         """
-        print ('@~@~ in collect_items')
         beamline_object.graphics.de_select_all()
 
         collection_par_list = []
@@ -949,18 +948,14 @@ class DataCollectTree(QtImport.QWidget):
         self.continue_button.setEnabled(True)
         self.parent().set_condition_state("confirmation_window_accepted",
                                           True)
-        print ('@~@~ before run_cb')
         self.run_cb()
         beamline_object.graphics.set_cursor_busy(True)
         try:
-            print ('@~@~ queue_manager.execute', beamline_object.queue_manager)
             beamline_object.queue_manager.execute()
-            print ('@~@~ Done queue_manager.execute')
         except Exception as ex:
             raise ex
         self.parent().set_condition_state("confirmation_window_accepted",
                                           False)
-        print ('@~@~ done collect_items')
 
     def stop_collection(self):
         """Stops queue"""
