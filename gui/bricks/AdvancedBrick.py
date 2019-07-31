@@ -17,12 +17,14 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import queue_item, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -70,24 +72,24 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.connect(api.graphics,
+        self.connect(beamline_object.graphics,
                      "gridClicked",
                      self.grid_clicked
         )
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(
-            api.session.get_base_image_directory()
+            beamline_object.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget.set_base_process_directory(
-            api.session.get_base_process_directory()
+            beamline_object.session.get_base_process_directory()
         )
 
         self.line_parameters_widget._data_path_widget.set_base_image_directory(
-            api.session.get_base_image_directory()
+            beamline_object.session.get_base_image_directory()
         )
         self.line_parameters_widget._data_path_widget.set_base_process_directory(
-            api.session.get_base_process_directory()
+            beamline_object.session.get_base_process_directory()
         )
 
         if isinstance(item, queue_item.XrayCenteringQueueItem):
@@ -123,7 +125,10 @@ class AdvancedBrick(BaseWidget):
     def grid_clicked(self, grid, image, line, image_num):
         if self._data_collection is not None:
             image_path = self._data_collection.acquisitions[0].path_template.get_image_path() % image_num
-            try:
-                api.beamline_setup.image_tracking_hwobj.load_image(image_path)
-            except AttributeError:
-                pass
+            # try:
+            #     beamline_object.image_tracking.load_image(image_path)
+            # except AttributeError:
+            #     pass
+            if hasattr(beamline_object, "image_tracking"):
+                beamline_object.image_tracking.load_image(image_path)
+

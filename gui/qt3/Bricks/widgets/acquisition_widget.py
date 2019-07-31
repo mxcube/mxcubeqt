@@ -5,6 +5,8 @@ import queue_model_objects
 
 from widgets.widget_utils import DataModelInputBinder
 from BlissFramework.Utils import widget_colors
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 MAD_ENERGY_COMBO_NAMES = {"ip": 0, "pk": 1, "rm1": 2, "rm2": 3}
@@ -300,7 +302,7 @@ class AcquisitionWidget(qt.QWidget):
         self.acq_widget_layout.child("shutterless_cbx").setEnabled(has_shutter_less)
         self.acq_widget_layout.child("shutterless_cbx").setChecked(has_shutter_less)
 
-        if self._beamline_setup.disable_num_passes():
+        if beamline_object.disable_num_passes:
             num_passes = self.acq_widget_layout.child("num_passes_ledit")
             if num_passes:
                 self.acq_widget_layout.child("num_passes_ledit").setDisabled(True)

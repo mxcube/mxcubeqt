@@ -22,12 +22,14 @@ import abc
 import logging
 from copy import deepcopy
 
-import api
 from gui.utils import queue_item, QtImport
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -72,44 +74,46 @@ class CreateTaskBase(QtImport.QWidget):
         self._path_template = None
         self._enable_compression = None
 
-        self._in_plate_mode = api.diffractometer.in_plate_mode()
+        self._in_plate_mode = beamline_object.diffractometer.in_plate_mode()
         try:
-            api.energy.connect("energyChanged", self.set_energy)
-            api.energy.connect(
+            beamline_object.energy.connect("energyChanged", self.set_energy)
+            beamline_object.energy.connect(
                 "energyLimitsChanged", self.set_energy_limits
             )
-            api.transmission.connect(
+            beamline_object.transmission.connect(
                 "transmissionChanged", self.set_transmission
             )
-            api.transmission.connect(
+            beamline_object.transmission.connect(
                 "limitsChanged", self.set_transmission_limits
             )
-            api.resolution.connect(
+            beamline_object.resolution.connect(
                 "positionChanged", self.set_resolution
             )
-            api.resolution.connect(
+            beamline_object.resolution.connect(
                 "limitsChanged", self.set_resolution_limits
             )
-            api.omega_axis.connect(
+            beamline_object.diffractometer.omega.connect(
                 "positionChanged", self.set_osc_start
             )
-            api.kappa_axis.connect("positionChanged", self.set_kappa)
-            api.kappa_phi_axis.connect(
+            beamline_object.diffractometer.kappa.connect(
+                "positionChanged", self.set_kappa
+            )
+            beamline_object.diffractometer.kappa_phi.connect(
                 "positionChanged", self.set_kappa_phi
             )
-            api.detector.connect(
+            beamline_object.detector.connect(
                 "detectorRoiModeChanged", self.set_detector_roi_mode
             )
-            api.detector.connect(
+            beamline_object.detector.connect(
                 "expTimeLimitsChanged", self.set_detector_exp_time_limits
             )
-            api.beam_info.connect(
+            beamline_object.beam.connect(
                 "beamInfoChanged", self.set_beam_info
             )
 
-            api.resolution.update_values()
-            api.detector.update_values()
-            self.set_resolution_limits(api.resolution.get_limits())
+            beamline_object.resolution.update_values()
+            beamline_object.detector.update_values()
+            self.set_resolution_limits(beamline_object.resolution.get_limits())
         except AttributeError as ex:
             msg = "Could not connect to one or more hardware objects " + str(ex)
             logging.getLogger("HWR").warning(msg)
@@ -145,9 +149,9 @@ class CreateTaskBase(QtImport.QWidget):
 
     def init_acq_model(self):
         if self._acq_widget:
-            def_acq_parameters = api.beamline_setup.get_default_acquisition_parameters()
+            def_acq_parameters = beamline_object.get_default_acquisition_parameters()
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
-            if api.diffractometer.in_plate_mode():
+            if beamline_object.diffractometer.in_plate_mode():
                 self._acq_widget.use_kappa(False)
                 self._acq_widget.use_max_osc_range(True)
             else:
@@ -162,18 +166,18 @@ class CreateTaskBase(QtImport.QWidget):
         # values read from the beamline setup
         if self._data_path_widget:
             self._data_path_widget.set_base_image_directory(
-                api.session.get_base_image_directory()
+                beamline_object.session.get_base_image_directory()
             )
             self._data_path_widget.set_base_process_directory(
-                api.session.get_base_process_directory()
+                beamline_object.session.get_base_process_directory()
             )
 
             (data_directory, proc_directory) = self.get_default_directory()
-            self._path_template = api.beamline_setup.get_default_path_template()
+            self._path_template = beamline_object.get_default_path_template()
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix()
-            self._path_template.run_number = api.queue_model.get_next_run_number(
+            self._path_template.run_number = beamline_object.queue_model.get_next_run_number(
                   self._path_template
             )
             self._path_template.compression = self._enable_compression
@@ -183,7 +187,7 @@ class CreateTaskBase(QtImport.QWidget):
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
         # ISPyB
-        if tab_index is 0 and api.session.proposal_code:
+        if tab_index is 0 and beamline_object.session.proposal_code:
             self.update_selection()
 
     def set_osc_start(self, new_value):
@@ -209,7 +213,7 @@ class CreateTaskBase(QtImport.QWidget):
         self._data_path_widget.update_file_name()
         if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
-            path_conflict = api.queue_model.check_for_path_collisions(
+            path_conflict = beamline_object.queue_model.check_for_path_collisions(
                 self._path_template
             )
             self._data_path_widget.indicate_path_conflict(path_conflict)
@@ -343,11 +347,11 @@ class CreateTaskBase(QtImport.QWidget):
         pass
 
     def get_default_prefix(self, sample_data_node=None, generic_name=False):
-        prefix = api.session.get_default_prefix(sample_data_node, generic_name)
+        prefix = beamline_object.session.get_default_prefix(sample_data_node, generic_name)
         return prefix
 
     def get_default_directory(self, tree_item=None, sub_dir=""):
-        group_name = api.session.get_group_name()
+        group_name = beamline_object.session.get_group_name()
 
         if group_name:
             sub_dir = group_name + "/" + sub_dir
@@ -361,9 +365,9 @@ class CreateTaskBase(QtImport.QWidget):
                     if item.get_model().lims_id == -1:
                         sub_dir += ""
 
-        data_directory = api.session.get_image_directory(sub_dir)
+        data_directory = beamline_object.session.get_image_directory(sub_dir)
 
-        proc_directory = api.session.get_process_directory(sub_dir)
+        proc_directory = beamline_object.session.get_process_directory(sub_dir)
 
         return (data_directory, proc_directory)
 
@@ -372,7 +376,7 @@ class CreateTaskBase(QtImport.QWidget):
         self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        api.graphics.select_shape_with_cpos(cpos)
+        beamline_object.graphics.select_shape_with_cpos(cpos)
 
     def selection_changed(self, items):
         if items:
@@ -408,7 +412,9 @@ class CreateTaskBase(QtImport.QWidget):
 
             self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
-            self._acquisition_parameters.centred_position.snapshot_image = api.graphics.get_scene_snapshot()
+            self._acquisition_parameters.centred_position.snapshot_image = (
+                beamline_object.graphics.get_scene_snapshot()
+            )
 
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
@@ -422,8 +428,8 @@ class CreateTaskBase(QtImport.QWidget):
                 # self._path_template.directory = data_directory
                 # self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
-            elif api.session.get_group_name() != "":
-                base_dir = api.session.get_base_image_directory()
+            elif beamline_object.session.get_group_name() != "":
+                base_dir = beamline_object.session.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
 
@@ -445,7 +451,7 @@ class CreateTaskBase(QtImport.QWidget):
             #    self._path_template.process_directory = proc_directory
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = api.queue_model.get_next_run_number(
+            self._path_template.run_number = beamline_object.queue_model.get_next_run_number(
                 self._path_template
             )
 
@@ -493,12 +499,9 @@ class CreateTaskBase(QtImport.QWidget):
         #         not isinstance(tree_item, queue_item.TaskQueueItem))
 
     def _update_etr(self):
-        omega = api.beamline_setup._get_omega_axis_position()
-        kappa = api.beamline_setup._get_kappa_axis_position()
-        kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
-        energy = api.energy.get_current_energy()
-        transmission = api.beamline_setup._get_transmission()
-        resolution = api.beamline_setup._get_resolution()
+        default_acq_params = beamline_object.get_default_acquisition_parameters()
+        for tag in ("kappa", "kappa_phi", "energy", "transmission", "resolution", ):
+            setattr(self._acquisition_parameters, tag, getattr(default_acq_params, tag))
 
         set_omega = True
         if self._acq_widget:
@@ -508,12 +511,7 @@ class CreateTaskBase(QtImport.QWidget):
                 if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
                     set_omega = False
         if set_omega:
-            self._acquisition_parameters.osc_start = omega
-        self._acquisition_parameters.kappa = kappa
-        self._acquisition_parameters.kappa_phi = kappa_phi
-        self._acquisition_parameters.energy = energy
-        self._acquisition_parameters.transmission = transmission
-        self._acquisition_parameters.resolution = resolution
+            self._acquisition_parameters.osc_start = default_acq_params.osc_start
 
         self._acq_widget.value_changed_list = []
         self._acq_widget._acquisition_mib.clear_edit()
@@ -536,7 +534,7 @@ class CreateTaskBase(QtImport.QWidget):
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = api.queue_model.\
+            self._path_template.run_number = beamline_object.queue_model.\
                 get_next_run_number(self._path_template)
 
             #Update energy transmission and resolution
@@ -582,15 +580,15 @@ class CreateTaskBase(QtImport.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = api.graphics.get_scene_snapshot(
+                        snapshot = beamline_object.graphics.get_scene_snapshot(
                             position
                         )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
-                kappa = api.beamline_setup._get_kappa_axis_position()
-                kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
+                kappa = beamline_object.diffractometer.kappa.get_value()
+                kappa_phi =  beamline_object.diffractometer.kappa_phi.get_value()
 
             if kappa:
                 self.set_kappa(kappa)
@@ -602,7 +600,7 @@ class CreateTaskBase(QtImport.QWidget):
     def approve_creation(self):
         result = True
 
-        path_conflict = api.queue_model.check_for_path_collisions(
+        path_conflict = beamline_object.queue_model.check_for_path_collisions(
             self._path_template
         )
 
@@ -635,12 +633,12 @@ class CreateTaskBase(QtImport.QWidget):
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
 
-        dm = api.diffractometer
+        dm = beamline_object.diffractometer
         sample_is_mounted = False
         if self._in_plate_mode:
             try:
                 sample_is_mounted = (
-                    api.plate_manipulator.getLoadedSample().getCoords()
+                    beamline_object.plate_manipulator.getLoadedSample().getCoords()
                     == sample.location
                 )
             except BaseException:
@@ -648,7 +646,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             try:
                 sample_is_mounted = (
-                    api.sample_changer.getLoadedSample().getCoords()
+                    beamline_object.sample_changer.getLoadedSample().getCoords()
                     == sample.location
                 )
 
@@ -765,7 +763,7 @@ class CreateTaskBase(QtImport.QWidget):
 
         if "<acronym>-<name>" in acq_path_template.base_prefix:
             acq_path_template.base_prefix = self.get_default_prefix(sample)
-            acq_path_template.run_number = api.queue_model.get_next_run_number(
+            acq_path_template.run_number = beamline_object.queue_model.get_next_run_number(
                 acq_path_template
             )
 
@@ -828,7 +826,9 @@ class CreateTaskBase(QtImport.QWidget):
 
         parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
-        self._acquisition_parameters.centred_position.snapshot_image = api.graphics.get_scene_snapshot()
+        self._acquisition_parameters.centred_position.snapshot_image = (
+            beamline_object.graphics.get_scene_snapshot()
+        )
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
         )
@@ -842,9 +842,9 @@ class CreateTaskBase(QtImport.QWidget):
 
     def _create_dc_from_grid(self, sample, grid=None):
         if grid is None:
-            grid = api.graphics.create_auto_grid()
+            grid = beamline_object.graphics.create_auto_grid()
 
-        grid.set_snapshot(api.graphics.get_scene_snapshot(grid))
+        grid.set_snapshot(beamline_object.graphics.get_scene_snapshot(grid))
 
         grid_properties = grid.get_properties()
 
@@ -894,7 +894,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             self._path_template.mad_prefix = ""
 
-        run_number = api.queue_model.get_next_run_number(
+        run_number = beamline_object.queue_model.get_next_run_number(
             self._path_template
         )
 
@@ -928,7 +928,7 @@ class CreateTaskBase(QtImport.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if api.diffractometer.in_plate_mode() and self._acq_widget:
+        if beamline_object.diffractometer.in_plate_mode() and self._acq_widget:
             set_max_range = False
 
             if num_images is None:
@@ -950,7 +950,7 @@ class CreateTaskBase(QtImport.QWidget):
             exp_time = None
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
 
-            scan_limits = api.diffractometer.get_scan_limits(
+            scan_limits = beamline_object.diffractometer.get_scan_limits(
                 num_images, exp_time
             )
 

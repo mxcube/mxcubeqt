@@ -52,9 +52,11 @@ try:
 except NameError:
     unichr = chr
 
-import api
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -117,7 +119,7 @@ class BeamSizeBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-        self.connect(api.beam_info, "beamInfoChanged", self.beam_info_changed)
+        self.connect(beamline_object.beam, "beamInfoChanged", self.beam_info_changed)
 
     def beam_info_changed(self, beam_info):
         """

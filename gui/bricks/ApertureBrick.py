@@ -147,7 +147,7 @@ class ApertureBrick(BaseWidget):
         self.aperture_hwobj.set_position(self.aperture_position_combo.currentIndex())
 
     def init_aperture(self):
-        aperture_size_list = self.aperture_hwobj.get_diameter_list()
+        aperture_size_list = self.aperture_hwobj.get_diameter_size_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
             self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))

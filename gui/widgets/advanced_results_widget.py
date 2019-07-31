@@ -17,9 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import QtImport
 from gui.widgets.heat_map_widget import HeatMapWidget
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -51,10 +53,10 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        api.parallel_processing.connect(
+        beamline_object.offline_processing.connect(
            "processingStarted", self.processing_started
         )
-        api.parallel_processing.connect(
+        beamline_object.offline_processing.connect(
            "processingResultsUpdate", self.update_processing_results
         )
 

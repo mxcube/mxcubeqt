@@ -19,6 +19,7 @@
 
 import sys
 import logging
+import warnings
 
 from HardwareRepository import HardwareRepository
 
@@ -75,7 +76,10 @@ ADDITIONAL_HWOBJ_ROLES = (
 
 
 def init(hwr_path):
-    hwr = HardwareRepository.getHardwareRepository(hwr_path)
+    # hwr = HardwareRepository.getHardwareRepository(hwr_path)
+
+    warnings.warn("The api module is deprecated - use the Beamline object instead")
+    hwr = HardwareRepository.getHardwareRepository()
     hwr.connect()
 
     global beamline_setup

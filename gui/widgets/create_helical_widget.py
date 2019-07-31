@@ -20,7 +20,6 @@
 import copy
 import logging
 
-import api
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -30,6 +29,9 @@ from gui.widgets.processing_widget import ProcessingWidget
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemLine
+
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -118,17 +120,17 @@ class CreateHelicalWidget(CreateTaskBase):
 
 
         self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-            api.beamline_setup._get_run_processing_parallel()
+            beamline_object.run_processing_parallel
         )
         self.enable_widgets(False)
 
-        shapes = api.graphics.get_shapes()
+        shapes = beamline_object.graphics.get_shapes()
         for shape in shapes:
             if isinstance(shape, GraphicsItemLine):
                 self.shape_created(shape, "Line")
-        api.graphics.connect("shapeCreated", self.shape_created)
-        api.graphics.connect("shapeChanged", self.shape_changed)
-        api.graphics.connect("shapeDeleted", self.shape_deleted)
+        beamline_object.graphics.connect("shapeCreated", self.shape_created)
+        beamline_object.graphics.connect("shapeChanged", self.shape_changed)
+        beamline_object.graphics.connect("shapeDeleted", self.shape_deleted)
 
     def enable_widgets(self, state):
         self._acq_widget.setEnabled(state)
@@ -140,11 +142,11 @@ class CreateHelicalWidget(CreateTaskBase):
         self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        has_shutter_less = api.beamline_setup.detector_has_shutterless()
+        has_shutter_less = beamline_object.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
-        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
-             "default_helical_values"
+        self._acquisition_parameters = beamline_object.get_default_acquisition_parameters(
+             "helical"
         )
 
     def shape_created(self, shape, shape_type):
@@ -200,15 +202,15 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_widget.overlay_slider.setEnabled(False)
         self._lines_widget.overlay_cbox.setEnabled(False)
 
-        api.graphics.de_select_all()
-        for shape in api.graphics.get_shapes():
+        beamline_object.graphics.de_select_all()
+        for shape in beamline_object.graphics.get_shapes():
             if isinstance(shape, GraphicsItemLine):
                 (start_cpos_index, end_cpos_index) = shape.get_points_index()
                 if (
                     start_cpos_index == start_cpos.index
                     and end_cpos_index == end_cpos.index
                 ):
-                    api.graphics.select_shape(shape)
+                    beamline_object.graphics.select_shape(shape)
                     shape.set_num_images(num_images)
 
                     self._lines_widget.overlay_slider.setEnabled(True)
@@ -275,7 +277,7 @@ class CreateHelicalWidget(CreateTaskBase):
         data_collections = []
 
         for shape in self.get_selected_shapes():
-            snapshot = api.graphics.get_scene_snapshot(shape)
+            snapshot = beamline_object.graphics.get_scene_snapshot(shape)
 
             # Acquisition for start position
             start_acq = self._create_acq(sample)
@@ -287,7 +289,7 @@ class CreateHelicalWidget(CreateTaskBase):
             )
             start_acq.acquisition_parameters.centred_position.snapshot_image = snapshot
 
-            start_acq.path_template.suffix = api.session.suffix
+            start_acq.path_template.suffix = beamline_object.session.suffix
 
             # Add another acquisition for the end position
             end_acq = self._create_acq(sample)
@@ -297,7 +299,7 @@ class CreateHelicalWidget(CreateTaskBase):
             )
             end_acq.acquisition_parameters.centred_position.snapshot_image = snapshot
 
-            end_acq.path_template.suffix = api.session.suffix
+            end_acq.path_template.suffix = beamline_object.session.suffix
 
             processing_parameters = copy.deepcopy(self._processing_parameters)
 
@@ -334,14 +336,14 @@ class CreateHelicalWidget(CreateTaskBase):
         )
 
         for shape, list_item in self._lines_map.items():
-            api.graphics.select_shape(shape, list_item.isSelected())
+            beamline_object.graphics.select_shape(shape, list_item.isSelected())
         self._acq_widget.emit_acq_parameters_changed()
 
     def create_line_button_clicked(self):
-        api.graphics.create_line()
+        beamline_object.graphics.create_line()
 
     def create_auto_line_button_clicked(self):
-        api.graphics.create_auto_line()
+        beamline_object.graphics.create_auto_line()
 
     def remove_line_button_clicked(self):
         line_to_delete = None
@@ -350,7 +352,7 @@ class CreateHelicalWidget(CreateTaskBase):
                 line_to_delete = line
                 break
         if line_to_delete:
-            api.graphics.delete_shape(line_to_delete)
+            beamline_object.graphics.delete_shape(line_to_delete)
         self.lines_treewidget_selection_changed()
 
     def get_selected_shapes(self):
@@ -361,7 +363,7 @@ class CreateHelicalWidget(CreateTaskBase):
         return selected_lines
 
     def overlay_toggled(self, state):
-        api.graphics.set_display_overlay(state)
+        beamline_object.graphics.set_display_overlay(state)
 
     def overlay_alpha_changed(self, alpha_value):
         for line, treewidget_item in self._lines_map.items():
@@ -371,4 +373,4 @@ class CreateHelicalWidget(CreateTaskBase):
     def swap_points_clicked(self):
         for line, treewidget_item in self._lines_map.items():
             if treewidget_item.isSelected():
-                api.graphics.swap_line_points(line)
+                beamline_object.graphics.swap_line_points(line)
