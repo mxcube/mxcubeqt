@@ -68,7 +68,6 @@ class BeamSizeBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.beam_info_hwobj = None
 
         # Internal values -----------------------------------------------------
 

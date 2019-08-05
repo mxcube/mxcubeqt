@@ -101,7 +101,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
             self.plate_navigator_table.setItem(row, col, new_item)
             self.__current_location = new_location
 
-    def init_plate_view(self, plate_manipulator_hwobj):
+    def init_plate_view(self, plate_manipulator):
         """Initalizes plate info
         """
         cell_width = 25
@@ -137,8 +137,6 @@ class PlateNavigatorWidget(QtImport.QWidget):
         table_height = (cell_height + 2) * (self.num_rows + 1)
         self.plate_navigator_table.setFixedWidth(table_width)
         self.plate_navigator_table.setFixedHeight(table_height)
-        # self.plate_navigator_cell.setFixedHeight(table_height)
-        # self.plate_navigator_cell.setFixedWidth(55)
         self.setFixedHeight(table_height + 2)
 
         self.navigation_item.set_size(200, table_height)

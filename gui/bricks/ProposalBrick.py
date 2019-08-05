@@ -73,7 +73,6 @@ class ProposalBrick(BaseWidget):
         self.login_as_user = None
 
         self.proposal = None
-        self.session = None
         self.person = None
         self.laboratory = None
         # self.sessionId=None
@@ -302,7 +301,6 @@ class ProposalBrick(BaseWidget):
         # Reset brick info
         self.proposal_number_ledit.setText("")
         self.proposal = None
-        self.session = None
         # self.sessionId=None
         self.person = None
         self.laboratory = None
@@ -347,7 +345,6 @@ class ProposalBrick(BaseWidget):
 
         # Store info in the brick
         self.proposal = proposal
-        self.session = session
 
         code = proposal["code"].lower()
 

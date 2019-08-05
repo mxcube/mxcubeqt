@@ -33,7 +33,7 @@ class PlateManipulatorBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.plate_manipulator_hwobj = None
+        self.plate_manipulator = None
 
         # Internal values -----------------------------------------------------
         self.num_cols = None
@@ -82,21 +82,21 @@ class PlateManipulatorBrick(BaseWidget):
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
-            if self.plate_manipulator_hwobj is not None:
+            if self.plate_manipulator is not None:
                 self.disconnect(
-                    self.plate_manipulator_hwobj,
+                    self.plate_manipulator,
                     SampleChanger.INFO_CHANGED_EVENT,
                     self.plate_navigator_widget.refresh_plate_location,
                 )
 
-            self.plate_manipulator_hwobj = self.get_hardware_object(new_value)
+            self.plate_manipulator = self.get_hardware_object(new_value)
 
-            if self.plate_manipulator_hwobj is not None:
+            if self.plate_manipulator is not None:
                 self.plate_navigator_widget.init_plate_view(
-                    self.plate_manipulator_hwobj
+                    self.plate_manipulator
                 )
                 self.connect(
-                    self.plate_manipulator_hwobj,
+                    self.plate_manipulator,
                     SampleChanger.INFO_CHANGED_EVENT,
                     self.plate_navigator_widget.refresh_plate_location,
                 )
@@ -104,9 +104,9 @@ class PlateManipulatorBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def search_button_clicked(self):
-        if self.plate_manipulator_hwobj:
-            # processing_plan = self.plate_manipulator_hwobj.
-            self.plate_content = self.plate_manipulator_hwobj.sync_with_crims(
+        if self.plate_manipulator:
+            # processing_plan = self.plate_manipulator.
+            self.plate_content = self.plate_manipulator.sync_with_crims(
                 self.plate_widget.barcode_ledit.text()
             )
             if self.plate_content:
@@ -123,12 +123,12 @@ class PlateManipulatorBrick(BaseWidget):
     def move_to_xtal_clicked(self):
         xtal_item = self.xtal_map.get(self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
-            self.plate_manipulator_hwobj.load(xtal_item),
+            self.plate_manipulator.load(xtal_item),
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):
-        if self.plate_manipulator_hwobj:
-            self.plate_manipulator_hwobj.abort()
+        if self.plate_manipulator:
+            self.plate_manipulator.abort()
 
     def xtal_treewidget_current_item_changed(self, current_item):
         xtal_item = self.xtal_map.get(current_item)
