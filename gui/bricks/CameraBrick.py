@@ -19,6 +19,8 @@
 
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -31,7 +33,6 @@ class CameraBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.graphics_manager_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.graphics_scene_size = None
@@ -211,36 +212,35 @@ class CameraBrick(BaseWidget):
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
-            if self.graphics_manager_hwobj is not None:
+            if beamline_object.graphics is not None:
                 self.disconnect(
-                    self.graphics_manager_hwobj, "mouseMoved", self.mouse_moved
+                    beamline_object.graphics, "mouseMoved", self.mouse_moved
                 )
                 self.disconnect(
-                    self.graphics_manager_hwobj, "imageScaleChanged", self.image_scaled
+                    beamline_object.graphics, "imageScaleChanged", self.image_scaled
                 )
                 self.disconnect(
-                    self.graphics_manager_hwobj, "infoMsg", self.set_info_msg
+                    beamline_object.graphics, "infoMsg", self.set_info_msg
                 )
 
-            self.graphics_manager_hwobj = self.get_hardware_object(new_value)
 
-            if self.graphics_manager_hwobj is not None:
+            if beamline_object.graphics is not None:
                 self.connect(
-                    self.graphics_manager_hwobj, "mouseMoved", self.mouse_moved
+                    beamline_object.graphics, "mouseMoved", self.mouse_moved
                 )
                 self.connect(
-                    self.graphics_manager_hwobj, "imageScaleChanged", self.image_scaled
+                    beamline_object.graphics, "imageScaleChanged", self.image_scaled
                 )
-                self.connect(self.graphics_manager_hwobj, "infoMsg", self.set_info_msg)
-                self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
-                # self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame()
+                self.connect(beamline_object.graphics, "infoMsg", self.set_info_msg)
+                self.graphics_view = beamline_object.graphics.get_graphics_view()
+                # self.graphics_camera_frame = beamline_object.graphics.get_camera_frame()
                 self.main_layout.addWidget(self.graphics_view)
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
                 self.init_image_scale_list()
-                if hasattr(self.graphics_manager_hwobj, "camera_hwobj"):
+                if hasattr(beamline_object.graphics, "camera"):
                     self.camera_control_dialog.set_camera_hwobj(
-                        self.graphics_manager_hwobj.camera_hwobj
+                        beamline_object.graphics.camera
                     )
         elif property_name == "fixedSize":
             try:
@@ -254,8 +254,15 @@ class CameraBrick(BaseWidget):
             self.display_beam = new_value
         elif property_name == "displayScale":
             self.display_scale = new_value
-            if self.graphics_manager_hwobj is not None:
-                self.graphics_manager_hwobj.set_scale_visible(new_value)
+            if beamline_object.graphics is not None:
+                if hasattr(beamline_object.graphics, "set_scale_visible"):
+                    # NBNB HACK Where did set_scale_visible come from?
+                    # Why no errors earlier? Te,porarily put in guard
+                    beamline_object.graphics.set_scale_visible(new_value)
+                else:
+                    print ("@~@~ WARNING beamline_object.graphics has no attribute"
+                           " 'set_scale_visible'")
+
         elif property_name == "beamDefiner":
             self.define_beam_action.setEnabled(new_value)
         elif property_name == "cameraControls":
@@ -264,18 +271,18 @@ class CameraBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def display_beam_size_toggled(self):
-        self.graphics_manager_hwobj.display_beam_size(
+        beamline_object.graphics.display_beam_size(
             self.display_beam_size_action.isChecked()
         )
 
     def start_magnification_tool(self):
-        self.graphics_manager_hwobj.set_magnification_mode(True)
+        beamline_object.graphics.set_magnification_mode(True)
 
     def set_control_mode(self, have_control):
         if have_control:
-            self.graphics_manager_hwobj.hide_info_msg()
+            beamline_object.graphics.hide_info_msg()
         else:
-            self.graphics_manager_hwobj.display_info_msg(
+            beamline_object.graphics.display_info_msg(
                 [
                     "",
                     "Controls are disabled in the Slave mode",
@@ -289,8 +296,8 @@ class CameraBrick(BaseWidget):
         self.info_label.setText(msg)
 
     def set_fixed_size(self):
-        if self.fixed_size and self.graphics_manager_hwobj:
-            self.graphics_manager_hwobj.set_graphics_scene_size(self.fixed_size, True)
+        if self.fixed_size and beamline_object.graphics:
+            beamline_object.graphics.set_graphics_scene_size(self.fixed_size, True)
             self.graphics_view.setFixedSize(self.fixed_size[0], self.fixed_size[1])
             # self.info_widget.setFixedWidth(self.fixed_size[0])
 
@@ -299,7 +306,7 @@ class CameraBrick(BaseWidget):
             action.setChecked(scale_value == self.image_scale_list[index])
 
     def init_image_scale_list(self):
-        self.image_scale_list = self.graphics_manager_hwobj.get_image_scale_list()
+        self.image_scale_list = beamline_object.graphics.get_image_scale_list()
         if len(self.image_scale_list) > 0:
             self.image_scale_menu.setEnabled(True)
             for scale in self.image_scale_list:
@@ -310,7 +317,7 @@ class CameraBrick(BaseWidget):
                 )
             for action in self.image_scale_menu.actions():
                 action.setCheckable(True)
-            self.image_scaled(self.graphics_manager_hwobj.get_image_scale())
+            self.image_scaled(beamline_object.graphics.get_image_scale())
 
     def not_used_function(self, *arg):
         pass
@@ -318,7 +325,7 @@ class CameraBrick(BaseWidget):
     def image_scale_triggered(self, selected_action):
         for index, action in enumerate(self.image_scale_menu.actions()):
             if selected_action == action:
-                self.graphics_manager_hwobj.set_image_scale(
+                beamline_object.graphics.set_image_scale(
                     self.image_scale_list[index], action.isChecked()
                 )
 
@@ -326,61 +333,61 @@ class CameraBrick(BaseWidget):
         self.popup_menu.popup(QtImport.QCursor.pos())
 
     def measure_distance_clicked(self):
-        self.graphics_manager_hwobj.start_measure_distance(wait_click=True)
+        beamline_object.graphics.start_measure_distance(wait_click=True)
 
     def measure_angle_clicked(self):
-        self.graphics_manager_hwobj.start_measure_angle(wait_click=True)
+        beamline_object.graphics.start_measure_angle(wait_click=True)
 
     def measure_area_clicked(self):
-        self.graphics_manager_hwobj.start_measure_area(wait_click=True)
+        beamline_object.graphics.start_measure_area(wait_click=True)
 
     def display_histogram_toggled(self):
-        self.graphics_manager_hwobj.display_histogram(
+        beamline_object.graphics.display_histogram(
             self.display_histogram_action.isChecked()
         )
 
     def create_point_click_clicked(self):
-        self.graphics_manager_hwobj.start_centring(tree_click=True)
+        beamline_object.graphics.start_centring(tree_click=True)
 
     def create_points_one_click_clicked(self):
-        self.graphics_manager_hwobj.start_one_click_centring()
+        beamline_object.graphics.start_one_click_centring()
 
     def create_point_current_clicked(self):
-        self.graphics_manager_hwobj.start_centring(tree_click=False)
+        beamline_object.graphics.start_centring(tree_click=False)
 
     def create_line_clicked(self):
-        self.graphics_manager_hwobj.create_line()
+        beamline_object.graphics.create_line()
 
     def create_auto_line_clicked(self):
-        self.graphics_manager_hwobj.create_auto_line()
+        beamline_object.graphics.create_auto_line()
 
     def create_grid(self):
-        self.graphics_manager_hwobj.create_grid()
+        beamline_object.graphics.create_grid()
 
     def create_auto_grid(self):
-        self.graphics_manager_hwobj.create_auto_grid()
+        beamline_object.graphics.create_auto_grid()
 
     def move_beam_mark_manual(self):
-        self.graphics_manager_hwobj.start_move_beam_mark()
+        beamline_object.graphics.start_move_beam_mark()
 
     def move_beam_mark_auto(self):
-        self.graphics_manager_hwobj.move_beam_mark_auto()
+        beamline_object.graphics.move_beam_mark_auto()
 
     def mouse_moved(self, x, y):
         self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" % (x, y))
 
     def select_all_points_clicked(self):
-        self.graphics_manager_hwobj.select_all_points()
+        beamline_object.graphics.select_all_points()
 
     def deselect_all_items_clicked(self):
-        self.graphics_manager_hwobj.de_select_all()
+        beamline_object.graphics.de_select_all()
 
     def clear_all_items_clicked(self):
-        self.graphics_manager_hwobj.clear_all()
+        beamline_object.graphics.clear_all()
 
     def zoom_window_clicked(self):
         self.zoom_dialog.set_camera_frame(
-            self.graphics_manager_hwobj.get_camera_frame()
+            beamline_object.graphics.get_camera_frame()
         )
         self.zoom_dialog.set_coord(100, 100)
         self.zoom_dialog.show()
@@ -389,13 +396,13 @@ class CameraBrick(BaseWidget):
         self.camera_control_dialog.show()
 
     def display_grid_toggled(self):
-        self.graphics_manager_hwobj.display_grid(self.display_grid_action.isChecked())
+        beamline_object.graphics.display_grid(self.display_grid_action.isChecked())
 
     def define_beam_size(self):
-        self.graphics_manager_hwobj.start_define_beam()
+        beamline_object.graphics.start_define_beam()
 
     def display_radiation_damage_toggled(self):
-        self.graphics_manager_hwobj.display_radiation_damage(
+        beamline_object.graphics.display_radiation_damage(
             self.display_radiation_damage_action.isChecked()
         )
 
@@ -409,7 +416,6 @@ class CameraControlDialog(QtImport.QDialog):
         )
 
         # Internal variables --------------------------------------------------
-        self.camera_hwobj = None
 
         # Graphic elements ----------------------------------------------------
         self.contrast_slider = QtImport.QSlider(QtImport.Qt.Horizontal, self)
@@ -490,71 +496,70 @@ class CameraControlDialog(QtImport.QDialog):
         self.setWindowTitle("Camera controls")
 
     def set_camera_hwobj(self, camera_hwobj):
-        self.camera_hwobj = camera_hwobj
 
         # get attribute value
         try:
-            contrast_value = self.camera_hwobj.get_contrast()
+            contrast_value = beamline_object.graphics.camera.get_contrast()
         except AttributeError:
             contrast_value = None
         try:
-            brightness_value = self.camera_hwobj.get_brightness()
+            brightness_value = beamline_object.graphics.camera.get_brightness()
         except AttributeError:
             brightness_value = None
         try:
-            gain_value = self.camera_hwobj.get_gain()
+            gain_value = beamline_object.graphics.camera.get_gain()
         except AttributeError:
             gain_value = None
         try:
-            gamma_value = self.camera_hwobj.get_gamma()
+            gamma_value = beamline_object.graphics.camera.get_gamma()
         except AttributeError:
             gamma_value = None
         try:
-            exposure_time_value = self.camera_hwobj.get_exposure_time()
+            exposure_time_value = beamline_object.graphics.camera.get_exposure_time()
         except AttributeError:
             exposure_time_value = None
 
         # get attribute auto state
         try:
-            contrast_auto = self.camera_hwobj.get_contrast_auto()
+            contrast_auto = beamline_object.graphics.camera.get_contrast_auto()
         except AttributeError:
             contrast_auto = None
         try:
-            brightness_auto = self.camera_hwobj.get_brightness_auto()
+            brightness_auto = beamline_object.graphics.camera.get_brightness_auto()
         except AttributeError:
             brightness_auto = None
         try:
-            gain_auto = self.camera_hwobj.get_gain_auto()
+            gain_auto = beamline_object.graphics.camera.get_gain_auto()
         except AttributeError:
             gain_auto = None
         try:
-            gamma_auto = self.camera_hwobj.get_gamma_auto()
+            gamma_auto = beamline_object.graphics.camera.get_gamma_auto()
         except AttributeError:
             gamma_auto = None
         try:
-            exposure_time_auto = self.camera_hwobj.get_exposure_time_auto()
+            exposure_time_auto = beamline_object.graphics.camera.get_exposure_time_auto()
         except AttributeError:
             exposure_time_auto = None
 
         # get attribute range
         try:
-            contrast_min_max = self.camera_hwobj.get_contrast_min_max()
+            contrast_min_max = beamline_object.graphics.camera.get_contrast_min_max()
         except AttributeError:
             contrast_min_max = (0, 100)
         try:
-            brightness_min_max = self.camera_hwobj.get_brightness_min_max()
+            brightness_min_max = beamline_object.graphics.camera.get_brightness_min_max()
         except AttributeError:
             brightness_min_max = (0, 100)
         try:
-            gain_min_max = self.camera_hwobj.get_gain_min_max()
+            gain_min_max = beamline_object.graphics.camera.get_gain_min_max()
         except AttributeError:
             gain_min_max = (0, 100)
         try:
-            gamma_min_max = self.camera_hwobj.get_gamma_min_max()
+            gamma_min_max = beamline_object.graphics.camera.get_gamma_min_max()
         except AttributeError:
             gamma_min_max = (0, 100)
         try:
-            exposure_time_min_max = self.camera_hwobj.get_exposure_time_min_max()
+            exposure_time_min_max = beamline_object.graphics.camera.get_exposure_time_min_max()
         except AttributeError:
             exposure_time_min_max = (0, 100)
 
@@ -634,59 +639,59 @@ class CameraControlDialog(QtImport.QDialog):
     def set_contrast(self, value):
         self.contrast_slider.setValue(value)
         self.contrast_doublespinbox.setValue(value)
-        self.camera_hwobj.set_contrast(value)
+        beamline_object.graphics.camera.set_contrast(value)
 
     def set_brightness(self, value):
         self.brightness_slider.setValue(value)
         self.brightness_doublespinbox.setValue(value)
-        self.camera_hwobj.set_brightness(value)
+        beamline_object.graphics.camera.set_brightness(value)
 
     def set_gain(self, value):
         self.gain_slider.setValue(value)
         self.gain_doublespinbox.setValue(value)
-        self.camera_hwobj.set_gain(value)
+        beamline_object.graphics.camera.set_gain(value)
 
     def set_gamma(self, value):
         self.gamma_slider.setValue(value)
         self.gamma_doublespinbox.setValue(value)
-        self.camera_hwobj.set_gamma(value)
+        beamline_object.graphics.camera.set_gamma(value)
 
     def set_exposure_time(self, value):
         self.exposure_time_slider.setValue(value)
         self.exposure_time_doublespinbox.setValue(value)
-        self.camera_hwobj.set_exposure_time(value)
+        beamline_object.graphics.camera.set_exposure_time(value)
 
     def set_contrast_auto(self, state):
         state = bool(state)
-        self.camera_hwobj.set_contrast_auto(state)
-        value = self.camera_hwobj.get_contrast()
+        beamline_object.graphics.camera.set_contrast_auto(state)
+        value = beamline_object.graphics.camera.get_contrast()
         self.contrast_slider.setValue(value)
         self.contrast_doublespinbox.setValue(value)
 
     def set_brightness_auto(self, state):
         state = bool(state)
-        self.camera_hwobj.set_brightness_auto(state)
-        value = self.camera_hwobj.get_brightness()
+        beamline_object.graphics.camera.set_brightness_auto(state)
+        value = beamline_object.graphics.camera.get_brightness()
         self.brightness_slider.setValue(value)
         self.brightness_doublespinbox.setValue(value)
 
     def set_gain_auto(self, state):
         state = bool(state)
-        self.camera_hwobj.set_gain_auto(state)
-        value = self.camera_hwobj.get_gain()
+        beamline_object.graphics.camera.set_gain_auto(state)
+        value = beamline_object.graphics.camera.get_gain()
         self.gain_slider.setValue(value)
         self.gain_doublespinbox.setValue(value)
 
     def set_gamma_auto(self, state):
         state = bool(state)
-        self.camera_hwobj.set_gamma_auto(state)
-        value = self.camera_hwobj.get_gamma()
+        beamline_object.graphics.camera.set_gamma_auto(state)
+        value = beamline_object.graphics.camera.get_gamma()
         self.gamma_slider.setValue(value)
         self.gamma_doublespinbox.setValue(value)
 
     def set_exposure_time_auto(self, state):
         state = bool(state)
-        self.camera_hwobj.set_exposure_time_auto(state)
-        value = self.camera_hwobj.get_exposure_time()
+        beamline_object.graphics.camera.set_exposure_time_auto(state)
+        value = beamline_object.graphics.camera.get_exposure_time()
         self.exposure_time_slider.setValue(value)
         self.exposure_time_doublespinbox.setValue(value)

@@ -19,6 +19,8 @@
 
 from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -35,7 +37,6 @@ class FluxBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.flux_hwobj = None
 
         # Internal values -----------------------------------------------------
 
@@ -73,17 +74,7 @@ class FluxBrick(BaseWidget):
         # Other ---------------------------------------------------------------
 
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == "hwobj_flux":
-            if self.flux_hwobj is not None:
-                self.disconnect(self.flux_hwobj, "fluxChanged", self.flux_changed)
-
-            self.flux_hwobj = self.get_hardware_object(new_value)
-
-            if self.flux_hwobj is not None:
-                self.connect(self.flux_hwobj, "fluxChanged", self.flux_changed)
-                self.flux_changed(self.flux_hwobj.get_flux_info())
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def flux_changed(self, info_dict):
         if info_dict:
