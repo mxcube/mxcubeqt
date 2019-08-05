@@ -202,8 +202,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         has_shutter_less = beamline_object.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
-        self._acquisition_parameters = beamline_object.get_default_acquisition_parameters(
-            "advanced"
+        self._acquisition_parameters = (
+            beamline_object.get_default_acquisition_parameters("advanced")
         )
 
     def set_beam_info(self, beam_info):

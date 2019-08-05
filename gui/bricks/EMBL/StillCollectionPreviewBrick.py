@@ -170,8 +170,8 @@ class StillCollectionPreviewBrick(BaseWidget):
         )
 
         self.grid_properties_combo.blockSignals(True)
-        for grid_property in beamline_object.offline_processing.get_available_grid_properties():
-            self.grid_properties_combo.addItem(str(grid_property))
+        for prop in beamline_object.offline_processing.get_available_grid_properties():
+            self.grid_properties_combo.addItem(str(prop))
         self.grid_properties_combo.setCurrentIndex(0)
         self.grid_properties_combo.blockSignals(False)
 

@@ -193,7 +193,9 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         if beamline_object.imaging is not None:
             beamline_object.imaging.connect("imageInit", self.image_init)
             beamline_object.imaging.connect("imageLoaded", self.image_loaded)
-            beamline_object.imaging.connect("measureItemChanged", self.measure_item_changed)
+            beamline_object.imaging.connect(
+                "measureItemChanged", self.measure_item_changed
+            )
 
             self.graphics_view = beamline_object.imaging.get_graphics_view()
             self._graphics_view_widget_vlayout.addWidget(self.graphics_view)

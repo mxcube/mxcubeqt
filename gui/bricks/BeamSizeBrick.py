@@ -47,10 +47,6 @@ Sizes are estimated by related HO
 """
 
 
-try:
-    unichr
-except NameError:
-    unichr = chr
 
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
@@ -58,6 +54,10 @@ from gui.BaseComponents import BaseWidget
 from HardwareRepository import HardwareRepository
 beamline_object = HardwareRepository.get_beamline()
 
+try:
+    unichr
+except NameError:
+    unichr = chr
 
 __credits__ = ["MXCuBE collaboration"]
 __category__ = "Beam definition"

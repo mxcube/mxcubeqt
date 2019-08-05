@@ -117,7 +117,9 @@ class EnergyScanParametersWidget(QtImport.QWidget):
             beamline_object.energy_scan.connect(
                 "energyScanStarted", self.energy_scan_started
             )
-            beamline_object.energy_scan.connect("scanNewPoint", self.energy_scan_new_point)
+            beamline_object.energy_scan.connect(
+                "scanNewPoint", self.energy_scan_new_point
+            )
             beamline_object.energy_scan.connect("choochFinished", self.chooch_finished)
 
     def _prefix_ledit_change(self, new_value):

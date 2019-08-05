@@ -92,9 +92,7 @@ class PlateManipulatorBrick(BaseWidget):
             self.plate_manipulator = self.get_hardware_object(new_value)
 
             if self.plate_manipulator is not None:
-                self.plate_navigator_widget.init_plate_view(
-                    self.plate_manipulator
-                )
+                self.plate_navigator_widget.init_plate_view()
                 self.connect(
                     self.plate_manipulator,
                     SampleChanger.INFO_CHANGED_EVENT,
@@ -123,7 +121,7 @@ class PlateManipulatorBrick(BaseWidget):
     def move_to_xtal_clicked(self):
         xtal_item = self.xtal_map.get(self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
-            self.plate_manipulator.load(xtal_item),
+            self.plate_manipulator.load(xtal_item)
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):

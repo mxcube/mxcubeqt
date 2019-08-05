@@ -143,7 +143,9 @@ class KappaPhiMotorsBrick(BaseWidget):
                     self.diffractometer_state_changed,
                 )
                 self.connect(
-                    beamline_object.diffractometer, "kappaMotorMoved", self.kappa_motor_moved
+                    beamline_object.diffractometer,
+                    "kappaMotorMoved",
+                    self.kappa_motor_moved
                 )
                 self.connect(
                     beamline_object.diffractometer,
