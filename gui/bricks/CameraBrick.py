@@ -33,6 +33,7 @@ class CameraBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
+        self.graphics_manager_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.graphics_scene_size = None
@@ -212,7 +213,7 @@ class CameraBrick(BaseWidget):
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
-            if beamline_object.graphics is not None:
+            if self.graphics_manager_hwobj is not None:
                 self.disconnect(
                     beamline_object.graphics, "mouseMoved", self.mouse_moved
                 )
@@ -223,8 +224,9 @@ class CameraBrick(BaseWidget):
                     beamline_object.graphics, "infoMsg", self.set_info_msg
                 )
 
+            self.graphics_manager_hwobj = beamline_object.graphics
 
-            if beamline_object.graphics is not None:
+            if self.graphics_manager_hwobj is not None:
                 self.connect(
                     beamline_object.graphics, "mouseMoved", self.mouse_moved
                 )
