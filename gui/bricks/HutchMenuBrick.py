@@ -127,7 +127,9 @@ class HutchMenuBrick(BaseWidget):
 
         self.connect(beamline_object.graphics, "centringStarted", self.centring_started)
         self.connect(beamline_object.graphics, "centringFailed", self.centring_failed)
-        self.connect(beamline_object.graphics, "centringSuccessful", self.centring_successful)
+        self.connect(
+            beamline_object.graphics, "centringSuccessful", self.centring_successful
+        )
         self.connect(
             beamline_object.graphics,
             "diffractometerPhaseChanged",

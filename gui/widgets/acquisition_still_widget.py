@@ -420,7 +420,9 @@ class AcquisitionStillWidget(QtImport.QWidget):
         return
 
     def update_exp_time_limits(self):
-        self.update_detector_exp_time_limits(beamline_object.detector.get_exposure_time_limits())
+        self.update_detector_exp_time_limits(
+            beamline_object.detector.get_exposure_time_limits()
+        )
 
     def update_osc_start(self, value):
         """

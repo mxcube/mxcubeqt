@@ -347,7 +347,9 @@ class CreateTaskBase(QtImport.QWidget):
         pass
 
     def get_default_prefix(self, sample_data_node=None, generic_name=False):
-        prefix = beamline_object.session.get_default_prefix(sample_data_node, generic_name)
+        prefix = beamline_object.session.get_default_prefix(
+            sample_data_node, generic_name
+        )
         return prefix
 
     def get_default_directory(self, tree_item=None, sub_dir=""):

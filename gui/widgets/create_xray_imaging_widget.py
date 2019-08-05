@@ -134,8 +134,8 @@ class CreateXrayImagingWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
 
         self._xray_imaging_parameters = queue_model_objects.XrayImagingParameters()
-        self._acquisition_parameters = beamline_object.get_default_acquisition_parameters(
-            "imaging"
+        self._acquisition_parameters = (
+            beamline_object.get_default_acquisition_parameters("imaging")
         )
         self._path_template.suffix = "tiff"
 

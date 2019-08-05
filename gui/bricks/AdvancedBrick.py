@@ -131,4 +131,3 @@ class AdvancedBrick(BaseWidget):
             #     pass
             if hasattr(beamline_object, "image_tracking"):
                 beamline_object.image_tracking.load_image(image_path)
-

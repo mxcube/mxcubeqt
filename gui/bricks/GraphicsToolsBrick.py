@@ -287,7 +287,9 @@ class GraphicsToolsBrick(BaseWidget):
         self.camera_control_dialog.show()
 
     def display_beam_size_toggled(self):
-        beamline_object.graphics.display_beam_size(self.display_beam_size_action.isChecked())
+        beamline_object.graphics.display_beam_size(
+            self.display_beam_size_action.isChecked()
+        )
 
     def start_magnification_tool(self):
         beamline_object.graphics.set_magnification_mode(True)

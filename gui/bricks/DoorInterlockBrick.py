@@ -86,7 +86,9 @@ class DoorInterlockBrick(BaseWidget):
         self.unlock_door_button.setToolTip("Unlocks the doors")
 
         self.connect(
-            beamline_object.hutch_interlock, "doorInterlockStateChanged", self.state_changed
+            beamline_object.hutch_interlock,
+            "doorInterlockStateChanged",
+            self.state_changed
         )
         beamline_object.hutch_interlock.update_values()
 

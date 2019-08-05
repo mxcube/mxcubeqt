@@ -98,9 +98,13 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
         try:
-            self._periodic_table_widget.set_elements(beamline_object.energy_scan.getElements())
+            self._periodic_table_widget.set_elements(
+                beamline_object.energy_scan.getElements()
+            )
 
-            max_transmission_value = beamline_object.energy_scan.get_max_transmission_value()
+            max_transmission_value = (
+                beamline_object.energy_scan.get_max_transmission_value()
+            )
 
             self._adjust_transmission_cbox.setEnabled(True)
             self._adjust_transmission_cbox.setChecked(True)

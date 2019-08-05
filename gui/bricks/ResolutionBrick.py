@@ -125,7 +125,9 @@ class ResolutionBrick(BaseWidget):
     def run(self):
         if beamline_object.detector.detector_distance is not None:
             self.connect(
-                beamline_object.detector.detector_distance, "deviceReady", self.detector_distance_ready
+                beamline_object.detector.detector_distance,
+                "deviceReady",
+                self.detector_distance_ready
             )
             self.connect(
                 beamline_object.detector.detector_distance,
@@ -138,7 +140,9 @@ class ResolutionBrick(BaseWidget):
                 self.detector_distance_state_changed,
             )
             self.connect(
-                beamline_object.detector.detector_distance, "positionChanged", self.detector_distance_changed
+                beamline_object.detector.detector_distance,
+                "positionChanged",
+                self.detector_distance_changed
             )
             self.connect(
                 beamline_object.detector.detector_distance,
@@ -154,14 +158,26 @@ class ResolutionBrick(BaseWidget):
         if beamline_object.energy is not None:
             self.connect(beamline_object.energy, "energyChanged", self.energy_changed)
         if beamline_object.resolution is not None:
-            self.connect(beamline_object.resolution, "deviceReady", self.resolution_ready)
-            self.connect(beamline_object.resolution, "deviceNotReady", self.resolution_not_ready)
-            self.connect(beamline_object.resolution, "stateChanged", self.resolution_state_changed)
             self.connect(
-                beamline_object.resolution, "positionChanged", self.resolution_value_changed
+                beamline_object.resolution, "deviceReady", self.resolution_ready
             )
             self.connect(
-                beamline_object.resolution, "limitsChanged", self.resolution_limits_changed
+                beamline_object.resolution, "deviceNotReady", self.resolution_not_ready
+            )
+            self.connect(
+                beamline_object.resolution,
+                "stateChanged",
+                self.resolution_state_changed
+            )
+            self.connect(
+                beamline_object.resolution,
+                "positionChanged",
+                self.resolution_value_changed
+            )
+            self.connect(
+                beamline_object.resolution,
+                "limitsChanged",
+                self.resolution_limits_changed
             )
 
             if beamline_object.resolution.is_ready():
@@ -256,21 +272,21 @@ class ResolutionBrick(BaseWidget):
         Door interlock is optional, because not all sites might have it
         """
         groupbox_title = ""
-
-        if beamline_object.detector.detector_distance is None:
+        detector_distance = beamline_object.detector.detector_distance
+        if detector_distance is None:
             detector_ready = False
         elif detector_ready is None:
             try:
-                if beamline_object.detector.detector_distance.connection.isSpecConnected():
-                    detector_ready = beamline_object.detector.detector_distance.isReady()
+                if detector_distance.connection.isSpecConnected():
+                    detector_ready = detector_distance.isReady()
             except AttributeError:
-                detector_ready = beamline_object.detector.detector_distance.is_ready()
+                detector_ready = detector_distance.is_ready()
 
         if detector_ready:
             self.get_detector_distance_limits()
-            curr_detector_distance = beamline_object.detector.detector_distance.get_position()
+            curr_detector_distance = detector_distance.get_position()
             self.detector_distance_changed(curr_detector_distance)
-            self.detector_distance_state_changed(beamline_object.detector.detector_distance.get_state())
+            self.detector_distance_state_changed(detector_distance.get_state())
             if self.units_combobox.currentText() == "mm":
                 groupbox_title = "Detector distance"
                 self.new_value_validator.setRange(
@@ -365,16 +381,17 @@ class ResolutionBrick(BaseWidget):
             return
 
         detector_ready = False
-        if beamline_object.detector.detector_distance is not None:
+        detector_distance = beamline_object.detector.detector_distance
+        if detector_distance is not None:
             try:
-                if (beamline_object.detector.detector_distance.connection.isSpecConnected()):
-                    detector_ready = beamline_object.detector.detector_distance.is_ready()
+                if (detector_distance.connection.isSpecConnected()):
+                    detector_ready = detector_distance.is_ready()
             except AttributeError:
-                detector_ready = beamline_object.detector.detector_distance.is_ready()
+                detector_ready = detector_distance.is_ready()
 
         if detector_ready:
             self.detector_distance_limits_changed(
-                beamline_object.detector.detector_distance.get_limits()
+                detector_distance.get_limits()
             )
         else:
             self.detector_distance_limits = None
@@ -390,7 +407,8 @@ class ResolutionBrick(BaseWidget):
             self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
-        if beamline_object.detector.detector_distance is not None:
+        detector_distance = beamline_object.detector.detector_distance
+        if detector_distance is not None:
             if state:
                 color = ResolutionBrick.STATE_COLORS[state]
             else:
@@ -398,21 +416,15 @@ class ResolutionBrick(BaseWidget):
 
             unit = self.units_combobox.currentText()
             if unit is chr(197):
-                if (
-                    state
-                    == beamline_object.detector.detector_distance.motor_states.READY
-                ):
+                if (state == detector_distance.motor_states.READY):
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")
                     self.new_value_ledit.blockSignals(False)
                     self.new_value_ledit.setEnabled(True)
                 else:
                     self.new_value_ledit.setEnabled(False)
-                # or state == beamline_object.detector.detector_distance.motor_states.MOVESTARTED:
-                if (
-                    state
-                    == beamline_object.detector.detector_distance.motor_states.MOVING
-                ):
+                # or state == detector_distance.motor_states.MOVESTARTED:
+                if (state == detector_distance.motor_states.MOVING):
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
@@ -423,19 +435,20 @@ class ResolutionBrick(BaseWidget):
         if state is None:
             return
 
+        detector_distance = beamline_object.detector.detector_distance
         color = ResolutionBrick.STATE_COLORS[state]
         unit = self.units_combobox.currentText()
         if unit == "mm":
-            if state == beamline_object.detector.detector_distance.motor_states.READY:
+            if state == detector_distance.motor_states.READY:
                 self.new_value_ledit.blockSignals(True)
                 self.new_value_ledit.setText("")
                 self.new_value_ledit.blockSignals(False)
                 self.new_value_ledit.setEnabled(True)
             else:
                 self.new_value_ledit.setEnabled(False)
-            if state == beamline_object.detector.detector_distance.motor_states.MOVING:
+            if state == detector_distance.motor_states.MOVING:
                 # or \
-                # state == beamline_object.detector.detector_distance.motor_states.MOVESTARTED:
+                # state == detector_distance.motor_states.MOVESTARTED:
                 self.stop_button.setEnabled(True)
             else:
                 self.stop_button.setEnabled(False)

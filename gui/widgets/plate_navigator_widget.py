@@ -101,7 +101,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
             self.plate_navigator_table.setItem(row, col, new_item)
             self.__current_location = new_location
 
-    def init_plate_view(self, plate_manipulator):
+    def init_plate_view(self):
         """Initalizes plate info
         """
         cell_width = 25

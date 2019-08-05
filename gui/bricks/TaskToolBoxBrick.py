@@ -95,7 +95,11 @@ class TaskToolBoxBrick(BaseWidget):
     def user_group_saved(self, new_user_group):
         beamline_object.session.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
-        path = beamline_object.session.get_base_image_directory() + "/" + str(new_user_group)
+        path = (
+            beamline_object.session.get_base_image_directory()
+            + "/"
+            + str(new_user_group)
+        )
         msg = "Image path is: %s" % path
         logging.getLogger("GUI").info(msg)
 

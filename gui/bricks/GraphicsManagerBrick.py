@@ -131,7 +131,9 @@ class GraphicsManagerBrick(BaseWidget):
         self.connect(beamline_object.graphics, "shapeDeleted", self.shape_deleted)
         self.connect(beamline_object.graphics, "shapeSelected", self.shape_selected)
         self.connect(
-            beamline_object.graphics, "centringInProgress", self.centring_in_progress_changed
+            beamline_object.graphics,
+            "centringInProgress",
+            self.centring_in_progress_changed
         )
 
     def shape_created(self, shape, shape_type):
@@ -222,7 +224,7 @@ class GraphicsManagerBrick(BaseWidget):
             if self.__grid_map.get(shape):
                 self.__grid_map[shape].setSelected(selected_state)
             self.manager_widget.change_color_button.setEnabled(
-                len(beamline_object.graphics.get_selected_shapes()) > 0
+                bool(beamline_object.graphics.get_selected_shapes())
             )
 
     def centring_in_progress_changed(self, centring_in_progress):
