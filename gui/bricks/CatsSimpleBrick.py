@@ -38,6 +38,8 @@ from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
 from gui.utils import sample_changer_helper as sc_helper
 from gui.bricks.SampleChangerBrick import SampleChangerBrick, BasketView, VialView
+from HardwareRepository import HardwareRepository
+beamline_object = HardwareRepository.get_beamline()
 
 
 __credits__ = ["MXCuBE collaboration"]
