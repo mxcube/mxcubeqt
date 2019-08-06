@@ -153,24 +153,24 @@ class StillCollectionPreviewBrick(BaseWidget):
         for score_type in ("Score", "Resolution", "Number of spots"):
             self.score_type_combo.addItem(score_type)
 
-        beamline_object.offline_processing.connect(
+        beamline_object.online_processing.connect(
             "processingStarted", self.processing_started
         )
-        beamline_object.offline_processing.connect(
+        beamline_object.online_processing.connect(
             "processingFinished", self.processing_finished
         )
-        beamline_object.offline_processing.connect(
+        beamline_object.online_processing.connect(
             "processingFailed", self.processing_failed
         )
-        beamline_object.offline_processing.connect(
+        beamline_object.online_processing.connect(
             "processingFrame", self.processing_frame_changed
         )
         self.current_grid_properties = (
-            beamline_object.offline_processing.get_current_grid_properties()
+            beamline_object.online_processing.get_current_grid_properties()
         )
 
         self.grid_properties_combo.blockSignals(True)
-        for prop in beamline_object.offline_processing.get_available_grid_properties():
+        for prop in beamline_object.online_processing.get_available_grid_properties():
             self.grid_properties_combo.addItem(str(prop))
         self.grid_properties_combo.setCurrentIndex(0)
         self.grid_properties_combo.blockSignals(False)
@@ -416,9 +416,9 @@ class StillCollectionPreviewBrick(BaseWidget):
         :param index: int
         :return: None
         """
-        beamline_object.offline_processing.set_current_grid_index(index)
+        beamline_object.online_processing.set_current_grid_index(index)
         self.current_grid_properties = (
-            beamline_object.offline_processing.get_current_grid_properties()
+            beamline_object.online_processing.get_current_grid_properties()
         )
         self.init_gui()
         self.grid_graphics_base.init_item(self.current_grid_properties)

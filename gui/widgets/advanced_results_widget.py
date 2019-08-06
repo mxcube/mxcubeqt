@@ -53,10 +53,10 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        beamline_object.offline_processing.connect(
+        beamline_object.online_processing.connect(
            "processingStarted", self.processing_started
         )
-        beamline_object.offline_processing.connect(
+        beamline_object.online_processing.connect(
            "processingResultsUpdate", self.update_processing_results
         )
 
