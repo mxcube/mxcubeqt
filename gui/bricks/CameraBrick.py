@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 from HardwareRepository import HardwareRepository
@@ -258,12 +259,13 @@ class CameraBrick(BaseWidget):
             self.display_scale = new_value
             if beamline_object.graphics is not None:
                 if hasattr(beamline_object.graphics, "set_scale_visible"):
-                    # NBNB HACK Where did set_scale_visible come from?
-                    # Why no errors earlier? Te,porarily put in guard
+                    # NBNB Where did this code come from? SHould probvably be removed
+                    # no known function "set_scale_visible" anywhere. TODO remove
                     beamline_object.graphics.set_scale_visible(new_value)
                 else:
-                    print ("@~@~ WARNING beamline_object.graphics has no attribute"
-                           " 'set_scale_visible'")
+                    logging.getLogger().info(
+                        "No such function: graphics.set_scale_visible()"
+                    )
 
         elif property_name == "beamDefiner":
             self.define_beam_action.setEnabled(new_value)
