@@ -731,6 +731,6 @@ class HeatMapWidget(QtImport.QWidget):
         Relaunches parallel processing
         """
         if self.__associated_data_collection and self.__associated_grid:
-            beamline_object.offline_processing.run_processing(
+            beamline_object.online_processing.run_processing(
                 self.__associated_data_collection
             )
