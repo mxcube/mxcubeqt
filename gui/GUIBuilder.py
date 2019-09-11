@@ -818,7 +818,7 @@ class GUIEditorWindow(QtImport.QWidget):
                     parent = parent_ref()
                     if parent is None:
                         return
-                    parent.childPropertyChanged(
+                    parent.child_property_changed(
                         item_name, property_name, old_value, new_value
                     )
 
