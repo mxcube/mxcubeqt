@@ -453,8 +453,8 @@ class CreateTaskBase(QtImport.QWidget):
             #    self._path_template.process_directory = proc_directory
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = beamline_object.queue_model.get_next_run_number(
-                self._path_template
+            self._path_template.run_number = (
+                beamline_object.queue_model.get_next_run_number(self._path_template)
             )
 
             # Update energy transmission and resolution

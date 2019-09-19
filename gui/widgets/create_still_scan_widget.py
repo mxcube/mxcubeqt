@@ -135,7 +135,9 @@ class CreateStillScanWidget(CreateTaskBase):
         has_shutter_less = beamline_object.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
-        self._acquisition_parameters = beamline_object.get_default_acquisition_parameters()
+        self._acquisition_parameters = (
+            beamline_object.get_default_acquisition_parameters()
+        )
         self._acquisition_parameters.num_triggers = 1
         self._acquisition_parameters.num_images_per_trigger = 1
 

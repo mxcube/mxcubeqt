@@ -384,7 +384,7 @@ class ResolutionBrick(BaseWidget):
         detector_distance = beamline_object.detector.detector_distance
         if detector_distance is not None:
             try:
-                if (detector_distance.connection.isSpecConnected()):
+                if detector_distance.connection.isSpecConnected():
                     detector_ready = detector_distance.is_ready()
             except AttributeError:
                 detector_ready = detector_distance.is_ready()
@@ -416,7 +416,7 @@ class ResolutionBrick(BaseWidget):
 
             unit = self.units_combobox.currentText()
             if unit is chr(197):
-                if (state == detector_distance.motor_states.READY):
+                if state == detector_distance.motor_states.READY:
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")
                     self.new_value_ledit.blockSignals(False)
@@ -424,7 +424,7 @@ class ResolutionBrick(BaseWidget):
                 else:
                     self.new_value_ledit.setEnabled(False)
                 # or state == detector_distance.motor_states.MOVESTARTED:
-                if (state == detector_distance.motor_states.MOVING):
+                if state == detector_distance.motor_states.MOVING:
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)

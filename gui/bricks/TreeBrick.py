@@ -270,10 +270,14 @@ class TreeBrick(BaseWidget):
             "minidiffPhaseChanged",
             self.diffractometer_phase_changed,
         )
-        self.diffractometer_phase_changed(beamline_object.diffractometer.get_current_phase())
+        self.diffractometer_phase_changed(
+            beamline_object.diffractometer.get_current_phase()
+        )
 
         self.connect(
-            beamline_object.queue_manager, "show_workflow_tab", self.show_workflow_tab_from_model
+            beamline_object.queue_manager,
+            "show_workflow_tab",
+            self.show_workflow_tab_from_model
         )
         self.connect(
             beamline_object.queue_manager,

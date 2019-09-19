@@ -146,7 +146,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._acquisition_parameters.shutterless = has_shutter_less
 
         self._acquisition_parameters = (
-            beamline_object.get_default_acquisition_parameters( "helical")
+            beamline_object.get_default_acquisition_parameters("helical")
         )
 
     def shape_created(self, shape, shape_type):
