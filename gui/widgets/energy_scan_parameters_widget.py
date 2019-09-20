@@ -26,8 +26,7 @@ from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -113,14 +112,14 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.scan_result_plot_widget.hide()
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if beamline_object.energy_scan is not None:
-            beamline_object.energy_scan.connect(
+        if HWR.beamline.energy_scan is not None:
+            HWR.beamline.energy_scan.connect(
                 "energyScanStarted", self.energy_scan_started
             )
-            beamline_object.energy_scan.connect(
+            HWR.beamline.energy_scan.connect(
                 "scanNewPoint", self.energy_scan_new_point
             )
-            beamline_object.energy_scan.connect("choochFinished", self.chooch_finished)
+            HWR.beamline.energy_scan.connect("choochFinished", self.chooch_finished)
 
     def _prefix_ledit_change(self, new_value):
         self.energy_scan_model.set_name(str(new_value))

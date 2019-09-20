@@ -1,5 +1,5 @@
 from BlissFramework import BaseComponents
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 import MotorBrick
 import logging
 

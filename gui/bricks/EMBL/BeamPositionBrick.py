@@ -27,8 +27,7 @@ from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -137,10 +136,10 @@ class BeamPositionBrick(BaseWidget):
         self.measure_flux_button.setIcon(Icons.load_icon("Sun"))
 
         self.connect(
-            beamline_object.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
 
-        beamline_object.diffractometer.update_values()
+        HWR.beamline.diffractometer.update_values()
         self.update_gui()
 
     def enable_widget(self, state):
@@ -321,7 +320,7 @@ class BeamPositionBrick(BaseWidget):
         :param phase:
         :return:
         """
-        self.is_beam_location_phase = phase == beamline_object.diffractometer.PHASE_BEAM
+        self.is_beam_location_phase = phase == HWR.beamline.diffractometer.PHASE_BEAM
         self.update_gui()
 
     def measure_flux_clicked(self):

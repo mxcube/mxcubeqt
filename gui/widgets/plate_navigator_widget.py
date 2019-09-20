@@ -19,8 +19,7 @@
 
 from gui.utils import Icons, QtImport
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -82,7 +81,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
             QtImport.Qt.ScrollBarAlwaysOff)
 
     def refresh_plate_location(self):
-        new_location = beamline_object.plate_manipulator.get_plate_location()
+        new_location = HWR.beamline.plate_manipulator.get_plate_location()
         self.plate_navigator_cell.setEnabled(True)
 
         if new_location and self.__current_location != new_location:
@@ -107,7 +106,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
         cell_width = 25
         cell_height = 23
 
-        plate_info = beamline_object.plate_manipulator.get_plate_info()
+        plate_info = HWR.beamline.plate_manipulator.get_plate_info()
 
         self.num_cols = plate_info.get("num_cols", 12)
         self.num_rows = plate_info.get("num_rows", 8)
@@ -145,7 +144,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
 
     def navigation_item_double_clicked(self, pos_x, pos_y):
         drop = int(pos_y * self.num_drops) + 1
-        beamline_object.plate_manipulator.load_sample(
+        HWR.beamline.plate_manipulator.load_sample(
             (int(self.__current_location[0] + 1),
              int((self.__current_location[1]) * self.num_drops + drop)),
             pos_x, pos_y, wait=False)
@@ -153,7 +152,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
     def navigation_table_double_clicked(self, table_item):
         """Moves to the col/row double clicked by user
         """
-        beamline_object.plate_manipulator.load_sample(
+        HWR.beamline.plate_manipulator.load_sample(
             (table_item.row() + 1, table_item.column() * self.num_drops + 1),
             wait=False)
 

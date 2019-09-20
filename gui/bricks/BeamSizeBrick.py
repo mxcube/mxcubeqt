@@ -51,8 +51,7 @@ Sizes are estimated by related HO
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 try:
     unichr
@@ -118,7 +117,7 @@ class BeamSizeBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-        self.connect(beamline_object.beam, "beamInfoChanged", self.beam_info_changed)
+        self.connect(HWR.beamline.beam, "beamInfoChanged", self.beam_info_changed)
 
     def beam_info_changed(self, beam_info):
         """

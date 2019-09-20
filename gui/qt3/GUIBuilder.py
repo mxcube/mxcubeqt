@@ -19,12 +19,12 @@ from BlissFramework.BaseLayoutItems import ContainerCfg
 from BlissFramework.Utils import GUIDisplay
 
 try:
-    from HardwareRepository import HardwareRepository
+    from HardwareRepository import HardwareRepository as HWR
 except ImportError:
     logging.getLogger().warning("no Hardware Repository client module could be found")
 else:
     print "rework HardwareRepositoryBrowser"
-    #from HardwareRepository import HardwareRepositoryBrowser
+    #from HardwareRepository import HardwareRepository as HWRBrowser
 
 
 class HorizontalSpacer(qt.QWidget):

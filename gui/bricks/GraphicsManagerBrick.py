@@ -20,8 +20,7 @@
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -127,11 +126,11 @@ class GraphicsManagerBrick(BaseWidget):
         self.main_groupbox_toggled(False)
         self.main_groupbox.setToolTip("Click to open/close item manager")
 
-        self.connect(beamline_object.graphics, "shapeCreated", self.shape_created)
-        self.connect(beamline_object.graphics, "shapeDeleted", self.shape_deleted)
-        self.connect(beamline_object.graphics, "shapeSelected", self.shape_selected)
+        self.connect(HWR.beamline.graphics, "shapeCreated", self.shape_created)
+        self.connect(HWR.beamline.graphics, "shapeDeleted", self.shape_deleted)
+        self.connect(HWR.beamline.graphics, "shapeSelected", self.shape_selected)
         self.connect(
-            beamline_object.graphics,
+            HWR.beamline.graphics,
             "centringInProgress",
             self.centring_in_progress_changed
         )
@@ -224,7 +223,7 @@ class GraphicsManagerBrick(BaseWidget):
             if self.__grid_map.get(shape):
                 self.__grid_map[shape].setSelected(selected_state)
             self.manager_widget.change_color_button.setEnabled(
-                bool(beamline_object.graphics.get_selected_shapes())
+                bool(HWR.beamline.graphics.get_selected_shapes())
             )
 
     def centring_in_progress_changed(self, centring_in_progress):
@@ -246,7 +245,7 @@ class GraphicsManagerBrick(BaseWidget):
     def change_color_clicked(self):
         color = QtImport.QColorDialog.getColor()
         if color.isValid():
-            for item in beamline_object.graphics.get_selected_shapes():
+            for item in HWR.beamline.graphics.get_selected_shapes():
                 item.set_base_color(color)
 
     def display_all_button_clicked(self):
@@ -260,19 +259,19 @@ class GraphicsManagerBrick(BaseWidget):
             treewidget_item.setData(3, QtImport.Qt.DisplayRole, "False")
 
     def clear_all_button_clicked(self):
-        beamline_object.graphics.clear_all()
+        HWR.beamline.graphics.clear_all()
 
     def create_point_start_button_clicked(self):
-        beamline_object.graphics.start_centring(tree_click=True)
+        HWR.beamline.graphics.start_centring(tree_click=True)
 
     def create_point_accept_button_clicked(self):
-        beamline_object.graphics.start_centring()
+        HWR.beamline.graphics.start_centring()
 
     def create_line_button_clicked(self):
-        beamline_object.graphics.create_line()
+        HWR.beamline.graphics.create_line()
 
     def draw_grid_button_clicked(self):
-        beamline_object.graphics.create_grid(self.get_spacing())
+        HWR.beamline.graphics.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
         QtImport.QMenu(self.manager_widget.shapes_treewidget)

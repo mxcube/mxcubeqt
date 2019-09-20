@@ -33,7 +33,7 @@ gevent.monkey.patch_all(thread=False)
 import gui
 from gui import GUISupervisor
 from gui.utils import GUILogHandler, ErrorHandler, QtImport
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -280,9 +280,9 @@ def run(gui_config_file=None):
     # configure modules
     if hwobj_directories:
         # Must be done before init_hardware_repository
-        HardwareRepository.addHardwareObjectsDirs(hwobj_directories)
-    HardwareRepository.init_hardware_repository(configuration_path)
-    HardwareRepository.setUserFileDirectory(user_file_dir)
+        HWR.addHardwareObjectsDirs(hwobj_directories)
+    HWR.init_hardware_repository(configuration_path)
+    HWR.setUserFileDirectory(user_file_dir)
     if custom_bricks_directories:
         gui.add_custom_bricks_dirs(custom_bricks_directories)
 

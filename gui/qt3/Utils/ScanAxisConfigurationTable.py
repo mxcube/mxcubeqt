@@ -1,5 +1,5 @@
 # $Id: ScanAxisConfigurationTable.py,v 1.1 2004/08/10 10:05:46 guijarro Exp $
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework.Bricks import MotorBrick
 
 from qt import *

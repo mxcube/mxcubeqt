@@ -21,8 +21,7 @@ from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -45,9 +44,9 @@ class EnergyScanParametersBrick(BaseWidget):
 
     def populate_parameter_widget(self, item):
         self.energy_scan_widget.data_path_widget.set_base_image_directory(
-            beamline_object.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.energy_scan_widget.data_path_widget.set_base_process_directory(
-            beamline_object.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
         self.energy_scan_widget.populate_widget(item)

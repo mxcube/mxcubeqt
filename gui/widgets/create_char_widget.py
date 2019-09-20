@@ -33,8 +33,7 @@ from HardwareRepository.HardwareObjects.queue_model_enumerables import XTAL_SPAC
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from HardwareRepository.HardwareObjects.abstract import AbstractDataAnalysis
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -188,12 +187,12 @@ class CreateCharWidget(CreateTaskBase):
         self._set_space_group(self._processing_parameters.space_group)
 
         self._acquisition_parameters = (
-            beamline_object.get_default_acquisition_parameters("characterisation")
+            HWR.beamline.get_default_acquisition_parameters("characterisation")
         )
 
         self._char_params = (
             AbstractDataAnalysis.get_default_characterisation_parameters(
-                beamline_object.data_analysis.edna_default_file
+                HWR.beamline.data_analysis.edna_default_file
             )
         )
         self._path_template.reference_image_prefix = "ref"
@@ -268,7 +267,7 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = beamline_object.graphics.get_selected_shapes()
+        selected_shapes = HWR.beamline.graphics.get_selected_shapes()
 
         for shape in selected_shapes:
             if isinstance(shape, GraphicsItemPoint):
@@ -282,11 +281,11 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = beamline_object.graphics.get_scene_snapshot()
+            cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = beamline_object.graphics.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 
@@ -316,7 +315,7 @@ class CreateCharWidget(CreateTaskBase):
         tasks.append(char)
         self._path_template.run_number += 1
 
-        if beamline_object.flux.get_flux() < 1e9:
+        if HWR.beamline.flux.get_flux() < 1e9:
             logging.getLogger("GUI").error(
                 "No flux reading is available! "
                 + "Characterisation result may be wrong. "

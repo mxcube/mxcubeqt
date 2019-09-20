@@ -24,8 +24,7 @@ from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -142,7 +141,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
             1, 9999999, self.acq_widget_layout.num_images_ledit
         )
 
-        limits_dict = beamline_object.acquisition_limit_values
+        limits_dict = HWR.beamline.acquisition_limit_values
 
         tpl = limits_dict.get("exposure_time")
         if tpl:
@@ -376,7 +375,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
         Initiates detetor ROI modes. Available modes are added to the combobox
         :return: None
         """
-        roi_modes = beamline_object.detector.get_roi_modes()
+        roi_modes = HWR.beamline.detector.get_roi_modes()
         if (
             len(roi_modes) > 0
             and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
@@ -410,7 +409,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
         :param roi_mode_index: int
         :return:
         """
-        beamline_object.detector.set_roi_mode(roi_mode_index)
+        HWR.beamline.detector.set_roi_mode(roi_mode_index)
 
     def update_osc_range_per_frame_limits(self):
         """
@@ -421,7 +420,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
 
     def update_exp_time_limits(self):
         self.update_detector_exp_time_limits(
-            beamline_object.detector.get_exposure_time_limits()
+            HWR.beamline.detector.get_exposure_time_limits()
         )
 
     def update_osc_start(self, value):

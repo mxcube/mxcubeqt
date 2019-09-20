@@ -28,8 +28,7 @@ from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidg
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from HardwareRepository.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -119,7 +118,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
-        beamline_object.detector.detector_distance.connect(
+        HWR.beamline.detector.detector_distance.connect(
             "positionChanged",
             self._xray_imaging_parameters_widget.set_detector_distance,
         )
@@ -135,7 +134,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self._xray_imaging_parameters = queue_model_objects.XrayImagingParameters()
         self._acquisition_parameters = (
-            beamline_object.get_default_acquisition_parameters("imaging")
+            HWR.beamline.get_default_acquisition_parameters("imaging")
         )
         self._path_template.suffix = "tiff"
 
@@ -149,7 +148,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._xray_imaging_parameters
             )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                beamline_object.detector.detector_distance.get_position()
+                HWR.beamline.detector.detector_distance.get_position()
             )
             self.setDisabled(False)
             self._xray_imaging_parameters_widget.enable_distance_tools(True)
@@ -181,12 +180,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = beamline_object.graphics.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = beamline_object.graphics.get_scene_snapshot()
+            cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
  
         detector_distance_list = []
         dc_list = []
@@ -211,7 +210,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
             if do_it:
                 do_it = False
                 self._path_template.run_number = \
-                    beamline_object.queue_model.get_next_run_number(
+                    HWR.beamline.queue_model.get_next_run_number(
                     acq.path_template)
                 acq.path_template.run_number = self._path_template.run_number
 

@@ -21,8 +21,7 @@ from gui.BaseComponents import BaseWidget
 from gui.utils import Icons, Colors, QtImport
 from gui.widgets.matplot_widget import TwoAxisPlotWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}
@@ -68,10 +67,10 @@ class MachineInfoBrick(BaseWidget):
 
     def run(self):
         """Method called when user changes a property in the gui builder"""
-        if beamline_object.machine_info is not None:
+        if HWR.beamline.machine_info is not None:
             self.setEnabled(True)
-            self.connect(beamline_object.machine_info, "valuesChanged", self.set_value)
-            beamline_object.machine_info.update_values()
+            self.connect(HWR.beamline.machine_info, "valuesChanged", self.set_value)
+            HWR.beamline.machine_info.update_values()
         else:
             self.setEnabled(False)
 

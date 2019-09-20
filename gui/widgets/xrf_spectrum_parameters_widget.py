@@ -24,8 +24,7 @@ from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -114,8 +113,8 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if beamline_object.xrf_spectrum is None:
-            beamline_object.xrf_spectrum.connect(
+        if HWR.beamline.xrf_spectrum is None:
+            HWR.beamline.xrf_spectrum.connect(
                 "xrfSpectrumFinished", self.spectrum_finished
             )
 

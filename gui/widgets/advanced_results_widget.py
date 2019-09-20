@@ -20,8 +20,7 @@
 from gui.utils import QtImport
 from gui.widgets.heat_map_widget import HeatMapWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -53,10 +52,10 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        beamline_object.online_processing.connect(
+        HWR.beamline.online_processing.connect(
            "processingStarted", self.processing_started
         )
-        beamline_object.online_processing.connect(
+        HWR.beamline.online_processing.connect(
            "processingResultsUpdate", self.update_processing_results
         )
 

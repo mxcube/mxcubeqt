@@ -20,8 +20,7 @@
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -94,23 +93,23 @@ class AttenuatorsBrick(BaseWidget):
 
         self.instance_synchronize("transmission_ledit", "new_value_ledit")
 
-        if beamline_object.transmission is not None:
-            self.connect(beamline_object.transmission, "deviceReady", self.connected)
+        if HWR.beamline.transmission is not None:
+            self.connect(HWR.beamline.transmission, "deviceReady", self.connected)
             self.connect(
-                beamline_object.transmission, "deviceNotReady", self.disconnected
+                HWR.beamline.transmission, "deviceNotReady", self.disconnected
             )
             self.connect(
-                beamline_object.transmission,
+                HWR.beamline.transmission,
                 "stateChanged",
                 self.transmission_state_changed
             )
             self.connect(
-                beamline_object.transmission,
+                HWR.beamline.transmission,
                 "transmissionChanged",
                 self.transmission_value_changed
             )
             self.connected()
-            beamline_object.transmission.update_values()
+            HWR.beamline.transmission.update_values()
         else:
             self.disconnected()
 
@@ -142,7 +141,7 @@ class AttenuatorsBrick(BaseWidget):
             self.new_value_validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
         ):
-            beamline_object.transmission.set_transmission(float(input_field_text))
+            HWR.beamline.transmission.set_transmission(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base

@@ -23,8 +23,7 @@ from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -72,24 +71,24 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.connect(beamline_object.graphics,
+        self.connect(HWR.beamline.graphics,
                      "gridClicked",
                      self.grid_clicked
         )
 
     def populate_advanced_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(
-            beamline_object.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget.set_base_process_directory(
-            beamline_object.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
 
         self.line_parameters_widget._data_path_widget.set_base_image_directory(
-            beamline_object.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.line_parameters_widget._data_path_widget.set_base_process_directory(
-            beamline_object.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
 
         if isinstance(item, queue_item.XrayCenteringQueueItem):
@@ -126,8 +125,8 @@ class AdvancedBrick(BaseWidget):
         if self._data_collection is not None:
             image_path = self._data_collection.acquisitions[0].path_template.get_image_path() % image_num
             # try:
-            #     beamline_object.image_tracking.load_image(image_path)
+            #     HWR.beamline.image_tracking.load_image(image_path)
             # except AttributeError:
             #     pass
-            if hasattr(beamline_object, "image_tracking"):
-                beamline_object.image_tracking.load_image(image_path)
+            if hasattr(HWR.beamline, "image_tracking"):
+                HWR.beamline.image_tracking.load_image(image_path)

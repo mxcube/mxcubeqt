@@ -21,7 +21,7 @@ import sys
 import logging
 import warnings
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -79,7 +79,7 @@ def init(hwr_path):
     # hwr = HardwareRepository.getHardwareRepository(hwr_path)
 
     warnings.warn("The api module is deprecated - use the Beamline object instead")
-    hwr = HardwareRepository.getHardwareRepository()
+    hwr = HWR.getHardwareRepository()
     hwr.connect()
 
     global beamline_setup

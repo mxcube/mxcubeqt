@@ -63,7 +63,7 @@ Example of a valid Hardware Object XML file:
 """
 
 from BlissFramework import BaseComponents
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework import Icons
 from qt import *
 

@@ -43,7 +43,7 @@ Example of a valid Equipment XML file :
 </equipment>
 """
 from BlissFramework import BaseComponents
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework.Bricks import MotorBrick
 from qt import *
 

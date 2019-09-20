@@ -30,8 +30,7 @@ from HardwareRepository.HardwareObjects import (
 )
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -95,17 +94,17 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
         self._processing_widget.processing_widget.run_processing_parallel_cbox.\
-            setChecked(beamline_object.run_processing_parallel)
+            setChecked(HWR.beamline.run_processing_parallel)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        has_shutter_less = beamline_object.detector.has_shutterless()
+        has_shutter_less = HWR.beamline.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
         self._acquisition_parameters = \
-            beamline_object.get_default_acquisition_parameters()
+            HWR.beamline.get_default_acquisition_parameters()
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
@@ -183,12 +182,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = beamline_object.graphics.get_snapshot(shape)
+            snapshot = HWR.beamline.graphics.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = beamline_object.graphics.get_snapshot()
+            cpos.snapshot_image = HWR.beamline.graphics.get_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1

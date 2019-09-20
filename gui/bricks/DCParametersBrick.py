@@ -24,8 +24,7 @@ from gui.widgets.image_tracking_widget import ImageTrackingWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -76,10 +75,10 @@ class DCParametersBrick(BaseWidget):
 
     def populate_dc_parameter_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(
-            beamline_object.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget.set_base_process_directory(
-            beamline_object.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
 
         data_collection = item.get_model()

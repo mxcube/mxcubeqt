@@ -22,8 +22,7 @@
 
 from gui.utils import QtImport
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -76,7 +75,7 @@ class ImageTrackingWidget(QtImport.QWidget):
         self.setEnabled(False)
 
         # NB will be None if not configured
-        self.image_tracking_hwobj = beamline_object.image_tracking
+        self.image_tracking_hwobj = HWR.beamline.image_tracking
 
     def previous_button_clicked(self):
         value = self.image_tracking_widget_layout.image_num_spinbox.value() - 1

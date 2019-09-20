@@ -20,8 +20,7 @@
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -71,13 +70,13 @@ class PhaseBrick(BaseWidget):
         self.init_phase_list()
 
         self.connect(
-            beamline_object.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
-        beamline_object.diffractometer.update_values()
+        HWR.beamline.diffractometer.update_values()
 
     def init_phase_list(self):
         self.phase_combobox.clear()
-        phase_list = beamline_object.diffractometer.get_phase_list()
+        phase_list = HWR.beamline.diffractometer.get_phase_list()
         if len(phase_list) > 0:
             for phase in phase_list:
                 self.phase_combobox.addItem(phase)
@@ -86,8 +85,8 @@ class PhaseBrick(BaseWidget):
             self.setEnabled(False)
 
     def change_phase(self):
-        if beamline_object.diffractometer is not None:
-            beamline_object.diffractometer.set_phase(
+        if HWR.beamline.diffractometer is not None:
+            HWR.beamline.diffractometer.set_phase(
                 self.phase_combobox.currentText(), timeout=None
             )
 

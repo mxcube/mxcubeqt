@@ -11,12 +11,12 @@ sys.path.insert(0, MXCUBE)
 print ("MXCuBE root: %s" % MXCUBE)
 print ("Config path: %s" % HWR_XML_FILES)
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 
 @pytest.fixture(scope="session")
 def hwr():
-    HardwareRepository.init_hardware_repository(HWR_XML_FILES)
-    hwr = HardwareRepository.getHardwareRepository()
+    HWR.init_hardware_repository(HWR_XML_FILES)
+    hwr = HWR.getHardwareRepository()
     hwr.connect()
     return hwr
 

@@ -21,8 +21,7 @@ from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from HardwareRepository.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -248,7 +247,7 @@ class AcquisitionWidget(QtImport.QWidget):
 
     def update_osc_range_per_frame_limits(self):
         try:
-            max_osc_speed = beamline_object.diffractometer.get_osc_max_speed()
+            max_osc_speed = HWR.beamline.diffractometer.get_osc_max_speed()
             top_limit = max_osc_speed * float(
                 self.acq_widget_layout.exp_time_ledit.text()
             )
@@ -324,7 +323,7 @@ class AcquisitionWidget(QtImport.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if beamline_object.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode():
             if hasattr(self.parent(), "set_osc_total_range"):
                 self.parent().set_osc_total_range(num_images)
                 self._acquisition_mib.validate_all()
@@ -332,9 +331,9 @@ class AcquisitionWidget(QtImport.QWidget):
     def update_exp_time_limits(self):
         try:
             exp_time_limits = (
-                beamline_object.detector.get_exposure_time_limits()
+                HWR.beamline.detector.get_exposure_time_limits()
             )
-            max_osc_speed = beamline_object.diffractometer.get_osc_max_speed()
+            max_osc_speed = HWR.beamline.diffractometer.get_osc_max_speed()
             top_limit = (
                 float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
             )
@@ -360,8 +359,8 @@ class AcquisitionWidget(QtImport.QWidget):
         self.acq_widget_layout.osc_start_ledit.setEnabled(not state)
 
     def use_kappa(self, state):
-        if beamline_object.diffractometer is not None:
-            if beamline_object.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer is not None:
+            if HWR.beamline.diffractometer.in_plate_mode():
                 state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
@@ -369,7 +368,7 @@ class AcquisitionWidget(QtImport.QWidget):
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
 
     def init_limits(self):
-        limits_dict = beamline_object.acquisition_limit_values
+        limits_dict = HWR.beamline.acquisition_limit_values
 
         tpl = limits_dict.get("osc_range")
         if tpl:
@@ -496,13 +495,13 @@ class AcquisitionWidget(QtImport.QWidget):
             "shutterless", self.acq_widget_layout.shutterless_cbx, bool, None
         )
 
-        self.set_tunable_energy(beamline_object.tunable_wavelength)
+        self.set_tunable_energy(HWR.beamline.tunable_wavelength)
 
-        has_shutter_less = beamline_object.detector.has_shutterless()
+        has_shutter_less = HWR.beamline.detector.has_shutterless()
         self.acq_widget_layout.shutterless_cbx.setEnabled(has_shutter_less)
         self.acq_widget_layout.shutterless_cbx.setChecked(has_shutter_less)
 
-        if beamline_object.disable_num_passes:
+        if HWR.beamline.disable_num_passes:
             num_passes = self.acq_widget_layout.findChild(
                 QtImport.QLineEdit, "num_passes_ledit"
             )
@@ -534,7 +533,7 @@ class AcquisitionWidget(QtImport.QWidget):
 
     def overlap_changed(self, new_value):
 
-        if beamline_object.detector.has_shutterless():
+        if HWR.beamline.detector.has_shutterless():
             try:
                 new_value = float(new_value)
             except ValueError:
@@ -559,7 +558,7 @@ class AcquisitionWidget(QtImport.QWidget):
             self.madEnergySelectedSignal.emit(name, energy, state)
         else:
             self.update_energy(self.previous_energy)
-            # energy = beamline_object.energy.get_current_energy()
+            # energy = HWR.beamline.energy.get_current_energy()
             self.madEnergySelectedSignal.emit("", self.previous_energy, state)
 
     def max_osc_range_toggled(self, state):
@@ -697,7 +696,7 @@ class AcquisitionWidget(QtImport.QWidget):
         self._acquisition_mib.validate_all()
 
         return
-        if beamline_object.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode():
             if num_images_limits is None:
                 try:
                     osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
@@ -719,7 +718,7 @@ class AcquisitionWidget(QtImport.QWidget):
             self._acquisition_mib.validate_all()
 
     def init_detector_roi_modes(self):
-        roi_modes = beamline_object.detector.get_roi_modes()
+        roi_modes = HWR.beamline.detector.get_roi_modes()
         if (
             len(roi_modes) > 0
             and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
@@ -739,7 +738,7 @@ class AcquisitionWidget(QtImport.QWidget):
             )
 
     def detector_roi_mode_changed(self, roi_mode_index):
-        beamline_object.detector.set_roi_mode(roi_mode_index)
+        HWR.beamline.detector.set_roi_mode(roi_mode_index)
 
     def kappa_ledit_changed(self, new_value):
         if "kappa" not in self.value_changed_list:

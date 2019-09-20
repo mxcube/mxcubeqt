@@ -23,8 +23,7 @@ from os.path import expanduser
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons, QtImport
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -125,13 +124,13 @@ class HutchMenuBrick(BaseWidget):
         self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
         # self.instanceSynchronize("")
 
-        self.connect(beamline_object.graphics, "centringStarted", self.centring_started)
-        self.connect(beamline_object.graphics, "centringFailed", self.centring_failed)
+        self.connect(HWR.beamline.graphics, "centringStarted", self.centring_started)
+        self.connect(HWR.beamline.graphics, "centringFailed", self.centring_failed)
         self.connect(
-            beamline_object.graphics, "centringSuccessful", self.centring_successful
+            HWR.beamline.graphics, "centringSuccessful", self.centring_successful
         )
         self.connect(
-            beamline_object.graphics,
+            HWR.beamline.graphics,
             "diffractometerPhaseChanged",
             self.diffractometer_phase_changed,
         )
@@ -152,9 +151,9 @@ class HutchMenuBrick(BaseWidget):
 
     def centre_button_clicked(self, state):
         if state:
-            beamline_object.graphics.start_centring(tree_click=True)
+            HWR.beamline.graphics.start_centring(tree_click=True)
         else:
-            beamline_object.graphics.cancel_centring(reject=False)
+            HWR.beamline.graphics.cancel_centring(reject=False)
             self.accept_button.setEnabled(True)
 
     def save_snapshot_clicked(self):
@@ -180,7 +179,7 @@ class HutchMenuBrick(BaseWidget):
 
         if len(filename):
             try:
-                beamline_object.graphics.save_scene_snapshot(filename)
+                HWR.beamline.graphics.save_scene_snapshot(filename)
                 self.file_index += 1
             except BaseException:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
@@ -188,14 +187,14 @@ class HutchMenuBrick(BaseWidget):
     def accept_clicked(self):
         Colors.set_widget_color(self.accept_button, self.standard_color)
         self.reject_button.setEnabled(False)
-        beamline_object.graphics.accept_centring()
+        HWR.beamline.graphics.accept_centring()
 
     def reject_clicked(self):
         Colors.set_widget_color(self.accept_button, self.standard_color)
         self.reject_button.setEnabled(False)
         self.centre_button.setEnabled(True)
         self.accept_button.setEnabled(True)
-        beamline_object.graphics.reject_centring()
+        HWR.beamline.graphics.reject_centring()
 
     def centring_snapshots(self, state):
         if state is None:
@@ -249,38 +248,38 @@ class HutchMenuBrick(BaseWidget):
 
 
 def refresh_camera_clicked():
-    beamline_object.graphics.refresh_camera()
+    HWR.beamline.graphics.refresh_camera()
 
 
 def visual_align_clicked():
-    beamline_object.graphics.start_visual_align()
+    HWR.beamline.graphics.start_visual_align()
 
 
 def select_all_clicked():
-    beamline_object.graphics.select_all_points()
+    HWR.beamline.graphics.select_all_points()
 
 
 def clear_all_clicked():
     """
     Clears all shapes (points, lines and meshes)
     """
-    beamline_object.graphics.clear_all()
+    HWR.beamline.graphics.clear_all()
 
 
 def auto_focus_clicked():
-    beamline_object.graphics.auto_focus()
+    HWR.beamline.graphics.auto_focus()
 
 
 def auto_center_clicked():
-    beamline_object.graphics.start_auto_centring()
+    HWR.beamline.graphics.start_auto_centring()
 
 
 def create_line_clicked():
-    beamline_object.graphics.create_line()
+    HWR.beamline.graphics.create_line()
 
 
 def draw_grid_clicked():
-    beamline_object.graphics.create_grid()
+    HWR.beamline.graphics.create_grid()
 
 
 class MonoStateButton(QtImport.QToolButton):

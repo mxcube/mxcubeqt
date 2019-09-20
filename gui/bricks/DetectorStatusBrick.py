@@ -20,8 +20,7 @@
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository
-beamline_object = HardwareRepository.get_beamline()
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -104,12 +103,12 @@ class DetectorStatusBrick(BaseWidget):
         self.frame_rate_label.setMinimumHeight(20)
 
         self.connect(
-            beamline_object.detector, "temperatureChanged", self.temperature_changed
+            HWR.beamline.detector, "temperatureChanged", self.temperature_changed
         )
-        self.connect(beamline_object.detector, "humidityChanged", self.humidity_changed)
-        self.connect(beamline_object.detector, "statusChanged", self.status_changed)
+        self.connect(HWR.beamline.detector, "humidityChanged", self.humidity_changed)
+        self.connect(HWR.beamline.detector, "statusChanged", self.status_changed)
         self.connect(
-            beamline_object.detector, "frameRateChanged", self.frame_rate_changed
+            HWR.beamline.detector, "frameRateChanged", self.frame_rate_changed
         )
 
     def status_changed(self, status, status_message):
