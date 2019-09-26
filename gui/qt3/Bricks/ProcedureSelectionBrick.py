@@ -3,7 +3,7 @@ Doc please ...
 """
 
 from BlissFramework import BaseComponents
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from qt import *
 
 # ?

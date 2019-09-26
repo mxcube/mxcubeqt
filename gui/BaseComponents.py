@@ -27,7 +27,7 @@ import weakref
 import gui
 from gui.utils import PropertyBag, Connectable, Colors, QtImport
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 
 try:
@@ -690,7 +690,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         dispatcher.connect(
             self.__hardware_object_discarded,
             "hardwareObjectDiscarded",
-            HardwareRepository.getHardwareRepository(),
+            HWR.getHardwareRepository(),
         )
         self.define_slot("enable_widget", ())
         self.define_slot("disable_widget", ())
@@ -925,7 +925,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 splash_screen.inc_progress_value()
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        hwobj = HardwareRepository.getHardwareRepository().getHardwareObject(
+        hwobj = HWR.getHardwareRepository().getHardwareObject(
             hardware_object_name
         )
 
@@ -970,7 +970,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def get_hardware_objects_info(self):
         info_dict = {}
         for ho_name in self.__loaded_hardware_objects:
-            info = HardwareRepository.getHardwareRepository().getInfo(ho_name)
+            info = HWR.getHardwareRepository().getInfo(ho_name)
 
             if len(info) > 0:
                 info_dict[ho_name] = info

@@ -3,7 +3,7 @@ from DataCollectParametersWidget import readonlyLineEdit
 from DataCollectParametersWidget import LineEditInput
 import logging
 from BlissFramework import Icons
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework.Utils import VideoDisplay
 import os
 

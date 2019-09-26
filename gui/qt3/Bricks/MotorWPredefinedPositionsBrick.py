@@ -8,7 +8,7 @@ __author__ = "Matias Guijarro"
 __version__ = "1.0"
 
 from qt import *
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework.BaseComponents import BlissWidget
 from BlissFramework.Bricks import MotorBrick
 import logging

@@ -33,7 +33,7 @@ from gui import Configuration, GUIBuilder
 from gui.utils import GUIDisplay, Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 
 LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
 
@@ -140,7 +140,7 @@ class GUISupervisor(QtImport.QWidget):
         self.user_settings = None
 
         self.launch_in_design_mode = design_mode
-        self.hardware_repository = HardwareRepository.getHardwareRepository()
+        self.hardware_repository = HWR.getHardwareRepository()
         self.show_maximized = show_maximized
         self.no_border = no_border
         self.windows = []

@@ -19,10 +19,11 @@
 
 import logging
 
-import api
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.task_toolbox_widget import TaskToolBoxWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -82,18 +83,22 @@ class TaskToolBoxBrick(BaseWidget):
         self.task_tool_box_widget.set_expert_mode(expert)
 
     def run(self):
-        if api.session.session_id:
+        if HWR.beamline.session.session_id:
             self.setEnabled(True)
 
-        api.graphics.connect("pointSelected", self.point_selected)
+        HWR.beamline.graphics.connect("pointSelected", self.point_selected)
 
         self.request_tree_brick.emit()
         self.task_tool_box_widget.adjust_width(self.width())
 
     def user_group_saved(self, new_user_group):
-        api.session.set_user_group(str(new_user_group))
+        HWR.beamline.session.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
-        path = api.session.get_base_image_directory() + "/" + str(new_user_group)
+        path = (
+            HWR.beamline.session.get_base_image_directory()
+            + "/"
+            + str(new_user_group)
+        )
         msg = "Image path is: %s" % path
         logging.getLogger("GUI").info(msg)
 
@@ -135,8 +140,8 @@ class TaskToolBoxBrick(BaseWidget):
 
         self.ispyb_logged_in = logged_in
 
-        if api.session is not None:
-            api.session.set_user_group("")
+        if HWR.beamline.session is not None:
+            HWR.beamline.session.set_user_group("")
 
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)

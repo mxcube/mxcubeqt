@@ -20,13 +20,14 @@
 import copy
 import logging
 
-import api
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+
+from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -96,13 +97,17 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
         try:
-            self._periodic_table_widget.set_elements(api.energyscan.getElements())
+            self._periodic_table_widget.set_elements(
+                HWR.beamline.energy_scan.getElements()
+            )
 
-            max_transmission_value = api.energyscan.get_max_transmission_value()
+            max_transmission_value = (
+                HWR.beamline.energy_scan.get_max_transmission_value()
+            )
 
             self._adjust_transmission_cbox.setEnabled(True)
             self._adjust_transmission_cbox.setChecked(True)
-            api.energyscan.adjust_transmission(True)
+            HWR.beamline.energy_scan.adjust_transmission(True)
 
             if max_transmission_value:
                 self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
@@ -169,12 +174,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if selected_element:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = api.graphics.get_scene_snapshot()
+                cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = api.graphics.get_scene_snapshot(shape)
+                    snapshot = HWR.beamline.graphics.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot
@@ -205,11 +210,11 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
     def adjust_transmission_state_changed(self, state):
         self._max_transmission_ledit.setEnabled(state)
-        api.energyscan.adjust_transmission(state)
+        HWR.beamline.energy_scan.adjust_transmission(state)
 
     def max_transmission_value_changed(self, value):
         try:
             max_transmission = float(value)
-            api.energyscan.set_max_transmission(max_transmission)
+            HWR.beamline.energy_scan.set_max_transmission(max_transmission)
         except BaseException:
             pass

@@ -31,7 +31,7 @@ from gui.utils import Icons, Colors, PropertyEditor, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -235,7 +235,7 @@ class CustomMenuBar(QtImport.QMenuBar):
 
     def reload_hwr_clicked(self):
         """Reloads hardware objects"""
-        hwr = HardwareRepository.getHardwareRepository()
+        hwr = HWR.getHardwareRepository()
         hwr.reloadHardwareObjects()
 
     def edit_brick_properties(self):

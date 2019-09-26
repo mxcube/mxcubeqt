@@ -19,12 +19,12 @@
 
 import logging
 
-import api
-
-from gui.utils import queue_item, QtImport
+from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -86,9 +86,7 @@ class AdvancedParametersWidget(QtImport.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = api.queue_model.get_next_run_number(
-            path_template
-        )
+        run_number = HWR.beamline.queue_model.get_next_run_number(path_template)
 
         self._data_path_widget.set_run_number(run_number)
         self._data_path_widget.set_prefix(path_template.base_prefix)

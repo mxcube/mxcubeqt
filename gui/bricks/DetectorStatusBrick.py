@@ -17,9 +17,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -101,10 +102,14 @@ class DetectorStatusBrick(BaseWidget):
         self.humidity_label.setMinimumHeight(20)
         self.frame_rate_label.setMinimumHeight(20)
 
-        self.connect(api.detector, "temperatureChanged", self.temperature_changed)
-        self.connect(api.detector, "humidityChanged", self.humidity_changed)
-        self.connect(api.detector, "statusChanged", self.status_changed)
-        self.connect(api.detector, "frameRateChanged", self.frame_rate_changed)
+        self.connect(
+            HWR.beamline.detector, "temperatureChanged", self.temperature_changed
+        )
+        self.connect(HWR.beamline.detector, "humidityChanged", self.humidity_changed)
+        self.connect(HWR.beamline.detector, "statusChanged", self.status_changed)
+        self.connect(
+            HWR.beamline.detector, "frameRateChanged", self.frame_rate_changed
+        )
 
     def status_changed(self, status, status_message):
         if status:

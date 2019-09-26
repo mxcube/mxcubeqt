@@ -17,9 +17,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -195,7 +196,7 @@ class GraphicsToolsBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def init_image_scale_list(self):
-        self.image_scale_list = api.graphics.get_image_scale_list()
+        self.image_scale_list = HWR.beamline.graphics.get_image_scale_list()
         if len(self.image_scale_list) > 0:
             self.image_scale_menu.setEnabled(True)
             for scale in self.image_scale_list:
@@ -206,7 +207,7 @@ class GraphicsToolsBrick(BaseWidget):
                 )
             for action in self.image_scale_menu.actions():
                 action.setCheckable(True)
-            self.image_scaled(api.graphics.get_image_scale())
+            self.image_scaled(HWR.beamline.graphics.get_image_scale())
 
     def image_scaled(self, scale_value):
         for index, action in enumerate(self.image_scale_menu.actions()):
@@ -218,7 +219,7 @@ class GraphicsToolsBrick(BaseWidget):
     def image_scale_triggered(self, selected_action):
         for index, action in enumerate(self.image_scale_menu.actions()):
             if selected_action == action:
-                api.graphics.set_image_scale(
+                HWR.beamline.graphics.set_image_scale(
                     self.image_scale_list[index], action.isChecked()
                 )
 
@@ -229,63 +230,65 @@ class GraphicsToolsBrick(BaseWidget):
             self.move_beam_mark_auto_action.setEnabled(expert)
 
     def measure_distance_clicked(self):
-        api.graphics.start_measure_distance(wait_click=True)
+        HWR.beamline.graphics.start_measure_distance(wait_click=True)
 
     def measure_angle_clicked(self):
-        api.graphics.start_measure_angle(wait_click=True)
+        HWR.beamline.graphics.start_measure_angle(wait_click=True)
 
     def measure_area_clicked(self):
-        api.graphics.start_measure_area(wait_click=True)
+        HWR.beamline.graphics.start_measure_area(wait_click=True)
 
     def create_point_click_clicked(self):
         if self.isEnabled():
-            api.graphics.start_centring(tree_click=True)
+            HWR.beamline.graphics.start_centring(tree_click=True)
 
     def create_point_current_clicked(self):
         if self.isEnabled():
-            api.graphics.start_centring()
+            HWR.beamline.graphics.start_centring()
 
     def create_line_clicked(self):
         if self.isEnabled():
-            api.graphics.create_line()
+            HWR.beamline.graphics.create_line()
 
     def create_auto_line_clicked(self):
         if self.isEnabled():
-            api.graphics.create_auto_line()
+            HWR.beamline.graphics.create_auto_line()
 
     def create_grid_clicked(self):
         if self.isEnabled():
-            api.graphics.create_grid()
+            HWR.beamline.graphics.create_grid()
 
     def select_all_points_clicked(self):
         if self.isEnabled():
-            api.graphics.select_all_points()
+            HWR.beamline.graphics.select_all_points()
 
     def deselect_all_items_clicked(self):
         if self.isEnabled():
-            api.graphics.de_select_all()
+            HWR.beamline.graphics.de_select_all()
 
     def clear_all_items_clicked(self):
         if self.isEnabled():
-            api.graphics.clear_all()
+            HWR.beamline.graphics.clear_all()
 
     def move_beam_mark_manual(self):
-        api.graphics.start_move_beam_mark()
+        HWR.beamline.graphics.start_move_beam_mark()
 
     def move_beam_mark_auto(self):
-        api.graphics.move_beam_mark_auto()
+        HWR.beamline.graphics.move_beam_mark_auto()
 
     def display_grid_toggled(self):
-        api.graphics.display_grid(self.display_grid_action.isChecked())
+        HWR.beamline.graphics.display_grid(self.display_grid_action.isChecked())
 
     def define_beam_size(self):
-        api.graphics.start_define_beam()
+        HWR.beamline.graphics.start_define_beam()
 
     def open_camera_control_dialog(self):
         self.camera_control_dialog.show()
 
     def display_beam_size_toggled(self):
-        api.graphics.display_beam_size(self.display_beam_size_action.isChecked())
+        HWR.beamline.graphics.display_beam_size(
+            self.display_beam_size_action.isChecked()
+        )
 
     def start_magnification_tool(self):
-        api.graphics.set_magnification_mode(True)
+        HWR.beamline.graphics.set_magnification_mode(True)

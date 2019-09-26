@@ -39,7 +39,6 @@ class DCGroupWidget(QtImport.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Hardware objects ----------------------------------------------------
-        self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
         self._data_collection = None
