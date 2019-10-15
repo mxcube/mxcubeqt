@@ -353,7 +353,7 @@ class MotorSpinBoxBrick(BaseWidget):
         menu.popup(QtImport.QCursor.pos())
 
     def go_to_history_pos(self):
-        self.motor_hwobj.move(float(self.sender))
+        self.motor_hwobj.move(float(self.sender().text()))
 
     def update_history(self, pos):
         pos = str(pos)
