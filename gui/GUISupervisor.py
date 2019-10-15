@@ -1,4 +1,4 @@
-#
+        #
 #  Project: MXCuBE
 #  https://github.com/mxcube
 #
@@ -218,7 +218,7 @@ class GUISupervisor(QtImport.QWidget):
                                             if load_from_dict:
                                                 prop_value = prop["value"]
                                             else:
-                                                prop_value = prop.getValue()
+                                                prop_value = prop.get_value()
                                             if isinstance(
                                                     prop_value, type("")
                                             ) and prop_value.startswith("/"):
