@@ -16,7 +16,7 @@ from BlissFramework import GUISupervisor
 from BlissFramework.Utils import ErrorHandler
 from BlissFramework.Utils import GUILogHandler
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 
 _logger = logging.getLogger()
 _GUIhdlr = GUILogHandler.GUILogHandler()

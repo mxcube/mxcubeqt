@@ -31,7 +31,6 @@ import webbrowser
 from datetime import datetime
 from collections import namedtuple
 
-import api
 from gui.utils import Colors, Icons, queue_item, QtImport
 from gui.widgets.confirm_dialog import ConfirmDialog
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
@@ -39,6 +38,8 @@ from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 from HardwareRepository.HardwareObjects import queue_entry
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MxCuBE collaboration"]
@@ -287,7 +288,7 @@ class DataCollectTree(QtImport.QWidget):
                 paste_action.setEnabled(self.item_copy is not None)
                 self.item_menu.addSeparator()
                 if not item.get_model().free_pin_mode:
-                    if api.diffractometer.in_plate_mode():
+                    if HWR.beamline.diffractometer.in_plate_mode():
                         self.plate_sample_to_mount = item
                         self.item_menu.addAction("Move", self.mount_sample)
                     else:
@@ -472,12 +473,14 @@ class DataCollectTree(QtImport.QWidget):
                 items[0].setText(1, "Loading sample...")
                 self.sample_centring_result = gevent.event.AsyncResult()
                 try:
-                    queue_entry.mount_sample(api.beamline_setup,
-                                             items[0], items[0].get_model(
-                                             ), self.centring_done,
-                                             self.sample_centring_result)
+                    queue_entry.mount_sample(
+                        items[0],
+                        items[0].get_model(),
+                        self.centring_done,
+                        self.sample_centring_result
+                    )
                     if self.close_kappa:
-                        api.diffractometer.close_kappa()
+                        HWR.beamline.diffractometer.close_kappa()
                 except Exception as e:
                     items[0].setText(1, "Error loading")
                     items[0].set_background_color(3)
@@ -511,7 +514,7 @@ class DataCollectTree(QtImport.QWidget):
 
         if len(items) == 1:
             items[0].setText(1, "Unloading sample...")
-            api.graphics.clear_all()
+            HWR.beamline.graphics.clear_all()
             logging.getLogger("GUI").\
                 info("All centred positions associated with this " +
                      "sample will be lost.")
@@ -522,12 +525,12 @@ class DataCollectTree(QtImport.QWidget):
             sample_changer = None
             if self.sample_mount_method == 1:
                 try:
-                    sample_changer = api.sample_changer
+                    sample_changer = HWR.beamline.sample_changer
                 except AttributeError:
                     sample_changer = None
             elif self.sample_mount_method == 2:
                 try:
-                    sample_changer = api.plate_manipulator
+                    sample_changer = HWR.beamline.plate_manipulator
                 except AttributeError:
                     sample_changer = None
 
@@ -537,7 +540,7 @@ class DataCollectTree(QtImport.QWidget):
                                      "dewarLocation": location[0],
                                      "sampleBarcode": items[0].get_model().code,
                                      "sampleId": items[0].get_model().lims_id,
-                                     "sessionId": api.session.session_id,
+                                     "sessionId": HWR.beamline.session.session_id,
                                      "startTime": time.strftime("%Y-%m-%d %H:%M:%S")}
 
                 try:
@@ -559,8 +562,7 @@ class DataCollectTree(QtImport.QWidget):
                     robot_action_dict['message'] = "Sample was not unloaded"
                     robot_action_dict['status'] = "ERROR"
 
-                api.lims.store_robot_action(
-                    robot_action_dict)
+                HWR.beamline.lims.store_robot_action(robot_action_dict)
 
             items[0].setText(1, "")
             items[0].setOn(False)
@@ -643,7 +645,7 @@ class DataCollectTree(QtImport.QWidget):
         else:
             view_item.setExpanded(True)
 
-        api.queue_model.view_created(view_item, task)
+        HWR.beamline.queue_model.view_created(view_item, task)
         # self.sample_tree_widget_selection()
         self.toggle_collect_button_enabled()
 
@@ -741,29 +743,30 @@ class DataCollectTree(QtImport.QWidget):
     def filter_sample_list(self, option):
         """Updates sample tree based on the sample mount"""
         self.sample_tree_widget.clearSelection()
-        api.beamline_setup.set_plate_mode(False)
+        # Unnecessary - beamline_setup._plate_mode is NEVER queried.
+        # api.beamline_setup.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)
         self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_tree_widget.clear()
-            api.queue_model.select_model('ispyb')
+            HWR.beamline.queue_model.select_model('ispyb')
             self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.PLATE:
             self.sample_tree_widget.clear()
-            api.queue_model.select_model('plate')
+            HWR.beamline.queue_model.select_model('plate')
             self.set_sample_pin_icon()
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
 
-            if api.diffractometer.in_plate_mode():
+            if HWR.beamline.diffractometer.in_plate_mode():
                 try:
-                    loaded_sample = api.plate_manipulator.getLoadedSample()
+                    loaded_sample = HWR.beamline.plate_manipulator.getLoadedSample()
                     loaded_sample_loc = loaded_sample.getCoords()
                 except BaseException:
                     pass
             else:
                 try:
-                    loaded_sample = api.sample_changer.getLoadedSample()
+                    loaded_sample = HWR.beamline.sample_changer.getLoadedSample()
                     loaded_sample_loc = loaded_sample.getCoords()
                 except BaseException:
                     pass
@@ -786,7 +789,7 @@ class DataCollectTree(QtImport.QWidget):
 
         elif option == SC_FILTER_OPTIONS.FREE_PIN:
             self.sample_tree_widget.clear()
-            api.queue_model.select_model('free-pin')
+            HWR.beamline.queue_model.select_model('free-pin')
             self.set_sample_pin_icon()
         self.sample_tree_widget_selection()
 
@@ -795,7 +798,7 @@ class DataCollectTree(QtImport.QWidget):
         self.centring_method = method_number
 
         try:
-            dm = api.diffractometer
+            dm = HWR.beamline.diffractometer
 
             if self.centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
                 dm.user_confirms_centring = False
@@ -807,11 +810,11 @@ class DataCollectTree(QtImport.QWidget):
 
     def continue_button_click(self):
         """Sets or resets pause event"""
-        if api.queue_manager.is_executing():
-            if not api.queue_manager.is_paused():
-                api.queue_manager.set_pause(True)
+        if HWR.beamline.queue_manager.is_executing():
+            if not HWR.beamline.queue_manager.is_paused():
+                HWR.beamline.queue_manager.set_pause(True)
             else:
-                api.queue_manager.set_pause(False)
+                HWR.beamline.queue_manager.set_pause(False)
 
     def queue_paused_handler(self, state):
         """Pause handlers"""
@@ -834,7 +837,7 @@ class DataCollectTree(QtImport.QWidget):
     def collect_stop_toggle(self):
         """Stops queue"""
 
-        api.queue_manager.disable(False)
+        HWR.beamline.queue_manager.disable(False)
         if self.collecting:
             self.stop_collection()
 
@@ -842,9 +845,9 @@ class DataCollectTree(QtImport.QWidget):
             path_conflict = self.check_for_path_collisions()
 
             if path_conflict:
-                api.queue_manager.disable(True)
+                HWR.beamline.queue_manager.disable(True)
 
-            if api.queue_manager.is_disabled():
+            if HWR.beamline.queue_manager.is_disabled():
                 logging.getLogger("GUI").\
                     error('Can not start collect, see the tasks marked' +
                           ' in the tree and solve the prorblems.')
@@ -879,17 +882,23 @@ class DataCollectTree(QtImport.QWidget):
         if isinstance(item, queue_item.SampleQueueItem):
             if item.get_model().free_pin_mode == True:
                 result = True
-            elif api.diffractometer.in_plate_mode():
-                if api.plate_manipulator is not None:
-                    if not api.plate_manipulator.hasLoadedSample():
+            elif HWR.beamline.diffractometer.in_plate_mode():
+                if HWR.beamline.plate_manipulator is not None:
+                    if not HWR.beamline.plate_manipulator.hasLoadedSample():
                         result = False
                     # TODO remove :2 and check full location
-                    elif item.get_model().location == api.plate_manipulator.getLoadedSample().getCoords():
+                    elif (
+                        item.get_model().location ==
+                        HWR.beamline.plate_manipulator.getLoadedSample().getCoords()
+                    ):
                         result = True
-            elif api.sample_changer is not None:
-                if not api.sample_changer.hasLoadedSample():
+            elif HWR.beamline.sample_changer is not None:
+                if not HWR.beamline.sample_changer.hasLoadedSample():
                     result = False
-                elif item.get_model().location == api.sample_changer.getLoadedSample().getCoords():
+                elif (
+                    item.get_model().location
+                    == HWR.beamline.sample_changer.getLoadedSample().getCoords()
+                ):
                     result = True
         return result
 
@@ -899,7 +908,7 @@ class DataCollectTree(QtImport.QWidget):
            - checks data collection parameters via beamline setup
            - calls collection method
         """
-        api.graphics.de_select_all()
+        HWR.beamline.graphics.de_select_all()
 
         collection_par_list = []
         for item in checked_items:
@@ -939,9 +948,9 @@ class DataCollectTree(QtImport.QWidget):
         self.parent().set_condition_state("confirmation_window_accepted",
                                           True)
         self.run_cb()
-        api.graphics.set_cursor_busy(True)
+        HWR.beamline.graphics.set_cursor_busy(True)
         try:
-            api.queue_manager.execute()
+            HWR.beamline.queue_manager.execute()
         except Exception as ex:
             raise ex
         self.parent().set_condition_state("confirmation_window_accepted",
@@ -949,13 +958,13 @@ class DataCollectTree(QtImport.QWidget):
 
     def stop_collection(self):
         """Stops queue"""
-        api.graphics.set_cursor_busy(False)
-        api.queue_manager.stop()
+        HWR.beamline.graphics.set_cursor_busy(False)
+        HWR.beamline.queue_manager.stop()
         self.queue_stop_handler()
 
     def queue_stop_handler(self, status=None):
         """Stop handler"""
-        api.graphics.set_cursor_busy(False)
+        HWR.beamline.graphics.set_cursor_busy(False)
         self.user_stopped = True
         self.queue_execution_completed(None)
 
@@ -1064,7 +1073,7 @@ class DataCollectTree(QtImport.QWidget):
         """Restores normal cursors, changes collect button
            Deselects all items and selects mounted sample
         """
-        api.graphics.set_cursor_busy(False)
+        HWR.beamline.graphics.set_cursor_busy(False)
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(self.play_icon)
@@ -1127,9 +1136,9 @@ class DataCollectTree(QtImport.QWidget):
             if type(item) not in (queue_item.BasketQueueItem,
                                   queue_item.SampleQueueItem,
                                   queue_item.DataCollectionGroupQueueItem):
-                new_node = api.queue_model.copy_node(item.get_model())
-                new_node.set_snapshot(api.graphics.get_scene_snapshot())
-                api.queue_model.add_child(
+                new_node = HWR.beamline.queue_model.copy_node(item.get_model())
+                new_node.set_snapshot(HWR.beamline.graphics.get_scene_snapshot())
+                HWR.beamline.queue_model.add_child(
                     item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
 
@@ -1146,8 +1155,9 @@ class DataCollectTree(QtImport.QWidget):
                 if not parent.isSelected() or (not parent.deletable):
                     self.tree_brick.show_sample_centring_tab()
 
-                    api.queue_model.del_child(parent.get_model(),
-                                                     item.get_model())
+                    HWR.beamline.queue_model.del_child(
+                        parent.get_model(), item.get_model()
+                    )
                     qe = item.get_queue_entry()
                     parent.get_queue_entry().dequeue(qe)
                     parent.takeChild(parent.indexOfChild(item))
@@ -1278,19 +1288,20 @@ class DataCollectTree(QtImport.QWidget):
     def enqueue_samples(self, sample_list):
         """Adds items to the queue"""
         for sample in sample_list:
-            api.queue_model.add_child(api.queue_model.
-                                             get_model_root(), sample)
+            HWR.beamline.queue_model.add_child(
+                HWR.beamline.queue_model. get_model_root(), sample
+            )
             self.add_to_queue([sample], self.sample_tree_widget, False)
 
     def populate_free_pin(self, sample=None):
         """Populates manualy mounted sample"""
-        api.queue_model.clear_model('free-pin')
-        api.queue_model.select_model('free-pin')
+        HWR.beamline.queue_model.clear_model('free-pin')
+        HWR.beamline.queue_model.select_model('free-pin')
         if sample is None:
             sample = queue_model_objects.Sample()
             sample.set_name('manually-mounted')
         sample.free_pin_mode = True
-        api.queue_model.add_child(api.queue_model.get_model_root(),
+        HWR.beamline.queue_model.add_child(HWR.beamline.queue_model.get_model_root(),
                                          sample)
         self.set_sample_pin_icon()
 
@@ -1302,18 +1313,20 @@ class DataCollectTree(QtImport.QWidget):
         else:
             mode_str = "plate"
 
-        api.queue_manager.clear()
-        api.queue_model.clear_model(mode_str)
+        HWR.beamline.queue_manager.clear()
+        HWR.beamline.queue_model.clear_model(mode_str)
         self.sample_tree_widget.clear()
-        api.queue_model.select_model(mode_str)
+        HWR.beamline.queue_model.select_model(mode_str)
 
         for basket_index, basket in enumerate(basket_list):
-            api.queue_model.add_child(api.queue_model.get_model_root(), basket)
+            HWR.beamline.queue_model.add_child(
+                HWR.beamline.queue_model.get_model_root(), basket
+            )
             basket.set_enabled(False)
             for sample in sample_list:
                 if sample.location[0] == basket_index + 1:
                     basket.add_sample(sample)
-                    api.queue_model.add_child(basket, sample)
+                    HWR.beamline.queue_model.add_child(basket, sample)
                     sample.set_enabled(False)
         self.set_sample_pin_icon()
 
@@ -1381,8 +1394,7 @@ class DataCollectTree(QtImport.QWidget):
                 pt = item.get_model().get_path_template()
 
                 if pt:
-                    path_conflict = api.queue_model.\
-                        check_for_path_collisions(pt)
+                    path_conflict = HWR.beamline.queue_model.check_for_path_collisions(pt)
 
                     if path_conflict:
                         conflict = True
@@ -1460,14 +1472,14 @@ class DataCollectTree(QtImport.QWidget):
         for item in self.get_selected_items():
             parent_nodes = []
             if new_node is None:
-                new_node = api.queue_model.copy_node(self.item_copy[0])
+                new_node = HWR.beamline.queue_model.copy_node(self.item_copy[0])
             else:
                 # we have to update run number
                 new_node.acquisitions[0].path_template.run_number = \
-                    api.queue_model.get_next_run_number(
+                    HWR.beamline.queue_model.get_next_run_number(
                     new_node.acquisitions[0].path_template)
 
-            new_node.set_snapshot(api.graphics.get_scene_snapshot())
+            new_node.set_snapshot(HWR.beamline.graphics.get_scene_snapshot())
 
             if isinstance(item, queue_item.DataCollectionQueueItem):
                 parent_nodes = [item.get_model().get_parent()]
@@ -1481,7 +1493,7 @@ class DataCollectTree(QtImport.QWidget):
                     parent_nodes.append(self.create_task_group(sample))
 
             for parent_node in parent_nodes:
-                api.queue_model.add_child(parent_node, new_node)
+                HWR.beamline.queue_model.add_child(parent_node, new_node)
         self.sample_tree_widget_selection()
 
         if self.item_copy[1]:
@@ -1541,9 +1553,9 @@ class DataCollectTree(QtImport.QWidget):
         if selected_items:
             item_model = selected_items[0].get_model().id
             if item_model:
-                webbrowser.open("%s%d" %
-                                (api.lims.get_dc_display_link(),
-                                 item_model))
+                webbrowser.open(
+                    "%s%d" % (HWR.beamline.lims.get_dc_display_link(), item_model)
+                )
 
     def create_task_group(self, sample_item_model, group_name="Group"):
         """Creates empty task group"""
@@ -1570,7 +1582,7 @@ class DataCollectTree(QtImport.QWidget):
         num = sample_item_model.get_next_number_for_name(group_name)
         task_group_node.set_number(num)
 
-        api.queue_model.add_child(sample_item_model, task_group_node)
+        HWR.beamline.queue_model.add_child(sample_item_model, task_group_node)
 
         return task_group_node
 
@@ -1581,7 +1593,7 @@ class DataCollectTree(QtImport.QWidget):
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
             filename += ".dat"
-        api.queue_model.save_queue(filename)
+        HWR.beamline.queue_model.save_queue(filename)
 
     def load_queue_from_file(self):
         """Loads queue from file"""
@@ -1590,8 +1602,9 @@ class DataCollectTree(QtImport.QWidget):
                                                             "Item file (*.dat)", "Choose queue file to open"))
         if len(filename) > 0:
             self.sample_tree_widget.clear()
-            loaded_model = api.queue_model.load_queue(filename,
-                                                             api.graphics.get_scene_snapshot())
+            loaded_model = HWR.beamline.queue_model.load_queue(
+                filename, HWR.beamline.graphics.get_scene_snapshot()
+            )
             return loaded_model
 
     def save_history_queue(self):
@@ -1679,16 +1692,15 @@ class DataCollectTree(QtImport.QWidget):
         # logging.getLogger("HWR").debug("Adding diffraction plan : %s",
         #                               str(sample_model.diffraction_plan))
         task_node = self.create_task_group(sample_model, "Diffraction plan")
-        prefix = api.session.get_default_prefix(
+        prefix = HWR.beamline.session.get_default_prefix(
             sample_model)
-        snapshot = api.graphics.get_scene_snapshot()
+        snapshot = HWR.beamline.graphics.get_scene_snapshot()
 
         if sample_model.diffraction_plan.experimentKind in ("OSC", "Default"):
             acq = queue_model_objects.Acquisition()
 
             # TODO create default_diffraction_plan_values
-            acq.acquisition_parameters = api.beamline_setup.\
-                get_default_acquisition_parameters("default_acquisition_values")
+            acq.acquisition_parameters = HWR.beamline.get_default_acquisition_parameters()
             if hasattr(sample_model.diffraction_plan, "oscillationRange"):
                 acq.acquisition_parameters.osc_range = \
                     sample_model.diffraction_plan.oscillationRange
@@ -1700,17 +1712,18 @@ class DataCollectTree(QtImport.QWidget):
                         sample_model.diffraction_plan.exposureTime
 
             acq.acquisition_parameters.centred_position.snapshot_image = snapshot
-            path_template = api.beamline_setup.get_default_path_template()
+            path_template = HWR.beamline.get_default_path_template()
             path_template.base_prefix = prefix
             path_template.num_files = 1800
             path_template.reference_image_prefix = "plan"
-            path_template.run_number = api.queue_model.\
-                get_next_run_number(path_template)
+            path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
+                path_template
+            )
             acq.path_template = path_template
 
             dc = queue_model_objects.DataCollection([acq],
                                                     sample_model.crystals[0])
             dc.set_name("OSC_" + str(sample_model.diffraction_plan.diffractionPlanId))
-            api.queue_model.add_child(task_node, dc)
+            HWR.beamline.queue_model.add_child(task_node, dc)
 
         self.sample_tree_widget_selection()

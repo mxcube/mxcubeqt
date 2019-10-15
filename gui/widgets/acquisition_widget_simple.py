@@ -17,10 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from HardwareRepository.HardwareObjects import queue_model_objects
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -115,9 +116,9 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-        self.set_tunable_energy(api.beamline_setup.tunable_wavelength())
+        self.set_tunable_energy(HWR.beamline.tunable_wavelength)
 
-        if api.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode():
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
@@ -145,9 +146,8 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
 
     def use_kappa(self, state):
-        if api.beamline_setup is not None:
-            if api.diffractometer.in_plate_mode():
-                state = False
+        if HWR.beamline.diffractometer.in_plate_mode():
+            state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
         self.acq_widget_layout.kappa_phi_label.setEnabled(state)
@@ -197,13 +197,12 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         pass
 
     def init_limits(self):
-        limits_dict = api.beamline_setup.get_acquisition_limit_values()
+        limits_dict = HWR.beamline.acquisition_limit_values
 
-        if "osc_range" in limits_dict:
-            limits = tuple(map(float, limits_dict["osc_range"].split(",")))
-            (lower, upper) = limits
-            self.osc_start_validator.setRange(lower, upper, 4)
-            self.osc_range_validator.setRange(lower, upper, 4)
+        tpl = limits_dict.get("osc_range")
+        if tpl:
+            self.osc_start_validator.setRange(tpl[0], tpl[1], 4)
+            self.osc_range_validator.setRange(tpl[0], tpl[1], 4)
 
         self._acquisition_mib.bind_value_update(
             "osc_start",
@@ -219,18 +218,16 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.osc_range_validator,
         )
 
-        if "kappa" in limits_dict:
-            limits = tuple(map(float, limits_dict["kappa"].split(",")))
-            (lower, upper) = limits
-            self.kappa_validator.setRange(lower, upper, 4)
+        tpl = limits_dict.get("kappa")
+        if tpl:
+            self.kappa_validator.setRange(tpl[0], tpl[1], 4)
         self._acquisition_mib.bind_value_update(
             "kappa", self.acq_widget_layout.kappa_ledit, float, self.kappa_validator
         )
 
-        if "kappa_phi" in limits_dict:
-            limits = tuple(map(float, limits_dict["kappa_phi"].split(",")))
-            (lower, upper) = limits
-            self.kappa_phi_validator.setRange(lower, upper, 4)
+        tpl = limits_dict.get("kappa_phi")
+        if tpl:
+            self.kappa_phi_validator.setRange(tpl[0], tpl[1], 4)
         self._acquisition_mib.bind_value_update(
             "kappa_phi",
             self.acq_widget_layout.kappa_phi_ledit,
@@ -238,11 +235,9 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.kappa_phi_validator,
         )
 
-        if "exposure_time" in limits_dict:
-            limits = tuple(map(float, limits_dict["exposure_time"].split(",")))
-            (lower, upper) = limits
-            self.exp_time_validator.setRange(lower, upper, 6)
-
+        tpl = limits_dict.get("exposure_time")
+        if tpl:
+            self.exp_time_validator.setRange(tpl[0], tpl[1], 6)
         self._acquisition_mib.bind_value_update(
             "exp_time",
             self.acq_widget_layout.exp_time_ledit,
@@ -328,7 +323,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
 
     def init_detector_roi_modes(self):
-        roi_modes = api.detector.get_roi_modes()
+        roi_modes = HWR.beamline.detector.get_roi_modes()
         if (
             len(roi_modes) > 0
             and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
@@ -341,9 +336,9 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
     def update_exp_time_limits(self):
         try:
             exp_time_limits = (
-                api.detector.get_exposure_time_limits()
+                HWR.beamline.detector.get_exposure_time_limits()
             )
-            max_osc_speed = api.diffractometer.get_osc_max_speed()
+            max_osc_speed = HWR.beamline.diffractometer.get_osc_max_speed()
             top_limit = (
                 float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
             )
@@ -365,7 +360,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         pass
 
     def detector_roi_mode_changed(self, roi_mode_index):
-        api.detector.set_roi_mode(roi_mode_index)
+        HWR.beamline.detector.set_roi_mode(roi_mode_index)
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters

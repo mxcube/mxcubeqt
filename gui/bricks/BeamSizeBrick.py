@@ -47,15 +47,16 @@ Sizes are estimated by related HO
 """
 
 
+
+from gui.utils import QtImport
+from gui.BaseComponents import BaseWidget
+
+from HardwareRepository import HardwareRepository as HWR
+
 try:
     unichr
 except NameError:
     unichr = chr
-
-import api
-from gui.utils import QtImport
-from gui.BaseComponents import BaseWidget
-
 
 __credits__ = ["MXCuBE collaboration"]
 __category__ = "Beam definition"
@@ -66,7 +67,6 @@ class BeamSizeBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.beam_info_hwobj = None
 
         # Internal values -----------------------------------------------------
 
@@ -117,7 +117,7 @@ class BeamSizeBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-        self.connect(api.beam_info, "beamInfoChanged", self.beam_info_changed)
+        self.connect(HWR.beamline.beam, "beamInfoChanged", self.beam_info_changed)
 
     def beam_info_changed(self, beam_info):
         """

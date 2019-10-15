@@ -17,13 +17,14 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.mca_spectrum_widget import McaSpectrumWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -112,8 +113,8 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if api.xrf_spectrum is None:
-            api.xrf_spectrum.connect(
+        if HWR.beamline.xrf_spectrum is None:
+            HWR.beamline.xrf_spectrum.connect(
                 "xrfSpectrumFinished", self.spectrum_finished
             )
 

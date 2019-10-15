@@ -7,7 +7,7 @@ import time
 
 import qt
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework import Configuration
 from BlissFramework import GUIBuilder
 from BlissFramework.Utils import GUIDisplay

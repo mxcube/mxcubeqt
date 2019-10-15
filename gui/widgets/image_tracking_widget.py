@@ -20,8 +20,9 @@
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
 
-import api
 from gui.utils import QtImport
+
+from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -72,11 +73,9 @@ class ImageTrackingWidget(QtImport.QWidget):
         )
 
         self.setEnabled(False)
- 
-        if hasattr(api.beamline_setup, "image_tracking_hwobj"):
-            self.image_tracking_hwobj = api.beamline_setup.image_tracking_hwobj
-        else:
-            self.image_tracking_hwobj = None
+
+        # NB will be None if not configured
+        self.image_tracking_hwobj = HWR.beamline.image_tracking
 
     def previous_button_clicked(self):
         value = self.image_tracking_widget_layout.image_num_spinbox.value() - 1

@@ -35,7 +35,7 @@ from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay, QtImp
 from gui.bricks import LogViewBrick
 from gui.BaseLayoutItems import ContainerCfg
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from HardwareRepository.ConvertUtils import string_types
 
 
@@ -1500,7 +1500,7 @@ class GUIBuilder(QtImport.QMainWindow):
                     ):
                         try:
                             hwr_server = (
-                                HardwareRepository.getHardwareRepository().serverAddress
+                                HWR.getHardwareRepository().serverAddress
                             )
                         except BaseException:
                             hwr_server = ""
@@ -1622,7 +1622,7 @@ class GUIBuilder(QtImport.QMainWindow):
         terminal = os.environ["TERM"] or "xterm"
 
         try:
-            hwr_server = HardwareRepository.getHardwareRepository().serverAddress
+            hwr_server = HWR.getHardwareRepository().serverAddress
         except BaseException:
             logging.getLogger().error(
                 "Sorry, could not find Hardware Repository server"

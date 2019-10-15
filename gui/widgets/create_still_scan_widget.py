@@ -21,8 +21,6 @@
 
 import copy
 
-import api
-
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.acquisition_still_widget import AcquisitionStillWidget
@@ -33,6 +31,8 @@ from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -98,7 +98,7 @@ class CreateStillScanWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
         self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-            api.beamline_setup._get_run_processing_parallel()
+            HWR.beamline.run_processing_parallel
         )
 
         #Rename to self._processing_widget.layout
@@ -131,11 +131,11 @@ class CreateStillScanWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        has_shutter_less = api.beamline_setup.detector_has_shutterless()
+        has_shutter_less = HWR.beamline.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
-        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
-            "default_acquisition_values"
+        self._acquisition_parameters = (
+            HWR.beamline.get_default_acquisition_parameters()
         )
         self._acquisition_parameters.num_triggers = 1
         self._acquisition_parameters.num_images_per_trigger = 1
@@ -224,7 +224,7 @@ class CreateStillScanWidget(CreateTaskBase):
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
-        cpos.snapshot_image = api.graphics.get_scene_snapshot()
+        cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1

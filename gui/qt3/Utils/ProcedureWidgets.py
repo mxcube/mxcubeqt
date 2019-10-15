@@ -13,7 +13,7 @@ from qttable import QComboTableItem
 
 import logging
 
-from HardwareRepository import HardwareRepository
+from HardwareRepository import HardwareRepository as HWR
 from BlissFramework import Icons
 
 

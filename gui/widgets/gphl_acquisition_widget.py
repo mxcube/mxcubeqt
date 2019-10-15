@@ -27,13 +27,13 @@ import logging
 from collections import namedtuple
 from collections import OrderedDict
 
-import api
-
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_enumerables
 from HardwareRepository.dispatcher import dispatcher
+
+from HardwareRepository import HardwareRepository as HWR
 
 __category__ = "TaskToolbox_Tabs"
 
@@ -190,7 +190,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        xx0 = next(api.gphl_workflow.getObjects("test_crystals"))
+        xx0 = next(HWR.beamline.gphl_workflow.getObjects("test_crystals"))
         for test_crystal in xx0.getObjects("test_crystal"):
             dd0 = test_crystal.getProperties()
             self.test_crystals[dd0["name"]] = CrystalData(**dd0)
@@ -228,12 +228,12 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
-        self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
+        self._pulldowns[field_name] = list(HWR.beamline.gphl_workflow.dose_budgets)
         self._pulldown_defaults[
             field_name
-        ] = api.gphl_workflow.default_dose_budget_label
+        ] = HWR.beamline.gphl_workflow.default_dose_budget_label
         indx = self._pulldowns[field_name].index(
-            api.gphl_workflow.default_dose_budget_label
+            HWR.beamline.gphl_workflow.default_dose_budget_label
         )
         self._widget_data[field_name] = (widget, str, None, indx)
 
@@ -358,7 +358,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
-        strategy_names = api.gphl_workflow.getProperty(
+        strategy_names = HWR.beamline.gphl_workflow.getProperty(
             "characterisation_strategies"
         ).split()
         self._pulldowns[field_name] = strategy_names
@@ -373,12 +373,12 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
-        self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
+        self._pulldowns[field_name] = list(HWR.beamline.gphl_workflow.dose_budgets)
         self._pulldown_defaults[
             field_name
-        ] = api.gphl_workflow.default_dose_budget_label
+        ] = HWR.beamline.gphl_workflow.default_dose_budget_label
         indx = self._pulldowns[field_name].index(
-            api.gphl_workflow.default_dose_budget_label
+            HWR.beamline.gphl_workflow.default_dose_budget_label
         )
         self._widget_data[field_name] = (widget, str, None, indx)
 

@@ -17,9 +17,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -68,12 +69,14 @@ class PhaseBrick(BaseWidget):
 
         self.init_phase_list()
 
-        self.connect(api.diffractometer, "minidiffPhaseChanged", self.phase_changed)
-        api.diffractometer.update_values()
+        self.connect(
+            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
+        )
+        HWR.beamline.diffractometer.update_values()
 
     def init_phase_list(self):
         self.phase_combobox.clear()
-        phase_list = api.diffractometer.get_phase_list()
+        phase_list = HWR.beamline.diffractometer.get_phase_list()
         if len(phase_list) > 0:
             for phase in phase_list:
                 self.phase_combobox.addItem(phase)
@@ -82,8 +85,8 @@ class PhaseBrick(BaseWidget):
             self.setEnabled(False)
 
     def change_phase(self):
-        if api.diffractometer is not None:
-            api.diffractometer.set_phase(
+        if HWR.beamline.diffractometer is not None:
+            HWR.beamline.diffractometer.set_phase(
                 self.phase_combobox.currentText(), timeout=None
             )
 

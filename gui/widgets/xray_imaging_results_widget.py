@@ -19,10 +19,10 @@
 
 import os
 
-import api
-
 from gui.utils import Icons, QtImport
 from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -189,12 +189,14 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.start_n_centering_button.setFixedSize(70, 50)
         self.accept_centering_button.setFixedSize(70, 50)
 
-        if api.xray_imaging is not None:
-            api.xray_imaging.connect("imageInit", self.image_init)
-            api.xray_imaging.connect("imageLoaded", self.image_loaded)
-            api.xray_imaging.connect("measureItemChanged", self.measure_item_changed)
+        if HWR.beamline.imaging is not None:
+            HWR.beamline.imaging.connect("imageInit", self.image_init)
+            HWR.beamline.imaging.connect("imageLoaded", self.image_loaded)
+            HWR.beamline.imaging.connect(
+                "measureItemChanged", self.measure_item_changed
+            )
 
-            self.graphics_view = api.xray_imaging.get_graphics_view()
+            self.graphics_view = HWR.beamline.imaging.get_graphics_view()
             self._graphics_view_widget_vlayout.addWidget(self.graphics_view)
             self.graphics_view_widget.setFixedSize(
                 self.graphics_view.scene().width(), self.graphics_view.scene().height()
@@ -241,7 +243,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.results_widget.config_path_ledit.setText(os.path.join(path_template.get_archive_directory(),
                                                                     config_filename))
 
-        api.xray_imaging.set_osc_start(acq_params.osc_start)
+        HWR.beamline.imaging.set_osc_start(acq_params.osc_start)
 
     def measure_item_changed(self, image_slice):
         self.histogram_plot.clear()
@@ -312,58 +314,58 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.results_widget.config_path_ledit.setText(selected_filename)
 
     def load_button_clicked(self):
-        api.xray_imaging.load_images(
+        HWR.beamline.imaging.load_images(
             str(self.results_widget.data_path_ledit.text()),
             str(self.results_widget.ff_path_ledit.text()),
             str(self.results_widget.config_path_ledit.text())
         )
 
     def play_button_clicked(self):
-        api.xray_imaging.play_images(
+        HWR.beamline.imaging.play_images(
             repeat=self.results_widget.repeat_cbox.isChecked()
         )
 
     def prev_image_button_clicked(self):
-        api.xray_imaging.display_image(self.current_image_num - 1)
+        HWR.beamline.imaging.display_image(self.current_image_num - 1)
 
     def next_image_button_clicked(self):
-        api.xray_imaging.display_image(self.current_image_num + 1)
+        HWR.beamline.imaging.display_image(self.current_image_num + 1)
 
     def last_image_button_clicked(self):
-        api.xray_imaging.display_image(self.total_image_num - 1)
+        HWR.beamline.imaging.display_image(self.total_image_num - 1)
 
 def ff_apply_state_changed(self, state):
-    api.xray_imaging.set_ff_apply(state)
+    HWR.beamline.imaging.set_ff_apply(state)
 
 def measure_distance_clicked(self):
-    api.xray_imaging.start_measure_distance(wait_click=True)
+    HWR.beamline.imaging.start_measure_distance(wait_click=True)
 
 def first_image_button_clicked():
-    api.xray_imaging.display_image(0)
+    HWR.beamline.imaging.display_image(0)
 
 def minus_quater_button_clicked(self):
-    api.xray_imaging.display_relative_image(-90)
+    HWR.beamline.imaging.display_relative_image(-90)
 
 def plus_quater_button_clicked():
-    api.xray_imaging.display_relative_image(90)
+    HWR.beamline.imaging.display_relative_image(90)
 
 def dial_value_changed(value):
-    api.xray_imaging.display_image(value)
+    HWR.beamline.imaging.display_image(value)
 
 def spinbox_value_changed(value):
-    api.xray_imaging.display_image(value - 1)
+    HWR.beamline.imaging.display_image(value - 1)
 
 def stop_button_clicked():
-    api.xray_imaging.stop_image_play()
+    HWR.beamline.imaging.stop_image_play()
 
 def repeat_state_changed(state):
-    api.xray_imaging.set_repeate_image_play(state)
+    HWR.beamline.imaging.set_repeate_image_play(state)
 
 def start_centering_clicked():
-    api.xray_imaging.start_centering()
+    HWR.beamline.imaging.start_centering()
 
 def start_n_centering_clicked():
-    api.xray_imaging.start_n_centering()
+    HWR.beamline.imaging.start_n_centering()
 
 def accept_centering_clicked():
-    api.graphics.accept_centring()
+    HWR.beamline.graphics.accept_centring()

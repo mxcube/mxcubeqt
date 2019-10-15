@@ -17,10 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
 from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.xrf_spectrum_parameters_widget import XRFSpectrumParametersWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -43,9 +44,9 @@ class XRFSpectrumParametersBrick(BaseWidget):
 
     def populate_xrf_widget(self, item):
         self.xrf_spectrum_widget.data_path_widget.set_base_image_directory(
-            api.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.xrf_spectrum_widget.data_path_widget.set_base_process_directory(
-            api.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
         self.xrf_spectrum_widget.populate_widget(item)
