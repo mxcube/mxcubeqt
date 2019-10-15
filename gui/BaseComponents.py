@@ -699,7 +699,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         # This solution of redirecting methods works...
 
         self.connect = self.connect_hwobj
-        self.diconnect = self.disconnect_hwobj
+        self.disconnect = self.disconnect_hwobj
         # self.run_mode = QPushButton("Run mode", self)
 
     def __run(self):

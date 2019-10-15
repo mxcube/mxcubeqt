@@ -412,7 +412,7 @@ class CameraMotorToolsBrick(BlissWidget):
                 self.__mosaicView.delAction(self.__movetoActionMosaic)
                 self.disconnect(self.__movetoActionMosaic, qt.PYSIGNAL("PointSelected"),
                                 self.__mosaicPointSelected)
-                self.diconnect(self.__movetoActionMosaic, qt.PYSIGNAL("StateChanged"),
+                self.disconnect(self.__movetoActionMosaic, qt.PYSIGNAL("StateChanged"),
                                self.__movetoMosaicStateChanged)
                 self.__movetoActionMosaic = None
 
