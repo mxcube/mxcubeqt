@@ -122,35 +122,35 @@ class ResolutionBrick(BaseWidget):
         )
 
     def run(self):
-        if HWR.beamline.detector.detector_distance is not None:
+        if HWR.beamline.detector.distance is not None:
             self.connect(
-                HWR.beamline.detector.detector_distance,
+                HWR.beamline.detector.distance,
                 "deviceReady",
                 self.detector_distance_ready
             )
             self.connect(
-                HWR.beamline.detector.detector_distance,
+                HWR.beamline.detector.distance,
                 "deviceNotReady",
                 self.detector_distance_not_ready,
             )
             self.connect(
-                HWR.beamline.detector.detector_distance,
+                HWR.beamline.detector.distance,
                 "stateChanged",
                 self.detector_distance_state_changed,
             )
             self.connect(
-                HWR.beamline.detector.detector_distance,
+                HWR.beamline.detector.distance,
                 "positionChanged",
                 self.detector_distance_changed
             )
             self.connect(
-                HWR.beamline.detector.detector_distance,
+                HWR.beamline.detector.distance,
                 "limitsChanged",
                 self.detector_distance_limits_changed,
             )
 
-            if HWR.beamline.detector.detector_distance.is_ready():
-                HWR.beamline.detector.detector_distance.update_values()
+            if HWR.beamline.detector.distance.is_ready():
+                HWR.beamline.detector.distance.update_values()
                 self.connected()
             else:
                 self.disconnected()
@@ -271,7 +271,7 @@ class ResolutionBrick(BaseWidget):
         Door interlock is optional, because not all sites might have it
         """
         groupbox_title = ""
-        detector_distance = HWR.beamline.detector.detector_distance
+        detector_distance = HWR.beamline.detector.distance
         if detector_distance is None:
             detector_ready = False
         elif detector_ready is None:
@@ -348,7 +348,7 @@ class ResolutionBrick(BaseWidget):
                 < value
                 < self.detector_distance_limits[1]
             ):
-                HWR.beamline.detector.detector_distance.move(value)
+                HWR.beamline.detector.distance.move(value)
 
     def energy_changed(self, energy_kev, energy_wavelength):
         self.get_resolution_limits(True)
@@ -380,7 +380,7 @@ class ResolutionBrick(BaseWidget):
             return
 
         detector_ready = False
-        detector_distance = HWR.beamline.detector.detector_distance
+        detector_distance = HWR.beamline.detector.distance
         if detector_distance is not None:
             try:
                 if detector_distance.connection.isSpecConnected():
@@ -406,7 +406,7 @@ class ResolutionBrick(BaseWidget):
             self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
-        detector_distance = HWR.beamline.detector.detector_distance
+        detector_distance = HWR.beamline.detector.distance
         if detector_distance is not None:
             if state:
                 color = ResolutionBrick.STATE_COLORS[state]
@@ -434,7 +434,7 @@ class ResolutionBrick(BaseWidget):
         if state is None:
             return
 
-        detector_distance = HWR.beamline.detector.detector_distance
+        detector_distance = HWR.beamline.detector.distance
         color = ResolutionBrick.STATE_COLORS[state]
         unit = self.units_combobox.currentText()
         if unit == "mm":
@@ -459,7 +459,7 @@ class ResolutionBrick(BaseWidget):
         if unit == chr(197):
             HWR.beamline.resolution.stop()
         elif unit == "mm":
-            HWR.beamline.detector.detector_distance.stop()
+            HWR.beamline.detector.distance.stop()
 
     def door_interlock_state_changed(self, state, state_message):
         self.door_interlocked = state in ["locked_active", "locked_inactive"]

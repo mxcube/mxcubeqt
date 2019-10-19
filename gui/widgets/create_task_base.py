@@ -377,7 +377,7 @@ class CreateTaskBase(QtImport.QWidget):
         self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        HWR.beamline.graphics.select_shape_with_cpos(cpos)
+        HWR.beamline.microscope.select_shape_with_cpos(cpos)
 
     def selection_changed(self, items):
         if items:
@@ -414,7 +414,7 @@ class CreateTaskBase(QtImport.QWidget):
             self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
             self._acquisition_parameters.centred_position.snapshot_image = (
-                HWR.beamline.graphics.get_scene_snapshot()
+                HWR.beamline.microscope.get_scene_snapshot()
             )
 
             # Sample with lims information, use values from lims
@@ -581,7 +581,7 @@ class CreateTaskBase(QtImport.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = HWR.beamline.graphics.get_scene_snapshot(
+                        snapshot = HWR.beamline.microscope.get_scene_snapshot(
                             position
                         )
                         cpos.snapshot_image = snapshot
@@ -828,7 +828,7 @@ class CreateTaskBase(QtImport.QWidget):
         parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
         self._acquisition_parameters.centred_position.snapshot_image = (
-            HWR.beamline.graphics.get_scene_snapshot()
+            HWR.beamline.microscope.get_scene_snapshot()
         )
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
@@ -843,9 +843,9 @@ class CreateTaskBase(QtImport.QWidget):
 
     def _create_dc_from_grid(self, sample, grid=None):
         if grid is None:
-            grid = HWR.beamline.graphics.create_auto_grid()
+            grid = HWR.beamline.microscope.create_auto_grid()
 
-        grid.set_snapshot(HWR.beamline.graphics.get_scene_snapshot(grid))
+        grid.set_snapshot(HWR.beamline.microscope.get_scene_snapshot(grid))
 
         grid_properties = grid.get_properties()
 

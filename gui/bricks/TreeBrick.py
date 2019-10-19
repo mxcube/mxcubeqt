@@ -244,18 +244,18 @@ class TreeBrick(BaseWidget):
             )
 
         self.connect(
-            HWR.beamline.graphics, "shapeCreated", self.dc_tree_widget.shape_created
+            HWR.beamline.microscope, "shapeCreated", self.dc_tree_widget.shape_created
         )
         self.connect(
-            HWR.beamline.graphics,
+            HWR.beamline.microscope,
             "shapeChanged",
             self.dc_tree_widget.shape_changed
         )
         self.connect(
-            HWR.beamline.graphics, "shapeDeleted", self.dc_tree_widget.shape_deleted
+            HWR.beamline.microscope, "shapeDeleted", self.dc_tree_widget.shape_deleted
         )
         self.connect(
-            HWR.beamline.graphics,
+            HWR.beamline.microscope,
             "diffractometerReady",
             self.diffractometer_ready_changed
         )

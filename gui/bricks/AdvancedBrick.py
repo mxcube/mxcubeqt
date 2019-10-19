@@ -71,7 +71,7 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.connect(HWR.beamline.graphics,
+        self.connect(HWR.beamline.microscope,
                      "gridClicked",
                      self.grid_clicked
         )

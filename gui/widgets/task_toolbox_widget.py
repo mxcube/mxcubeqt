@@ -335,7 +335,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
                 )
             else:
                 for item in items:
-                    shapes = HWR.beamline.graphics.get_selected_points()
+                    shapes = HWR.beamline.microscope.get_selected_points()
                     task_model = item.get_model()
 
                     # TODO Consider if GPhL workflow needs task-per-shape
@@ -411,7 +411,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         else:
             new_node = HWR.beamline.queue_model.copy_node(task_node)
             new_snapshot = (
-                HWR.beamline.graphics.get_scene_snapshot()
+                HWR.beamline.microscope.get_scene_snapshot()
             )
 
             if isinstance(task_node, queue_model_objects.Characterisation):
