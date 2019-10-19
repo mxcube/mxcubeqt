@@ -263,7 +263,7 @@ class CameraBrick(BaseWidget):
                     HWR.beamline.microscope.set_scale_visible(new_value)
                 else:
                     logging.getLogger().info(
-                        "No such function: graphics.set_scale_visible()"
+                        "No such function: microscope.set_scale_visible()"
                     )
 
         elif property_name == "beamDefiner":
