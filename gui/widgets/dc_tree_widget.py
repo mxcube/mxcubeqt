@@ -805,7 +805,7 @@ class DataCollectTree(QtImport.QWidget):
             else:
                 dm.user_confirms_centring = True
         except AttributeError:
-            # beamline_setup_hwobj not set when method called
+            # beamline not initialised when method called
             pass
 
     def continue_button_click(self):
@@ -920,19 +920,6 @@ class DataCollectTree(QtImport.QWidget):
             item.reset_style()
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 collection_par_list.append(item.get_model().as_dict())
-        """
-        invalid_parameters = api.beamline_setup.\
-            check_collection_parameters(collection_par_list)
-        if len(invalid_parameters) > 0:
-            msg = "Collection parameter "
-            for item in invalid_parameters:
-                msg = msg + "%s, " % item
-            msg = msg[:-2]
-            msg += " is out of range. Correct the parameter(s) " + \
-                   "and run queue again"
-            logging.getLogger("GUI").error(msg)
-            return
-        """
 
         self.user_stopped = False
         self.delete_button.setEnabled(False)

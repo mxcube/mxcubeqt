@@ -814,8 +814,6 @@ class CreateTaskBase(QtImport.QWidget):
         )
         acq_path_template.base_prefix
 
-        # acq_path_template.suffix = api.beamline_setup.suffix
-
         return acq_path_template
 
     def _create_acq(self, sample):
