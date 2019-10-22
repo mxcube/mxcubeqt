@@ -36,7 +36,8 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("beamline_setup", "string", "/beamline-setup")
+        # NBNB there is no longer a beamline_setup. If desired, replace
+        # self.add_property("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
 
