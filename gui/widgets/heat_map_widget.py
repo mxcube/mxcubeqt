@@ -487,7 +487,7 @@ class HeatMapWidget(QtImport.QWidget):
                             self.__results_display[self.__score_key].shape[1] - row - 1
                         )
                         self.create_centring_point(col + 0.5, row + 0.5)
-        HWR.beamline.graphics.select_all_points()
+        HWR.beamline.microscope.select_all_points()
 
     def display_image_clicked(self):
         """
@@ -605,7 +605,7 @@ class HeatMapWidget(QtImport.QWidget):
                 point_one, point_two, coord_x, num_images
             )
             motor_pos_dict["phi"] = omega
-        HWR.beamline.graphics.create_centring_point(
+        HWR.beamline.microscope.create_centring_point(
             True, {"motors": motor_pos_dict}
         )
 
@@ -613,12 +613,12 @@ class HeatMapWidget(QtImport.QWidget):
         motor_pos_dict = self.__associated_grid.get_motor_pos_from_col_row(
             self.__selected_x, self.__selected_y
         )
-        HWR.beamline.graphics.create_auto_line(motor_pos_dict)
+        HWR.beamline.microscope.create_auto_line(motor_pos_dict)
 
     def rotate_and_create_helical_line_clicked(self):
         self.move_to_selected_position()
         HWR.beamline.diffractometer.move_omega_relative(90)
-        HWR.beamline.graphics.create_auto_line()
+        HWR.beamline.microscope.create_auto_line()
 
     def move_to_selected_position(self):
         """Moves to grid position x and y are positions in micrometers starting

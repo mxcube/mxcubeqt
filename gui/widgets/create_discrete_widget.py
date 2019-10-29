@@ -182,12 +182,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.graphics.get_snapshot(shape)
+            snapshot = HWR.beamline.microscope.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.graphics.get_snapshot()
+            cpos.snapshot_image = HWR.beamline.microscope.get_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1

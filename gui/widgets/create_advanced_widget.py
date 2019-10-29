@@ -175,9 +175,9 @@ class CreateAdvancedWidget(CreateTaskBase):
             "%.1f" % (ver_size * 1000)
         )
 
-        HWR.beamline.graphics.connect("shapeCreated", self.shape_created)
-        HWR.beamline.graphics.connect("shapeChanged", self.shape_changed)
-        HWR.beamline.graphics.connect("shapeDeleted", self.shape_deleted)
+        HWR.beamline.microscope.connect("shapeCreated", self.shape_created)
+        HWR.beamline.microscope.connect("shapeChanged", self.shape_changed)
+        HWR.beamline.microscope.connect("shapeDeleted", self.shape_deleted)
 
     def enable_widgets(self, state):
         return
@@ -226,7 +226,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             msg = "No grid selected. Please select a grid to continue!"
             logging.getLogger("GUI").warning(msg)
             result = False
-            # selected_grid = HWR.beamline.graphics.get_auto_grid()
+            # selected_grid = HWR.beamline.microscope.get_auto_grid()
         else:
             grid_properties = selected_grid.get_properties()
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
@@ -280,7 +280,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                 self.setDisabled(False)
 
             if data_collection.is_mesh():
-                HWR.beamline.graphics.select_shape(data_collection.grid)
+                HWR.beamline.microscope.select_shape(data_collection.grid)
                 self._advanced_methods_widget.grid_treewidget.setCurrentItem(
                     self._grid_map[data_collection.grid]
                 )
@@ -453,7 +453,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def draw_grid_button_clicked(self):
         """Starts grid drawing
         """
-        HWR.beamline.graphics.create_grid(self.spacing)
+        HWR.beamline.microscope.create_grid(self.spacing)
 
     def remove_grid_button_clicked(self):
         """Removes selected grid
@@ -461,7 +461,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         grid_to_delete = self.get_selected_shapes()[0]
 
         if grid_to_delete:
-            HWR.beamline.graphics.delete_shape(grid_to_delete)
+            HWR.beamline.microscope.delete_shape(grid_to_delete)
             self._advanced_methods_widget.move_to_grid_button.setEnabled(False)
 
     def hor_spacing_changed(self, value):
@@ -552,7 +552,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         if grid:
             grid.move_by_pix(direction)
-            HWR.beamline.graphics.update_grid_motor_positions(grid)
+            HWR.beamline.microscope.update_grid_motor_positions(grid)
 
     def enable_grid_controls(self, state):
         """Enables grid controls if a grid is selectd

@@ -118,7 +118,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
-        HWR.beamline.detector.detector_distance.connect(
+        HWR.beamline.detector.distance.connect(
             "positionChanged",
             self._xray_imaging_parameters_widget.set_detector_distance,
         )
@@ -148,7 +148,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._xray_imaging_parameters
             )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                HWR.beamline.detector.detector_distance.get_position()
+                HWR.beamline.detector.distance.get_position()
             )
             self.setDisabled(False)
             self._xray_imaging_parameters_widget.enable_distance_tools(True)
@@ -180,12 +180,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.graphics.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.microscope.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
+            cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
  
         detector_distance_list = []
         dc_list = []
