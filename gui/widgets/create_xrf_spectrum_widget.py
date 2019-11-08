@@ -149,12 +149,12 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
+                cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = HWR.beamline.graphics.get_scene_snapshot(shape)
+                    snapshot = HWR.beamline.microscope.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot

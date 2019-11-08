@@ -267,7 +267,7 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = HWR.beamline.graphics.get_selected_shapes()
+        selected_shapes = HWR.beamline.microscope.get_selected_shapes()
 
         for shape in selected_shapes:
             if isinstance(shape, GraphicsItemPoint):
@@ -281,11 +281,11 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
+            cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = HWR.beamline.graphics.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.microscope.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 

@@ -514,7 +514,7 @@ class DataCollectTree(QtImport.QWidget):
 
         if len(items) == 1:
             items[0].setText(1, "Unloading sample...")
-            HWR.beamline.graphics.clear_all()
+            HWR.beamline.microscope.clear_all()
             logging.getLogger("GUI").\
                 info("All centred positions associated with this " +
                      "sample will be lost.")
@@ -805,7 +805,7 @@ class DataCollectTree(QtImport.QWidget):
             else:
                 dm.user_confirms_centring = True
         except AttributeError:
-            # beamline_setup_hwobj not set when method called
+            # beamline not initialised when method called
             pass
 
     def continue_button_click(self):
@@ -908,7 +908,7 @@ class DataCollectTree(QtImport.QWidget):
            - checks data collection parameters via beamline setup
            - calls collection method
         """
-        HWR.beamline.graphics.de_select_all()
+        HWR.beamline.microscope.de_select_all()
 
         collection_par_list = []
         for item in checked_items:
@@ -920,19 +920,6 @@ class DataCollectTree(QtImport.QWidget):
             item.reset_style()
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 collection_par_list.append(item.get_model().as_dict())
-        """
-        invalid_parameters = api.beamline_setup.\
-            check_collection_parameters(collection_par_list)
-        if len(invalid_parameters) > 0:
-            msg = "Collection parameter "
-            for item in invalid_parameters:
-                msg = msg + "%s, " % item
-            msg = msg[:-2]
-            msg += " is out of range. Correct the parameter(s) " + \
-                   "and run queue again"
-            logging.getLogger("GUI").error(msg)
-            return
-        """
 
         self.user_stopped = False
         self.delete_button.setEnabled(False)
@@ -948,7 +935,7 @@ class DataCollectTree(QtImport.QWidget):
         self.parent().set_condition_state("confirmation_window_accepted",
                                           True)
         self.run_cb()
-        HWR.beamline.graphics.set_cursor_busy(True)
+        HWR.beamline.microscope.set_cursor_busy(True)
         try:
             HWR.beamline.queue_manager.execute()
         except Exception as ex:
@@ -958,13 +945,13 @@ class DataCollectTree(QtImport.QWidget):
 
     def stop_collection(self):
         """Stops queue"""
-        HWR.beamline.graphics.set_cursor_busy(False)
+        HWR.beamline.microscope.set_cursor_busy(False)
         HWR.beamline.queue_manager.stop()
         self.queue_stop_handler()
 
     def queue_stop_handler(self, status=None):
         """Stop handler"""
-        HWR.beamline.graphics.set_cursor_busy(False)
+        HWR.beamline.microscope.set_cursor_busy(False)
         self.user_stopped = True
         self.queue_execution_completed(None)
 
@@ -1073,7 +1060,7 @@ class DataCollectTree(QtImport.QWidget):
         """Restores normal cursors, changes collect button
            Deselects all items and selects mounted sample
         """
-        HWR.beamline.graphics.set_cursor_busy(False)
+        HWR.beamline.microscope.set_cursor_busy(False)
         self.collecting = False
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(self.play_icon)
@@ -1137,7 +1124,7 @@ class DataCollectTree(QtImport.QWidget):
                                   queue_item.SampleQueueItem,
                                   queue_item.DataCollectionGroupQueueItem):
                 new_node = HWR.beamline.queue_model.copy_node(item.get_model())
-                new_node.set_snapshot(HWR.beamline.graphics.get_scene_snapshot())
+                new_node.set_snapshot(HWR.beamline.microscope.get_scene_snapshot())
                 HWR.beamline.queue_model.add_child(
                     item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
@@ -1479,7 +1466,7 @@ class DataCollectTree(QtImport.QWidget):
                     HWR.beamline.queue_model.get_next_run_number(
                     new_node.acquisitions[0].path_template)
 
-            new_node.set_snapshot(HWR.beamline.graphics.get_scene_snapshot())
+            new_node.set_snapshot(HWR.beamline.microscope.get_scene_snapshot())
 
             if isinstance(item, queue_item.DataCollectionQueueItem):
                 parent_nodes = [item.get_model().get_parent()]
@@ -1603,7 +1590,7 @@ class DataCollectTree(QtImport.QWidget):
         if len(filename) > 0:
             self.sample_tree_widget.clear()
             loaded_model = HWR.beamline.queue_model.load_queue(
-                filename, HWR.beamline.graphics.get_scene_snapshot()
+                filename, HWR.beamline.microscope.get_scene_snapshot()
             )
             return loaded_model
 
@@ -1694,7 +1681,7 @@ class DataCollectTree(QtImport.QWidget):
         task_node = self.create_task_group(sample_model, "Diffraction plan")
         prefix = HWR.beamline.session.get_default_prefix(
             sample_model)
-        snapshot = HWR.beamline.graphics.get_scene_snapshot()
+        snapshot = HWR.beamline.microscope.get_scene_snapshot()
 
         if sample_model.diffraction_plan.experimentKind in ("OSC", "Default"):
             acq = queue_model_objects.Acquisition()

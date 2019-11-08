@@ -224,7 +224,7 @@ class CreateStillScanWidget(CreateTaskBase):
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
-        cpos.snapshot_image = HWR.beamline.graphics.get_scene_snapshot()
+        cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1
