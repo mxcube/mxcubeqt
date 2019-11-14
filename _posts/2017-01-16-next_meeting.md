@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ HZB  (Berlin, Germany), October 2019
+# Next MXCuBE meeting @ ALBA  (Barcelona, Spain), May 2020
