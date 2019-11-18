@@ -7,12 +7,12 @@ fa-icon: users
 
 # Past meetings
 
-- [14th. MXCuBE meeting @ HZB  (Berlin, Germany), 31.10 - 02.11.2019](doc/past_meetings/2019_hzb/index.html)
+- [14th. MXCuBE meeting @ HZB  (Berlin, Germany), 31.10-02.11.2019](doc/past_meetings/2019_hzb/index.html)
 - [13th. MXCuBE meeting @ MAXIV  (Lund, Sweeden), 12-14.03.2019](doc/past_meetings/2019_maxiv/index.html)
 - [12th. MXCuBE meeting @ Elettra (Trieste, Italy), 11-13.09.2018](doc/past_meetings/2018_elettra/index.html)
-- [11th. MXCuBE meeting @ Diamond (Oxfordshire, UK), 31.01. - 02.02.2018](doc/past_meetings/2018_diamond/index.html)
+- [11th. MXCuBE meeting @ Diamond (Oxfordshire, UK), 31.01.-02.02.2018](doc/past_meetings/2018_diamond/index.html)
 - [10th. MXCuBE meeting @ SOLEIL (Saint-Aubin, France), 12-14.06.2017](doc/past_meetings/2017_soleil/index.html)
-- [9th.  MXCuBE meeting @ ESRF (Grenoble, France), 16-18.01..2017](doc/past_meetings/2017_esrf/index.html)
+- [9th.  MXCuBE meeting @ ESRF (Grenoble, France), 16-18.01.2017](doc/past_meetings/2017_esrf/index.html)
 - [8th.  MXCuBE meeting @ EMBL (Hamburg, Germany), 27-29.06.2016](doc/past_meetings/2016_embl/index.html)
 - [7th.  MXCuBE meeting @ ALBA (Barcelona), 01-02.12.2015](doc/past_meetings/2015_alba/index.html)
 - [6th.  MXCuBE meeting @ HZB (Berlin), 01-02.06.2015](doc/past_meetings/2015_hzb/index.html)
