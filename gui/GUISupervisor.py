@@ -26,7 +26,10 @@ import pickle
 import logging
 import collections
 
-import yaml
+try:
+    import ruamel.yaml as yaml
+except:
+    import yaml
 
 from gui import set_splash_screen
 from gui import Configuration, GUIBuilder
@@ -41,7 +44,6 @@ LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
-
 
 
 class SplashScreen(QtImport.QSplashScreen):
@@ -287,7 +289,7 @@ class GUISupervisor(QtImport.QWidget):
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
 
-                    self.hardware_repository.printReport()
+                    #self.hardware_repository.printReport()
 
                     if self.launch_in_design_mode:
                         self.framework = GUIBuilder.GUIBuilder()
