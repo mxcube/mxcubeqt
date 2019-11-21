@@ -21,4 +21,4 @@ script:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 python -m pytest; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 python3 -m pytest; fi
   - cd ..
-  - pylint -E gui --extension-pkg-whitelist=PyQt5,PyQt4
+  - travis_wait 20 pylint -E gui --extension-pkg-whitelist=PyQt5,PyQt4
