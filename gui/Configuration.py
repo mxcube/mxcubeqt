@@ -29,7 +29,7 @@ import json
 
 try:
     import ruamel.yaml as yaml
-except:
+except ImportError:
     import yaml
 
 

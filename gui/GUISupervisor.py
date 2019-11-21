@@ -28,7 +28,7 @@ import collections
 
 try:
     import ruamel.yaml as yaml
-except:
+except ImportError:
     import yaml
 
 from gui import set_splash_screen
