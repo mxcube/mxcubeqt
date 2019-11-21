@@ -2,10 +2,10 @@ PyDispatcher
 gevent
 suds
 jsonpickle
-simpleyaml
 numpy
 scipy
 matplotlib
 pymca
 enum34
 lxml
+ruamel.yaml
