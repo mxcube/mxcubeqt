@@ -5,8 +5,8 @@ python:
   - "3.6"
 
 before_install:
-  - travis_wait 20 if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then bash bin/install_pyqt4.sh; fi
-  - travis_wait 20 if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then bash bin/install_pyqt5.sh; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 bash bin/install_pyqt4.sh; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 bash bin/install_pyqt5.sh; fi
 
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev; fi
@@ -18,7 +18,7 @@ before_script:
 
 script:
   - cd test
-  - travis_wait 20 if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then python -m pytest; fi
-  - travis_wait 20 if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then python3 -m pytest; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 python -m pytest; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 python3 -m pytest; fi
   - cd ..
   - pylint -E gui --extension-pkg-whitelist=PyQt5,PyQt4

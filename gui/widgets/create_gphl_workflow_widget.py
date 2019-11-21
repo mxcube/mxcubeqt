@@ -219,7 +219,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     self.continue_button_click
                 )
 
-        wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
+        wf = queue_model_objects.GphlWorkflow()
         wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
