@@ -26,7 +26,12 @@ import pprint
 import pickle
 
 import json
-import yaml
+
+try:
+    import ruamel.yaml as yaml
+except ImportError:
+    import yaml
+
 
 from gui import BaseLayoutItems
 from gui.utils import PropertyBag

@@ -3,7 +3,7 @@ import sys
 import os
 import gevent
 
-MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
+MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
 
 print("MXCuBE root: %s" % MXCUBE_ROOT)
 
@@ -20,5 +20,6 @@ def close_app():
 gevent.spawn_later(30, close_app)
 
 from gui import startGUI
+print("MXCuBE gui file: %s" % MXCUBE_GUI_FILE)
 startGUI.run(MXCUBE_GUI_FILE)
 
