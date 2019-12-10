@@ -1,0 +1,55 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>SnapshotWidgetLayout</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>SnapshotWidgetLayout</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>451</width>
+            <height>356</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Snapshot widget</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>svideo_gbox</cstring>
+            </property>
+            <property name="title">
+                <string>Centred position</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>svideo</cstring>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap></pixmap>
+                    </property>
+                    <property name="scaledContents">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </hbox>
+</widget>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
