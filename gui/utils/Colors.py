@@ -36,6 +36,7 @@ DARK_GRAY = QColor(Qt.darkGray)
 GREEN = QColor(Qt.green)
 DARK_GREEN = QColor(Qt.darkGreen)
 RED = QColor(Qt.red)
+YELLOW = QColor(Qt.yellow)
 
 LIGHT_GREEN = QColor(204, 255, 204)
 LIGHT_RED = QColor(255, 204, 204)
