@@ -70,7 +70,6 @@ logging.getLogger().addHandler(_hdlr)
 gui_path = os.path.dirname(__file__)
 sys.path.insert(0, gui_path)
 
-
 def get_base_bricks_path():
     std_bricks_pkg = __import__(STD_BRICKS_LOCATION, globals(), locals(), [""])
     return os.path.dirname(std_bricks_pkg.__file__)
@@ -96,7 +95,10 @@ def add_custom_bricks_dirs(bricks_dirs):
         _bricks_dirs += new_bricks_dirs
 
 
+base_bricks_path = get_base_bricks_path()
 sys.path.insert(0, get_base_bricks_path())
+# add 'EMBL' 'ESRF' 'ALBA' ... subfolders to path
+[sys.path.insert(0, f.path) for f in os.scandir(base_bricks_path) if f.is_dir() and f.name != "__pycache__"]
 
 
 def get_custom_bricks_dirs():
