@@ -136,6 +136,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
         from PyQt5.QtWidgets import (
             QAbstractItemView,
             QAction,
+            QActionGroup,
             QApplication,
             QButtonGroup,
             QCheckBox,
