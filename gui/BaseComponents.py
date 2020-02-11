@@ -1023,6 +1023,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         elif property_name == "hide":
             if new_value:
                 self.setHidden(True)
+            else:
+                self.setVisible(True)
         else:
             try:
                 self.property_changed(property_name, old_value, new_value)
