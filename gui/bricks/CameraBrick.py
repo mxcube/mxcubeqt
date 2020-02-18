@@ -57,7 +57,7 @@ class CameraBrick(BaseWidget):
         # Graphic elements-----------------------------------------------------
         self.info_widget = QtImport.QWidget(self)
         self.display_beam_size_cbox = QtImport.QCheckBox("Display beam size", self)
-        self.display_beam_size_cbox.setHidden(True)
+        self.display_beam_size_cbox.setHidden(False)
         self.coord_label = QtImport.QLabel(":", self)
         self.info_label = QtImport.QLabel(self)
         self.camera_control_dialog = CameraControlDialog(self)
@@ -312,12 +312,14 @@ class CameraBrick(BaseWidget):
         self.image_scale_list = HWR.beamline.microscope.get_image_scale_list()
         if len(self.image_scale_list) > 0:
             self.image_scale_menu.setEnabled(True)
+            self.image_scale_action_group = QtImport.QActionGroup(self.image_scale_menu)
             for scale in self.image_scale_list:
                 # probably there is a way to use a single method for all actions
                 # by passing index. lambda function at first try did not work
-                self.image_scale_menu.addAction(
+                action_temp = self.image_scale_menu.addAction(
                     "%d %%" % (scale * 100), self.not_used_function
                 )
+                self.image_scale_action_group.addAction(action_temp)
             for action in self.image_scale_menu.actions():
                 action.setCheckable(True)
             self.image_scaled(HWR.beamline.microscope.get_image_scale())
