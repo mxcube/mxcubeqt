@@ -236,7 +236,6 @@ class CameraBrick(BaseWidget):
                 self.connect(HWR.beamline.microscope, "infoMsg", self.set_info_msg)
                 self.graphics_view = HWR.beamline.microscope.get_graphics_view()
                 # self.graphics_camera_frame = HWR.beamline.microscope.get_camera_frame()
-                self.graphics_view.resize(700,700)
                 self.main_layout.addWidget(self.graphics_view)
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
