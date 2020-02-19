@@ -20,6 +20,7 @@
 import sys
 import math
 import logging
+import numpy
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
@@ -121,6 +122,7 @@ class MotorSpinBoxBrick(BaseWidget):
             "Moves the motor to a specific "
             + "position or step by step; right-click for motor history"
         )
+        self.position_spinbox.setContextMenuPolicy(QtImport.Qt.CustomContextMenu)
 
         # Extra controls
         self.stop_button = QtImport.QPushButton(self.main_gbox)
@@ -175,7 +177,7 @@ class MotorSpinBoxBrick(BaseWidget):
         spinbox_event.returnPressedSignal.connect(self.change_position)
         spinbox_event.contextMenuSignal.connect(self.open_history_menu)
         self.position_spinbox.lineEdit().textEdited.connect(self.position_value_edited)
-
+        
         self.step_combo.activated.connect(self.go_to_step)
         self.step_combo.activated.connect(self.step_changed)
         self.step_combo.editTextChanged.connect(self.step_edited)
@@ -322,8 +324,8 @@ class MotorSpinBoxBrick(BaseWidget):
 
     def limits_changed(self, limits):
         # limits = self.make_limits_bounded(limits)
-
         if limits and not None in limits:
+            
             self.position_spinbox.blockSignals(True)
             self.position_spinbox.setMinimum(limits[0])
             self.position_spinbox.setMaximum(limits[1])
@@ -363,7 +365,7 @@ class MotorSpinBoxBrick(BaseWidget):
             self.position_history.insert(0, pos)
 
     def open_step_editor(self):
-        if self.isRunning():
+        if self.is_running():
             if self.step_editor is None:
                 self.step_editor = StepEditorDialog(self)
             self.step_editor.set_motor(
@@ -537,7 +539,7 @@ class MotorSpinBoxBrick(BaseWidget):
 
         if motor_ho_name is not None:
             self.motor_hwobj = self.get_hardware_object(motor_ho_name)
-
+            
         if self.motor_hwobj is None:
             # first time motor is set
             try:

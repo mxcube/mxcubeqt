@@ -23,6 +23,7 @@ The standard Motor brick.
 """
 
 import logging
+import numpy
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
@@ -348,12 +349,10 @@ class MotorSlider(QtImport.QWidget):
 
     def set_range(self, min, max):
         """Set slider's min and max values."""
-        logging.getLogger().error(f"def set_range : min {min} -max {max} " )
-        if min == float("-inf") or min is None:
-            min = -100#-2147483648
-        if max == float("inf") or max is None:
-            max = 100#2147483647
-        logging.getLogger().error(f"def set_range after if : min {min} -max {max} ")
+        if not numpy.isfinite(min) or min is None:
+            min = -1000#-2147483648
+        if not numpy.isfinite(max) or max is None:
+            max = 1000#2147483647
         self.slider.setRange(min, max)
         self.slider.setValue((max + min)/2)
         self.set_min(min)
