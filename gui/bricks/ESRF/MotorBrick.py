@@ -23,7 +23,6 @@ The standard Motor brick.
 """
 
 import logging
-import numpy
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
@@ -349,10 +348,6 @@ class MotorSlider(QtImport.QWidget):
 
     def set_range(self, min, max):
         """Set slider's min and max values."""
-        if not numpy.isfinite(min) or min is None:
-            min = -1000#-2147483648
-        if not numpy.isfinite(max) or max is None:
-            max = 1000#2147483647
         self.slider.setRange(min, max)
         self.slider.setValue((max + min)/2)
         self.set_min(min)
@@ -748,9 +743,9 @@ class MotorBrick(BaseWidget):
             )
 
             step = 1.0
-            if hasattr(self.motor_hwobj, "GUIStep"):
-                if self.motor_hwobj.GUIStep is not None:
-                    step = self.motor_hwobj.GUIStep
+            if hasattr(self.motor_hwobj, "GUIstep"):
+                if self.motor_hwobj.GUIstep is not None:
+                    step = self.motor_hwobj.GUIstep
 
             self.step_backward.set_value(step)
             self.step_forward.set_value(step)
@@ -844,11 +839,11 @@ class MotorBrick(BaseWidget):
                 )
 
                 step = 1.0
-                if hasattr(self.motor_hwobj, "GUIStep"):
-                    if self.motor_hwobj.GUIStep is not None:
-                        step = self.motor_hwobj.GUIStep
+                if hasattr(self.motor_hwobj, "GUIstep"):
+                    if self.motor_hwobj.GUIstep is not None:
+                        step = self.motor_hwobj.GUIstep
                 else:
-                    logging.getLogger().error(f"self.motor_hwobj has no GUIStep attribute")
+                    logging.getLogger().error(f"self.motor_hwobj has no GUIstep attribute")
                 
                 self.step_backward.set_value(step)
                 self.step_forward.set_value(step)
