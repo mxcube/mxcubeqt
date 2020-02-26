@@ -20,7 +20,6 @@
 import sys
 import math
 import logging
-import numpy
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
