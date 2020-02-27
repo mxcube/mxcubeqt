@@ -348,12 +348,6 @@ class MotorSlider(QtImport.QWidget):
 
     def set_range(self, min, max):
         """Set slider's min and max values."""
-        logging.getLogger().error(f"def set_range : min {min} -max {max} " )
-        if min == float("-inf") or min is None:
-            min = -100#-2147483648
-        if max == float("inf") or max is None:
-            max = 100#2147483647
-        logging.getLogger().error(f"def set_range after if : min {min} -max {max} ")
         self.slider.setRange(min, max)
         self.slider.setValue((max + min)/2)
         self.set_min(min)
@@ -749,9 +743,9 @@ class MotorBrick(BaseWidget):
             )
 
             step = 1.0
-            if hasattr(self.motor_hwobj, "GUIStep"):
-                if self.motor_hwobj.GUIStep is not None:
-                    step = self.motor_hwobj.GUIStep
+            if hasattr(self.motor_hwobj, "GUIstep"):
+                if self.motor_hwobj.GUIstep is not None:
+                    step = self.motor_hwobj.GUIstep
 
             self.step_backward.set_value(step)
             self.step_forward.set_value(step)
@@ -845,11 +839,11 @@ class MotorBrick(BaseWidget):
                 )
 
                 step = 1.0
-                if hasattr(self.motor_hwobj, "GUIStep"):
-                    if self.motor_hwobj.GUIStep is not None:
-                        step = self.motor_hwobj.GUIStep
+                if hasattr(self.motor_hwobj, "GUIstep"):
+                    if self.motor_hwobj.GUIstep is not None:
+                        step = self.motor_hwobj.GUIstep
                 else:
-                    logging.getLogger().error(f"self.motor_hwobj has no GUIStep attribute")
+                    logging.getLogger().error(f"self.motor_hwobj has no GUIstep attribute")
                 
                 self.step_backward.set_value(step)
                 self.step_forward.set_value(step)
