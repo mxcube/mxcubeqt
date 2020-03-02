@@ -38,6 +38,15 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __status__ = "Production"
 
+class CustomLabel(QtImport.QLabel):
+    """Label"""
+
+    def __init__(self, *args, **kwargs):
+        """init"""
+
+        QtImport.QLabel.__init__(self, args[0])
+        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
+
 
 class CustomMenuBar(QtImport.QMenuBar):
     """MenuBar displayed on the top of the window"""
@@ -399,16 +408,388 @@ class CustomGroupBox(QtImport.QGroupBox):
             if hasattr(child, "setVisible"):
                 child.setVisible(state)
 
+class Spacer(QtImport.QFrame):
+    """Spacer widget"""
+
+    def __init__(self, *args, **kwargs):
+        """init"""
+        QtImport.QFrame.__init__(self, args[0])
+        self.setObjectName(args[1])
+
+        self.orientation = kwargs.get("orientation", "horizontal")
+        self.execution_mode = kwargs.get("execution_mode", False)
+
+        self.setFixedSize(-1)
+
+        if self.orientation == "horizontal":
+            self.main_layout = QtImport.QHBoxLayout(self)
+        else:
+            self.main_layout = QtImport.QVBoxLayout(self)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+
+    def setFixedSize(self, fixed_size):
+        """Sets fixed size"""
+
+        if fixed_size >= 0:
+            hor_size_policy = (
+                self.orientation == "horizontal"
+                and QtImport.QSizePolicy.Fixed
+                or QtImport.QSizePolicy.MinimumExpanding
+            )
+            ver_size_policy = (
+                hor_size_policy == QtImport.QSizePolicy.Fixed
+                and QtImport.QSizePolicy.MinimumExpanding
+                or QtImport.QSizePolicy.Fixed
+            )
+
+            if self.orientation == "horizontal":
+                self.setFixedWidth(fixed_size)
+            else:
+                self.setFixedHeight(fixed_size)
+        else:
+            hor_size_policy = (
+                self.orientation == "horizontal"
+                and QtImport.QSizePolicy.Expanding
+                or QtImport.QSizePolicy.MinimumExpanding
+            )
+            ver_size_policy = (
+                hor_size_policy == QtImport.QSizePolicy.Expanding
+                and QtImport.QSizePolicy.MinimumExpanding
+                or QtImport.QSizePolicy.Expanding
+            )
+        self.setSizePolicy(hor_size_policy, ver_size_policy)
+
+    def paintEvent(self, event):
+        """Paints the widgets"""
+
+        QtImport.QFrame.paintEvent(self, event)
+
+        if self.execution_mode:
+            return
+        painter = QtImport.QPainter(self)
+        painter.setPen(QtImport.QPen(QtImport.Qt.black, 3))
+
+        if self.orientation == "horizontal":
+            height = self.height() / 2
+            painter.drawLine(0, height, self.width(), height)
+            painter.drawLine(0, height, 5, height - 5)
+            painter.drawLine(0, height, 5, height + 5)
+            painter.drawLine(self.width(), height, self.width() - 5, height - 5)
+            painter.drawLine(self.width(), height, self.width() - 5, height + 5)
+        else:
+            width = self.width() / 2
+            painter.drawLine(self.width() / 2, 0, self.width() / 2, self.height())
+            painter.drawLine(width, 0, width - 5, 5)
+            painter.drawLine(width, 0, width + 5, 5)
+            painter.drawLine(width, self.height(), width - 5, self.height() - 5)
+            painter.drawLine(width, self.height(), width + 5, self.height() - 5)
+
+class CustomFrame(QtImport.QFrame):
+    def __init__(self, *args, **kwargs):
+        """init"""
+        QtImport.QFrame.__init__(self, args[0])
+
+        self.setObjectName(args[1])
+        self.pinned = True
+        self.dialog = None
+        self.origin_parent = self.parent()
+        self.origin_index = None
+        execution_mode = kwargs.get("execution_mode", False)
+
+        if not execution_mode:
+            self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
+
+        if kwargs.get("layout") == "vertical":
+            __frame_layout = QtImport.QVBoxLayout(self)
+        else:
+            __frame_layout = QtImport.QHBoxLayout(self)
+
+        self.open_in_dialog_button = QtImport.QPushButton(
+            Icons.load_icon("UnLock"), ""
+        )
+        self.open_in_dialog_button.setFixedWidth(30)
+        # self.open_in_dialog_button.setObjectName("pin")
+        self.open_in_dialog_button.setVisible(False)
+
+        self.dialog = QtImport.QDialog(self.parent())
+        self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
+
+        __frame_layout.addWidget(self.open_in_dialog_button)
+        __frame_layout.setSpacing(0)
+        __frame_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.open_in_dialog_button.clicked.connect(self.show_in_dialog_toggled)
+
+    def show_in_dialog_toggled(self):
+        if self.pinned:
+            self.pinned = False
+            self.open_in_dialog_button.setIcon(Icons.load_icon("Lock"))
+            self.origin_index = self.origin_parent.layout().indexOf(self)
+            self.origin_parent.layout().removeWidget(self)
+            self.dialog_layout.addWidget(self)
+            self.dialog.show()
+        else:
+            self.pinned = True
+            self.open_in_dialog_button.setIcon(Icons.load_icon("UnLock"))
+            self.dialog_layout.removeWidget(self)
+            self.origin_parent.layout().insertWidget(self.origin_index, self)
+            self.dialog.close()
+
+    def set_background_color(self, color):
+        Colors.set_widget_color(self, color, QtImport.QPalette.Background)
+
+    def set_expert_mode(self, expert_mode):
+        self.open_in_dialog_button.setVisible(expert_mode)
+
+class CustomTabWidget(QtImport.QTabWidget):
+    """Tab widget"""
+
+    # notebookPageChangedSignal = pyqtSignal(str)
+    tabChangedSignal = QtImport.pyqtSignal(int, object)
+
+    def __init__(self, *args, **kwargs):
+        """init"""
+
+        QtImport.QTabWidget.__init__(self, args[0])
+        self.setObjectName(args[1])
+        self.open_in_dialog_button = None
+        self.close_tab_button = None
+        self.pinned = True
+
+        # self.tab_widgets = []
+        self.count_changed = {}
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
+        self.currentChanged.connect(self._page_changed)
+
+        self.dialog = QtImport.QDialog(self.parent())
+        self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
+
+    def _page_changed(self, index):
+        """Page changed event"""
+
+        page = self.widget(index)
+        self.count_changed[index] = False
+
+        tab_label = str(self.tabText(index))
+        label_list = tab_label.split()
+
+        self.tabChangedSignal.emit(index, page)
+
+        tab_name = self.objectName()
+        BaseWidget.update_tab_widget(tab_name, index)
+
+    def add_tab(self, page_widget, label, icon=""):
+        """Add tab"""
+
+        scroll_area = page_widget
+        self.addTab(scroll_area, label)
+
+        slot_name = "showPage_%s" % label
+
+        def tab_show_slot(self, page_index=self.indexOf(scroll_area)):
+            self.setCurrentIndex(page_index)
+
+        try:
+            self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                tab_show_slot, self
+            )
+        except BaseException:
+            logging.getLogger().exception(
+               "Could not add slot %s " % slot_name + "in %s" % self.objectName()
+            )
+        slot_name = "hidePage_%s" % label
+
+        def tab_hide_slot(
+            self,
+            hide=True,
+            page={
+                "widget": scroll_area,
+                "label": label,
+                "index": self.indexOf(scroll_area),
+                "icon": icon,
+                "hidden": False,
+            },
+        ):
+
+            if hide:
+                if not page["hidden"]:
+                    self.removeTab(self.indexOf(page["widget"]))
+                    self.repaint()
+                    page["hidden"] = True
+            else:
+                if page["hidden"]:
+                    if icon:
+                        self.insertTab(
+                            page["index"],
+                            page["widget"],
+                            Icons.load_icon(icon),
+                            label,
+                        )
+                    else:
+                        self.insertTab(page["index"], page["widget"], page["label"])
+                    slot_name = "showPage_%s" % page["label"].replace(" ", "_")
+                    getattr(self, slot_name)()
+                    page["hidden"] = False
+                else:
+                    slot_name = "showPage_%s" % page["label"].replace(" ", "_")
+                    getattr(self, slot_name)()
+                self.setCurrentWidget(page["widget"])
+        try:
+            self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                tab_hide_slot, self
+            )
+        except BaseException:
+            logging.getLogger().exception(
+                "Could not add slot %s " % slot_name
+                 + "in %s" % str(self.objectName())
+            )
+
+        # add 'enable page' slot
+        slot_name = "enablePage_%s" % label
+
+        def enable_page_slot(self, enable, page_index=self.indexOf(scroll_area)):
+            self.page(page_index).setEnabled(enable)
+
+        try:
+            self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                enable_page_slot, self
+            )
+        except BaseException:
+            logging.getLogger().exception(
+                "Could not add slot %s " % slot_name
+                + "in %s" % str(self.objectName())
+            )
+
+        # add 'enable tab' slot
+        slot_name = "enableTab_%s" % label
+
+        def tab_enable_slot(self, enable, page_index=self.indexOf(scroll_area)):
+            self.setTabEnabled(page_index, enable)
+
+        try:
+            self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                tab_enable_slot, self
+                )
+        except BaseException:
+            logging.getLogger().exception(
+                "Could not add slot %s " % slot_name
+                + "in %s" % str(self.objectName())
+            )
+
+        # add 'tab reset count' slot
+        slot_name = "resetTabCount_%s" % label
+
+        def tab_reset_count_slot(
+            self, erase_count, page_index=self.indexOf(scroll_area)
+        ):
+            tab_label = str(self.tabLabel(self.page(page_index)))
+            label_list = tab_label.split()
+            found = False
+            try:
+                count = label_list[-1]
+                try:
+                    found = count[0] == "("
+                except BaseException:
+                    pass
+                else:
+                    try:
+                        found = count[-1] == ")"
+                    except BaseException:
+                        pass
+            except BaseException:
+                pass
+            if found:
+                try:
+                    int(count[1:-1])
+                except BaseException:
+                    pass
+                else:
+                    new_label = " ".join(label_list[0:-1])
+                    if not erase_count:
+                        new_label += " (0)"
+                    self.count_changed[page_index] = False
+                    self.setTabLabel(self.page(page_index), new_label)
+            else:
+                if not erase_count:
+                    new_label = " ".join(label_list)
+                    new_label += " (0)"
+                    self.count_changed[page_index] = False
+                    self.setTabLabel(self.page(page_index), new_label)
+        try:
+            self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                tab_reset_count_slot, self
+            )
+        except BaseException:
+            logging.getLogger().exception(
+                "Could not add slot %s " % slot_name + "in %s" % str(self.name())
+            )
+
+        # add 'tab increase count' slot
+        slot_name = "incTabCount_%s" % label
+
+        def tab_inc_count_slot(
+            self, delta, only_if_hidden, page_index=self.indexOf(scroll_area)
+        ):
+            if only_if_hidden and page_index == self.currentPageIndex():
+                return
+            tab_label = str(self.tabLabel(self.page(page_index)))
+            label_list = tab_label.split()
+            found = False
+            try:
+                count = label_list[-1]
+                try:
+                    found = count[0] == "("
+                except BaseException:
+                    pass
+                else:
+                    try:
+                        found = count[-1] == ")"
+                    except BaseException:
+                        pass
+            except BaseException:
+                pass
+            if found:
+                try:
+                    num = int(count[1:-1])
+                except BaseException:
+                    pass
+                else:
+                    new_label = " ".join(label_list[0:-1])
+                    new_label += " (%d)" % (num + delta)
+                    self.count_changed[page_index] = True
+                    self.setTabLabel(self.page(page_index), new_label)
+            else:
+                new_label = " ".join(label_list)
+                new_label += " (%d)" % delta
+                self.count_changed[page_index] = True
+                self.setTabLabel(self.page(page_index), new_label)
+
+        try:
+            self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
+                tab_inc_count_slot, self
+            )
+        except BaseException:
+            logging.getLogger().exception(
+                "Could not add slot %s " % slot_name
+                + "in %s" % str(self.objectName())
+            )
+
+        # that's the real page
+        return scroll_area
+
 def get_vertical_spacer(*args, **kwargs):
     """Vertical spacer"""
     kwargs["orientation"] = "vertical"
-    return WindowDisplayWidget.Spacer(*args, **kwargs)
+    return Spacer(*args, **kwargs)
 
 def get_horizontal_spacer(*args, **kwargs):
     """Horizontal spacer"""
 
     kwargs["orientation"] = "horizontal"
-    return WindowDisplayWidget.Spacer(*args, **kwargs)
+    return Spacer(*args, **kwargs)
 
 def get_horizontal_splitter(*args, **kwargs):
     """Horizontal splitter"""
@@ -423,13 +804,13 @@ def get_vertical_splitter(*args, **kwargs):
 def get_vertical_box(*args, **kwargs):
     """Vertical box"""
     kwargs["layout"] = "vertical"
-    return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+    return CustomFrame(*args, **kwargs)
 
 def get_horizontal_box(*args, **kwargs):
     """Horizontal box"""
 
     kwargs["layout"] = "horizontal"
-    return WindowDisplayWidget.CustomFrame(*args, **kwargs)
+    return CustomFrame(*args, **kwargs)
 
 def get_horizontal_groupbox(*args, **kwargs):
     """Horizontal group box"""
@@ -445,390 +826,6 @@ def get_vertical_groupbox(*args, **kwargs):
 
 class WindowDisplayWidget(QtImport.QScrollArea):
     """Main widget"""
-
-    class Spacer(QtImport.QFrame):
-        """Spacer widget"""
-
-        def __init__(self, *args, **kwargs):
-            """init"""
-
-            QtImport.QFrame.__init__(self, args[0])
-            self.setObjectName(args[1])
-
-            self.orientation = kwargs.get("orientation", "horizontal")
-            self.execution_mode = kwargs.get("execution_mode", False)
-
-            self.setFixedSize(-1)
-
-            if self.orientation == "horizontal":
-                self.main_layout = QtImport.QHBoxLayout(self)
-            else:
-                self.main_layout = QtImport.QVBoxLayout(self)
-            self.main_layout.setSpacing(0)
-            self.main_layout.setContentsMargins(0, 0, 0, 0)
-
-        def setFixedSize(self, fixed_size):
-            """Sets fixed size"""
-
-            if fixed_size >= 0:
-                hor_size_policy = (
-                    self.orientation == "horizontal"
-                    and QtImport.QSizePolicy.Fixed
-                    or QtImport.QSizePolicy.MinimumExpanding
-                )
-                ver_size_policy = (
-                    hor_size_policy == QtImport.QSizePolicy.Fixed
-                    and QtImport.QSizePolicy.MinimumExpanding
-                    or QtImport.QSizePolicy.Fixed
-                )
-
-                if self.orientation == "horizontal":
-                    self.setFixedWidth(fixed_size)
-                else:
-                    self.setFixedHeight(fixed_size)
-            else:
-                hor_size_policy = (
-                    self.orientation == "horizontal"
-                    and QtImport.QSizePolicy.Expanding
-                    or QtImport.QSizePolicy.MinimumExpanding
-                )
-                ver_size_policy = (
-                    hor_size_policy == QtImport.QSizePolicy.Expanding
-                    and QtImport.QSizePolicy.MinimumExpanding
-                    or QtImport.QSizePolicy.Expanding
-                )
-            self.setSizePolicy(hor_size_policy, ver_size_policy)
-
-        def paintEvent(self, event):
-            """Paints the widgets"""
-
-            QtImport.QFrame.paintEvent(self, event)
-
-            if self.execution_mode:
-                return
-            painter = QtImport.QPainter(self)
-            painter.setPen(QtImport.QPen(QtImport.Qt.black, 3))
-
-            if self.orientation == "horizontal":
-                height = self.height() / 2
-                painter.drawLine(0, height, self.width(), height)
-                painter.drawLine(0, height, 5, height - 5)
-                painter.drawLine(0, height, 5, height + 5)
-                painter.drawLine(self.width(), height, self.width() - 5, height - 5)
-                painter.drawLine(self.width(), height, self.width() - 5, height + 5)
-            else:
-                width = self.width() / 2
-                painter.drawLine(self.width() / 2, 0, self.width() / 2, self.height())
-                painter.drawLine(width, 0, width - 5, 5)
-                painter.drawLine(width, 0, width + 5, 5)
-                painter.drawLine(width, self.height(), width - 5, self.height() - 5)
-                painter.drawLine(width, self.height(), width + 5, self.height() - 5)
-
-    class CustomFrame(QtImport.QFrame):
-        def __init__(self, *args, **kwargs):
-            """init"""
-            QtImport.QFrame.__init__(self, args[0])
-
-            self.setObjectName(args[1])
-            self.pinned = True
-            self.dialog = None
-            self.origin_parent = self.parent()
-            self.origin_index = None
-            execution_mode = kwargs.get("execution_mode", False)
-
-            if not execution_mode:
-                self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
-
-            if kwargs.get("layout") == "vertical":
-                __frame_layout = QtImport.QVBoxLayout(self)
-            else:
-                __frame_layout = QtImport.QHBoxLayout(self)
-
-            self.open_in_dialog_button = QtImport.QPushButton(
-                Icons.load_icon("UnLock"), ""
-            )
-            self.open_in_dialog_button.setFixedWidth(30)
-            # self.open_in_dialog_button.setObjectName("pin")
-            self.open_in_dialog_button.setVisible(False)
-
-            self.dialog = QtImport.QDialog(self.parent())
-            self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
-
-            __frame_layout.addWidget(self.open_in_dialog_button)
-            __frame_layout.setSpacing(0)
-            __frame_layout.setContentsMargins(0, 0, 0, 0)
-
-            self.open_in_dialog_button.clicked.connect(self.show_in_dialog_toggled)
-
-        def show_in_dialog_toggled(self):
-            if self.pinned:
-                self.pinned = False
-                self.open_in_dialog_button.setIcon(Icons.load_icon("Lock"))
-                self.origin_index = self.origin_parent.layout().indexOf(self)
-                self.origin_parent.layout().removeWidget(self)
-                self.dialog_layout.addWidget(self)
-                self.dialog.show()
-            else:
-                self.pinned = True
-                self.open_in_dialog_button.setIcon(Icons.load_icon("UnLock"))
-                self.dialog_layout.removeWidget(self)
-                self.origin_parent.layout().insertWidget(self.origin_index, self)
-                self.dialog.close()
-
-        def set_background_color(self, color):
-            Colors.set_widget_color(self, color, QtImport.QPalette.Background)
-
-        def set_expert_mode(self, expert_mode):
-            self.open_in_dialog_button.setVisible(expert_mode)
-
-    class CustomTabWidget(QtImport.QTabWidget):
-        """Tab widget"""
-
-        # notebookPageChangedSignal = pyqtSignal(str)
-        tabChangedSignal = QtImport.pyqtSignal(int, object)
-
-        def __init__(self, *args, **kwargs):
-            """init"""
-
-            QtImport.QTabWidget.__init__(self, args[0])
-            self.setObjectName(args[1])
-            self.open_in_dialog_button = None
-            self.close_tab_button = None
-            self.pinned = True
-
-            # self.tab_widgets = []
-            self.count_changed = {}
-            self.setSizePolicy(
-                QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
-            )
-            self.currentChanged.connect(self._page_changed)
-
-            self.dialog = QtImport.QDialog(self.parent())
-            self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
-
-        def _page_changed(self, index):
-            """Page changed event"""
-
-            page = self.widget(index)
-            self.count_changed[index] = False
-
-            tab_label = str(self.tabText(index))
-            label_list = tab_label.split()
-
-            self.tabChangedSignal.emit(index, page)
-
-            tab_name = self.objectName()
-            BaseWidget.update_tab_widget(tab_name, index)
-
-        def add_tab(self, page_widget, label, icon=""):
-            """Add tab"""
-
-            scroll_area = page_widget
-            self.addTab(scroll_area, label)
-
-            slot_name = "showPage_%s" % label
-
-            def tab_show_slot(self, page_index=self.indexOf(scroll_area)):
-                self.setCurrentIndex(page_index)
-
-            try:
-                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_show_slot, self
-                )
-            except BaseException:
-                logging.getLogger().exception(
-                    "Could not add slot %s " % slot_name + "in %s" % self.objectName()
-                )
-            slot_name = "hidePage_%s" % label
-
-            def tab_hide_slot(
-                self,
-                hide=True,
-                page={
-                    "widget": scroll_area,
-                    "label": label,
-                    "index": self.indexOf(scroll_area),
-                    "icon": icon,
-                    "hidden": False,
-                },
-            ):
-
-                if hide:
-                    if not page["hidden"]:
-                        self.removeTab(self.indexOf(page["widget"]))
-                        self.repaint()
-                        page["hidden"] = True
-                else:
-                    if page["hidden"]:
-                        if icon:
-                            self.insertTab(
-                                page["index"],
-                                page["widget"],
-                                Icons.load_icon(icon),
-                                label,
-                            )
-                        else:
-                            self.insertTab(page["index"], page["widget"], page["label"])
-                        slot_name = "showPage_%s" % page["label"].replace(" ", "_")
-                        getattr(self, slot_name)()
-                        page["hidden"] = False
-                    else:
-                        slot_name = "showPage_%s" % page["label"].replace(" ", "_")
-                        getattr(self, slot_name)()
-                    self.setCurrentWidget(page["widget"])
-
-            try:
-                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_hide_slot, self
-                )
-            except BaseException:
-                logging.getLogger().exception(
-                    "Could not add slot %s " % slot_name
-                    + "in %s" % str(self.objectName())
-                )
-
-            # add 'enable page' slot
-            slot_name = "enablePage_%s" % label
-
-            def enable_page_slot(self, enable, page_index=self.indexOf(scroll_area)):
-                self.page(page_index).setEnabled(enable)
-
-            try:
-                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    enable_page_slot, self
-                )
-            except BaseException:
-                logging.getLogger().exception(
-                    "Could not add slot %s " % slot_name
-                    + "in %s" % str(self.objectName())
-                )
-
-            # add 'enable tab' slot
-            slot_name = "enableTab_%s" % label
-
-            def tab_enable_slot(self, enable, page_index=self.indexOf(scroll_area)):
-                self.setTabEnabled(page_index, enable)
-
-            try:
-                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_enable_slot, self
-                )
-            except BaseException:
-                logging.getLogger().exception(
-                    "Could not add slot %s " % slot_name
-                    + "in %s" % str(self.objectName())
-                )
-
-            # add 'tab reset count' slot
-            slot_name = "resetTabCount_%s" % label
-
-            def tab_reset_count_slot(
-                self, erase_count, page_index=self.indexOf(scroll_area)
-            ):
-                tab_label = str(self.tabLabel(self.page(page_index)))
-                label_list = tab_label.split()
-                found = False
-                try:
-                    count = label_list[-1]
-                    try:
-                        found = count[0] == "("
-                    except BaseException:
-                        pass
-                    else:
-                        try:
-                            found = count[-1] == ")"
-                        except BaseException:
-                            pass
-                except BaseException:
-                    pass
-                if found:
-                    try:
-                        int(count[1:-1])
-                    except BaseException:
-                        pass
-                    else:
-                        new_label = " ".join(label_list[0:-1])
-                        if not erase_count:
-                            new_label += " (0)"
-                        self.count_changed[page_index] = False
-                        self.setTabLabel(self.page(page_index), new_label)
-                else:
-                    if not erase_count:
-                        new_label = " ".join(label_list)
-                        new_label += " (0)"
-                        self.count_changed[page_index] = False
-                        self.setTabLabel(self.page(page_index), new_label)
-
-            try:
-                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_reset_count_slot, self
-                )
-            except BaseException:
-                logging.getLogger().exception(
-                    "Could not add slot %s " % slot_name + "in %s" % str(self.name())
-                )
-
-            # add 'tab increase count' slot
-            slot_name = "incTabCount_%s" % label
-
-            def tab_inc_count_slot(
-                self, delta, only_if_hidden, page_index=self.indexOf(scroll_area)
-            ):
-                if only_if_hidden and page_index == self.currentPageIndex():
-                    return
-                tab_label = str(self.tabLabel(self.page(page_index)))
-                label_list = tab_label.split()
-                found = False
-                try:
-                    count = label_list[-1]
-                    try:
-                        found = count[0] == "("
-                    except BaseException:
-                        pass
-                    else:
-                        try:
-                            found = count[-1] == ")"
-                        except BaseException:
-                            pass
-                except BaseException:
-                    pass
-                if found:
-                    try:
-                        num = int(count[1:-1])
-                    except BaseException:
-                        pass
-                    else:
-                        new_label = " ".join(label_list[0:-1])
-                        new_label += " (%d)" % (num + delta)
-                        self.count_changed[page_index] = True
-                        self.setTabLabel(self.page(page_index), new_label)
-                else:
-                    new_label = " ".join(label_list)
-                    new_label += " (%d)" % delta
-                    self.count_changed[page_index] = True
-                    self.setTabLabel(self.page(page_index), new_label)
-
-            try:
-                self.__dict__[slot_name.replace(" ", "_")] = types.MethodType(
-                    tab_inc_count_slot, self
-                )
-            except BaseException:
-                logging.getLogger().exception(
-                    "Could not add slot %s " % slot_name
-                    + "in %s" % str(self.objectName())
-                )
-
-            # that's the real page
-            return scroll_area
-
-    class CustomLabel(QtImport.QLabel):
-        """Label"""
-
-        def __init__(self, *args, **kwargs):
-            """init"""
-
-            QtImport.QLabel.__init__(self, args[0])
-            self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
 
     items = {
         "vbox": get_vertical_box,
@@ -881,6 +878,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._statusbar = QtImport.QStatusBar(self)
         self._statusbar.hide()
 
+        self._keep_open_checkbox = QtImport.QCheckBox("Keep window open")
+        self._keep_open_checkbox.hide() 
+
         self._statusbar_user_label = QtImport.QLabel("-")
         self._statusbar_state_label = QtImport.QLabel(" <b>State: -</b>")
         self._statusbar_diffractometer_label = QtImport.QLabel(
@@ -896,6 +896,14 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._file_system_status_label = QtImport.QLabel("File system")
         self._edna_status_label = QtImport.QLabel("EDNA")
         self._ispyb_status_label = QtImport.QLabel("ISPyB")
+
+        self._warning_box = QtImport.QMessageBox(
+             QtImport.QMessageBox.Question,
+             "Warning",
+             "-",
+             QtImport.QMessageBox.Ok
+        )
+        self._warning_box.setModal(True)
 
         self._statusbar.addWidget(self._statusbar_user_label)
         self._statusbar.addWidget(self._statusbar_state_label)
@@ -929,6 +937,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._menubar)
+        _main_vlayout.addWidget(self._keep_open_checkbox)
         _main_vlayout.addWidget(self._toolbar)
         _main_vlayout.addWidget(self.central_widget)
         _main_vlayout.addWidget(self._statusbar)
@@ -941,6 +950,10 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self.setWindowIcon(Icons.load_icon("desktop_icon"))
 
         self._menubar.saveConfigSignal.connect(self.save_config_requested)
+
+    def set_keep_open(self, keep_open):
+        if keep_open:
+            self._keep_open_checkbox.show()
 
     def save_config_requested(self):
         pass
@@ -967,8 +980,12 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._statusbar.show()
         BaseWidget._statusbar = self._statusbar
 
-    def set_progress_dialog(self):
-        BaseWidget._progress_dialog = self._progress_dialog
+    #def set_progress_dialog(self):
+    #    BaseWidget._progress_dialog = self._progress_dialog
+
+    def show_warning_box(self, warning_msg):
+        self._warning_box.setText(warning_msg)
+        self._warning_box.show()
 
     def update_status_info(self, info_type, info_message, info_state="ready"):
         """Updates status info"""
@@ -1073,11 +1090,11 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
     def hide(self, *args):
         """Hide"""
-
-        ret = QtImport.QWidget.hide(self)
-        self.isHiddenSignal.emit()
-        # self.emit(SIGNAL("isHidden"), ())
-        return ret
+        if not self._keep_open_checkbox.isChecked():
+            ret = QtImport.QWidget.hide(self)
+            self.isHiddenSignal.emit()
+            # self.emit(SIGNAL("isHidden"), ())
+            return ret
 
     def set_caption(self, caption):
         """Set caption"""
@@ -1330,7 +1347,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             if container_cfg.properties["statusbar"]:
                 self.show_statusbar()
 
-        self.set_progress_dialog()
+        #self.set_progress_dialog()
+        BaseWidget._progress_dialog = self._progress_dialog
+        BaseWidget._warning_box = self._warning_box
 
     def remove_widget(self, item_name, child_name_list):
         """Remove widget"""
