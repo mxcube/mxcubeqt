@@ -971,7 +971,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         BaseWidget.set_status_info(info_type, message, state)
 
     def show_warning(self, warning_msg):
-        print 2
         BaseWidget.set_warning_box(warning_msg)
 
     def __hardware_object_discarded(self, hardware_object_name):
