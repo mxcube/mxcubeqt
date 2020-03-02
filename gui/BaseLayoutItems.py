@@ -19,7 +19,7 @@
 
 """Module contains classes defining graphical objects in MXCuBE"""
 
-from gui.utils import PropertyBag, Connectable, QtImport
+from gui.utils import PropertyBag, QtImport
 
 DEFAULT_MARGIN = 2
 DEFAULT_SPACING = 2
