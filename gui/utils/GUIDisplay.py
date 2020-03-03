@@ -574,7 +574,6 @@ class CustomTabWidget(QtImport.QTabWidget):
         self.count_changed[index] = False
 
         tab_label = str(self.tabText(index))
-        label_list = tab_label.split()
 
         self.tabChangedSignal.emit(index, page)
 
