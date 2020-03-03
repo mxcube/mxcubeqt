@@ -573,8 +573,6 @@ class CustomTabWidget(QtImport.QTabWidget):
         page = self.widget(index)
         self.count_changed[index] = False
 
-        tab_label = str(self.tabText(index))
-
         self.tabChangedSignal.emit(index, page)
 
         tab_name = self.objectName()
