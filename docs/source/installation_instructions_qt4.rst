@@ -6,7 +6,7 @@ In this page a sequence how to get software code, install dependencies and execu
 Tested with:
 
 * Linux: Ubuntu 10, 12, 14, 16 (with gnome and kde) and Centos 7 (with gnome)
-* Macos.
+* MacOs.
 
 *****************
 1. Git repository
@@ -44,6 +44,7 @@ Other dependencies:
 * `enum34 <https://pypi.org/project/enum34/>`_
 * `PyChooch <http://github.com/mxcube/pychooch>`_
 * `PyMca <http://sourceforge.net/projects/pymca/>`_
+* `OpenCV <https://pypi.org/project/opencv-python/>`_
 
 2.1. Debian/Ubuntu
 ==================
@@ -65,7 +66,7 @@ Python 3x
 
 .. code-block:: bash
 
-   sudo pip3 install PyQt5 gevent numpy scipy matplotlib jsonpickle
+   sudo pip3 install PyQt5 gevent numpy scipy matplotlib jsonpickle PyMca5 opencv-python enum34 Louie suds3 PyYAML PyMca5
 
 2.2. Fedora/Centos
 ==================
