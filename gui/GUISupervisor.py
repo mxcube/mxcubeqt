@@ -247,7 +247,7 @@ class GUISupervisor(QtImport.QWidget):
                         if gui_config_file.endswith(".json"):
                             raw_config = json.load(gui_file)
                         elif gui_config_file.endswith(".yml"):
-                            raw_config = yaml.load(gui_file)
+                            raw_config = yaml.safe_load(gui_file)
                         else:
                             raw_config = eval(gui_file.read())
                     except BaseException:
@@ -337,6 +337,7 @@ class GUISupervisor(QtImport.QWidget):
             display.set_caption(window["properties"]["caption"])
             display.draw_preview(window, id(display))
             display.close_on_exit = window["properties"]["closeOnExit"]
+            display.set_keep_open(window["properties"]["keepOpen"])
             display.set_font_size(window["properties"]["fontSize"])
 
             if window["properties"]["show"]:

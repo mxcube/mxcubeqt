@@ -98,7 +98,9 @@ def add_custom_bricks_dirs(bricks_dirs):
 base_bricks_path = get_base_bricks_path()
 sys.path.insert(0, get_base_bricks_path())
 # add 'EMBL' 'ESRF' 'ALBA' ... subfolders to path
-[sys.path.insert(0, f.path) for f in os.scandir(base_bricks_path) if f.is_dir() and f.name != "__pycache__"]
+for root, dirs, files in os.walk(base_bricks_path):
+    if root[root.rfind("/"):] != "/__pycache__" and root != base_bricks_path:
+        sys.path.insert(0, root)
 
 
 def get_custom_bricks_dirs():

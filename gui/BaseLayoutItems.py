@@ -29,7 +29,7 @@ DEFAULT_ALIGNMENT = "top center"
 __license__ = "LGPLv3+"
 
 
-class _CfgItem:
+class _CfgItem(object):
     """Configuration item base class"""
 
     def __init__(self, name=None, item_type=""):
@@ -37,6 +37,9 @@ class _CfgItem:
         self.type = item_type
         self.children = []
         self.connections = []
+
+        self.signals = {}
+        self.slots = {}
 
         self.properties = PropertyBag.PropertyBag()
         self.properties.add_property(
@@ -58,8 +61,6 @@ class _CfgItem:
             ),
             "none",
         )
-        self.signals = {}
-        self.slots = {}
 
     def set_properties(self, properties):
         """Set properties
@@ -160,6 +161,7 @@ class WindowCfg(ContainerCfg):
         self.properties.add_property("caption", "string", "")
         self.properties.add_property("show", "boolean", True)
         self.properties.add_property("closeOnExit", "boolean", True)
+        self.properties.add_property("keepOpen", "boolean", False)
         self.properties.add_property("menubar", "boolean", False)
         self.properties.add_property("statusbar", "boolean", False)
         self.properties.add_property("menudata", "", {}, hidden=True)
