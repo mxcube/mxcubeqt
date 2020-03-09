@@ -418,6 +418,9 @@ class ConnectionEditor(QtImport.QDialog):
             if hasattr(window, "slots"):
                 for slot_name in window["slots"]:
                     self.receiver_slots_listwidget.addItem(slot_name)
+            else:
+                self.receiver_slots_listwidget.addItem("show")
+                self.receiver_slots_listwidget.addItem("hide")
             self.receiver_slots_listwidget.setFont(
                 self.receiver_slots_listwidget.font()
             )

@@ -184,6 +184,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     _menubar = None
     _toolbar = None
     _statusbar = None
+    _warning_box = None
     _progressbar = None
     _progress_dialog = None
 
@@ -290,6 +291,12 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             BaseWidget._statusbar.parent().update_status_info(
                 info_type, info_message, info_status
             )
+
+    @staticmethod
+    def set_warning_box(warning_msg):
+        """Updates status bar"""
+        if BaseWidget._warning_box:
+            BaseWidget._warning_box.parent().show_warning_box(warning_msg)
 
     @staticmethod
     def init_progress_bar(progress_type, number_of_steps):
@@ -934,6 +941,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             self.connect(hwobj, "progressStep", self.progress_step)
             self.connect(hwobj, "progressStop", self.progress_stop)
             self.connect(hwobj, "statusMessage", self.status_message_changed)
+            self.connect(hwobj, "showWarning", self.show_warning)
 
         if hwobj is None and not optional:
             logging.getLogger("GUI").error(
@@ -961,6 +969,9 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     def status_message_changed(self, info_type, message, state):
         BaseWidget.set_status_info(info_type, message, state)
+
+    def show_warning(self, warning_msg):
+        BaseWidget.set_warning_box(warning_msg)
 
     def __hardware_object_discarded(self, hardware_object_name):
         if hardware_object_name in self.__loaded_hardware_objects:
@@ -1023,8 +1034,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         elif property_name == "hide":
             if new_value:
                 self.setHidden(True)
-            else:
-                self.setVisible(True)
+            #else:
+            #    self.setVisible(True)
         else:
             try:
                 self.property_changed(property_name, old_value, new_value)

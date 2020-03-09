@@ -29,6 +29,7 @@ __license__ = "LGPLv3+"
 # Basic core colors
 BLUE = QColor(Qt.blue)
 WHITE = QColor(Qt.white)
+BLACK = QColor(Qt.black)
 GRAY = QColor(Qt.gray)
 LIGHT_GRAY = QColor(Qt.lightGray)
 DARK_BLUE = QColor(Qt.darkBlue)
