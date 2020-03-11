@@ -717,7 +717,7 @@ class MotorBrick(BaseWidget):
             
             self.disconnect(self.motor_hwobj, "deviceReady", self.motor_ready)
             self.disconnect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-            self.disconnect(self.motor_hwobj, "positionChanged", self.slot_position)
+            self.disconnect(self.motor_hwobj, "valueChanged", self.slot_position)
             self.disconnect(self.motor_hwobj, "stateChanged", self.slot_status)
             self.disconnect(self.motor_hwobj, "limitsChanged", self.limit_changed)
            
@@ -732,7 +732,7 @@ class MotorBrick(BaseWidget):
             
             self.connect(self.motor_hwobj, "deviceReady", self.motor_ready)
             self.connect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-            self.connect(self.motor_hwobj, "positionChanged", self.slot_position)
+            self.connect(self.motor_hwobj, "valueChanged", self.slot_position)
             self.connect(self.motor_hwobj, "stateChanged", self.slot_status)
             self.connect(self.motor_hwobj, "limitsChanged", self.limit_changed)
 
@@ -813,7 +813,7 @@ class MotorBrick(BaseWidget):
 
                 self.disconnect(self.motor_hwobj, "deviceReady", self.motor_ready)
                 self.disconnect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-                self.disconnect(self.motor_hwobj, "positionChanged", self.slot_position)
+                self.disconnect(self.motor_hwobj, "valueChanged", self.slot_position)
                 self.disconnect(self.motor_hwobj, "stateChanged", self.slot_status)
                 self.disconnect(self.motor_hwobj, "limitsChanged", self.limit_changed)
 
@@ -828,7 +828,7 @@ class MotorBrick(BaseWidget):
 
                 self.connect(self.motor_hwobj, "deviceReady", self.motor_ready)
                 self.connect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-                self.connect(self.motor_hwobj, "positionChanged", self.slot_position)
+                self.connect(self.motor_hwobj, "valueChanged", self.slot_position)
                 self.connect(self.motor_hwobj, "stateChanged", self.slot_status)
                 self.connect(self.motor_hwobj, "limitsChanged", self.limit_changed)
 

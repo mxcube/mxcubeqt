@@ -119,7 +119,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
         HWR.beamline.detector.distance.connect(
-            "positionChanged",
+            "valueChanged",
             self._xray_imaging_parameters_widget.set_detector_distance,
         )
 

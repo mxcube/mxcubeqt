@@ -86,19 +86,19 @@ class CreateTaskBase(QtImport.QWidget):
                 "limitsChanged", self.set_transmission_limits
             )
             HWR.beamline.resolution.connect(
-                "positionChanged", self.set_resolution
+                "valueChanged", self.set_resolution
             )
             HWR.beamline.resolution.connect(
                 "limitsChanged", self.set_resolution_limits
             )
             HWR.beamline.diffractometer.omega.connect(
-                "positionChanged", self.set_osc_start
+                "valueChanged", self.set_osc_start
             )
             HWR.beamline.diffractometer.kappa.connect(
-                "positionChanged", self.set_kappa
+                "valueChanged", self.set_kappa
             )
             HWR.beamline.diffractometer.kappa_phi.connect(
-                "positionChanged", self.set_kappa_phi
+                "valueChanged", self.set_kappa_phi
             )
             HWR.beamline.detector.connect(
                 "detectorRoiModeChanged", self.set_detector_roi_mode
