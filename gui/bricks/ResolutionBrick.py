@@ -140,7 +140,7 @@ class ResolutionBrick(BaseWidget):
             )
             self.connect(
                 HWR.beamline.detector.distance,
-                "positionChanged",
+                "valueChanged",
                 self.detector_distance_changed
             )
             self.connect(
@@ -170,7 +170,7 @@ class ResolutionBrick(BaseWidget):
             )
             self.connect(
                 HWR.beamline.resolution,
-                "positionChanged",
+                "valueChanged",
                 self.resolution_value_changed
             )
             self.connect(

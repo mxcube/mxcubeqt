@@ -121,7 +121,7 @@ class ApertureBrick(BaseWidget):
                     self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
                 )
                 self.disconnect(
-                    self.aperture_hwobj, "positionChanged", self.position_changed
+                    self.aperture_hwobj, "valueChanged", self.position_changed
                 )
 
             self.aperture_hwobj = self.get_hardware_object(new_value)
@@ -132,7 +132,7 @@ class ApertureBrick(BaseWidget):
                     self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
                 )
                 self.connect(
-                    self.aperture_hwobj, "positionChanged", self.position_changed
+                    self.aperture_hwobj, "valueChanged", self.position_changed
                 )
                 self.aperture_hwobj.update_values()
         else:

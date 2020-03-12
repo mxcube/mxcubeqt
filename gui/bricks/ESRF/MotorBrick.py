@@ -46,7 +46,7 @@ class MotorControlDialog(QtImport.QDialog):
         :param caption: displayed text
         """
 
-        super().__init__(parent)
+        super(MotorControlDialog, self).__init__(parent)
 
         self.motor_widget = MotorBrick(self)
 
@@ -118,7 +118,7 @@ class StepEditor(QtImport.QFrame):
         :param title: step value edit widget's title
         :param prefix: + / - symbol fordward/backward step buttons
         """
-        super().__init__(parent)
+        super(StepEditor, self).__init__(parent)
 
         self.prefix = prefix
         self.value = initial_value
@@ -291,7 +291,7 @@ class MotorSlider(QtImport.QWidget):
 
         :param parent: sliders parent widget
         """
-        super().__init__(parent)
+        super(MotorSlider, self).__init__(parent)
 
         self.values_format = "%+8.4f"#"{0:8.4f}"
 
@@ -390,7 +390,7 @@ class MoveBox(QtImport.QWidget):
 
         :param parent: MoveBox parent widget
         """
-        super().__init__(parent)
+        super(MoveBox, self).__init__(parent)
 
         self.old_positions = []  # history of motor positions
 
@@ -526,7 +526,7 @@ class MotorBrick(BaseWidget):
         Arguments:
         :params args: 
         """
-        super().__init__(*args)
+        super(MotorBrick, self).__init__(*args)
 
         # Hardware objects ----------------------------------------------------
 
@@ -683,7 +683,7 @@ class MotorBrick(BaseWidget):
     def step_forward_value_changed(self, value):
         """Act when forward step button value changed."""
         logging.getLogger().error(
-            f"MotorBrick step_forward_value_changed : {value}"
+            "MotorBrick step_forward_value_changed : %s" % value
         )
         self.step_backward.set_value(value)
         self.step_forward.set_value(value)
@@ -717,7 +717,7 @@ class MotorBrick(BaseWidget):
             
             self.disconnect(self.motor_hwobj, "deviceReady", self.motor_ready)
             self.disconnect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-            self.disconnect(self.motor_hwobj, "positionChanged", self.slot_position)
+            self.disconnect(self.motor_hwobj, "valueChanged", self.slot_position)
             self.disconnect(self.motor_hwobj, "stateChanged", self.slot_status)
             self.disconnect(self.motor_hwobj, "limitsChanged", self.limit_changed)
            
@@ -732,7 +732,7 @@ class MotorBrick(BaseWidget):
             
             self.connect(self.motor_hwobj, "deviceReady", self.motor_ready)
             self.connect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-            self.connect(self.motor_hwobj, "positionChanged", self.slot_position)
+            self.connect(self.motor_hwobj, "valueChanged", self.slot_position)
             self.connect(self.motor_hwobj, "stateChanged", self.slot_status)
             self.connect(self.motor_hwobj, "limitsChanged", self.limit_changed)
 
@@ -813,7 +813,7 @@ class MotorBrick(BaseWidget):
 
                 self.disconnect(self.motor_hwobj, "deviceReady", self.motor_ready)
                 self.disconnect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-                self.disconnect(self.motor_hwobj, "positionChanged", self.slot_position)
+                self.disconnect(self.motor_hwobj, "valueChanged", self.slot_position)
                 self.disconnect(self.motor_hwobj, "stateChanged", self.slot_status)
                 self.disconnect(self.motor_hwobj, "limitsChanged", self.limit_changed)
 
@@ -828,7 +828,7 @@ class MotorBrick(BaseWidget):
 
                 self.connect(self.motor_hwobj, "deviceReady", self.motor_ready)
                 self.connect(self.motor_hwobj, "deviceNotReady", self.motor_not_ready)
-                self.connect(self.motor_hwobj, "positionChanged", self.slot_position)
+                self.connect(self.motor_hwobj, "valueChanged", self.slot_position)
                 self.connect(self.motor_hwobj, "stateChanged", self.slot_status)
                 self.connect(self.motor_hwobj, "limitsChanged", self.limit_changed)
 
@@ -843,7 +843,9 @@ class MotorBrick(BaseWidget):
                     if self.motor_hwobj.GUIstep is not None:
                         step = self.motor_hwobj.GUIstep
                 else:
-                    logging.getLogger().error(f"self.motor_hwobj has no GUIstep attribute")
+                    logging.getLogger().error(
+                        "self.motor_hwobj has no GUIstep attribute"
+                    )
                 
                 self.step_backward.set_value(step)
                 self.step_forward.set_value(step)
@@ -875,7 +877,7 @@ class DialogButtonsBar(QtImport.QWidget):
     def __init__(self, parent, button1="OK", button2="Cancel",
                  button3=None, callback=None, margin=6, spacing=6):
         """Constructor docstring."""
-        super().__init__(parent)
+        super(DialogButtonsBar, self).__init__(parent)
 
         self.callback = callback
         spacer = QtImport.QWidget(self)
