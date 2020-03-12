@@ -123,7 +123,7 @@ class ALBA_LightControlBrick(BaseWidget):
                     "Control of %s (light level and on/off switch."
                     % self.light_ho.getUserName()
                 )
-                self.set_level_limits(self.light_ho.getLimits())
+                self.set_level_limits(self.light_ho.get_limits())
                 self.set_label(self.light_ho.getUserName())
             else:
                 self.setEnabled(False)

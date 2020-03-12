@@ -751,9 +751,9 @@ class MotorBrick(BaseWidget):
             self.step_forward.set_value(step)
 
             if self.motor_hwobj.isReady():
-                self.limit_changed(self.motor_hwobj.getLimits())
+                self.limit_changed(self.motor_hwobj.get_limits())
                 self.slot_position(self.motor_hwobj.getPosition())
-                self.slot_status(self.motor_hwobj.getState())
+                self.slot_status(self.motor_hwobj.get_state())
                 self.motor_ready()
             else:
                 self.motor_not_ready()
@@ -851,9 +851,9 @@ class MotorBrick(BaseWidget):
                 self.step_forward.set_value(step)
 
                 if self.motor_hwobj.isReady():
-                    self.limit_changed(self.motor_hwobj.getLimits())
+                    self.limit_changed(self.motor_hwobj.get_limits())
                     self.slot_position(self.motor_hwobj.getPosition())
-                    self.slot_status(self.motor_hwobj.getState())
+                    self.slot_status(self.motor_hwobj.get_state())
                     self.motor_ready()
                 else:
                     self.motor_not_ready()
