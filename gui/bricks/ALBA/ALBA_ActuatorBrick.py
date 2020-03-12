@@ -125,7 +125,7 @@ class ALBA_ActuatorBrick(BaseWidget):
     def update(self, state=None):
         if self.actuator_hwo is not None:
             if state is None:
-                state = self.actuator_hwo.getState()
+                state = self.actuator_hwo.get_state()
                 status = self.actuator_hwo.getStatus()
                 self.widget.stateLabel.setText(status)
                 Colors.set_widget_color(self.widget.stateLabel, STATES[state])

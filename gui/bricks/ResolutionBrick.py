@@ -309,7 +309,7 @@ class ResolutionBrick(BaseWidget):
             self.get_resolution_limits()
             curr_resolution = HWR.beamline.resolution.getPosition()
             self.resolution_value_changed(curr_resolution)
-            self.resolution_state_changed(HWR.beamline.resolution.getState())
+            self.resolution_state_changed(HWR.beamline.resolution.get_state())
             if self.units_combobox.currentText() != "mm":
                 groupbox_title = "Resolution"
                 self.new_value_validator.setRange(
@@ -368,8 +368,8 @@ class ResolutionBrick(BaseWidget):
 
         if resolution_ready:
             # TODO remove this check and use get_limits
-            if hasattr(HWR.beamline.resolution, "getLimits"):
-                self.resolution_limits_changed(HWR.beamline.resolution.getLimits())
+            if hasattr(HWR.beamline.resolution, "get_limits"):
+                self.resolution_limits_changed(HWR.beamline.resolution.get_limits())
             else:
                 self.resolution_limits_changed(HWR.beamline.resolution.get_limits())
         else:

@@ -1075,7 +1075,7 @@ class SampleChangerBrick(BaseWidget):
                     self.loadedSampleChanged,
                 )
                 self.sc_status_changed(HWR.beamline.sample_changer.getStatus())
-                self.sc_state_changed(HWR.beamline.sample_changer.getState())
+                self.sc_state_changed(HWR.beamline.sample_changer.get_state())
                 self.infoChanged()
                 self.selectionChanged()
                 self.loadedSampleChanged(HWR.beamline.sample_changer.getLoadedSample())
