@@ -140,6 +140,9 @@ class AcquisitionStillWidget(QtImport.QWidget):
         self.num_img_validator = QtImport.QIntValidator(
             1, 9999999, self.acq_widget_layout.num_images_ledit
         )
+        self.hare_num_validator = QtImport.QIntValidator(
+            1, 9999999, self.acq_widget_layout.hare_num_ledit
+        )
 
         limits_dict = HWR.beamline.acquisition_limit_values
 
@@ -167,6 +170,14 @@ class AcquisitionStillWidget(QtImport.QWidget):
             int,
             self.num_images_per_trigger_validator,
         )
+
+        self._acquisition_mib.bind_value_update(
+            "hare_num",
+            self.acq_widget_layout.hare_num_ledit,
+            int,
+            self.hare_num_validator,
+        )
+
 
         tpl = limits_dict.get("number_of_images")
         if tpl:
@@ -206,6 +217,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
         self.init_detector_roi_modes()
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
+        self.update_exp_time_limits()
 
     def update_osc_total_range(self):
         """

@@ -25,7 +25,10 @@ from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.acquisition_still_widget import AcquisitionStillWidget
 from gui.widgets.data_path_widget import DataPathWidget
+from gui.widgets.ssx_sequence_widget import SSXSequenceWidget
 from gui.widgets.processing_widget import ProcessingWidget
+#from gui.widgets.comment_widget import CommentWidget
+
 
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
@@ -70,15 +73,21 @@ class CreateStillScanWidget(CreateTaskBase):
             layout="vertical",
         )
 
+        self._col_seq_widget = SSXSequenceWidget(self)
+
         self._processing_widget = ProcessingWidget(
             self, data_model=self._processing_parameters
         )
+
+        #self._comment_widget = CommentWidget(self)
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
+        _main_vlayout.addWidget(self._col_seq_widget)
         _main_vlayout.addWidget(self._processing_widget)
+        #_main_vlayout.addWidget(self._comment_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -148,21 +157,6 @@ class CreateStillScanWidget(CreateTaskBase):
         """
         self._acq_widget.set_tunable_energy(state)
 
-    def update_processing_parameters(self, crystal):
-        """
-        Updates processing parameters
-        :param crystal: Crystal
-        :return:
-        """
-        self._processing_parameters.space_group = crystal.space_group
-        self._processing_parameters.cell_a = crystal.cell_a
-        self._processing_parameters.cell_alpha = crystal.cell_alpha
-        self._processing_parameters.cell_b = crystal.cell_b
-        self._processing_parameters.cell_beta = crystal.cell_beta
-        self._processing_parameters.cell_c = crystal.cell_c
-        self._processing_parameters.cell_gamma = crystal.cell_gamma
-        self._processing_widget.update_data_model(self._processing_parameters)
-
     def single_item_selection(self, tree_item):
         """
         Method called when a queue item in the tree is selected
@@ -203,7 +197,7 @@ class CreateStillScanWidget(CreateTaskBase):
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
                 if len(dc_model.acquisitions) == 1:
-                    self.select_shape_with_cpos(
+                    HWR.beamline.sample_view.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
@@ -214,7 +208,7 @@ class CreateStillScanWidget(CreateTaskBase):
         else:
             self.setDisabled(True)
 
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         """
         Creates a new Still scan task
         :param sample: sample node
@@ -224,9 +218,9 @@ class CreateStillScanWidget(CreateTaskBase):
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
-        cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
+        cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
 
-        tasks.extend(self.create_dc(sample, cpos=cpos))
+        tasks.extend(self.create_dc(sample, cpos=cpos, comments=comments))
         self._path_template.run_number += 1
 
         return tasks
@@ -241,6 +235,7 @@ class CreateStillScanWidget(CreateTaskBase):
         sc=None,
         cpos=None,
         inverse_beam=False,
+        comments=None
     ):
         """
         Creates a new data collection item
@@ -277,6 +272,8 @@ class CreateStillScanWidget(CreateTaskBase):
             acq.acquisition_parameters.inverse_beam = False
 
         acq.acquisition_parameters.centred_position = cpos
+        if comments:
+            acq.acquisition_parameters.comments = comments
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
         data_collection = queue_model_objects.DataCollection(

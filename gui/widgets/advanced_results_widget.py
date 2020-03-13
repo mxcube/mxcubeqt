@@ -15,10 +15,10 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import QtImport
-from gui.widgets.heat_map_widget import HeatMapWidget
+from gui.widgets.hit_map_widget import HitMapWidget
 
 from HardwareRepository import HardwareRepository as HWR
 
@@ -28,20 +28,21 @@ __license__ = "LGPLv3+"
 
 
 class AdvancedResultsWidget(QtImport.QWidget):
-    def __init__(self, parent=None, show_aligned_results=False):
+
+    def __init__(self, parent=None):
         QtImport.QWidget.__init__(self, parent)
         self.setObjectName("advanced_results_widget")
 
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-
+         
         # Graphic elements ----------------------------------------------------
-        self.heat_map_widget = HeatMapWidget(self, show_aligned_results)
+        self.hit_map_widget = HitMapWidget(self)
 
         # Layout --------------------------------------------------------------
         _main_hlayout = QtImport.QHBoxLayout(self)
-        _main_hlayout.addWidget(self.heat_map_widget)
+        _main_hlayout.addWidget(self.hit_map_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.addStretch(0)
@@ -52,30 +53,27 @@ class AdvancedResultsWidget(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        HWR.beamline.online_processing.connect(
-           "processingStarted", self.processing_started
-        )
-        HWR.beamline.online_processing.connect(
-           "processingResultsUpdate", self.update_processing_results
-        )
+        if HWR.beamline.online_processing is not None:
+            HWR.beamline.online_processing.connect(
+               "processingStarted", self.processing_started
+            )
+            HWR.beamline.online_processing.connect(
+               "processingResultsUpdate", self.update_processing_results
+            )
+        else:
+            self.setEnabled(False)
 
-    def populate_widget(self, item, data_collection):
-        # if isinstance(item, queue_item.XrayCenteringQueueItem):
-        #    data_collection = item.get_model().reference_image_collection
-        # else:
-        #    data_collection = item.get_model()
+    def populate_widget(self, item):
+        data_collection = item.get_model()
+        self.hit_map_widget.set_associated_data_collection(data_collection)
+        if data_collection.is_executed():
+            processing_results = data_collection.get_online_processing_results()
+            self.hit_map_widget.set_results(processing_results["raw"], processing_results["aligned"])
+            self.hit_map_widget.update_results(True)
 
-        executed = data_collection.is_executed()
-        self.heat_map_widget.set_associated_data_collection(data_collection)
-
-        if executed:
-            processing_results = data_collection.get_parallel_processing_result()
-            if processing_results is not None:
-                self.heat_map_widget.set_results(processing_results)
-                self.heat_map_widget.update_results(True)
-
-    def processing_started(self, params_dict, raw_results, aligned_results):
-        self.heat_map_widget.set_results(aligned_results)
+    def processing_started(self, data_collection, results_raw, results_aligned):
+        #self.hit_map_widget.set_associated_data_collection(data_collection)
+        self.hit_map_widget.set_results(results_raw, results_aligned)
 
     def update_processing_results(self, last_results):
-        self.heat_map_widget.update_results(last_results)
+        self.hit_map_widget.update_results(last_results)

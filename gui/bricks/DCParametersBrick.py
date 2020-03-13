@@ -83,6 +83,11 @@ class DCParametersBrick(BaseWidget):
 
         data_collection = item.get_model()
 
+        # if data_collection.is_helical():
+        #    self.advance_results_widget.show()
+        # else:
+        #    self.advance_results_widget.hide()
+
         self.snapshot_widget.display_snapshot(
             data_collection.acquisitions[
                 0
@@ -99,7 +104,7 @@ class DCParametersBrick(BaseWidget):
             self.parameters_widget.setEnabled(True)
 
         self.parameters_widget.populate_widget(item)
-        self.advance_results_widget.populate_widget(item, data_collection)
+        self.advance_results_widget.populate_widget(item)
 
     def populate_results(self, data_collection):
         if data_collection.html_report[-4:] == "html":

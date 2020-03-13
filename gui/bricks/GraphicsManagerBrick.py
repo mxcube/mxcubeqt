@@ -126,11 +126,11 @@ class GraphicsManagerBrick(BaseWidget):
         self.main_groupbox_toggled(False)
         self.main_groupbox.setToolTip("Click to open/close item manager")
 
-        self.connect(HWR.beamline.microscope, "shapeCreated", self.shape_created)
-        self.connect(HWR.beamline.microscope, "shapeDeleted", self.shape_deleted)
-        self.connect(HWR.beamline.microscope, "shapeSelected", self.shape_selected)
+        self.connect(HWR.beamline.sample_view, "shapeCreated", self.shape_created)
+        self.connect(HWR.beamline.sample_view, "shapeDeleted", self.shape_deleted)
+        self.connect(HWR.beamline.sample_view, "shapeSelected", self.shape_selected)
         self.connect(
-            HWR.beamline.microscope,
+            HWR.beamline.sample_view,
             "centringInProgress",
             self.centring_in_progress_changed
         )
@@ -223,7 +223,7 @@ class GraphicsManagerBrick(BaseWidget):
             if self.__grid_map.get(shape):
                 self.__grid_map[shape].setSelected(selected_state)
             self.manager_widget.change_color_button.setEnabled(
-                bool(HWR.beamline.microscope.get_selected_shapes())
+                bool(HWR.beamline.sample_view.get_selected_shapes())
             )
 
     def centring_in_progress_changed(self, centring_in_progress):
@@ -245,7 +245,7 @@ class GraphicsManagerBrick(BaseWidget):
     def change_color_clicked(self):
         color = QtImport.QColorDialog.getColor()
         if color.isValid():
-            for item in HWR.beamline.microscope.get_selected_shapes():
+            for item in HWR.beamline.sample_view.get_selected_shapes():
                 item.set_base_color(color)
 
     def display_all_button_clicked(self):
@@ -259,19 +259,19 @@ class GraphicsManagerBrick(BaseWidget):
             treewidget_item.setData(3, QtImport.Qt.DisplayRole, "False")
 
     def clear_all_button_clicked(self):
-        HWR.beamline.microscope.clear_all()
+        HWR.beamline.sample_view.clear_all()
 
     def create_point_start_button_clicked(self):
-        HWR.beamline.microscope.start_centring(tree_click=True)
+        HWR.beamline.sample_view.start_centring(tree_click=True)
 
     def create_point_accept_button_clicked(self):
-        HWR.beamline.microscope.start_centring()
+        HWR.beamline.sample_view.start_centring()
 
     def create_line_button_clicked(self):
-        HWR.beamline.microscope.create_line()
+        HWR.beamline.sample_view.create_line()
 
     def draw_grid_button_clicked(self):
-        HWR.beamline.microscope.create_grid(self.get_spacing())
+        HWR.beamline.sample_view.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
         QtImport.QMenu(self.manager_widget.shapes_treewidget)

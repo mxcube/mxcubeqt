@@ -24,6 +24,7 @@ from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
+__category__ = "Sample changer"
 
 
 class PlateNavigatorWidget(QtImport.QWidget):
@@ -35,7 +36,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.__current_location = None
+        self.__current_location = [0, 0]
 
         # Graphic elements ----------------------------------------------------
         self.plate_navigator_table = QtImport.QTableWidget(self)
@@ -79,26 +80,30 @@ class PlateNavigatorWidget(QtImport.QWidget):
             QtImport.Qt.ScrollBarAlwaysOff)
         self.plate_navigator_cell.setVerticalScrollBarPolicy(
             QtImport.Qt.ScrollBarAlwaysOff)
+    
+        if HWR.beamline.plate_manipulator is not None:
+            self.init_plate_view()
 
     def refresh_plate_location(self):
         new_location = HWR.beamline.plate_manipulator.get_plate_location()
         self.plate_navigator_cell.setEnabled(True)
-
-        if new_location and self.__current_location != new_location:
+ 
+        if new_location:
             row = new_location[0]
             col = new_location[1]
             pos_x = new_location[2]
             pos_y = new_location[3]
             self.navigation_item.set_navigation_pos(pos_x, pos_y)
             self.plate_navigator_cell.update()
-            if self.__current_location:
+            if self.__current_location != new_location:
                 empty_item = QtImport.QTableWidgetItem(QtImport.QIcon(), "")
                 self.plate_navigator_table.setItem(self.__current_location[0],
                                                    self.__current_location[1],
                                                    empty_item)
-            new_item = QtImport.QTableWidgetItem(Icons.load_icon("sample_axis"), "")
-            self.plate_navigator_table.setItem(row, col, new_item)
-            self.__current_location = new_location
+                new_item = QtImport.QTableWidgetItem(Icons.load_icon("sample_axis"), "")
+                self.plate_navigator_table.setItem(row, col, new_item)
+                self.__current_location = new_location
+            
 
     def init_plate_view(self):
         """Initalizes plate info
@@ -136,7 +141,11 @@ class PlateNavigatorWidget(QtImport.QWidget):
         table_height = (cell_height + 2) * (self.num_rows + 1)
         self.plate_navigator_table.setFixedWidth(table_width)
         self.plate_navigator_table.setFixedHeight(table_height)
+        self.plate_navigator_cell.setFixedHeight(table_height)
+        self.plate_navigator_cell.setFixedWidth(200)
         self.setFixedHeight(table_height + 2)
+        self.navigation_graphicsscene.setSceneRect(0, 0, table_height, 200)
+        
 
         self.navigation_item.set_size(200, table_height)
         self.navigation_item.set_num_drops_per_cell(plate_info['num_drops'])
@@ -200,6 +209,7 @@ class NavigationItem(QtImport.QGraphicsItem):
                                  pos_x + 4, pos_y + 4)
                 painter.drawLine(pos_x + 4, pos_y - 4,
                                  pos_x - 4, pos_y + 4)
+                
         pen.setColor(QtImport.Qt.blue)
         pen.setWidth(2)
         #        painter.drawLine(pos_x - 2, pos_y - 2,
@@ -217,6 +227,8 @@ class NavigationItem(QtImport.QGraphicsItem):
     def set_navigation_pos(self, pos_x, pos_y):
         self.__navigation_posx = (pos_x - 0.5) * 2 * self.scene().width()
         self.__navigation_posy = pos_y * self.scene().height()
+        #self.__navigation_posx = pos_x
+        #self.__navigation_posy = pos_y
         self.scene().update()
 
     def set_num_drops_per_cell(self, num_drops):

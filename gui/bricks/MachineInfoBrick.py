@@ -41,7 +41,7 @@ class MachineInfoBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Internal values -----------------------------------------------------
-        self.graphics_initialized = None
+        self.graphics_initialized = False
         self.value_label_list = []
 
         # Properties (name, type, default value, comment)----------------------
@@ -79,7 +79,7 @@ class MachineInfoBrick(BaseWidget):
            At first time initializes gui by adding necessary labels.
            If the gui is initialized then update labels with values
         """
-        if self.graphics_initialized is None:
+        if not self.graphics_initialized:
             for item in values_dict.values():
                 temp_widget = CustomInfoWidget(self)
                 temp_widget.init_info(item, self["maxPlotPoints"])

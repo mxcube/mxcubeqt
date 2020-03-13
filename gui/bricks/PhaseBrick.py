@@ -15,7 +15,7 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
@@ -36,6 +36,9 @@ class PhaseBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
+        self.add_property("confirmPhaseChange", "boolean", False)
+
+        # Properties to initialize hardware objects --------------------------
 
         # Signals ------------------------------------------------------------
 
@@ -86,9 +89,23 @@ class PhaseBrick(BaseWidget):
 
     def change_phase(self):
         if HWR.beamline.diffractometer is not None:
-            HWR.beamline.diffractometer.set_phase(
-                self.phase_combobox.currentText(), timeout=None
-            )
+            requested_phase = self.phase_combobox.currentText()
+            if self["confirmPhaseChange"] and requested_phase == "BeamLocation":
+                conf_msg = "Please remove any objects that might cause collision!\n" + \
+                           "Continue"
+                if (
+                    QtImport.QMessageBox.warning(
+                        None,
+                        "Warning",
+                        conf_msg,
+                        QtImport.QMessageBox.Ok,
+                        QtImport.QMessageBox.Cancel,
+                   )
+                   == QtImport.QMessageBox.Ok
+                ):
+                   HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
+            else:
+                HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
 
     def phase_changed(self, phase):
         if phase.lower() != "unknown" and self.phase_combobox.count() > 0:

@@ -368,4 +368,4 @@ def start_n_centering_clicked():
     HWR.beamline.imaging.start_n_centering()
 
 def accept_centering_clicked():
-    HWR.beamline.microscope.accept_centring()
+    HWR.beamline.sample_view.accept_centring()

@@ -123,10 +123,6 @@ class DCParametersWidget(QtImport.QWidget):
         model.set_name(path_template.get_prefix())
         self._tree_view_item.setText(0, model.get_name())
 
-    def tab_changed(self):
-        if self._tree_view_item:
-            self.populate_parameter_widget(self._tree_view_item)
-
     def set_enabled(self, state):
         self._acq_widget.setEnabled(state)
         self._data_path_widget.setEnabled(state)

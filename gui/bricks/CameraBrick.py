@@ -215,34 +215,34 @@ class CameraBrick(BaseWidget):
         if property_name == "mnemonic":
             if self.graphics_manager_hwobj is not None:
                 self.disconnect(
-                    HWR.beamline.microscope, "mouseMoved", self.mouse_moved
+                    self.graphics_manager_hwobj, "mouseMoved", self.mouse_moved
                 )
                 self.disconnect(
-                    HWR.beamline.microscope, "imageScaleChanged", self.image_scaled
+                    self.graphics_manager_hwobj, "imageScaleChanged", self.image_scaled
                 )
                 self.disconnect(
-                    HWR.beamline.microscope, "infoMsg", self.set_info_msg
+                    self.graphics_manager_hwobj, "infoMsg", self.set_info_msg
                 )
 
-            self.graphics_manager_hwobj = HWR.beamline.microscope
+            self.graphics_manager_hwobj = self.get_hardware_object(new_value)
 
             if self.graphics_manager_hwobj is not None:
                 self.connect(
-                    HWR.beamline.microscope, "mouseMoved", self.mouse_moved
+                    self.graphics_manager_hwobj, "mouseMoved", self.mouse_moved
                 )
                 self.connect(
-                    HWR.beamline.microscope, "imageScaleChanged", self.image_scaled
+                    self.graphics_manager_hwobj, "imageScaleChanged", self.image_scaled
                 )
-                self.connect(HWR.beamline.microscope, "infoMsg", self.set_info_msg)
-                self.graphics_view = HWR.beamline.microscope.get_graphics_view()
-                # self.graphics_camera_frame = HWR.beamline.microscope.get_camera_frame()
+                self.connect(self.graphics_manager_hwobj, "infoMsg", self.set_info_msg)
+                self.graphics_view = self.graphics_manager_hwobj.get_graphics_view()
+                # self.graphics_camera_frame = self.graphics_manager_hwobj.get_camera_frame()
                 self.main_layout.addWidget(self.graphics_view)
                 self.main_layout.addWidget(self.info_widget)
                 self.set_fixed_size()
                 self.init_image_scale_list()
-                if hasattr(HWR.beamline.microscope, "camera"):
+                if hasattr(self.graphics_manager_hwobj, "camera"):
                     self.camera_control_dialog.set_camera_hwobj(
-                        HWR.beamline.microscope.camera
+                        self.graphics_manager_hwobj.camera
                     )
         elif property_name == "fixedSize":
             try:
@@ -256,14 +256,14 @@ class CameraBrick(BaseWidget):
             self.display_beam = new_value
         elif property_name == "displayScale":
             self.display_scale = new_value
-            if HWR.beamline.microscope is not None:
-                if hasattr(HWR.beamline.microscope, "set_scale_visible"):
+            if self.graphics_manager_hwobj is not None:
+                if hasattr(self.graphics_manager_hwobj, "set_scale_visible"):
                     # NBNB Where did this code come from? SHould probvably be removed
                     # no known function "set_scale_visible" anywhere. TODO remove
-                    HWR.beamline.microscope.set_scale_visible(new_value)
+                    self.graphics_manager_hwobj.set_scale_visible(new_value)
                 else:
                     logging.getLogger().info(
-                        "No such function: microscope.set_scale_visible()"
+                        "No such function: sample_view.set_scale_visible()"
                     )
 
         elif property_name == "beamDefiner":
@@ -274,18 +274,18 @@ class CameraBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def display_beam_size_toggled(self):
-        HWR.beamline.microscope.display_beam_size(
+        self.graphics_manager_hwobj.display_beam_size(
             self.display_beam_size_action.isChecked()
         )
 
     def start_magnification_tool(self):
-        HWR.beamline.microscope.set_magnification_mode(True)
+        self.graphics_manager_hwobj.set_magnification_mode(True)
 
     def set_control_mode(self, have_control):
         if have_control:
-            HWR.beamline.microscope.hide_info_msg()
+            self.graphics_manager_hwobj.hide_info_msg()
         else:
-            HWR.beamline.microscope.display_info_msg(
+            self.graphics_manager_hwobj.display_info_msg(
                 [
                     "",
                     "Controls are disabled in the Slave mode",
@@ -299,8 +299,8 @@ class CameraBrick(BaseWidget):
         self.info_label.setText(msg)
 
     def set_fixed_size(self):
-        if self.fixed_size and HWR.beamline.microscope:
-            HWR.beamline.microscope.set_graphics_scene_size(self.fixed_size, True)
+        if self.fixed_size and self.graphics_manager_hwobj:
+            self.graphics_manager_hwobj.set_graphics_scene_size(self.fixed_size, True)
             self.graphics_view.setFixedSize(self.fixed_size[0], self.fixed_size[1])
             # self.info_widget.setFixedWidth(self.fixed_size[0])
 
@@ -309,7 +309,7 @@ class CameraBrick(BaseWidget):
             action.setChecked(scale_value == self.image_scale_list[index])
 
     def init_image_scale_list(self):
-        self.image_scale_list = HWR.beamline.microscope.get_image_scale_list()
+        self.image_scale_list = self.graphics_manager_hwobj.get_image_scale_list()
         if len(self.image_scale_list) > 0:
             self.image_scale_menu.setEnabled(True)
             self.image_scale_action_group = QtImport.QActionGroup(self.image_scale_menu)
@@ -322,7 +322,7 @@ class CameraBrick(BaseWidget):
                 self.image_scale_action_group.addAction(action_temp)
             for action in self.image_scale_menu.actions():
                 action.setCheckable(True)
-            self.image_scaled(HWR.beamline.microscope.get_image_scale())
+            self.image_scaled(self.graphics_manager_hwobj.get_image_scale())
 
     def not_used_function(self, *arg):
         pass
@@ -330,7 +330,7 @@ class CameraBrick(BaseWidget):
     def image_scale_triggered(self, selected_action):
         for index, action in enumerate(self.image_scale_menu.actions()):
             if selected_action == action:
-                HWR.beamline.microscope.set_image_scale(
+                self.graphics_manager_hwobj.set_image_scale(
                     self.image_scale_list[index], action.isChecked()
                 )
 
@@ -338,61 +338,61 @@ class CameraBrick(BaseWidget):
         self.popup_menu.popup(QtImport.QCursor.pos())
 
     def measure_distance_clicked(self):
-        HWR.beamline.microscope.start_measure_distance(wait_click=True)
+        self.graphics_manager_hwobj.start_measure_distance(wait_click=True)
 
     def measure_angle_clicked(self):
-        HWR.beamline.microscope.start_measure_angle(wait_click=True)
+        self.graphics_manager_hwobj.start_measure_angle(wait_click=True)
 
     def measure_area_clicked(self):
-        HWR.beamline.microscope.start_measure_area(wait_click=True)
+        self.graphics_manager_hwobj.start_measure_area(wait_click=True)
 
     def display_histogram_toggled(self):
-        HWR.beamline.microscope.display_histogram(
+        self.graphics_manager_hwobj.display_histogram(
             self.display_histogram_action.isChecked()
         )
 
     def create_point_click_clicked(self):
-        HWR.beamline.microscope.start_centring(tree_click=True)
+        self.graphics_manager_hwobj.start_centring(tree_click=True)
 
     def create_points_one_click_clicked(self):
-        HWR.beamline.microscope.start_one_click_centring()
+        self.graphics_manager_hwobj.start_one_click_centring()
 
     def create_point_current_clicked(self):
-        HWR.beamline.microscope.start_centring(tree_click=False)
+        self.graphics_manager_hwobj.start_centring(tree_click=False)
 
     def create_line_clicked(self):
-        HWR.beamline.microscope.create_line()
+        self.graphics_manager_hwobj.create_line()
 
     def create_auto_line_clicked(self):
-        HWR.beamline.microscope.create_auto_line()
+        self.graphics_manager_hwobj.create_auto_line()
 
     def create_grid(self):
-        HWR.beamline.microscope.create_grid()
+        self.graphics_manager_hwobj.create_grid()
 
     def create_auto_grid(self):
-        HWR.beamline.microscope.create_auto_grid()
+        self.graphics_manager_hwobj.create_auto_grid()
 
     def move_beam_mark_manual(self):
-        HWR.beamline.microscope.start_move_beam_mark()
+        self.graphics_manager_hwobj.start_move_beam_mark()
 
     def move_beam_mark_auto(self):
-        HWR.beamline.microscope.move_beam_mark_auto()
+        self.graphics_manager_hwobj.move_beam_mark_auto()
 
     def mouse_moved(self, x, y):
         self.coord_label.setText("X: <b>%d</b> Y: <b>%d</b>" % (x, y))
 
     def select_all_points_clicked(self):
-        HWR.beamline.microscope.select_all_points()
+        self.graphics_manager_hwobj.select_all_points()
 
     def deselect_all_items_clicked(self):
-        HWR.beamline.microscope.de_select_all()
+        self.graphics_manager_hwobj.de_select_all()
 
     def clear_all_items_clicked(self):
-        HWR.beamline.microscope.clear_all()
+        self.graphics_manager_hwobj.clear_all()
 
     def zoom_window_clicked(self):
         self.zoom_dialog.set_camera_frame(
-            HWR.beamline.microscope.get_camera_frame()
+            self.graphics_manager_hwobj.get_camera_frame()
         )
         self.zoom_dialog.set_coord(100, 100)
         self.zoom_dialog.show()
@@ -401,13 +401,13 @@ class CameraBrick(BaseWidget):
         self.camera_control_dialog.show()
 
     def display_grid_toggled(self):
-        HWR.beamline.microscope.display_grid(self.display_grid_action.isChecked())
+        self.graphics_manager_hwobj.display_grid(self.display_grid_action.isChecked())
 
     def define_beam_size(self):
-        HWR.beamline.microscope.start_define_beam()
+        self.graphics_manager_hwobj.start_define_beam()
 
     def display_radiation_damage_toggled(self):
-        HWR.beamline.microscope.display_radiation_damage(
+        self.graphics_manager_hwobj.display_radiation_damage(
             self.display_radiation_damage_action.isChecked()
         )
 
@@ -504,67 +504,67 @@ class CameraControlDialog(QtImport.QDialog):
 
         # get attribute value
         try:
-            contrast_value = HWR.beamline.microscope.camera.get_contrast()
+            contrast_value = self.graphics_manager_hwobj.camera.get_contrast()
         except AttributeError:
             contrast_value = None
         try:
-            brightness_value = HWR.beamline.microscope.camera.get_brightness()
+            brightness_value = self.graphics_manager_hwobj.camera.get_brightness()
         except AttributeError:
             brightness_value = None
         try:
-            gain_value = HWR.beamline.microscope.camera.get_gain()
+            gain_value = self.graphics_manager_hwobj.camera.get_gain()
         except AttributeError:
             gain_value = None
         try:
-            gamma_value = HWR.beamline.microscope.camera.get_gamma()
+            gamma_value = self.graphics_manager_hwobj.camera.get_gamma()
         except AttributeError:
             gamma_value = None
         try:
-            exposure_time_value = HWR.beamline.microscope.camera.get_exposure_time()
+            exposure_time_value = self.graphics_manager_hwobj.camera.get_exposure_time()
         except AttributeError:
             exposure_time_value = None
 
         # get attribute auto state
         try:
-            contrast_auto = HWR.beamline.microscope.camera.get_contrast_auto()
+            contrast_auto = self.graphics_manager_hwobj.camera.get_contrast_auto()
         except AttributeError:
             contrast_auto = None
         try:
-            brightness_auto = HWR.beamline.microscope.camera.get_brightness_auto()
+            brightness_auto = self.graphics_manager_hwobj.camera.get_brightness_auto()
         except AttributeError:
             brightness_auto = None
         try:
-            gain_auto = HWR.beamline.microscope.camera.get_gain_auto()
+            gain_auto = self.graphics_manager_hwobj.camera.get_gain_auto()
         except AttributeError:
             gain_auto = None
         try:
-            gamma_auto = HWR.beamline.microscope.camera.get_gamma_auto()
+            gamma_auto = self.graphics_manager_hwobj.camera.get_gamma_auto()
         except AttributeError:
             gamma_auto = None
         try:
-            exposure_time_auto = HWR.beamline.microscope.camera.get_exposure_time_auto()
+            exposure_time_auto = self.graphics_manager_hwobj.camera.get_exposure_time_auto()
         except AttributeError:
             exposure_time_auto = None
 
         # get attribute range
         try:
-            contrast_min_max = HWR.beamline.microscope.camera.get_contrast_min_max()
+            contrast_min_max = self.graphics_manager_hwobj.camera.get_contrast_min_max()
         except AttributeError:
             contrast_min_max = (0, 100)
         try:
-            brightness_min_max = HWR.beamline.microscope.camera.get_brightness_min_max()
+            brightness_min_max = self.graphics_manager_hwobj.camera.get_brightness_min_max()
         except AttributeError:
             brightness_min_max = (0, 100)
         try:
-            gain_min_max = HWR.beamline.microscope.camera.get_gain_min_max()
+            gain_min_max = self.graphics_manager_hwobj.camera.get_gain_min_max()
         except AttributeError:
             gain_min_max = (0, 100)
         try:
-            gamma_min_max = HWR.beamline.microscope.camera.get_gamma_min_max()
+            gamma_min_max = self.graphics_manager_hwobj.camera.get_gamma_min_max()
         except AttributeError:
             gamma_min_max = (0, 100)
         try:
-            exposure_time_min_max = HWR.beamline.microscope.camera.get_exposure_time_min_max()
+            exposure_time_min_max = self.graphics_manager_hwobj.camera.get_exposure_time_min_max()
         except AttributeError:
             exposure_time_min_max = (0, 100)
 
@@ -644,59 +644,59 @@ class CameraControlDialog(QtImport.QDialog):
     def set_contrast(self, value):
         self.contrast_slider.setValue(value)
         self.contrast_doublespinbox.setValue(value)
-        HWR.beamline.microscope.camera.set_contrast(value)
+        self.graphics_manager_hwobj.camera.set_contrast(value)
 
     def set_brightness(self, value):
         self.brightness_slider.setValue(value)
         self.brightness_doublespinbox.setValue(value)
-        HWR.beamline.microscope.camera.set_brightness(value)
+        self.graphics_manager_hwobj.camera.set_brightness(value)
 
     def set_gain(self, value):
         self.gain_slider.setValue(value)
         self.gain_doublespinbox.setValue(value)
-        HWR.beamline.microscope.camera.set_gain(value)
+        self.graphics_manager_hwobj.camera.set_gain(value)
 
     def set_gamma(self, value):
         self.gamma_slider.setValue(value)
         self.gamma_doublespinbox.setValue(value)
-        HWR.beamline.microscope.camera.set_gamma(value)
+        self.graphics_manager_hwobj.camera.set_gamma(value)
 
     def set_exposure_time(self, value):
         self.exposure_time_slider.setValue(value)
         self.exposure_time_doublespinbox.setValue(value)
-        HWR.beamline.microscope.camera.set_exposure_time(value)
+        self.graphics_manager_hwobj.camera.set_exposure_time(value)
 
     def set_contrast_auto(self, state):
         state = bool(state)
-        HWR.beamline.microscope.camera.set_contrast_auto(state)
-        value = HWR.beamline.microscope.camera.get_contrast()
+        self.graphics_manager_hwobj.camera.set_contrast_auto(state)
+        value = self.graphics_manager_hwobj.camera.get_contrast()
         self.contrast_slider.setValue(value)
         self.contrast_doublespinbox.setValue(value)
 
     def set_brightness_auto(self, state):
         state = bool(state)
-        HWR.beamline.microscope.camera.set_brightness_auto(state)
-        value = HWR.beamline.microscope.camera.get_brightness()
+        self.graphics_manager_hwobj.camera.set_brightness_auto(state)
+        value = self.graphics_manager_hwobj.camera.get_brightness()
         self.brightness_slider.setValue(value)
         self.brightness_doublespinbox.setValue(value)
 
     def set_gain_auto(self, state):
         state = bool(state)
-        HWR.beamline.microscope.camera.set_gain_auto(state)
-        value = HWR.beamline.microscope.camera.get_gain()
+        self.graphics_manager_hwobj.camera.set_gain_auto(state)
+        value = self.graphics_manager_hwobj.camera.get_gain()
         self.gain_slider.setValue(value)
         self.gain_doublespinbox.setValue(value)
 
     def set_gamma_auto(self, state):
         state = bool(state)
-        HWR.beamline.microscope.camera.set_gamma_auto(state)
-        value = HWR.beamline.microscope.camera.get_gamma()
+        self.graphics_manager_hwobj.camera.set_gamma_auto(state)
+        value = self.graphics_manager_hwobj.camera.get_gamma()
         self.gamma_slider.setValue(value)
         self.gamma_doublespinbox.setValue(value)
 
     def set_exposure_time_auto(self, state):
         state = bool(state)
-        HWR.beamline.microscope.camera.set_exposure_time_auto(state)
-        value = HWR.beamline.microscope.camera.get_exposure_time()
+        self.graphics_manager_hwobj.camera.set_exposure_time_auto(state)
+        value = self.graphics_manager_hwobj.camera.get_exposure_time()
         self.exposure_time_slider.setValue(value)
         self.exposure_time_doublespinbox.setValue(value)

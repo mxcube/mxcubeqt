@@ -45,6 +45,7 @@ class TaskToolBoxBrick(BaseWidget):
         # Properties ----------------------------------------------------------
         self.add_property("useOscStartCbox", "boolean", False)
         self.add_property("useCompression", "boolean", False)
+        #self.add_property("availableTasks", "string", "discrete char helical")
         self.add_property("showDiscreetTask", "boolean", True)
         self.add_property("showHelicalTask", "boolean", True)
         self.add_property("showCharTask", "boolean", True)
@@ -77,7 +78,7 @@ class TaskToolBoxBrick(BaseWidget):
         #                   QtImport.QSizePolicy.MinimumExpanding)
 
         # Other ---------------------------------------------------------------
-        # self.setEnabled(self.ispyb_logged_in)
+        HWR.beamline.sample_view.connect("pointSelected", self.point_selected)
 
     def set_expert_mode(self, expert):
         self.task_tool_box_widget.set_expert_mode(expert)
@@ -86,8 +87,7 @@ class TaskToolBoxBrick(BaseWidget):
         if HWR.beamline.session.session_id:
             self.setEnabled(True)
 
-        HWR.beamline.microscope.connect("pointSelected", self.point_selected)
-
+        #self.task_tool_box_widget.set_available_tasks(self["availableTasks"])
         self.request_tree_brick.emit()
         self.task_tool_box_widget.adjust_width(self.width())
 

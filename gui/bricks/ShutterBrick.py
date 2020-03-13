@@ -108,10 +108,10 @@ class ShutterBrick(BaseWidget):
                 )
             else:
                 self.shutter_hwobj = self.get_hardware_object(new_value)
-                self.connect(
-                    self.shutter_hwobj, "shutterStateChanged", self.state_changed
-                )
-                self.shutter_hwobj.update_values()
+                #self.connect(
+                #    self.shutter_hwobj, "shutterStateChanged", self.state_changed
+                #)
+                #self.shutter_hwobj.update_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 

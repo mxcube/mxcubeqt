@@ -72,6 +72,7 @@ class BeamPositionBrick(BaseWidget):
         self.add_property("enableCenterBeam", "boolean", True)
         self.add_property("enableMeasureFlux", "boolean", True)
         self.add_property("compactView", "boolean", False)
+        self.add_property("alwaysEnableBeamPositioning", "boolean", False)
 
         # Signals -------------------------------------------------------------
 
@@ -291,10 +292,16 @@ class BeamPositionBrick(BaseWidget):
             self.double_ver_motor_brick.setVisible(False)
             self.main_group_box.setTitle("Beam positioning")
 
-        self.unf_hor_motor_brick.setEnabled(self.is_beam_location_phase)
-        self.unf_ver_motor_brick.setEnabled(self.is_beam_location_phase)
-        self.double_hor_motor_brick.setEnabled(self.is_beam_location_phase)
-        self.double_ver_motor_brick.setEnabled(self.is_beam_location_phase)
+        if self['alwaysEnableBeamPositioning']:
+            enable = True
+        elif self.is_beam_location_phase:
+            enable = True
+        else:
+            enable = False
+        self.unf_hor_motor_brick.setEnabled(enable)
+        self.unf_ver_motor_brick.setEnabled(enable)
+        self.double_hor_motor_brick.setEnabled(enable)
+        self.double_ver_motor_brick.setEnabled(enable)
 
     def center_beam_clicked(self):
         """
@@ -312,7 +319,7 @@ class BeamPositionBrick(BaseWidget):
             )
             == QtImport.QMessageBox.Ok
         ):
-            self.beamline_test_hwobj.center_beam_report()
+            self.beamline_test_hwobj.center_beam()
 
     def phase_changed(self, phase):
         """

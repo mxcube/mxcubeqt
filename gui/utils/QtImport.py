@@ -280,6 +280,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             qApp,
             QAbstractItemView,
             QAction,
+            QActionGroup,
             QApplication,
             QBrush,
             QButtonGroup,
