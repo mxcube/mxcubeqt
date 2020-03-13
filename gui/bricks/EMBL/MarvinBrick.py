@@ -157,7 +157,6 @@ class MarvinBrick(BaseWidget):
             ["Property", "Description", "Value"]
         )
 
-<<<<<<< Updated upstream
         self.puck_switches_gbox.setSizePolicy(
             QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed
         )
@@ -172,15 +171,6 @@ class MarvinBrick(BaseWidget):
         )
 
         HWR.beamline.sample_changer.update_values()
-=======
-        self.puck_switches_gbox.setSizePolicy(QtImport.QSizePolicy.Preferred,
-                                              QtImport.QSizePolicy.Fixed)
-        if api.sample_changer is not None:
-            self.init_tables()
-            self.connect(api.sample_changer, "statusListChanged", self.status_list_changed)
-            self.connect(api.sample_changer, "infoDictChanged", self.info_dict_changed)
-            api.sample_changer.update_values()
->>>>>>> Stashed changes
 
     def init_tables(self):
         """
