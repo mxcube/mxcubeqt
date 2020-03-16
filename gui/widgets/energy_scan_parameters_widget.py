@@ -20,7 +20,7 @@
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
-from widgets.pyqtgraph_widget import TwoDimenisonalPlotWidget
+from widgets.pyqtgraph_widget import PlotWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
@@ -52,8 +52,8 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.data_path_widget.data_path_layout.file_name_value_label.hide()
         self.snapshot_widget = SnapshotWidget(self)
 
-        self.scan_plot_widget = TwoDimenisonalPlotWidget(self)
-        self.chooch_plot_widget = TwoDimenisonalPlotWidget(self)
+        self.scan_plot_widget = PlotWidget(self)
+        self.chooch_plot_widget = PlotWidget(self)
 
         # Layout -------------------------------------------------------------
         _parameters_widget_layout = QtImport.QVBoxLayout()

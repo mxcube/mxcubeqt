@@ -412,7 +412,7 @@ class PolarScater(FigureCanvas):
         self.fig.canvas.draw_idle()
 
 
-class TwoDimenisonalPlotWidget(QtImport.QWidget):
+class PlotWidget(QtImport.QWidget):
 
     mouseMovedSignal = QtImport.pyqtSignal(float, float)
     mouseClickedSignal = QtImport.pyqtSignal(float, float)

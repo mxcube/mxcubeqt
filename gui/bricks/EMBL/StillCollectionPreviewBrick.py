@@ -24,7 +24,7 @@ import numpy as np
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
-from gui.widgets.pyqtgraph_widget import TwoDimenisonalPlotWidget
+from gui.widgets.pyqtgraph_widget import PlotWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
 
@@ -87,7 +87,7 @@ class StillCollectionPreviewBrick(BaseWidget):
             "Selected compartment cell: A1", self.comp_widget
         )
         self.comp_table = QtImport.QTableWidget(self.comp_widget)
-        self.hit_map_plot = TwoDimenisonalPlotWidget(self.comp_widget)
+        self.hit_map_plot = PlotWidget(self.comp_widget)
 
         self.grid_dialog = QtImport.QDialog(self)
         self.grid_graphics_view = GraphicsView()

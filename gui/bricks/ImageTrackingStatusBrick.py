@@ -33,7 +33,6 @@ class ImageTrackingStatusBrick(BaseWidget):
         "tracking": Colors.LIGHT_GREEN,
         "disabled": Colors.LIGHT_GRAY,
         "error": Colors.LIGHT_RED,
-        "tracking": Colors.LIGHT_GREEN,
         "ready": Colors.LIGHT_BLUE,
     }
 

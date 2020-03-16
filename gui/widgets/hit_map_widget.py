@@ -22,9 +22,9 @@ from copy import deepcopy
 
 from gui.utils import QtImport
 try:
-   from widgets.pyqtgraph_widget import TwoDimenisonalPlotWidget
+   from widgets.pyqtgraph_widget import PlotWidget
 except:
-   from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
+   from gui.widgets.matplot_widget import PlotWidget
 
 from HardwareRepository import HardwareRepository as HWR
 
@@ -69,7 +69,7 @@ class HitMapWidget(QtImport.QWidget):
 
         # Graphic elements ----------------------------------------------------
         self._hit_map_gbox = QtImport.QGroupBox("Hit map", self)
-        self._hit_map_plot = TwoDimenisonalPlotWidget(self._hit_map_gbox)
+        self._hit_map_plot = PlotWidget(self._hit_map_gbox)
         self._hit_map_popup_menu = QtImport.QMenu(self._hit_map_gbox)
         
 

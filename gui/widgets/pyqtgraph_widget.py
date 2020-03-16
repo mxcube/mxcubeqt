@@ -29,7 +29,7 @@ __license__ = "LGPLv3+"
 #pg.setConfigOption('background', 'w')
 
 
-class TwoDimenisonalPlotWidget(QtImport.QWidget):
+class PlotWidget(QtImport.QWidget):
 
     mouseMovedSignal = QtImport.pyqtSignal(float, float)
     mouseClickedSignal = QtImport.pyqtSignal(float, float)
