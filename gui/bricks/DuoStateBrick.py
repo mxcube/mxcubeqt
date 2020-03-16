@@ -561,7 +561,7 @@ class WrapperHO(QtImport.QObject):
         self.set_out_cmd = None
 
         try:
-            channel = self.dev.get_channel_obect("dev_state")
+            channel = self.dev.get_channel_object("dev_state")
         except KeyError:
             channel = None
         self.stateChannel = channel
