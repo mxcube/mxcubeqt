@@ -17,10 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from gui.BaseComponents import BaseWidget
 from gui.utils import QtImport
+from gui.BaseComponents import BaseWidget
 from gui.utils.sample_changer_helper import SampleChanger
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
+
+from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -33,7 +35,6 @@ class PlateManipulatorBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.plate_manipulator = None
 
         # Internal values -----------------------------------------------------
         self.num_cols = None
@@ -44,7 +45,6 @@ class PlateManipulatorBrick(BaseWidget):
         self.xtal_map = None
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
         self.add_property("icons", "string", "")
 
         # Signals -------------------------------------------------------------
@@ -80,31 +80,17 @@ class PlateManipulatorBrick(BaseWidget):
         self.xtal_image_graphics_pixmap = QtImport.QGraphicsPixmapItem()
         self.xtal_image_graphicsscene.addItem(self.xtal_image_graphics_pixmap)
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.plate_manipulator is not None:
-                self.disconnect(
-                    self.plate_manipulator,
-                    SampleChanger.INFO_CHANGED_EVENT,
-                    self.plate_navigator_widget.refresh_plate_location,
-                )
+        if HWR.beamline.plate_manipulator is not None:
+            self.connect(HWR.beamline.plate_manipulator,
+                         SampleChanger.INFO_CHANGED_EVENT,
+                         self.plate_navigator_widget.refresh_plate_location,
+            )
 
-            self.plate_manipulator = self.get_hardware_object(new_value)
-
-            if self.plate_manipulator is not None:
-                self.plate_navigator_widget.init_plate_view()
-                self.connect(
-                    self.plate_manipulator,
-                    SampleChanger.INFO_CHANGED_EVENT,
-                    self.plate_navigator_widget.refresh_plate_location,
-                )
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def search_button_clicked(self):
-        if self.plate_manipulator:
-            # processing_plan = self.plate_manipulator.
-            self.plate_content = self.plate_manipulator.sync_with_crims(
+        if HWR.beamline.plate_manipulator is not None:
+            # processing_plan = HWR.beamline.plate_manipulator.
+            self.plate_content = HWR.beamline.plate_manipulator.sync_with_crims(
                 self.plate_widget.barcode_ledit.text()
             )
             if self.plate_content:
@@ -121,12 +107,12 @@ class PlateManipulatorBrick(BaseWidget):
     def move_to_xtal_clicked(self):
         xtal_item = self.xtal_map.get(self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
-            self.plate_manipulator.load(xtal_item)
+            HWR.beamline.plate_manipulator.load(xtal_item),
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):
-        if self.plate_manipulator:
-            self.plate_manipulator.abort()
+        if HWR.beamline.plate_manipulator:
+            HWR.beamline.plate_manipulator.abort()
 
     def xtal_treewidget_current_item_changed(self, current_item):
         xtal_item = self.xtal_map.get(current_item)

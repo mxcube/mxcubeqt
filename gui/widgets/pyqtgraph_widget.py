@@ -26,7 +26,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class TwoDimenisonalPlotWidget(QtImport.QWidget):
+#pg.setConfigOption('background', 'w')
+
+
+class PlotWidget(QtImport.QWidget):
 
     mouseMovedSignal = QtImport.pyqtSignal(float, float)
     mouseClickedSignal = QtImport.pyqtSignal(float, float)
@@ -36,14 +39,19 @@ class TwoDimenisonalPlotWidget(QtImport.QWidget):
     def __init__(self, parent=None):
         QtImport.QWidget.__init__(self, parent)
 
-        self.plot_widget = pg.PlotWidget()
+        self.view_box = CustomViewBox()
+        self.plot_widget = pg.PlotWidget(viewBox=self.view_box)
         self.image_view = pg.ImageView()
+
+        self.image_view.ui.histogram.hide()
+        self.image_view.ui.roiBtn.hide()
+        self.image_view.ui.menuBtn.hide()
 
         self.plot_widget.showGrid(x=True, y=True)
         self.curves_dict = {}
 
         self.vlayout = QtImport.QVBoxLayout(self)
-        # self.vlayout.addWidget(self.plot_widget)
+        self.vlayout.addWidget(self.plot_widget)
         self.vlayout.addWidget(self.image_view)
 
         # self.curve.setPen((200,200,100))
@@ -55,36 +63,84 @@ class TwoDimenisonalPlotWidget(QtImport.QWidget):
                   (255, 255, 255)]
         cmap = pg.ColorMap(pos=np.linspace(0.0, 1.0, 4), color=colors)
         self.image_view.setColorMap(cmap)
-        # self.image_view.setAutoVisible(y=True)
 
-        # self.image_view.sigMouseMoveEvent.connect(self.mouse_moved)
-        # self.image_view.mouseDoubleClickEvent.connect(self.mouse_double_clicked)
-        # self.image_view.mousePressEvent
+        self.plot_widget.scene().sigMouseMoved.connect(self.plot_widget_mouse_moved)
+        self.image_view.scene.sigMouseMoved.connect(self.image_view_mouse_moved)
+        #self.setMouseMode(self.RectMode)
 
-        self.image_view.scene.sigMouseMoved.connect(self.mouse_moved)
+    def set_plot_type(self, plot_type):
+        self.plot_widget.setVisible(plot_type == "1D")
+        self.image_view.setVisible(plot_type == "2D")
 
-    def add_curve(self, key, x_array, y_array, linestyle, label, color, marker):
-        curve = self.plot_widget.plot(symbolPen='w', symbolSize=5)
-        curve.setPen((200, 200, 100))
+    def add_curve(self, key, y_array, x_array, linestyle, label, color, marker):
+        curve = self.plot_widget.plot(y=y_array, x=x_array, pen=None, symbolPen='w', symbolBrush=color, symbolSize=5)
+        #curve.setPen((200, 200, 100))
         self.curves_dict[key] = curve
-
-    def plot_result(self, result, aspect=None):
-        self.image_view.setImage(result)
 
     def update_curves(self, result):
         for key in result.keys():
             if key in self.curves_dict:
-                self.curves_dict[key].setData(
-                    y=result['spots_num'], x=result['x_array'])
+                self.curves_dict[key].setData(y=result[key]) #, x=result['x_array'])
 
-    def adjust_axes(self, result_key):
-        pass
+    def plot_result(self, result, aspect=None):
+        self.image_view.setImage(result)
+
+    def update_plot(self, result, aspect=None):
+        self.image_view.setImage(result)
+
+    def autoscale_axes(self):
+        #self.plot_widget.enableAutoRange(self.view_box.XYAxes, True)
+        self.view_box.autoRange()
 
     def clear(self):
-        pass
+        self.plot_widget.clear()
+        self.image_view.clear()
+        self.curves_dict = {}
 
-    def mouse_moved(self, mouse_event):
-        self.mouseMovedSignal.emit(mouse_event.x(), mouse_event.y())
+    def hide_all_curves(self):
+        for key in self.curves_dict.keys():
+            self.curves_dict[key].hide()
+
+    def show_curve(self, curve_key):
+        for key in self.curves_dict.keys():
+            if key == curve_key:
+                self.curves_dict[key].show()
+
+    def plot_widget_mouse_moved(self, mouse_event):
+        mouse_point = self.plot_widget.plotItem.vb.mapSceneToView(mouse_event)
+        self.mouseMovedSignal.emit(mouse_point.x(), mouse_point.y())
+
+    def image_view_mouse_moved(self, mouse_event):
+        mouse_point = self.image_view.imageItem.getViewBox().mapSceneToView(mouse_event)
+        self.mouseMovedSignal.emit(mouse_point.x(), mouse_point.y())
 
     def mouse_double_clicked(self, press_event, double):
-        print(press_event, double)
+        pass
+
+    def set_yticks(self, ticks):
+        pass
+
+    def set_ytick_labels(self, labels):
+        pass
+
+    def set_x_axis_limits(self, limits):
+        self.plot_widget.setRange(xRange=limits)
+
+    def set_y_axis_limits(self, limits):
+        self.plot_widget.setRange(yRange=limits)
+
+class CustomViewBox(pg.ViewBox):
+    def __init__(self, *args, **kwds):
+        pg.ViewBox.__init__(self, *args, **kwds)
+        self.setMouseMode(self.RectMode)
+
+    ## reimplement right-click to zoom out
+    #def mouseClickEvent(self, ev):
+    #    if ev.button() == QtImport.Qt.RightButton:
+    #        self.autoRange()
+
+    def mouseDragEvent(self, ev):
+        if ev.button() == QtImport.Qt.RightButton:
+            ev.ignore()
+        else:
+            pg.ViewBox.mouseDragEvent(self, ev)

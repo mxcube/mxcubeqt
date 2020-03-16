@@ -412,7 +412,7 @@ class PolarScater(FigureCanvas):
         self.fig.canvas.draw_idle()
 
 
-class TwoDimenisonalPlotWidget(QtImport.QWidget):
+class PlotWidget(QtImport.QWidget):
 
     mouseMovedSignal = QtImport.pyqtSignal(float, float)
     mouseClickedSignal = QtImport.pyqtSignal(float, float)
@@ -458,7 +458,8 @@ class TwoDimenisonalPlotWidget(QtImport.QWidget):
         dbl_click = False
         if hasattr(mouse_event, "dblclick"):
             dbl_click = mouse_event.dblclick
-        if mouse_event.xdata and mouse_event.ydata:
+        #if mouse_event.xdata and mouse_event.ydata:
+        if True: 
             if dbl_click:
                 self.mouseDoubleClickedSignal.emit(mouse_event.xdata, mouse_event.ydata)
             else:
@@ -469,8 +470,6 @@ class TwoDimenisonalPlotWidget(QtImport.QWidget):
         self.mouse_clicked = False
 
     def motion_notify_event(self, mouse_event):
-        QtImport.QApplication.restoreOverrideCursor()
-
         if mouse_event.xdata and mouse_event.ydata:
             self.mouseMovedSignal.emit(mouse_event.xdata, mouse_event.ydata)
         else:

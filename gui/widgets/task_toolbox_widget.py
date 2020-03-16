@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+#import importlib
 
 from gui.utils import Icons, queue_item, QtImport
 from gui.widgets.create_discrete_widget import CreateDiscreteWidget
@@ -53,6 +54,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.path_conflict = False
         self.acq_conflict = False
         self.enable_collect = False
+        self.create_task_widgets = {}
 
         # Graphic elements ----------------------------------------------------
         self.method_label = QtImport.QLabel("Collection method", self)
@@ -158,6 +160,15 @@ class TaskToolBoxWidget(QtImport.QWidget):
             self.gphl_workflow_page.initialise_workflows()
         else:
             logging.getLogger("HWR").info("GPhL workflow task not available")
+
+    def set_available_tasks(self, available_tasks):
+        for task_name in available_tasks.split():
+            module_name = "gui.widgets.create_%s_widget" % task_name
+            class_name = "Create%sWidget" % task_name.title().replace(" ", "")
+            create_task_widget_cls = getattr(importlib.import_module(module_name), class_name)
+            create_task_widget = create_task_widget_cls(self.tool_box, task_name)
+            self.tool_box.addItem(create_task_widget, task_name.title())
+            self.create_task_widgets[task_name] = create_task_widget
 
     def adjust_width(self, width):
         # Adjust periodic table width
@@ -331,11 +342,11 @@ class TaskToolBoxWidget(QtImport.QWidget):
 
             if not items:
                 logging.getLogger("GUI").warning(
-                    "Select the sample or group you " "would like to add to."
+                    "Select the sample, basket or task group you would like to add to."
                 )
             else:
                 for item in items:
-                    shapes = HWR.beamline.microscope.get_selected_points()
+                    shapes = HWR.beamline.sample_view.get_selected_points()
                     task_model = item.get_model()
 
                     # TODO Consider if GPhL workflow needs task-per-shape
@@ -357,7 +368,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
                             self.create_task(task_model)
                     elif isinstance(task_model, queue_model_objects.Basket):
                         for sample_node in task_model.get_sample_list():
-                            child_task_model = self.create_task_group(sample_node)
+                            task_group = self.create_task_group(sample_node)
                             if self.tool_box.currentWidget() in (
                                 self.discrete_page,
                                 self.char_page,
@@ -366,9 +377,9 @@ class TaskToolBoxWidget(QtImport.QWidget):
                                 self.xray_imaging_page,
                             ) and len(shapes):
                                 for shape in shapes:
-                                    self.create_task(child_task_model, shape)
+                                    self.create_task(task_group, shape)
                             else:
-                                self.create_task(child_task_model)
+                                self.create_task(task_group)
                     else:
                         if self.tool_box.currentWidget() in (
                             self.discrete_page,
@@ -390,7 +401,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         group_task_node = queue_model_objects.TaskGroup()
         current_item = self.tool_box.currentWidget()
 
-        group_name = current_item._task_node_name
+        group_name = current_item.get_task_node_name()
         group_task_node.set_name(group_name)
         num = task_model.get_next_number_for_name(group_name)
         group_task_node.set_number(num)
@@ -403,7 +414,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-            task_list = self.tool_box.currentWidget().create_task(sample, shape)
+            task_list = self.tool_box.currentWidget().create_task(sample, task_node, shape)
 
             for child_task_node in task_list:
                 HWR.beamline.queue_model.add_child(task_node, child_task_node)
@@ -411,7 +422,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         else:
             new_node = HWR.beamline.queue_model.copy_node(task_node)
             new_snapshot = (
-                HWR.beamline.microscope.get_scene_snapshot()
+                HWR.beamline.sample_view.get_scene_snapshot()
             )
 
             if isinstance(task_node, queue_model_objects.Characterisation):

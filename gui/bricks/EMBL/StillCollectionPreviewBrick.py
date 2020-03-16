@@ -24,7 +24,7 @@ import numpy as np
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
-from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
+from gui.widgets.pyqtgraph_widget import PlotWidget
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
 
@@ -44,11 +44,17 @@ class StillCollectionPreviewBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        self.current_grid_properties = None
-        self.info_dict = {"grid_cell": -1, "comp_cell": -1}
+        self.current_chip_config = None
+        self.info_dict = {
+           "collect_grid_cell": -1,
+           "collect_comp_cell": -1,
+           "processing_grid_cell": -1,
+           "processing_comp_cell": -1
+        }
         self.params_dict = None
         self.results = None
-        self.frame_num = 0
+        self.collect_frame_num = 0
+        self.processing_frame_num = 0
         self.score_type = "score"
         self.score_type_list = ("score", "spots_resolution", "spots_num")
         self.grid_table_item_fixed = False
@@ -67,7 +73,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         self.grid_cell_label = QtImport.QLabel(
             "Selected grid cell: A1", self.grid_widget
         )
-        self.grid_properties_combo = QtImport.QComboBox(self)
+        self.chip_config_combo = QtImport.QComboBox(self)
 
         self.inverted_rows_cbox = QtImport.QCheckBox("Inverted rows", self.grid_widget)
         self.image_tracking_cbox = QtImport.QCheckBox("Live update", self.grid_widget)
@@ -81,7 +87,7 @@ class StillCollectionPreviewBrick(BaseWidget):
             "Selected compartment cell: A1", self.comp_widget
         )
         self.comp_table = QtImport.QTableWidget(self.comp_widget)
-        self.hit_map_plot = TwoDimenisonalPlotWidget(self.comp_widget)
+        self.hit_map_plot = PlotWidget(self.comp_widget)
 
         self.grid_dialog = QtImport.QDialog(self)
         self.grid_graphics_view = GraphicsView()
@@ -98,7 +104,7 @@ class StillCollectionPreviewBrick(BaseWidget):
         _grid_vlayout.addWidget(self.grid_cell_label)
         _grid_vlayout.addWidget(self.grid_table)
         _grid_vlayout.addStretch()
-        _grid_vlayout.addWidget(self.grid_properties_combo)
+        _grid_vlayout.addWidget(self.chip_config_combo)
         _grid_vlayout.addWidget(self.inverted_rows_cbox)
         _grid_vlayout.addWidget(self.image_tracking_cbox)
         _grid_vlayout.addWidget(self.score_type_combo)
@@ -131,7 +137,7 @@ class StillCollectionPreviewBrick(BaseWidget):
 
         self.comp_table.cellClicked.connect(self.comp_cell_clicked)
         self.comp_table.cellEntered.connect(self.comp_cell_entered)
-        self.grid_properties_combo.activated.connect(self.grid_properties_combo_changed)
+        self.chip_config_combo.activated.connect(self.grid_properties_combo_changed)
         self.score_type_combo.activated.connect(self.score_type_changed)
         self.show_grid_dialog_button.clicked.connect(self.show_grid_dialog)
         self.hit_map_plot.mouseMovedSignal.connect(self.hit_map_mouse_moved)
@@ -175,8 +181,8 @@ class StillCollectionPreviewBrick(BaseWidget):
         self.grid_properties_combo.blockSignals(False)
 
         self.init_gui()
-        self.grid_graphics_base.init_item(self.current_grid_properties)
-        self.grid_graphics_overlay.init_item(self.current_grid_properties)
+        self.grid_graphics_base.init_item(self.current_chip_config)
+        self.grid_graphics_overlay.init_item(self.current_chip_config)
 
     def init_gui(self):
         """
@@ -185,61 +191,64 @@ class StillCollectionPreviewBrick(BaseWidget):
         """
         self.image_tracking_cbox.setChecked(True)
         self.inverted_rows_cbox.setChecked(
-            self.current_grid_properties["inverted_rows"]
+            self.current_chip_config["inverted_rows"]
         )
-        self.grid_table.setColumnCount(self.current_grid_properties["grid_num_col"])
-        self.grid_table.setRowCount(self.current_grid_properties["grid_num_row"])
+        self.grid_table.setColumnCount(self.current_chip_config["num_comp_h"])
+        self.grid_table.setRowCount(self.current_chip_config["num_comp_v"])
 
-        for col in range(self.current_grid_properties["grid_num_col"]):
+        for col in range(self.current_chip_config["num_comp_h"]):
             temp_header_item = QtImport.QTableWidgetItem("%d" % (col + 1))
             self.grid_table.setHorizontalHeaderItem(col, temp_header_item)
             self.grid_table.setColumnWidth(col, self["cell_size"])
 
-        for row in range(self.current_grid_properties["grid_num_row"]):
+        for row in range(self.current_chip_config["num_comp_v"]):
             temp_header_item = QtImport.QTableWidgetItem(chr(65 + row))
             self.grid_table.setVerticalHeaderItem(row, temp_header_item)
             self.grid_table.setRowHeight(row, self["cell_size"])
 
-        for col in range(self.current_grid_properties["grid_num_col"]):
-            for row in range(self.current_grid_properties["grid_num_row"]):
+        for col in range(self.current_chip_config["num_comp_h"]):
+            for row in range(self.current_chip_config["num_comp_v"]):
                 temp_item = QtImport.QTableWidgetItem()
                 self.grid_table.setItem(row, col, temp_item)
 
         table_width = (
-            self["cell_size"] * (self.current_grid_properties["grid_num_col"] + 1) + 4
+            self["cell_size"] * (self.current_chip_config["num_comp_h"] + 1) + 4
         )
         table_height = (
-            self["cell_size"] * (self.current_grid_properties["grid_num_row"] + 1) + 4
+            self["cell_size"] * (self.current_chip_config["num_comp_v"] + 1) + 4
         )
         self.grid_table.setFixedWidth(table_width)
         self.grid_table.setFixedHeight(table_height)
 
-        self.comp_table.setColumnCount(self.current_grid_properties["comp_num_col"])
-        self.comp_table.setRowCount(self.current_grid_properties["comp_num_row"])
+        self.comp_table.setColumnCount(self.current_chip_config["num_crystal_h"])
+        self.comp_table.setRowCount(self.current_chip_config["num_crystal_v"])
 
-        for col in range(self.current_grid_properties["comp_num_col"]):
+        for col in range(self.current_chip_config["num_crystal_h"]):
             temp_header_item = QtImport.QTableWidgetItem("%d" % (col + 1))
             self.comp_table.setHorizontalHeaderItem(col, temp_header_item)
             self.comp_table.setColumnWidth(col, self["cell_size"])
 
-        for row in range(self.current_grid_properties["comp_num_row"]):
+        for row in range(self.current_chip_config["num_crystal_v"]):
             temp_header_item = QtImport.QTableWidgetItem(chr(65 + row))
             self.comp_table.setVerticalHeaderItem(row, temp_header_item)
             self.comp_table.setRowHeight(row, self["cell_size"])
 
-        for col in range(self.current_grid_properties["comp_num_col"]):
-            for row in range(self.current_grid_properties["comp_num_row"]):
+        for col in range(self.current_chip_config["num_crystal_h"]):
+            for row in range(self.current_chip_config["num_crystal_v"]):
                 temp_item = QtImport.QTableWidgetItem()
                 self.comp_table.setItem(row, col, temp_item)
 
         table_width = (
-            self["cell_size"] * (self.current_grid_properties["comp_num_col"] + 1) + 7
+            self["cell_size"] * (self.current_chip_config["num_crystal_h"] + 1) + 7
         )
         table_height = (
-            self["cell_size"] * (self.current_grid_properties["comp_num_row"] + 1) + 7
+            self["cell_size"] * (self.current_chip_config["num_crystal_v"] + 1) + 7
         )
-        self.comp_table.setFixedWidth(table_width)
+        self.comp_table.setFixedWidth(table_width + 10)
         self.comp_table.setFixedHeight(table_height)
+
+        self.hit_map_plot.setFixedWidth(table_width)
+        self.hit_map_plot.setFixedHeight(200)
 
         for score_type in self.score_type_list:
             self.hit_map_plot.add_curve(
@@ -304,8 +313,8 @@ class StillCollectionPreviewBrick(BaseWidget):
         :return: None
         """
         if not self.grid_table_item_fixed and not self.image_tracking_cbox.isChecked():
-            self.info_dict["grid_cell"] = (
-                row * self.current_grid_properties["grid_num_row"] + col
+            self.info_dict["processing_grid_cell"] = (
+                row * self.current_chip_config["num_comp_v"] + col
             )
             self.grid_cell_label.setText(
                 "Current grid cell: %s%d" % (chr(65 + row), col + 1)
@@ -313,18 +322,18 @@ class StillCollectionPreviewBrick(BaseWidget):
             self.update_comp_table()
 
             if self.params_dict:
-                grid_cell = row * self.current_grid_properties["grid_num_row"] + col
+                grid_cell = row * self.current_chip_config["num_comp_v"] + col
 
                 start_index = (
                     grid_cell
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    * self.current_chip_config["num_crystal_v"]
+                    * self.current_chip_config["num_crystal_h"]
                     * self.params_dict["num_images_per_trigger"]
                 )
                 end_index = min(
                     start_index
-                    + self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    + self.current_chip_config["num_crystal_v"]
+                    * self.current_chip_config["num_crystal_h"]
                     * self.params_dict["num_images_per_trigger"],
                     self.results[self.score_type].size - 1,
                 )
@@ -366,10 +375,10 @@ class StillCollectionPreviewBrick(BaseWidget):
 
             if self.params_dict is not None:
                 start_index = (
-                    self.info_dict["grid_cell"]
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
-                    + row * self.current_grid_properties["comp_num_row"]
+                    self.info_dict["processing_grid_cell"]
+                    * self.current_chip_config["num_crystal_v"]
+                    * self.current_chip_config["num_crystal_h"]
+                    + row * self.current_chip_config["num_crystal_h"]
                     + col
                 ) * self.params_dict["num_images_per_trigger"]
                 end_index = min(
@@ -394,7 +403,8 @@ class StillCollectionPreviewBrick(BaseWidget):
                         self.hit_map_plot.set_x_axis_limits(
                             (start_index - 0.5, end_index + 0.5)
                         )
-                        self.hit_map_plot.adjust_axes(self.score_type)
+                        #self.hit_map_plot.adjust_axes(self.score_type)
+                        self.hit_map_plot.autoscale_axes()
 
                         index = start_index + np.argmax(
                             self.results[self.score_type][start_index:end_index]
@@ -420,8 +430,8 @@ class StillCollectionPreviewBrick(BaseWidget):
             HWR.beamline.online_processing.get_current_grid_properties()
         )
         self.init_gui()
-        self.grid_graphics_base.init_item(self.current_grid_properties)
-        self.grid_graphics_overlay.init_item(self.current_grid_properties)
+        self.grid_graphics_base.init_item(self.current_chip_config)
+        self.grid_graphics_overlay.init_item(self.current_chip_config)
 
     def score_type_changed(self, index):
         """
@@ -465,6 +475,8 @@ class StillCollectionPreviewBrick(BaseWidget):
         :param aligned_results: dict with multi dimensional numpy arrays
         :return: None
         """
+        self.image_tracking_cbox.setChecked(True)
+
         self.results = raw_results
         self.params_dict = params_dict
         self.hit_map_plot.set_x_axis_limits(
@@ -479,7 +491,9 @@ class StillCollectionPreviewBrick(BaseWidget):
         Updates grid view last time
         :return: None
         """
-        self.info_dict["comp_cell"] = -1
+        self.image_tracking_cbox.setChecked(False)
+
+        self.info_dict["processing_comp_cell"] = -1
         self.processing_frame_changed(self.params_dict["images_num"])
 
     def processing_failed(self):
@@ -495,7 +509,17 @@ class StillCollectionPreviewBrick(BaseWidget):
         :param frame_num: int
         :return: None
         """
-        self.frame_num = frame_num
+        self.processing_frame_num = frame_num
+        self.update_gui()
+        self.grid_graphics_view.scene().update()
+
+    def collect_frame_changed(self, frame_num):
+        """
+        Redraws grid view
+        :param frame_num: int
+        :return: None
+        """
+        self.collect_frame_num = frame_num
         self.update_gui()
         self.grid_graphics_view.scene().update()
 
@@ -507,32 +531,55 @@ class StillCollectionPreviewBrick(BaseWidget):
         if not self.image_tracking_cbox.isChecked():
             return
 
-        self.info_dict["frame_num"] = self.frame_num
-        self.info_dict["comp_num"] = (
-            self.frame_num / self.params_dict["num_images_per_trigger"]
+        self.info_dict["collect_comp_num"] = (
+            self.collect_frame_num / self.params_dict["num_images_per_trigger"]
+        )
+        self.info_dict["processing_comp_num"] = (
+            self.processing_frame_num / self.params_dict["num_images_per_trigger"]
         )
 
-        grid_cell = (
-            self.info_dict["comp_num"]
-            / self.current_grid_properties["comp_num_col"]
-            / self.current_grid_properties["comp_num_row"]
+        collect_grid_cell = (
+            self.info_dict["collect_comp_num"]
+            / self.current_chip_config["num_crystal_v"]
+            / self.current_chip_config["num_crystal_h"]
+        )
+        processing_grid_cell = (
+            self.info_dict["processing_comp_num"]
+            / self.current_chip_config["num_crystal_v"]
+            / self.current_chip_config["num_crystal_h"]
         )
 
-        if self.info_dict["grid_cell"] != grid_cell:
-            self.info_dict["grid_cell"] = grid_cell
-            self.info_dict["comp_cell"] = -1
+        if self.info_dict["collect_grid_cell"] != collect_grid_cell:
+            self.info_dict["collect_grid_cell"] = collect_grid_cell
+            self.info_dict["collect_comp_cell"] = -1
+
+        if self.info_dict["processing_grid_cell"] != processing_grid_cell:
+            self.info_dict["processing_grid_cell"] = processing_grid_cell
+            self.info_dict["processing_comp_cell"] = -1
             self.update_grid_table()
 
-        comp_cell = (
-            self.frame_num
-            - grid_cell
-            * self.current_grid_properties["comp_num_col"]
-            * self.current_grid_properties["comp_num_row"]
+        
+
+        collect_comp_cell = (
+            self.collect_frame_num
+            - collect_grid_cell
+            * self.current_chip_config["num_crystal_v"]
+            * self.current_chip_config["num_crystal_h"]
+            * self.params_dict["num_images_per_trigger"]
+        ) / self.params_dict["num_images_per_trigger"]        
+
+        processing_comp_cell = (
+            self.processing_frame_num
+            - processing_grid_cell
+            * self.current_chip_config["num_crystal_v"]
+            * self.current_chip_config["num_crystal_h"]
             * self.params_dict["num_images_per_trigger"]
         ) / self.params_dict["num_images_per_trigger"]
 
-        if self.info_dict["comp_cell"] != comp_cell:
-            self.info_dict["comp_cell"] = comp_cell
+        self.info_dict["collect_comp_cell"] = collect_comp_cell
+
+        if self.info_dict["processing_comp_cell"] != processing_comp_cell:
+            self.info_dict["processing_comp_cell"] = processing_comp_cell
             self.update_comp_table()
 
         self.update_stats()
@@ -545,28 +592,30 @@ class StillCollectionPreviewBrick(BaseWidget):
         if self.params_dict is None or not self.image_tracking_cbox.isChecked():
             return
 
-        for row in range(self.current_grid_properties["grid_num_row"]):
-            for col in range(self.current_grid_properties["grid_num_col"]):
+        for row in range(self.current_chip_config["num_comp_v"]):
+            for col in range(self.current_chip_config["num_comp_h"]):
                 grid_table_item = self.grid_table.item(row, col)
-                grid_cell = row * self.current_grid_properties["grid_num_row"] + col
+                grid_cell = row * self.current_chip_config["num_comp_v"] + col
 
                 start_index = (
                     grid_cell
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    * self.current_chip_config["num_crystal_v"]
+                    * self.current_chip_config["num_crystal_h"]
                     * self.params_dict["num_images_per_trigger"]
                 )
                 end_index = min(
                     start_index
-                    + self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    + self.current_chip_config["num_crystal_v"]
+                    * self.current_chip_config["num_crystal_h"]
                     * self.params_dict["num_images_per_trigger"],
                     self.results[self.score_type].size - 1,
                 )
 
                 color = Colors.LIGHT_GRAY
-                if grid_cell == self.info_dict["grid_cell"]:
+                if grid_cell == self.info_dict["processing_grid_cell"]:
                     color = Colors.DARK_GREEN
+                elif grid_cell == self.info_dict["collect_grid_cell"]:
+                    color = Colors.LIGHT_ORANGE
                 elif start_index < self.results[self.score_type].size:
                     if self.results[self.score_type][start_index:end_index].max() > 0:
                         color = Colors.LIGHT_BLUE
@@ -582,21 +631,21 @@ class StillCollectionPreviewBrick(BaseWidget):
         if self.params_dict is None or not self.image_tracking_cbox.isChecked():
             return
 
-        for row in range(self.current_grid_properties["comp_num_row"]):
-            for col in range(self.current_grid_properties["comp_num_col"]):
+        for row in range(self.current_chip_config["num_crystal_h"]):
+            for col in range(self.current_chip_config["num_crystal_v"]):
 
                 if self.inverted_rows_cbox.isChecked() and row % 2:
-                    table_col = self.current_grid_properties["comp_num_col"] - col - 1
+                    table_col = self.current_chip_config["num_crystal_v"] - col - 1
                 else:
                     table_col = col
 
                 comp_table_item = self.comp_table.item(row, table_col)
                 start_index = (
-                    self.info_dict["grid_cell"]
-                    * self.current_grid_properties["comp_num_col"]
-                    * self.current_grid_properties["comp_num_row"]
+                    self.info_dict["processing_grid_cell"]
+                    * self.current_chip_config["num_crystal_v"]
+                    * self.current_chip_config["num_crystal_h"]
                     * self.params_dict["num_images_per_trigger"]
-                    + (row * self.current_grid_properties["comp_num_row"] + col)
+                    + (row * self.current_chip_config["num_crystal_h"] + col)
                     * self.params_dict["num_images_per_trigger"]
                 )
 
@@ -606,8 +655,13 @@ class StillCollectionPreviewBrick(BaseWidget):
                 )
                 color = Colors.LIGHT_GRAY
                 if (
-                    self.info_dict["comp_cell"]
-                    == row * self.current_grid_properties["comp_num_row"] + col
+                    self.info_dict["collect_comp_cell"]
+                    == row * self.current_chip_config["num_crystal_h"] + col
+                ):
+                    color = Colors.LIGHT_ORANGE
+                elif (
+                    self.info_dict["processing_comp_cell"]
+                    == row * self.current_chip_config["num_crystal_h"] + col
                 ):
                     color = Colors.DARK_GREEN
                 elif start_index < self.results[self.score_type].size:
@@ -627,8 +681,9 @@ class StillCollectionPreviewBrick(BaseWidget):
                 comp_table_item.setBackground(color)
 
     def update_stats(self):
-        for key in self.results.keys():
-            print(key, self.results[key].min(), self.results[key].max())
+        return
+        #for key in self.results.keys():
+        #    print(key, self.results[key].min(), self.results[key].max())
 
 
 class GridViewGraphicsItem(QtImport.QGraphicsItem):
@@ -709,10 +764,10 @@ class GridViewGraphicsItem(QtImport.QGraphicsItem):
         """
         self.results = results
 
-        self.num_comp_x = params_dict["grid_num_col"]
-        self.num_comp_y = params_dict["grid_num_row"]
-        self.num_holes_x = params_dict["comp_num_row"]
-        self.num_holes_y = params_dict["comp_num_col"]
+        self.num_comp_x = params_dict["num_comp_h"]
+        self.num_comp_y = params_dict["num_comp_v"]
+        self.num_holes_x = params_dict["num_crystal_h"]
+        self.num_holes_y = params_dict["num_crystal_v"]
 
         self.size_hole = 2000 / (
             self.num_comp_x * (self.offset_comp + self.num_holes_x * self.offset_hole)

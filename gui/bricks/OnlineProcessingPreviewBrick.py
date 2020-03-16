@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+
 from gui.utils import queue_item, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
@@ -27,7 +28,8 @@ __license__ = "LGPLv3+"
 __category__ = "Task"
 
 
-class ParallelProcessingPreviewBrick(BaseWidget):
+class OnlineProcessingPreviewBrick(BaseWidget):
+
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -36,8 +38,6 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        # NBNB there is no longer a beamline_setup. If desired, replace
-        # self.add_property("beamline_setup", "string", "/beamline-setup")
 
         # Signals -------------------------------------------------------------
 
@@ -45,43 +45,49 @@ class ParallelProcessingPreviewBrick(BaseWidget):
         self.define_slot("populate_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.show_raw_results_cbox = QtImport.QCheckBox("Raw results", self)
-        self.show_aligned_results_cbox = QtImport.QCheckBox("Aligned results", self)
-        self.raw_results_widget = AdvancedResultsWidget(self, show_aligned_results=False)
-        self.aligned_results_widget = AdvancedResultsWidget(self, show_aligned_results=True)
+        self.tab_widget = QtImport.QTabWidget(self)
+        self.osc_results_widget = AdvancedResultsWidget(self.tab_widget)
+        self.mesh_results_widget = AdvancedResultsWidget(self.tab_widget)
+
+        self.tab_widget.addTab(self.osc_results_widget, "Osc")
+        self.tab_widget.addTab(self.mesh_results_widget, "Mesh")
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.raw_results_widget)
-        _main_vlayout.addWidget(self.aligned_results_widget)
+        _main_vlayout = QtImport.QHBoxLayout(self)
+        _main_vlayout.addWidget(self.tab_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.MinimumExpanding
-        )
 
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.raw_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
-        self.raw_results_widget.heat_map_widget._summary_gbox.setHidden(True)
-        self.aligned_results_widget.setHidden(True)
-        self.aligned_results_widget.heat_map_widget._heat_map_tools_widget.setHidden(True)
-        self.aligned_results_widget.heat_map_widget._summary_gbox.setHidden(True)
-
-        self.aligned_results_widget.heat_map_widget.setFixedWidth(1300)
-        self.raw_results_widget.heat_map_widget.setFixedWidth(1300)
+        self.osc_results_widget.hit_map_widget._hit_map_tools_widget.setHidden(True)
+        self.osc_results_widget.hit_map_widget._summary_gbox.setHidden(True)
+        self.mesh_results_widget.hit_map_widget._hit_map_tools_widget.setHidden(True)
+        self.mesh_results_widget.hit_map_widget._summary_gbox.setHidden(True)
 
     def populate_widget(self, item):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
-            self.results_widget.populate_widget(item, data_collection)
-            self.raw_results_widget.populate_widget(
+            self.osc_results_widget.populate_widget(
                 item, item.get_model().line_collection
             )
         else:
             data_collection = item.get_model()
-            self.raw_results_widget.populate_widget(item, data_collection)
-            self.aligned_results_widget.populate_widget(item, data_collection)
+            self.osc_results_widget.populate_widget(item)
+            self.mesh_results_widget.populate_widget(item)
+
+    def run(self):
+        self.osc_results_widget.hit_map_widget.set_plot_type("1D")
+        self.mesh_results_widget.hit_map_widget.set_plot_type("2D")
+        if self["fixedWidth"] > 0:
+            #self.results_widget._hit_map_gbox.setFixedWidth(self["fixedWidth"] - 2)
+            self.osc_results_widget.hit_map_widget._hit_map_plot.setFixedWidth(self["fixedWidth"] - 4)
+            self.mesh_results_widget.hit_map_widget._hit_map_plot.setFixedWidth(self["fixedWidth"] - 4)
+        if self["fixedHeight"] > 0:
+            self.osc_results_widget.hit_map_widget._hit_map_gbox.setFixedHeight(self["fixedHeight"] - 2)
+            self.osc_results_widget.hit_map_widget._hit_map_plot.setFixedHeight(self["fixedHeight"] - 40)
+            self.mesh_results_widget.hit_map_widget._hit_map_gbox.setFixedHeight(self["fixedHeight"] - 2)
+            self.mesh_results_widget.hit_map_widget._hit_map_plot.setFixedHeight(self["fixedHeight"] - 40)

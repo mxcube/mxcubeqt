@@ -111,13 +111,15 @@ class DataPathWidget(QtImport.QWidget):
 
         selected_dir = str(
             file_dialog.getExistingDirectory(
-                self, "Select a directory", self._base_image_dir
+                self, "Select a directory", str(self._base_image_dir), QtImport.QFileDialog.ShowDirsOnly
             )
         )
-        #selected_dir = os.path.dirname(selected_dir)
-
-        if selected_dir is not None and len(selected_dir) > 0:
-            self.set_directory(selected_dir)
+        if selected_dir is not None and len(selected_dir) > 0 and selected_dir.startswith(self._base_image_dir):
+             self.set_directory(selected_dir)
+        else:
+            msg = "Selected directory do not start " +\
+                  "with the base directory %s" % self._base_image_dir
+            logging.getLogger("GUI").error(msg) 
 
     def _prefix_ledit_change(self, new_value):
         cursor_pos = self.data_path_layout.prefix_ledit.cursorPosition()
@@ -270,6 +272,7 @@ class DataPathWidget(QtImport.QWidget):
         self._data_model = data_model
         self.set_data_path(data_model.get_image_path())
         self._data_model_pm.set_model(data_model)
+        self.data_path_layout.browse_button.setEnabled(os.path.exists(self._base_image_dir))
 
     def indicate_path_conflict(self, conflict):
         if conflict:

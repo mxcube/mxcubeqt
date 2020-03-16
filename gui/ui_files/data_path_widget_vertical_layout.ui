@@ -199,6 +199,9 @@
         </item>
         <item row="4" column="3">
          <widget class="QPushButton" name="browse_button">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>

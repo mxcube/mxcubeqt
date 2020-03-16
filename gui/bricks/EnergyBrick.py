@@ -138,8 +138,9 @@ class EnergyBrick(BaseWidget):
             )
 
             HWR.beamline.energy.update_values()
-            HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
-            if HWR.beamline.energy.isReady():
+            if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
+                HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
+            if HWR.beamline.energy.is_ready():
                 self.connected()
             else:
                 self.disconnected()
@@ -236,7 +237,7 @@ class EnergyBrick(BaseWidget):
 
     def set_new_value_limits(self):
         if self.units_combobox.currentIndex() == 0:
-            value_limits = HWR.beamline.energy.get_energy_limits()
+            value_limits = HWR.beamline.energy.get_limits()
             self.group_box.setTitle("Energy")
             self.new_value_ledit.setToolTip(
                 "Energy limits %.4f : %.4f keV" % (value_limits[0], value_limits[1])

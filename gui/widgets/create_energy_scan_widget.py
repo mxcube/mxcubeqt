@@ -24,6 +24,8 @@ from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
+from gui.widgets.comments_widget import CommentsWidget
+
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 
@@ -63,6 +65,8 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._max_transmission_ledit.setFixedWidth(80)
         self._max_transmission_ledit.setEnabled(False)
 
+        self._comments_widget = CommentsWidget(self)
+
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QtImport.QGridLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(self._adjust_transmission_cbox, 0, 0)
@@ -75,11 +79,13 @@ class CreateEnergyScanWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._periodic_table_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(_parameters_gbox)
+        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.setSpacing(6)
         _main_vlayout.addStretch(10)
 
         # SizePolicies --------------------------------------------------------
+        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         # self._periodic_table_widget.elementEdgeSelectedSignal.connect(\
@@ -131,6 +137,29 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.suffix = "raw"
         self._path_template.compression = False
 
+    def init_data_path_model(self):
+        # Initialize the path_template of the widget to default
+        # values read from the beamline setup
+        if self._data_path_widget:
+            self._data_path_widget.set_base_image_directory(
+                HWR.beamline.session.get_secondary_image_directory()
+            )
+            self._data_path_widget.set_base_process_directory(
+                HWR.beamline.session.get_base_process_directory()
+            )
+
+            (data_directory, proc_directory) = self.get_default_directory()
+            self._path_template = HWR.beamline.get_default_path_template()
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix()
+            self._path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
+                  self._path_template
+            )
+            self._path_template.compression = self._enable_compression
+        else:
+            self._path_template = queue_model_objects.PathTemplate()
+
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         escan_model = tree_item.get_model()
@@ -165,7 +194,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         data_collections = []
         selected_element, selected_edge = (
             self._periodic_table_widget.get_selected_element_edge()
@@ -174,12 +203,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if selected_element:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
+                cpos.snapshot_image = HWR.beamline.sample_view.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = HWR.beamline.microscope.get_scene_snapshot(shape)
+                    snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot

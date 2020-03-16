@@ -24,6 +24,8 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.processing_widget import ProcessingWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.create_task_base import CreateTaskBase
+from gui.widgets.comments_widget import CommentsWidget
+
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
@@ -70,16 +72,21 @@ class CreateDiscreteWidget(CreateTaskBase):
             self, data_model=self._processing_parameters
         )
 
+        self._comments_widget = CommentsWidget(self)
+        self._comments_widget.setHidden(True)
+
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
+        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
+        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
@@ -108,16 +115,6 @@ class CreateDiscreteWidget(CreateTaskBase):
 
     def set_tunable_energy(self, state):
         self._acq_widget.set_tunable_energy(state)
-
-    def update_processing_parameters(self, crystal):
-        self._processing_parameters.space_group = crystal.space_group
-        self._processing_parameters.cell_a = crystal.cell_a
-        self._processing_parameters.cell_alpha = crystal.cell_alpha
-        self._processing_parameters.cell_b = crystal.cell_b
-        self._processing_parameters.cell_beta = crystal.cell_beta
-        self._processing_parameters.cell_c = crystal.cell_c
-        self._processing_parameters.cell_gamma = crystal.cell_gamma
-        self._processing_widget.update_data_model(self._processing_parameters)
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -156,7 +153,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
                 if len(dc_model.acquisitions) == 1:
-                    self.select_shape_with_cpos(
+                    HWR.beamline.sample_view.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
@@ -171,7 +168,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         result = CreateTaskBase.approve_creation(self)
         return result
 
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         """
         Called by the owning widget (task_toolbox_widget) to create
         a collection. When a data collection group is selected.
@@ -182,12 +179,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.microscope.get_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.microscope.get_snapshot()
+            cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1
@@ -233,6 +230,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         data_collection = queue_model_objects.DataCollection(
             [acq], sample.crystals[0], processing_parameters
         )
+
         data_collection.set_name(acq.path_template.get_prefix())
         data_collection.set_number(acq.path_template.run_number)
         data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE

@@ -89,7 +89,6 @@ class ProposalBrick(BaseWidget):
         self.add_property("icons", "string", "")
         self.add_property("serverStartDelay", "integer", 500)
         self.add_property("dbConnection", "string")
-        self.add_property("session", "string", "/session")
 
         # Signals ------------------------------------------------------------
         self.define_signal("sessionSelected", ())

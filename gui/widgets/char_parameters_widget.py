@@ -413,13 +413,6 @@ class CharParametersWidget(QtImport.QWidget):
         else:
             self.opt_parameters_widget.setEnabled(False)
 
-    def tab_changed(self):
-        """
-        Descript. :
-        """
-        if self._tree_view_item:
-            self.populate_parameter_widget(self._tree_view_item)
-
     def set_enabled(self, state):
         """
         Descript. :

@@ -105,11 +105,7 @@ class BeamstopDistanceBrick(BaseWidget):
                     "beamstopDistanceChanged",
                     self.beamstop_distance_changed,
                 )
-                if self.beamstop_hwobj.isReady():
-                    self.connected()
-                    self.beamstop_hwobj.update_values()
-                else:
-                    self.disconnected()
+                self.beamstop_hwobj.update_values()
             else:
                 self.disconnected()
         else:

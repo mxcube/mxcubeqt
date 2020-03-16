@@ -47,7 +47,6 @@ class KappaPhiMotorsBrick(BaseWidget):
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
         self.add_property("label", "string", "")
         self.add_property("showStop", "boolean", True)
         self.add_property("defaultStep", "string", "10.0")
@@ -125,41 +124,12 @@ class KappaPhiMotorsBrick(BaseWidget):
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedSize(27, 27)
 
+        self.connect(HWR.beamline.diffractometer, "kappaMotorMoved", self.kappa_motor_moved)
+        self.connect(HWR.beamline.diffractometer, "kappaPhiMotorMoved", self.kappaphi_motor_moved)
+        self.connect(HWR.beamline.diffractometer, "minidiffStatusChanged", self.diffractometer_state_changed)
+
     def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if HWR.beamline.diffractometer is not None:
-                self.disconnect(
-                    HWR.beamline.diffractometer, "kappaMotorMoved", self.kappa_motor_moved
-                )
-                self.disconnect(
-                    HWR.beamline.diffractometer,
-                    "kappaPhiMotorMoved",
-                    self.kappaphi_motor_moved,
-                )
-                self.disconnect(
-                    HWR.beamline.diffractometer,
-                    "minidiffStatusChanged",
-                    self.diffractometer_state_changed,
-                )
-                self.connect(
-                    HWR.beamline.diffractometer,
-                    "kappaMotorMoved",
-                    self.kappa_motor_moved
-                )
-                self.connect(
-                    HWR.beamline.diffractometer,
-                    "kappaPhiMotorMoved",
-                    self.kappaphi_motor_moved,
-                )
-                self.connect(
-                    HWR.beamline.diffractometer,
-                    "minidiffStatusChanged",
-                    self.diffractometer_state_changed,
-                )
-                self.diffractometer_state_changed("Ready")
-            else:
-                self.setEnabled(False)
-        elif property_name == "showStop":
+        if property_name == "showStop":
             if new_value:
                 self.stop_button.show()
             else:

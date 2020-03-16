@@ -94,10 +94,6 @@ class AdvancedParametersWidget(QtImport.QWidget):
         model.set_name(path_template.get_prefix())
         self._tree_view_item.setText(0, model.get_name())
 
-    def tab_changed(self):
-        if self._tree_view_item:
-            self.populate_widget(self._tree_view_item, None)
-
     def populate_widget(self, tree_view_item, data_collection):
         self._tree_view_item = tree_view_item
         self._data_collection = data_collection

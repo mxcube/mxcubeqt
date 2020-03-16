@@ -20,8 +20,7 @@
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
-# from widgets.matplot_widget import TwoAxisPlotWidget
-from gui.widgets.pymca_plot_widget import PymcaPlotWidget
+from widgets.pyqtgraph_widget import PlotWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
@@ -53,11 +52,8 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.data_path_widget.data_path_layout.file_name_value_label.hide()
         self.snapshot_widget = SnapshotWidget(self)
 
-        self.scan_actual_plot_widget = PymcaPlotWidget(self, True)
-        self.scan_result_plot_widget = PymcaPlotWidget(self, False)
-        self.chooch_plot_widget = PymcaPlotWidget(self, False)
-        # self.scan_actual_plot_widget = TwoAxisPlotWidget(self, True)
-        # self.chooch_plot_widget = TwoAxisPlotWidget(self, False)
+        self.scan_plot_widget = PlotWidget(self)
+        self.chooch_plot_widget = PlotWidget(self)
 
         # Layout -------------------------------------------------------------
         _parameters_widget_layout = QtImport.QVBoxLayout()
@@ -78,8 +74,8 @@ class EnergyScanParametersWidget(QtImport.QWidget):
 
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
-        _main_vlayout.addWidget(self.scan_actual_plot_widget)
-        _main_vlayout.addWidget(self.scan_result_plot_widget)
+        _main_vlayout.addWidget(self.scan_plot_widget)
+        #_main_vlayout.addWidget(self.scan_result_plot_widget)
         _main_vlayout.addWidget(self.chooch_plot_widget)
         _main_vlayout.setSpacing(5)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -88,7 +84,7 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.setLayout(_main_vlayout)
 
         # SizePolicies --------------------------------------------------------
-        self.scan_actual_plot_widget.setSizePolicy(
+        self.scan_plot_widget.setSizePolicy(
             QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Expanding
         )
         self.chooch_plot_widget.setSizePolicy(
@@ -108,8 +104,8 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         )
 
         # Other ---------------------------------------------------------------
-        self.scan_actual_plot_widget.hide()
-        self.scan_result_plot_widget.hide()
+        self.scan_plot_widget.hide()
+        #self.scan_result_plot_widget.hide()
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
         if HWR.beamline.energy_scan is not None:
@@ -130,10 +126,6 @@ class EnergyScanParametersWidget(QtImport.QWidget):
             self.energy_scan_model.set_number(int(new_value))
             self._tree_view_item.setText(0, self.energy_scan_model.get_name())
 
-    def tab_changed(self):
-        if self._tree_view_item:
-            self.populate_widget(self._tree_view_item)
-
     def populate_widget(self, item):
         self._tree_view_item = item
         self.energy_scan_model = item.get_model()
@@ -142,13 +134,13 @@ class EnergyScanParametersWidget(QtImport.QWidget):
 
         self.data_path_widget.setDisabled(executed or is_running)
         self.periodic_table_widget.setDisabled(executed or is_running)
-        # self.scan_actual_plot_widget.setEnabled()
-        # self.scan_actual_plot_widget.setEnabled(not executed)
+        # self.scan_plot_widget.setEnabled()
+        # self.scan_plot_widget.setEnabled(not executed)
         # self.chooch_plot_widget.setEnabled(not executed)
 
         width = self.data_path_widget.width() + self.snapshot_widget.width()
-        self.scan_actual_plot_widget.setFixedWidth(width)
-        self.scan_result_plot_widget.setFixedWidth(width)
+        self.scan_plot_widget.setFixedWidth(width)
+        #self.scan_result_plot_widget.setFixedWidth(width)
         self.chooch_plot_widget.setFixedWidth(width)
 
         self.chooch_plot_widget.clear()
@@ -158,11 +150,11 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         )
 
         if executed:
-            self.scan_actual_plot_widget.hide()
-            self.scan_result_plot_widget.show()
+            self.scan_plot_widget.hide()
+            #self.scan_result_plot_widget.show()
 
             result = self.energy_scan_model.get_scan_result()
-            self.scan_result_plot_widget.plot_energy_scan_curve(result.data, title)
+            #self.scan_result_plot_widget.plot_energy_scan_curve(result.data, title)
 
             self.chooch_plot_widget.plot_energy_scan_results(
                 result.pk,
@@ -177,14 +169,6 @@ class EnergyScanParametersWidget(QtImport.QWidget):
                 result.chooch_graph_y2,
                 result.title,
             )
-        elif is_running:
-            self.scan_actual_plot_widget.show()
-            self.scan_result_plot_widget.hide()
-        else:
-            self.scan_actual_plot_widget.hide()
-            self.scan_result_plot_widget.show()
-            self.scan_result_plot_widget.clear()
-
         self.data_path_widget.update_data_model(self.energy_scan_model.path_template)
         self.periodic_table_widget.set_current_element_edge(
             self.energy_scan_model.element_symbol, self.energy_scan_model.edge
@@ -198,17 +182,14 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.energy_scan_model.edge = energy
 
     def energy_scan_started(self, scan_info):
-        self.scan_actual_plot_widget.clear()
-        self.scan_actual_plot_widget.show()
-        self.scan_result_plot_widget.clear()
-        self.scan_result_plot_widget.hide()
+        self.scan_plot_widget.clear()
         self.chooch_plot_widget.clear()
-        self.scan_actual_plot_widget.start_new_scan(scan_info)
+        self.scan_plot_widget.start_new_scan(scan_info)
         self.data_path_widget.setEnabled(False)
         self.periodic_table_widget.setEnabled(False)
 
     def energy_scan_new_point(self, x, y):
-        self.scan_actual_plot_widget.add_new_plot_value(x, y)
+        self.scan_plot_widget.add_new_plot_value(x, y)
 
     def chooch_finished(
         self,
@@ -237,4 +218,4 @@ class EnergyScanParametersWidget(QtImport.QWidget):
             chooch_graph_y2,
             title,
         )
-        self.scan_actual_plot_widget.plot_finished()
+        self.scan_plot_widget.plot_finished()

@@ -15,7 +15,7 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
@@ -60,12 +60,16 @@ class ImageTrackingStatusBrick(BaseWidget):
         self.filter_frames_cbox = QtImport.QCheckBox(
             "Filter frames based on Dozor score", _main_groupbox
         )
+        self.spot_list_cbox = QtImport.QCheckBox(
+            "Indicate spots in ADxV", _main_groupbox
+        )
 
         # Layout --------------------------------------------------------------
         _main_groupbox_vlayout = QtImport.QVBoxLayout(_main_groupbox)
         _main_groupbox_vlayout.addWidget(self.state_label)
         _main_groupbox_vlayout.addWidget(self.image_tracking_cbox)
         _main_groupbox_vlayout.addWidget(self.filter_frames_cbox)
+        _main_groupbox_vlayout.addWidget(self.spot_list_cbox)
         _main_groupbox_vlayout.setSpacing(2)
         _main_groupbox_vlayout.setContentsMargins(4, 4, 4, 4)
 
@@ -79,6 +83,7 @@ class ImageTrackingStatusBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
         self.image_tracking_cbox.toggled.connect(self.image_tracking_cbox_toggled)
         self.filter_frames_cbox.toggled.connect(self.filter_frames_cbox_toggled)
+        self.spot_list_cbox.toggled.connect(self.spot_list_cbox_toggled)
 
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(QtImport.Qt.AlignCenter)
@@ -105,12 +110,6 @@ class ImageTrackingStatusBrick(BaseWidget):
                 self.image_tracking_cbox.setChecked(
                     self.image_tracking_hwobj.is_tracking_enabled() == True
                 )
-                self.filter_frames_cbox.setEnabled(
-                    self.image_tracking_hwobj.is_tracking_enabled()
-                )
-                self.spot_list_cbox.setEnabled(
-                    self.image_tracking_hwobj.is_tracking_enabled()
-                )
                 self.image_tracking_cbox.blockSignals(False)
                 self.connect(
                     self.image_tracking_hwobj,
@@ -130,8 +129,6 @@ class ImageTrackingStatusBrick(BaseWidget):
 
     def image_tracking_cbox_toggled(self, state):
         self.image_tracking_hwobj.set_image_tracking_state(state)
-        self.filter_frames_cbox.setEnabled(state)
-        self.spot_list_cbox.setEnabled(state)
 
     def filter_frames_cbox_toggled(self, state):
         self.image_tracking_hwobj.set_filter_frames_state(state)
@@ -139,6 +136,10 @@ class ImageTrackingStatusBrick(BaseWidget):
     def image_tracking_state_changed(self, state_dict):
         self.image_tracking_cbox.setChecked(state_dict["image_tracking"])
         self.filter_frames_cbox.setChecked(state_dict["filter_frames"])
+        self.spot_list_cbox.setChecked(state_dict["spot_list"])
+
+    def spot_list_cbox_toggled(self, state):
+        self.image_tracking_hwobj.set_spot_list_enabled(state)
 
     def state_changed(self, state, state_label=None):
         color = None
@@ -147,6 +148,9 @@ class ImageTrackingStatusBrick(BaseWidget):
         except KeyError:
             state = "unknown"
             color = self.STATES[state]
+        # if color is None:
+        #    color = qt.QWidget.paletteBackgroundColor(self)
+
         if color:
             Colors.set_widget_color(self.state_label, color)
         if state_label is not None:
