@@ -141,9 +141,10 @@ class CreateEnergyScanWidget(CreateTaskBase):
         # Initialize the path_template of the widget to default
         # values read from the beamline setup
         if self._data_path_widget:
-            self._data_path_widget.set_base_image_directory(
-                HWR.beamline.session.get_secondary_image_directory()
-            )
+            if hasattr(HWR.beamline.session, 'get_secondary_image_directory'):
+                self._data_path_widget.set_base_image_directory(
+                    HWR.beamline.session.get_secondary_image_directory()
+                )
             self._data_path_widget.set_base_process_directory(
                 HWR.beamline.session.get_base_process_directory()
             )
