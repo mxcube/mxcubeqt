@@ -20,7 +20,7 @@
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.periodic_table_widget import PeriodicTableWidget
-from widgets.pyqtgraph_widget import PlotWidget
+from gui.widgets.pyqtgraph_widget import PlotWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
