@@ -533,7 +533,7 @@ class MotorSpinBoxBrick(BaseWidget):
     def set_motor(self, motor, motor_ho_name=None):
         if self.motor_hwobj is not None:
             self.disconnect(self.motor_hwobj, "limitsChanged", self.limits_changed)
-            self.disconnect(self.motor_hwobj, "positionChanged", self.position_changed)
+            self.disconnect(self.motor_hwobj, "valueChanged", self.position_changed)
             self.disconnect(self.motor_hwobj, "stateChanged", self.state_changed)
 
         if motor_ho_name is not None:
@@ -554,7 +554,7 @@ class MotorSpinBoxBrick(BaseWidget):
             self.connect(self.motor_hwobj, "limitsChanged", self.limits_changed)
             self.connect(
                 self.motor_hwobj,
-                "positionChanged",
+                "valueChanged",
                 self.position_changed,
                 instance_filter=True,
             )

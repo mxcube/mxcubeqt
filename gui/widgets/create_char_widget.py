@@ -315,7 +315,7 @@ class CreateCharWidget(CreateTaskBase):
         tasks.append(char)
         self._path_template.run_number += 1
 
-        if HWR.beamline.flux.get_flux() < 1e9:
+        if HWR.beamline.flux.get_value() < 1e9:
             logging.getLogger("GUI").error(
                 "No flux reading is available! "
                 + "Characterisation result may be wrong. "
