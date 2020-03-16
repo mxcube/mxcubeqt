@@ -242,8 +242,6 @@ class TreeBrick(BaseWidget):
             logging.getLogger("GUI").debug(
                 "TreeBrick: plate manipulator hwobj not defined."
             )
-        print("**********", HWR.beamline)
-        print("**********", HWR.beamline.sample_view)
         self.connect(
             HWR.beamline.sample_view, "shapeCreated", self.dc_tree_widget.shape_created
         )
