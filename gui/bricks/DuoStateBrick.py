@@ -555,13 +555,13 @@ class WrapperHO(QtImport.QObject):
 
     # Procedure HO methods
     def init_procedure(self):
-        cmds = self.dev.get_commands()
+        cmds = self.dev.getCommands()
 
         self.set_in_cmd = None
         self.set_out_cmd = None
 
         try:
-            channel = self.dev.get_channel_object("dev_state")
+            channel = self.dev.getChannelObject("dev_state")
         except KeyError:
             channel = None
         self.stateChannel = channel
