@@ -34,7 +34,7 @@ except ImportError:
 from gui import set_splash_screen
 from gui import Configuration, GUIBuilder
 from gui.utils import GUIDisplay, Icons, Colors, QtImport
-from gui.BaseComponents import BaseWidget
+from gui.BaseComponents import BaseWidget, NullBrick
 
 from HardwareRepository import HardwareRepository as HWR
 
@@ -247,7 +247,7 @@ class GUISupervisor(QtImport.QWidget):
                         if gui_config_file.endswith(".json"):
                             raw_config = json.load(gui_file)
                         elif gui_config_file.endswith(".yml"):
-                            raw_config = yaml.load(gui_file)
+                            raw_config = yaml.safe_load(gui_file)
                         else:
                             raw_config = eval(gui_file.read())
                     except BaseException:
@@ -416,7 +416,8 @@ class GUISupervisor(QtImport.QWidget):
                                         + "in receiver %s" % _receiver
                                     )
                                 else:
-                                    getattr(sender, connection["signal"]).connect(slot)
+                                    if not isinstance(sender, NullBrick):
+                                        getattr(sender, connection["signal"]).connect(slot)
                                     # sender.connect(sender,
                                     #    QtCore.SIGNAL(connection["signal"]),
                                     #    slot)

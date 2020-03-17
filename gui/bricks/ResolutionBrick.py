@@ -385,7 +385,7 @@ class ResolutionBrick(BaseWidget):
         detector_distance = HWR.beamline.detector.distance
         if detector_distance is not None:
             if state:
-                color = ResolutionBrick.STATE_COLORS[state]
+                color = ResolutionBrick.STATE_COLORS[state.value]
             else:
                 color = Colors.LIGHT_RED
 
@@ -411,7 +411,7 @@ class ResolutionBrick(BaseWidget):
             return
 
         detector_distance = HWR.beamline.detector.distance
-        color = ResolutionBrick.STATE_COLORS[state]
+        color = ResolutionBrick.STATE_COLORS[state.value]
         unit = self.units_combobox.currentText()
         if unit == "mm":
             if state == detector_distance.motor_states.READY:

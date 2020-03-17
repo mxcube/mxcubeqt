@@ -117,7 +117,7 @@ class ShutterBrick(BaseWidget):
 
     def state_changed(self, shutter_state):
         """Based on the shutter state enables/disables open and close buttons"""
-        self.state_label.setText(str(shutter_state.capitalize()))
+        self.state_label.setText(str(shutter_state.name.capitalize()))
         if shutter_state in ("UNKOWN", "AUTOMATIC", "DISABLED"):
             Colors.set_widget_color(self.state_label, Colors.LIGHT_GRAY)
         elif shutter_state in ("FAULT", "ERROR"):
