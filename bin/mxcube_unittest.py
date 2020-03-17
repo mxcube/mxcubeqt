@@ -64,7 +64,7 @@ class TestMethods(unittest.TestCase):
                       "Transmission hwobj | getAttFactor() returns float")
 
     def test_get_limits(self):
-        self.assertIsInstance(unittest_hwobj.energy_hwobj.get_energy_limits(),
+        self.assertIsInstance(unittest_hwobj.energy_hwobj.get_limits(),
                               list,
                               "Energy hwobj | get_energy_limits() returns list with two floats")
 
