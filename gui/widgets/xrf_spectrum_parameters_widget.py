@@ -131,10 +131,6 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         if str(new_value).isdigit():
             self.xrf_spectrum_model.set_count_time(float(new_value))
 
-    def tab_changed(self):
-        if self._tree_view_item:
-            self.populate_widget(self._tree_view_item)
-
     def populate_widget(self, item):
         self._tree_view_item = item
         self.xrf_spectrum_model = item.get_model()

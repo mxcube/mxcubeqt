@@ -19,10 +19,10 @@
 
 from gui.utils import Icons, QtImport
 
-if hasattr(QtImport, "QWebView"):
-    QWEBVIEW_AVAILABLE = True
-else:
-    QWEBVIEW_AVAILABLE = False
+#if hasattr(QtImport, "QWebView"):
+#    QWEBVIEW_AVAILABLE = True
+#else:
+QWEBVIEW_AVAILABLE = False
 
 
 class WebViewWidget(QtImport.QWidget):
@@ -43,11 +43,11 @@ class WebViewWidget(QtImport.QWidget):
         self.back_button.setIcon(Icons.load_icon("Left2"))
         self.forward_button.setIcon(Icons.load_icon("Right2"))
 
-        if QWEBVIEW_AVAILABLE:
-            self.web_page_viewer = QtImport.QWebView(self)
-            self.web_page_viewer.settings().setObjectCacheCapacities(0, 0, 0)
-        else:
-            self.web_page_viewer = QtImport.QTextBrowser(self)
+        #if QWEBVIEW_AVAILABLE:
+        #    self.web_page_viewer = QtImport.QWebView(self)
+        #    self.web_page_viewer.settings().setObjectCacheCapacities(0, 0, 0)
+        #else:
+        self.web_page_viewer = QtImport.QTextBrowser(self)
 
         _navigation_bar_hlayout = QtImport.QHBoxLayout(self.navigation_bar)
         _navigation_bar_hlayout.addWidget(self.home_button)
@@ -72,10 +72,12 @@ class WebViewWidget(QtImport.QWidget):
         self.forward_button.clicked.connect(self.go_forward)
 
     def set_url(self, url):
-        if QWEBVIEW_AVAILABLE:
-            self.home_url = url
-            self.navigation_bar.setEnabled(True)
-            self.go_to_home_page()
+        #if QWEBVIEW_AVAILABLE:
+        #    self.home_url = url
+        #    self.navigation_bar.setEnabled(True)
+        #    self.go_to_home_page()
+        #else:
+        self.web_page_viewer.setSource(QtImport.QUrl(url))
 
     def set_static_page(self, html_text):
         if QWEBVIEW_AVAILABLE:

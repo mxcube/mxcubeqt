@@ -20,7 +20,7 @@
 import os
 
 from gui.utils import Icons, QtImport
-from gui.widgets.matplot_widget import TwoDimenisonalPlotWidget
+from gui.widgets.matplot_widget import PlotWidget
 
 from HardwareRepository import HardwareRepository as HWR
 
@@ -66,7 +66,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.accept_centering_button = QtImport.QPushButton(
             Icons.load_icon("ThumbUp"), "Save", tools_widget
         )
-        self.histogram_plot = TwoDimenisonalPlotWidget(self)
+        self.histogram_plot = PlotWidget(self)
 
         self.popup_menu = QtImport.QMenu(self)
         self.popup_menu.menuAction().setIconVisibleInMenu(True)
@@ -368,4 +368,4 @@ def start_n_centering_clicked():
     HWR.beamline.imaging.start_n_centering()
 
 def accept_centering_clicked():
-    HWR.beamline.microscope.accept_centring()
+    HWR.beamline.sample_view.accept_centring()

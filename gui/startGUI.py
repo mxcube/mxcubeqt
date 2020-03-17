@@ -351,6 +351,7 @@ def run(gui_config_file=None):
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
     # logging.getLogger().info("\n\n\n\n")
+    logging.getLogger("HWR").info("Starting to load gui...")
     logging.getLogger("HWR").info("GUI file: %s" % (gui_config_file or "unnamed"))
     if len(log_file) > 0:
         logging.getLogger("HWR").info("Log file: %s" % log_file)

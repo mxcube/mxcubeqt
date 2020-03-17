@@ -71,7 +71,7 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.connect(HWR.beamline.microscope,
+        self.connect(HWR.beamline.sample_view,
                      "gridClicked",
                      self.grid_clicked
         )
@@ -94,7 +94,7 @@ class AdvancedBrick(BaseWidget):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             self._data_collection = item.get_model().reference_image_collection
             self.parameters_widget.populate_widget(item, self._data_collection)
-            self.results_widget.populate_widget(item, self._data_collection)
+            self.results_widget.populate_widget(item)
 
             self.line_parameters_widget.populate_widget(
                 item, item.get_model().line_collection
@@ -105,7 +105,7 @@ class AdvancedBrick(BaseWidget):
         else:
             self._data_collection = item.get_model()
             self.parameters_widget.populate_widget(item, self._data_collection)
-            self.results_widget.populate_widget(item, self._data_collection)
+            self.results_widget.populate_widget(item)
 
         self.line_parameters_widget.setEnabled(
             isinstance(item, queue_item.XrayCenteringQueueItem)

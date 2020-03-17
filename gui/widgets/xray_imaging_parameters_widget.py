@@ -63,8 +63,8 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         self._parameters_widget.remove_button.pressed.connect(self.remove_distance_pressed)
 
         # Other ---------------------------------------------------------------
-        self.detector_distance_validator = QtImport.QIntValidator(
-            0, 99999, self._parameters_widget.detector_distance_ledit
+        self.detector_distance_validator = QtImport.QDoubleValidator(
+            0, 99999, 2, self._parameters_widget.detector_distance_ledit
         )
 
         self._xray_imaging_mib.bind_value_update(
@@ -115,7 +115,7 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         self._xray_imaging_mib.bind_value_update(
             "detector_distance",
             self._parameters_widget.detector_distance_ledit,
-            int,
+            float,
             self.detector_distance_validator,
         )
 

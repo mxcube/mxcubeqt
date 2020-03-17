@@ -392,7 +392,10 @@ class MotorSpinBoxBrick(BaseWidget):
 
     def set_position_spinbox_color(self, state):
         """Changes color of the spinbox based on the state"""
-        color = MotorSpinBoxBrick.STATE_COLORS[state]
+        if state in MotorSpinBoxBrick.STATE_COLORS:
+            color = MotorSpinBoxBrick.STATE_COLORS[state]
+        else:
+            color = Colors.DARK_GRAY
         Colors.set_widget_color(
             self.position_spinbox.lineEdit(), color, QtImport.QPalette.Base
         )

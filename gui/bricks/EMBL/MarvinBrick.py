@@ -28,6 +28,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "EMBL"
 
+PUCK_COUNT = 19
 
 class MarvinBrick(BaseWidget):
     """
@@ -59,20 +60,18 @@ class MarvinBrick(BaseWidget):
 
         self.puck_switches_gbox = QtImport.QGroupBox("Puck switches", self)
         self.puck_switches_table = QtImport.QTableWidget(self.puck_switches_gbox)
-        self.central_puck_ledit = QtImport.QLineEdit(
-            "No center puck", self.puck_switches_gbox
-        )
+        self.central_puck_ledit = QtImport.QLineEdit("No center puck",
+                                                     self.puck_switches_gbox)
 
         self.control_gbox = QtImport.QGroupBox("Control", self)
         self.open_lid_button = QtImport.QPushButton("Open lid", self.control_gbox)
         self.close_lid_button = QtImport.QPushButton("Close lid", self.control_gbox)
-        self.base_to_center_button = QtImport.QPushButton(
-            "Base to center", self.control_gbox
-        )
-        self.center_to_base_button = QtImport.QPushButton(
-            "Center to base", self.control_gbox
-        )
-        self.dry_gripper_button = QtImport.QPushButton("Dry gripper", self.control_gbox)
+        self.base_to_center_button = QtImport.QPushButton("Base to center",
+                                                          self.control_gbox)
+        self.center_to_base_button = QtImport.QPushButton("Center to base",
+                                                          self.control_gbox)
+        self.dry_gripper_button = QtImport.QPushButton("Dry gripper",
+                                                       self.control_gbox)
 
         self.status_list_gbox = QtImport.QGroupBox("Status list", self)
         self.status_table = QtImport.QTableWidget(self)
@@ -138,15 +137,15 @@ class MarvinBrick(BaseWidget):
         self.focus_mode_ledit.setFixedWidth(80)
 
         self.puck_switches_table.setRowCount(1)
-        self.puck_switches_table.setColumnCount(17)
+        self.puck_switches_table.setColumnCount(PUCK_COUNT)
         self.puck_switches_table.verticalHeader().hide()
         self.puck_switches_table.horizontalHeader().hide()
         self.puck_switches_table.setRowHeight(0, 28)
         self.puck_switches_table.setFixedHeight(28)
         self.puck_switches_table.setShowGrid(True)
-        self.puck_switches_table.setFixedWidth(33 * 17 + 4)
+        self.puck_switches_table.setFixedWidth(33 * PUCK_COUNT + 4)
 
-        for col_index in range(17):
+        for col_index in range(PUCK_COUNT):
             temp_item = QtImport.QTableWidgetItem(str(col_index + 1))
             temp_item.setFlags(QtImport.Qt.ItemIsEnabled)
             temp_item.setBackground(Colors.WHITE)
@@ -225,7 +224,9 @@ class MarvinBrick(BaseWidget):
             self.focus_mode_ledit.setText(info_dict.get("focus_mode"))
 
         for index in range(self.puck_switches_table.columnCount()):
-            self.puck_switches_table.item(0, index).setBackground(Colors.LIGHT_GRAY)
+            self.puck_switches_table.item(0, index).setBackground(
+                Colors.LIGHT_GRAY
+            )
             if info_dict.get("puck_switches", 0) & pow(2, index) > 0:
                 self.puck_switches_table.item(0, index).setBackground(
                     Colors.LIGHT_GREEN
@@ -267,14 +268,12 @@ class MarvinBrick(BaseWidget):
         self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
         self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
-
 def open_lid_clicked():
     """
     Opens SC lid
     :return:
     """
     HWR.beamline.sample_changer.open_lid()
-
 
 def close_lid_clicked():
     """
@@ -283,7 +282,6 @@ def close_lid_clicked():
     """
     HWR.beamline.sample_changer.close_lid()
 
-
 def base_to_center_clicked():
     """
     Calls base-to-center function
@@ -291,14 +289,12 @@ def base_to_center_clicked():
     """
     HWR.beamline.sample_changer.base_to_center()
 
-
 def center_to_base_clicked():
     """
     Calls center-to-base function
     :return:
     """
     HWR.beamline.sample_changer.center_to_base()
-
 
 def dry_gripper_clicked():
     """

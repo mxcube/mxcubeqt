@@ -391,6 +391,9 @@
         </item>
         <item row="2" column="4">
          <widget class="QLineEdit" name="exp_time_total_ledit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>50</width>
@@ -403,9 +406,6 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
          </widget>
         </item>
         <item row="2" column="3">
@@ -415,6 +415,29 @@
           </property>
           <property name="text">
            <string>Total exp. time (s):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="hare_num_label">
+          <property name="text">
+           <string>HARE number:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLineEdit" name="hare_num_ledit">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>16777215</height>
+           </size>
           </property>
          </widget>
         </item>

@@ -25,13 +25,14 @@ from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget_simple import AcquisitionWidgetSimple
+from gui.widgets.comments_widget import CommentsWidget
+
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )
 from HardwareRepository.HardwareObjects.queue_model_enumerables import XTAL_SPACEGROUPS
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-from HardwareRepository.HardwareObjects.abstract import AbstractDataAnalysis
 
 from HardwareRepository import HardwareRepository as HWR
 
@@ -41,6 +42,7 @@ __license__ = "LGPLv3+"
 
 
 class CreateCharWidget(CreateTaskBase):
+
     def __init__(self, parent=None, name=None, fl=0):
 
         CreateTaskBase.__init__(self, parent, name, fl, "Characterisation")
@@ -76,17 +78,21 @@ class CreateCharWidget(CreateTaskBase):
             "characterise_simple_widget_vertical_layout.ui"
         )
 
+        self._comments_widget = CommentsWidget(self)
+
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
+        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.setSpacing(6)
         _main_vlayout.addStretch(0)
 
         # SizePolicies --------------------------------------------------------
+        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.pathTemplateChangedSignal.connect(
@@ -97,8 +103,6 @@ class CreateCharWidget(CreateTaskBase):
         self._vertical_dimension_widget.space_group_ledit.activated.connect(
             self._space_group_change
         )
-        # self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
-        #             self.use_induced_burn)
 
         self._char_widget.characterisation_gbox.toggled.connect(
             self.characterisation_gbox_toggled
@@ -109,49 +113,46 @@ class CreateCharWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
-        self._char_params_mib.bind_value_update(
-            "opt_sad", self._char_widget.optimised_sad_cbx, bool, None
-        )
+        if False:
+            self._char_params_mib.bind_value_update(
+                "opt_sad", self._char_widget.optimised_sad_cbx, bool, None
+            )
 
-        self._char_params_mib.bind_value_update(
-            "account_rad_damage", self._char_widget.account_rad_dmg_cbx, bool, None
-        )
+            self._char_params_mib.bind_value_update(
+                "account_rad_damage", self._char_widget.account_rad_dmg_cbx, bool, None
+            )
 
-        # self._char_params_mib.bind_value_update('determine_rad_params',
-        #                                        induced_burn_cbx,
-        #                                        bool, None)
+            self._char_params_mib.bind_value_update(
+                "strategy_complexity", self._char_widget.start_comp_cbox, int, None
+            )
 
-        self._char_params_mib.bind_value_update(
-            "strategy_complexity", self._char_widget.start_comp_cbox, int, None
-        )
+            self._char_params_mib.bind_value_update(
+                "max_crystal_vdim",
+                self._vertical_dimension_widget.max_vdim_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
-        self._char_params_mib.bind_value_update(
-            "max_crystal_vdim",
-            self._vertical_dimension_widget.max_vdim_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
+            self._char_params_mib.bind_value_update(
+                "min_crystal_vdim",
+                self._vertical_dimension_widget.min_vdim_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
-        self._char_params_mib.bind_value_update(
-            "min_crystal_vdim",
-            self._vertical_dimension_widget.min_vdim_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
+            self._char_params_mib.bind_value_update(
+                "min_crystal_vphi",
+                self._vertical_dimension_widget.min_vphi_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
-        self._char_params_mib.bind_value_update(
-            "min_crystal_vphi",
-            self._vertical_dimension_widget.min_vphi_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
-
-        self._char_params_mib.bind_value_update(
-            "max_crystal_vphi",
-            self._vertical_dimension_widget.max_vphi_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
+            self._char_params_mib.bind_value_update(
+                "max_crystal_vphi",
+                self._vertical_dimension_widget.max_vphi_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 
@@ -178,45 +179,40 @@ class CreateCharWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
-        self._init_models()
 
-    def _init_models(self):
-        self._char = queue_model_objects.Characterisation()
-        self._char_params = self._char.characterisation_parameters
-        self._processing_parameters = queue_model_objects.ProcessingParameters()
-        self._set_space_group(self._processing_parameters.space_group)
+        if True:
+            self._char = queue_model_objects.Characterisation()
+            self._char_params = self._char.characterisation_parameters
+            self._processing_parameters = queue_model_objects.ProcessingParameters()
+            self._set_space_group(self._processing_parameters.space_group)
 
-        self._acquisition_parameters = (
-            HWR.beamline.get_default_acquisition_parameters("characterisation")
-        )
-
-        self._char_params = (
-            AbstractDataAnalysis.get_default_characterisation_parameters(
-                HWR.beamline.data_analysis.edna_default_file
+            self._acquisition_parameters = (
+                HWR.beamline.get_default_acquisition_parameters("characterisation")
             )
-        )
-        self._path_template.reference_image_prefix = "ref"
-        # The num images drop down default value is 1
-        # we would like it to be 2
-        self._acquisition_parameters.num_images = 2
-        self._char.characterisation_software = (
-            queue_model_enumerables.COLLECTION_ORIGIN.EDNA
-        )
-        self._path_template.num_files = 2
-        self._path_template.compression = False
-        self._acquisition_parameters.shutterless = False
+ 
+            self._char_params = (
+                HWR.beamline.characterisation.get_default_characterisation_parameters()
+            )
+            self._path_template.reference_image_prefix = "ref"
+            # The num images drop down default value is 1
+            # we would like it to be 2
+            self._acquisition_parameters.num_images = 2
+            self._char.characterisation_software = (
+                queue_model_enumerables.COLLECTION_ORIGIN.EDNA
+            )
+            self._path_template.num_files = 2
+            self._path_template.compression = False
+            self._acquisition_parameters.shutterless = False
+        else:
+            self.setDisabled(True)
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            # self._init_models()
             if self._char_params.space_group == "":
                 sample_model = tree_item.get_model()
                 self._set_space_group(sample_model.processing_parameters.space_group)
-            # self._acq_widget.update_data_model(self._acquisition_parameters,
-            #                                   self._path_template)
-            # self._char_params_mib.set_model(self._char_params)
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
@@ -247,7 +243,7 @@ class CreateCharWidget(CreateTaskBase):
             # self.get_acquisition_widget().use_osc_start(True)
 
             if len(data_collection.acquisitions) == 1:
-                self.select_shape_with_cpos(
+                HWR.beamline.sample_view.select_shape_with_cpos(
                     self._acquisition_parameters.centred_position
                 )
 
@@ -267,7 +263,7 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = HWR.beamline.microscope.get_selected_shapes()
+        selected_shapes = HWR.beamline.sample_view.get_selected_shapes()
 
         for shape in selected_shapes:
             if isinstance(shape, GraphicsItemPoint):
@@ -276,16 +272,16 @@ class CreateCharWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         tasks = []
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.microscope.get_scene_snapshot()
+            cpos.snapshot_image = HWR.beamline.sample_view.get_scene_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = HWR.beamline.microscope.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 

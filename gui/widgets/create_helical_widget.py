@@ -25,6 +25,7 @@ from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.processing_widget import ProcessingWidget
+from gui.widgets.comments_widget import CommentsWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
@@ -72,17 +73,21 @@ class CreateHelicalWidget(CreateTaskBase):
             self, data_model=self._processing_parameters
         )
 
+        self._comments_widget = CommentsWidget(self) 
+
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
+        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
+        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._lines_widget.lines_treewidget.itemSelectionChanged.connect(
@@ -123,13 +128,16 @@ class CreateHelicalWidget(CreateTaskBase):
         )
         self.enable_widgets(False)
 
-        shapes = HWR.beamline.microscope.get_shapes()
+        shapes = HWR.beamline.sample_view.get_shapes()
         for shape in shapes:
             if isinstance(shape, GraphicsItemLine):
                 self.shape_created(shape, "Line")
-        HWR.beamline.microscope.connect("shapeCreated", self.shape_created)
-        HWR.beamline.microscope.connect("shapeChanged", self.shape_changed)
-        HWR.beamline.microscope.connect("shapeDeleted", self.shape_deleted)
+
+        HWR.beamline.sample_view.connect("shapeCreated", self.shape_created)
+        HWR.beamline.sample_view.connect("shapeChanged", self.shape_changed)
+        HWR.beamline.sample_view.connect("shapeDeleted", self.shape_deleted)
+
+        self._comments_widget.setHidden(True)
 
     def enable_widgets(self, state):
         self._acq_widget.setEnabled(state)
@@ -184,16 +192,6 @@ class CreateHelicalWidget(CreateTaskBase):
         else:
             return base_result
 
-    def update_processing_parameters(self, crystal):
-        self._processing_parameters.space_group = crystal.space_group
-        self._processing_parameters.cell_a = crystal.cell_a
-        self._processing_parameters.cell_alpha = crystal.cell_alpha
-        self._processing_parameters.cell_b = crystal.cell_b
-        self._processing_parameters.cell_beta = crystal.cell_beta
-        self._processing_parameters.cell_c = crystal.cell_c
-        self._processing_parameters.cell_gamma = crystal.cell_gamma
-        self._processing_widget.update_data_model(self._processing_parameters)
-
     def select_line_with_cpos(self, start_cpos, end_cpos, num_images):
         """Selects graphical line which contains two cpositions
            Adds number of frames next to the graphical line
@@ -201,15 +199,15 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_widget.overlay_slider.setEnabled(False)
         self._lines_widget.overlay_cbox.setEnabled(False)
 
-        HWR.beamline.microscope.de_select_all()
-        for shape in HWR.beamline.microscope.get_shapes():
+        HWR.beamline.sample_view.de_select_all()
+        for shape in HWR.beamline.sample_view.get_shapes():
             if isinstance(shape, GraphicsItemLine):
                 (start_cpos_index, end_cpos_index) = shape.get_points_index()
                 if (
                     start_cpos_index == start_cpos.index
                     and end_cpos_index == end_cpos.index
                 ):
-                    HWR.beamline.microscope.select_shape(shape)
+                    HWR.beamline.sample_view.select_shape(shape)
                     shape.set_num_images(num_images)
 
                     self._lines_widget.overlay_slider.setEnabled(True)
@@ -272,11 +270,11 @@ class CreateHelicalWidget(CreateTaskBase):
                 self._acquisition_parameters, self._path_template
             )
 
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         data_collections = []
 
         for shape in self.get_selected_shapes():
-            snapshot = HWR.beamline.microscope.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
 
             # Acquisition for start position
             start_acq = self._create_acq(sample)
@@ -297,7 +295,6 @@ class CreateHelicalWidget(CreateTaskBase):
                 end_graphical_point.get_centred_position()
             )
             end_acq.acquisition_parameters.centred_position.snapshot_image = snapshot
-
             end_acq.path_template.suffix = HWR.beamline.session.suffix
 
             processing_parameters = copy.deepcopy(self._processing_parameters)
@@ -335,14 +332,14 @@ class CreateHelicalWidget(CreateTaskBase):
         )
 
         for shape, list_item in self._lines_map.items():
-            HWR.beamline.microscope.select_shape(shape, list_item.isSelected())
+            HWR.beamline.sample_view.select_shape(shape, list_item.isSelected())
         self._acq_widget.emit_acq_parameters_changed()
 
     def create_line_button_clicked(self):
-        HWR.beamline.microscope.create_line()
+        HWR.beamline.sample_view.create_line()
 
     def create_auto_line_button_clicked(self):
-        HWR.beamline.microscope.create_auto_line()
+        HWR.beamline.sample_view.create_auto_line()
 
     def remove_line_button_clicked(self):
         line_to_delete = None
@@ -351,7 +348,7 @@ class CreateHelicalWidget(CreateTaskBase):
                 line_to_delete = line
                 break
         if line_to_delete:
-            HWR.beamline.microscope.delete_shape(line_to_delete)
+            HWR.beamline.sample_view.delete_shape(line_to_delete)
         self.lines_treewidget_selection_changed()
 
     def get_selected_shapes(self):
@@ -362,7 +359,7 @@ class CreateHelicalWidget(CreateTaskBase):
         return selected_lines
 
     def overlay_toggled(self, state):
-        HWR.beamline.microscope.set_display_overlay(state)
+        HWR.beamline.sample_view.set_display_overlay(state)
 
     def overlay_alpha_changed(self, alpha_value):
         for line, treewidget_item in self._lines_map.items():
@@ -372,4 +369,4 @@ class CreateHelicalWidget(CreateTaskBase):
     def swap_points_clicked(self):
         for line, treewidget_item in self._lines_map.items():
             if treewidget_item.isSelected():
-                HWR.beamline.microscope.swap_line_points(line)
+                HWR.beamline.sample_view.swap_line_points(line)
