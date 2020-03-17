@@ -66,6 +66,8 @@ class TreeBrick(BaseWidget):
     set_sample = QtImport.pyqtSignal(object)
     get_tree_brick = QtImport.pyqtSignal(BaseWidget)
     diffractometer_ready = QtImport.pyqtSignal(bool)
+    sample_mount_started = QtImport.pyqtSignal()
+    sample_mount_finished = QtImport.pyqtSignal()
 
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
@@ -135,6 +137,8 @@ class TreeBrick(BaseWidget):
         self.define_signal("set_prefix", ())
         self.define_signal("set_sample", ())
         self.define_signal("get_tree_brick", ())
+        self.define_signal("sample_mount_started", ())
+        self.define_signal("sample_mount_finished", ())
 
         # Slots ---------------------------------------------------------------
         self.define_slot("logged_in", ())
@@ -199,6 +203,7 @@ class TreeBrick(BaseWidget):
         # Other ---------------------------------------------------------------
         self.enable_collect(True)
         self.sample_changer_widget.synch_ispyb_button.setEnabled(False)
+        #self.setSizePolicy(QtImport.QSizePolicy.Maximum, QtImport.QSizePolicy.Expanding)
 
         if HWR.beamline.sample_changer is not None:
             self.connect(
@@ -464,8 +469,6 @@ class TreeBrick(BaseWidget):
                 if self["usePlateNavigator"]:
                     self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
-                # Unnecessary - beamline_setup._plater_mode is NEVER queried.
-                # api.beamline_setup.set_plate_mode(True)
                 if plate_sample_content:
                     plate_row_list, plate_sample_list = self.dc_tree_widget.samples_from_sc_content(
                         plate_row_content, plate_sample_content
@@ -540,6 +543,7 @@ class TreeBrick(BaseWidget):
 
     def queue_execution_finished(self, status):
         # self.enable_widgets.emit(True)
+        self.current_queue_entry = None
         self.dc_tree_widget.queue_execution_completed(status)
 
     def queue_stop_handler(self, status):
@@ -1144,6 +1148,9 @@ class TreeBrick(BaseWidget):
             self.update_enable_collect()
 
     def update_enable_collect(self):
+        if self.current_queue_entry is not None:
+            #Do not enable/disable collect button if queue is executing
+            return
 
         # Do not allow to start xray imaging from BeamLocation and DataCollection phase
         self.enable_collect_conditions["imaging"] = True
@@ -1160,37 +1167,37 @@ class TreeBrick(BaseWidget):
             item == True for item in self.enable_collect_conditions.values()
         )
 
-        if enable_collect:
-            if enable_collect != self.dc_tree_widget.enable_collect_condition:
+        if enable_collect != self.dc_tree_widget.enable_collect_condition:
+            if enable_collect:
                 logging.getLogger("GUI").info("Data collection is enabled")
-        else:
-            msg = ""
-            logging.getLogger("GUI").warning("Data collect is disabled")
-            for key, value in self.enable_collect_conditions.items():
-                if value == False:
-                    if key == "diffractometer":
-                        logging.getLogger("GUI").warning(
-                            "  - Diffractometer is in beam location phase"
-                        )
-                    elif key == "shutter":
-                        logging.getLogger("GUI").warning(
-                            "  - Safety shutter is closed "
-                            + "(Open the safety shutter to enable collections)"
-                        )
-                    elif key == "ppu":
-                        logging.getLogger("GUI").error("  - PPU is in error state")
-                    elif key == "machine_current":
-                        logging.getLogger("GUI").error(
-                            "  - Machine current is to low "
-                            + "(Wait till the machine current reaches 90 mA)"
-                        )
-                    elif key == "imaging":
-                        logging.getLogger("GUI").warning(
-                            "To start an imaging collection "
-                            + "diffractometer has to be in SampleCentering or in Transfer phase"
-                        )
-        self.dc_tree_widget.enable_collect_condition = enable_collect
-        self.dc_tree_widget.toggle_collect_button_enabled()
+            else:
+                msg = ""
+                logging.getLogger("GUI").warning("Data collect is disabled")
+                for key, value in self.enable_collect_conditions.items():
+                    if value == False:
+                        if key == "diffractometer":
+                            logging.getLogger("GUI").warning(
+                                "  - Diffractometer is in beam location phase"
+                            )
+                        elif key == "shutter":
+                            logging.getLogger("GUI").warning(
+                                "  - Safety shutter is closed "
+                                + "(Open the safety shutter to enable collections)"
+                            )
+                        elif key == "ppu":
+                            logging.getLogger("GUI").error("  - PPU is in error state")
+                        elif key == "machine_current":
+                            logging.getLogger("GUI").error(
+                                "  - Machine current is to low "
+                                + "(Wait till the machine current reaches 90 mA)"
+                            )
+                        elif key == "imaging":
+                            logging.getLogger("GUI").warning(
+                                "To start an imaging collection "
+                                + "diffractometer has to be in SampleCentering or in Transfer phase"
+                            )
+            self.dc_tree_widget.enable_collect_condition = enable_collect
+            self.dc_tree_widget.toggle_collect_button_enabled()
 
     def save_queue(self):
         """Saves queue in the file"""
