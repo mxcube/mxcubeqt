@@ -25,6 +25,8 @@ from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget_simple import AcquisitionWidgetSimple
+from gui.widgets.comments_widget import CommentsWidget
+
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
@@ -41,6 +43,7 @@ __license__ = "LGPLv3+"
 
 
 class CreateCharWidget(CreateTaskBase):
+
     def __init__(self, parent=None, name=None, fl=0):
 
         CreateTaskBase.__init__(self, parent, name, fl, "Characterisation")
@@ -76,17 +79,21 @@ class CreateCharWidget(CreateTaskBase):
             "characterise_simple_widget_vertical_layout.ui"
         )
 
+        self._comments_widget = CommentsWidget(self)
+
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
+        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.setSpacing(6)
         _main_vlayout.addStretch(0)
 
         # SizePolicies --------------------------------------------------------
+        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.pathTemplateChangedSignal.connect(
@@ -97,8 +104,6 @@ class CreateCharWidget(CreateTaskBase):
         self._vertical_dimension_widget.space_group_ledit.activated.connect(
             self._space_group_change
         )
-        # self.connect(induced_burn_cbx, QtCore.SIGNAL("toggled(bool)"),
-        #             self.use_induced_burn)
 
         self._char_widget.characterisation_gbox.toggled.connect(
             self.characterisation_gbox_toggled
@@ -109,49 +114,46 @@ class CreateCharWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
-        self._char_params_mib.bind_value_update(
-            "opt_sad", self._char_widget.optimised_sad_cbx, bool, None
-        )
+        if False:
+            self._char_params_mib.bind_value_update(
+                "opt_sad", self._char_widget.optimised_sad_cbx, bool, None
+            )
 
-        self._char_params_mib.bind_value_update(
-            "account_rad_damage", self._char_widget.account_rad_dmg_cbx, bool, None
-        )
+            self._char_params_mib.bind_value_update(
+                "account_rad_damage", self._char_widget.account_rad_dmg_cbx, bool, None
+            )
 
-        # self._char_params_mib.bind_value_update('determine_rad_params',
-        #                                        induced_burn_cbx,
-        #                                        bool, None)
+            self._char_params_mib.bind_value_update(
+                "strategy_complexity", self._char_widget.start_comp_cbox, int, None
+            )
 
-        self._char_params_mib.bind_value_update(
-            "strategy_complexity", self._char_widget.start_comp_cbox, int, None
-        )
+            self._char_params_mib.bind_value_update(
+                "max_crystal_vdim",
+                self._vertical_dimension_widget.max_vdim_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
-        self._char_params_mib.bind_value_update(
-            "max_crystal_vdim",
-            self._vertical_dimension_widget.max_vdim_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
+            self._char_params_mib.bind_value_update(
+                "min_crystal_vdim",
+                self._vertical_dimension_widget.min_vdim_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
-        self._char_params_mib.bind_value_update(
-            "min_crystal_vdim",
-            self._vertical_dimension_widget.min_vdim_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
+            self._char_params_mib.bind_value_update(
+                "min_crystal_vphi",
+                self._vertical_dimension_widget.min_vphi_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
-        self._char_params_mib.bind_value_update(
-            "min_crystal_vphi",
-            self._vertical_dimension_widget.min_vphi_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
-
-        self._char_params_mib.bind_value_update(
-            "max_crystal_vphi",
-            self._vertical_dimension_widget.max_vphi_ledit,
-            float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
-        )
+            self._char_params_mib.bind_value_update(
+                "max_crystal_vphi",
+                self._vertical_dimension_widget.max_vphi_ledit,
+                float,
+                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            )
 
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
 
@@ -208,13 +210,9 @@ class CreateCharWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            # self._init_models()
             if self._char_params.space_group == "":
                 sample_model = tree_item.get_model()
                 self._set_space_group(sample_model.processing_parameters.space_group)
-            # self._acq_widget.update_data_model(self._acquisition_parameters,
-            #                                   self._path_template)
-            # self._char_params_mib.set_model(self._char_params)
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.CharacterisationQueueItem):
@@ -245,7 +243,7 @@ class CreateCharWidget(CreateTaskBase):
             # self.get_acquisition_widget().use_osc_start(True)
 
             if len(data_collection.acquisitions) == 1:
-                self.select_shape_with_cpos(
+                HWR.beamline.sample_view.select_shape_with_cpos(
                     self._acquisition_parameters.centred_position
                 )
 
@@ -274,7 +272,7 @@ class CreateCharWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. when a data collection group is selected.
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         tasks = []
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
