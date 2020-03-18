@@ -33,6 +33,7 @@ from HardwareRepository.HardwareObjects import (
 )
 from HardwareRepository.HardwareObjects.queue_model_enumerables import XTAL_SPACEGROUPS
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+from HardwareRepository.HardwareObjects.abstract.AbstractCharacterisation import AbstractCharacterisation
 
 from HardwareRepository import HardwareRepository as HWR
 
@@ -179,32 +180,31 @@ class CreateCharWidget(CreateTaskBase):
 
     def init_models(self):
         CreateTaskBase.init_models(self)
+        self._init_models()
 
-        if True:
-            self._char = queue_model_objects.Characterisation()
-            self._char_params = self._char.characterisation_parameters
-            self._processing_parameters = queue_model_objects.ProcessingParameters()
-            self._set_space_group(self._processing_parameters.space_group)
+    def _init_models(self):
+        self._char = queue_model_objects.Characterisation()
+        self._char_params = self._char.characterisation_parameters
+        self._processing_parameters = queue_model_objects.ProcessingParameters()
+        self._set_space_group(self._processing_parameters.space_group)
 
-            self._acquisition_parameters = (
-                HWR.beamline.get_default_acquisition_parameters("characterisation")
-            )
- 
-            self._char_params = (
-                HWR.beamline.characterisation.get_default_characterisation_parameters()
-            )
-            self._path_template.reference_image_prefix = "ref"
-            # The num images drop down default value is 1
-            # we would like it to be 2
-            self._acquisition_parameters.num_images = 2
-            self._char.characterisation_software = (
-                queue_model_enumerables.COLLECTION_ORIGIN.EDNA
-            )
-            self._path_template.num_files = 2
-            self._path_template.compression = False
-            self._acquisition_parameters.shutterless = False
-        else:
-            self.setDisabled(True)
+        self._acquisition_parameters = (
+            HWR.beamline.get_default_acquisition_parameters("default")
+        )
+
+        self._char_params = (
+            HWR.beamline.get_default_acquisition_parameters("characterisation")
+        )
+        self._path_template.reference_image_prefix = "ref"
+        # The num images drop down default value is 1
+        # we would like it to be 2
+        self._acquisition_parameters.num_images = 2
+        self._char.characterisation_software = (
+            queue_model_enumerables.COLLECTION_ORIGIN.EDNA
+        )
+        self._path_template.num_files = 2
+        self._path_template.compression = False
+        self._acquisition_parameters.shutterless = False
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)

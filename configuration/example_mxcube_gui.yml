@@ -3085,11 +3085,11 @@
     old_value: null
     type: combo
     value: default
-  signals:
-    enableExpertMode: !!python/tuple []
-    isHidden: !!python/tuple []
-    isShown: !!python/tuple []
-    quit: !!python/tuple []
+#  signals:
+#    enableExpertMode: !!python/tuple []
+#    isHidden: !!python/tuple []
+#    isShown: !!python/tuple []
+#    quit: !!python/tuple []
   type: window
 - children:
   - children:
@@ -3267,9 +3267,9 @@
     old_value: null
     type: combo
     value: default
-  signals:
-    enableExpertMode: !!python/tuple []
-    isHidden: !!python/tuple []
-    isShown: !!python/tuple []
-    quit: !!python/tuple []
+#  signals:
+#    enableExpertMode: !!python/tuple []
+#    isHidden: !!python/tuple []
+#    isShown: !!python/tuple []
+#    quit: !!python/tuple []
   type: window
