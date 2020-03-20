@@ -354,7 +354,7 @@ class MotorSpinBoxBrick(BaseWidget):
         menu.popup(QtImport.QCursor.pos())
 
     def go_to_history_pos(self):
-        self.motor_hwobj.move(float(self.sender().text()))
+        self.motor_hwobj.set_value(float(self.sender().text()))
 
     def update_history(self, pos):
         pos = str(pos)
@@ -447,7 +447,7 @@ class MotorSpinBoxBrick(BaseWidget):
 
     def change_position(self):
         if self.motor_hwobj is not None:
-            self.motor_hwobj.move(self.position_spinbox.value())
+            self.motor_hwobj.set_value(self.position_spinbox.value())
         self.update_history(self.position_spinbox.value())
 
     def position_value_edited(self, value):
@@ -576,7 +576,7 @@ class MotorSpinBoxBrick(BaseWidget):
     def position_slider_double_value_changed(self, value):
         """Sets motor postion based on the slider value"""
         if self.motor_hwobj is not None:
-            self.motor_hwobj.move(value)
+            self.motor_hwobj.set_value(value)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
@@ -711,7 +711,7 @@ class StepEditorDialog(QtImport.QDialog):
         self.brick = brick
 
         if name is None or name == "":
-            name = motor.userName()
+            name = motor.username
         self.setWindowTitle(name)
         self.setWindowTitle("%s step editor" % name)
         self.current_step.setText(str(brick.get_line_step()))
