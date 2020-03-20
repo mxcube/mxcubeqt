@@ -329,7 +329,7 @@ class ResolutionBrick(BaseWidget):
     def set_resolution(self, value):
         if self.resolution_limits is not None:
             if self.resolution_limits[0] < value < self.resolution_limits[1]:
-                HWR.beamline.resolution.move(value)
+                HWR.beamline.resolution.set_value(value)
 
     def set_detector_distance(self, value):
         if self.detector_distance_limits is not None:
@@ -338,7 +338,7 @@ class ResolutionBrick(BaseWidget):
                 < value
                 < self.detector_distance_limits[1]
             ):
-                HWR.beamline.detector.distance.move(value)
+                HWR.beamline.detector.distance.set_value(value)
 
     def energy_changed(self, energy_kev, energy_wavelength):
         self.get_resolution_limits(True)

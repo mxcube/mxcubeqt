@@ -664,7 +664,7 @@ class MotorBrick(BaseWidget):
 
     def move_motor(self, new_position):
         """Move motor to new position."""
-        self.motor_hwobj.move(new_position)
+        self.motor_hwobj.set_value(new_position)
 
     def stop_motor(self):
         """Stop motor."""
@@ -770,7 +770,7 @@ class MotorBrick(BaseWidget):
             #
             if self.control_dialog is None:
                 self.control_dialog = MotorControlDialog(
-                    self, self["dialog_caption"] or self.motor_hwobj.userName()
+                    self, self["dialog_caption"] or self.motor_hwobj.username
                 )
                 self.control_dialog.set_motor_mnemonic(self["mnemonic"])
 

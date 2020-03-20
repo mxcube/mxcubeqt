@@ -232,7 +232,7 @@ class DuoStateBrick(BaseWidget):
                 self.main_gbox.show()
 
                 if self["username"] == "":
-                    self["username"] = self.wrapper_hwobj.userName()
+                    self["username"] = self.wrapper_hwobj.username
 
                 help_text = self["setin"] + " the " + self["username"].lower()
                 self.set_in_button.setToolTip(help_text)
@@ -308,7 +308,7 @@ class DuoStateBrick(BaseWidget):
         elif property_name == "username":
             if new_value == "":
                 if self.wrapper_hwobj is not None:
-                    name = self.wrapper_hwobj.userName()
+                    name = self.wrapper_hwobj.username
                     if name != "":
                         self["username"] = name
                         return
@@ -433,7 +433,7 @@ class WrapperHO(QtImport.QObject):
             self.getState = types.MethodType(lambda self: "unknown", self)
 
     def userName(self):
-        return self.dev.userName()
+        return self.dev.username
 
     # WagoPneu HO methods
     def initWagoPneu(self):

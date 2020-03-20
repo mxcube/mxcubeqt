@@ -96,7 +96,7 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
                         delta = 0.0
 
                     light_limits = self.motor_hwobj.get_limits()
-                    self.motor_hwobj.move(light_limits[0] + delta)
+                    self.motor_hwobj.set_value(light_limits[0] + delta)
 
                 self.light_state_changed(STATE_UNKNOWN)
                 self.light_actuator_hwo.cmdOut()
@@ -113,7 +113,7 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
                 self.light_state_changed(STATE_UNKNOWN)
                 self.light_actuator_hwo.cmdIn()
                 if self.light_saved_pos is not None and self.motor_hwobj is not None:
-                    self.motor_hwobj.move(self.light_saved_pos)
+                    self.motor_hwobj.set_value(self.light_saved_pos)
             else:
                 self.light_on_button.setDown(True)
 
