@@ -78,7 +78,7 @@ class VolpiBrick(BaseWidget):
 
     def value_changed(self, new_intensity):
         """set volpi to new value."""
-        self.volpi_hwobj.set_intensity(new_intensity)
+        self.volpi_hwobj.set_value(new_intensity)
         
     def set_mnemonic(self, mne):
         """set mnemonic."""

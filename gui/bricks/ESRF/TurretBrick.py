@@ -79,7 +79,7 @@ class TurretBrick(BaseWidget):
 
     def value_changed(self, new_position):
         """Move turret to new position."""
-        self.turret_hwobj.set_position(new_position)
+        self.turret_hwobj.set_value(new_position)
         
     def set_mnemonic(self, mne):
         """set mnemonic."""
