@@ -141,7 +141,7 @@ class AttenuatorsBrick(BaseWidget):
             self.new_value_validator.validate(input_field_text, 0)[0]
             == QtImport.QValidator.Acceptable
         ):
-            HWR.beamline.transmission.set_transmission(float(input_field_text))
+            HWR.beamline.transmission.set_value(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
