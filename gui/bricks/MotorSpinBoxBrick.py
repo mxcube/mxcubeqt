@@ -429,7 +429,7 @@ class MotorSpinBoxBrick(BaseWidget):
             self.move_left_button.setEnabled(False)
             self.move_right_button.setEnabled(False)
         elif state == self.motor_hwobj.motor_states.MOVING:
-            # self.update_history(self.motor_hwobj.getPosition())
+            # self.update_history(self.motor_hwobj.get_value())
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(True)
             self.move_left_button.setEnabled(False)

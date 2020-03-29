@@ -43,7 +43,7 @@ class VolpiBrick(BaseWidget):
         Arguments:
         :params args: 
         """
-        super().__init__(*args)
+        super(VolpiBrick, self).__init__(*args)
 
         # Hardware objects ----------------------------------------------------
 
@@ -99,7 +99,7 @@ class VolpiBrick(BaseWidget):
             self.connect(self.volpi_hwobj, "intensityChanged", self.slot_intensity)
             # if self.volpi_hwobj.is_ready():
             #     self.slot_position(self.volpi_hwobj.get_position())
-            #     self.slot_status(self.volpi_hwobj.getState())
+            #     self.slot_status(self.volpi_hwobj.get_state())
             #     self.volpi_ready()
             # else:
             #     self.volpi_not_ready()
@@ -138,7 +138,7 @@ class _Bar(QtImport.QWidget):
     clickedValue = QtImport.pyqtSignal(int)
 
     def __init__(self, steps, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(_Bar, self).__init__(*args, **kwargs)
 
         self.setSizePolicy(
             QtImport.QSizePolicy.MinimumExpanding,
@@ -240,7 +240,7 @@ class PowerBar(QtImport.QWidget):
     valueChanged = QtImport.pyqtSignal(int)
 
     def __init__(self, steps=5, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(PowerBar, self).__init__(*args, **kwargs)
 
         layout = QtImport.QVBoxLayout()
         self._bar = _Bar(steps)

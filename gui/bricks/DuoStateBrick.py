@@ -240,7 +240,7 @@ class DuoStateBrick(BaseWidget):
                 self.set_out_button.setToolTip(help_text)
                 self.main_gbox.setTitle(self["username"])
                 self.wrapper_hwobj.duoStateChangedSignal.connect(self.stateChanged)
-                self.wrapper_hwobj.getState()
+                self.wrapper_hwobj.get_state()
             else:
                 self.wrapper_hwobj = None
                 # self.main_gbox.hide()
@@ -273,11 +273,11 @@ class DuoStateBrick(BaseWidget):
 
         # elif property_name=='in':
         #    if self.wrapper_hwobj is not None:
-        #        self.stateChanged(self.wrapper_hwobj.getState())
+        #        self.stateChanged(self.wrapper_hwobj.get_state())
 
         # elif property_name=='out':
         #    if self.wrapper_hwobj is not None:
-        #        self.stateChanged(self.wrapper_hwobj.getState())
+        #        self.stateChanged(self.wrapper_hwobj.get_state())
 
         elif property_name == "setin":
             icons = self["icons"]
@@ -389,8 +389,8 @@ class WrapperHO(QtImport.QObject):
         # self.setIn = new.instancemethod(lambda self: None, self)
         self.setIn = lambda self: None
         self.setOut = self.setIn
-        # self.getState = new.instancemethod(lambda self: "unknown", self)
-        self.getState = lambda self: "unknown"
+        # self.get-State = new.instancemethod(lambda self: "unknown", self)
+        self.get_state = lambda self: "unknown"
         self.dev = hardware_obj
         try:
             sClass = str(self.dev.__class__)
@@ -407,7 +407,7 @@ class WrapperHO(QtImport.QObject):
         initFunc()
         self.setIn = getattr(self, "setIn%s" % self.devClass)
         self.setOut = getattr(self, "setOut%s" % self.devClass)
-        self.getState = getattr(self, "getState%s" % self.devClass)
+        self.get_state = getattr(self, "getState%s" % self.devClass)
 
     def __getstate__(self):
         dict = self.__dict__.copy()
@@ -424,13 +424,13 @@ class WrapperHO(QtImport.QObject):
 
             self.setIn = new.instancemethod(lambda self: None, self)
             self.setOut = self.setIn
-            self.getState = new.instancemethod(lambda self: "unknown", self)
+            self.get_state = new.instancemethod(lambda self: "unknown", self)
         except ImportError:
             import types
 
             self.setIn = types.MethodType(lambda self: None, self)
             self.setOut = self.setIn
-            self.getState = types.MethodType(lambda self: "unknown", self)
+            self.get_state = types.MethodType(lambda self: "unknown", self)
 
     def userName(self):
         return self.dev.username
@@ -521,7 +521,7 @@ class WrapperHO(QtImport.QObject):
             self.duoStateChangedSignal.emit(state)
 
     def position_changed_spec_motor_wspec_positions(self, pos_name, pos):
-        if self.dev.getState() != self.dev.READY:
+        if self.dev.get_state() != self.dev.READY:
             return
         state = "error"
         if self.positions is not None:
@@ -533,9 +533,9 @@ class WrapperHO(QtImport.QObject):
     def get_state_spec_motor_wspec_positions(self):
         if self.positions is None:
             return "error"
-        curr_pos = self.dev.getCurrentPositionName()
+        curr_pos = self.dev.get_current_position_name()
         if curr_pos is None:
-            state = self.dev.getState()
+            state = self.dev.get_state()
             try:
                 state = WrapperHO.MOTOR_WSTATE[state]
             except IndexError:
@@ -550,7 +550,7 @@ class WrapperHO(QtImport.QObject):
     def new_predefined_spec_motor_wspec_positions(self):
         self.positions = self.dev.getPredefinedPositionsList()
         self.position_changed_spec_motor_wspec_positions(
-            self.dev.getCurrentPositionName(), self.dev.getPosition()
+            self.dev.get_current_position_name(), self.dev.get_value()
         )
 
     # Procedure HO methods
