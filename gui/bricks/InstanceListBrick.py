@@ -447,10 +447,13 @@ class InstanceListBrick(BaseWidget):
         BaseWidget.set_instance_location(local)
 
         for widget in QtImport.QApplication.allWidgets():
-            if hasattr(widget, "configuration"):
-                active_window = widget
-                break
-
+            try:
+                if hasattr(widget, "configuration"):
+                    active_window = widget
+                    break
+            except NameError:
+                logging.getLogger().warning("Widget {} has no attribute {}"
+                                            .format(widget, "configuration"))
         active_window.brickChangedSignal.connect(self.application_brick_changed)
         active_window.tabChangedSignal.connect(self.application_tab_changed)
 

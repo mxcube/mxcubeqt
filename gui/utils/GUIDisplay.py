@@ -230,15 +230,19 @@ class CustomMenuBar(QtImport.QMenuBar):
             self.parent.enableExpertModeSignal.emit(False)
             # go through all bricks and execute the method
             for widget in QtImport.QApplication.allWidgets():
-                if hasattr(widget, "set_expert_mode"):
-                    # if isinstance(widget, BaseWidget):
-                    widget.setWhatsThis("")
-                    try:
-                        widget.set_expert_mode(False)
-                    except BaseException:
-                        logging.getLogger().exception(
-                            "Could not set %s to user mode" % widget.objectName()
-                        )
+                try:
+                    if hasattr(widget, "set_expert_mode"):
+                        # if isinstance(widget, BaseWidget):
+                        widget.setWhatsThis("")
+                        try:
+                            widget.set_expert_mode(False)
+                        except BaseException:
+                            logging.getLogger().exception(
+                                "Could not set %s to user mode" % widget.objectName()
+                            )
+                except NameError:
+                    logging.getLogger().warning("Widget {} has no attribute {}"
+                                                .format(widget, "set_expert_mode"))
             if self.original_style:
                 self.setStyleSheet(self.original_style)
 
