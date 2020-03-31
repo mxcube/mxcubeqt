@@ -85,7 +85,7 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
             if self.light_actuator_hwo.get_state() != STATE_OUT:
                 if self.motor_hwobj is not None:
                     try:
-                        self.light_saved_pos = self.motor_hwobj.getPosition()
+                        self.light_saved_pos = self.motor_hwobj.get_value()
                     except BaseException:
                         logging.exception("could not get light actuator position")
                         self.light_saved_pos = None
@@ -140,7 +140,7 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
                 self, property_name, old_value, new_value
             )
             if self.motor_hwobj is not None:
-                if self.motor_hwobj.isReady():
+                if self.motor_hwobj.is_ready():
                     limits = self.motor_hwobj.get_limits()
                     motor_range = float(limits[1] - limits[0])
                     self["delta"] = str(motor_range / 10.0)

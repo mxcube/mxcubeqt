@@ -148,7 +148,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._xray_imaging_parameters
             )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                HWR.beamline.detector.distance.get_position()
+                HWR.beamline.detector.distance.get_value()
             )
             self.setDisabled(False)
             self._xray_imaging_parameters_widget.enable_distance_tools(True)

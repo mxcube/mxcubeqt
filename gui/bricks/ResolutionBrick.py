@@ -278,7 +278,7 @@ class ResolutionBrick(BaseWidget):
             detector_ready = detector_distance.is_ready()
         if detector_ready:
             self.get_detector_distance_limits()
-            curr_detector_distance = detector_distance.get_position()
+            curr_detector_distance = detector_distance.get_value()
             self.detector_distance_changed(curr_detector_distance)
             self.detector_distance_state_changed(detector_distance.get_state())
             if self.units_combobox.currentText() == "mm":

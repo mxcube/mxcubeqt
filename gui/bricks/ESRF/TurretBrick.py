@@ -44,7 +44,7 @@ class TurretBrick(BaseWidget):
         Arguments:
         :params args: 
         """
-        super().__init__(*args)
+        super(TurretBrick, self).__init__(*args)
 
         # Hardware objects ----------------------------------------------------
 
@@ -103,7 +103,7 @@ class TurretBrick(BaseWidget):
 
             # if self.turret_hwobj.is_ready():
             #     self.slot_position(self.turret_hwobj.get_position())
-            #     self.slot_status(self.turret_hwobj.getState())
+            #     self.slot_status(self.turret_hwobj.get_state())
             #     self.turret_ready()
             # else:
             #     self.turret_not_ready()

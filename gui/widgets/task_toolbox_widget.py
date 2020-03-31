@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-#import importlib
+import importlib
 
 from gui.utils import Icons, queue_item, QtImport
 from gui.widgets.create_discrete_widget import CreateDiscreteWidget
@@ -165,7 +165,9 @@ class TaskToolBoxWidget(QtImport.QWidget):
         for task_name in available_tasks.split():
             module_name = "gui.widgets.create_%s_widget" % task_name
             class_name = "Create%sWidget" % task_name.title().replace(" ", "")
-            create_task_widget_cls = getattr(importlib.import_module(module_name), class_name)
+            create_task_widget_cls = getattr(
+                importlib.import_module(module_name), class_name
+            )
             create_task_widget = create_task_widget_cls(self.tool_box, task_name)
             self.tool_box.addItem(create_task_widget, task_name.title())
             self.create_task_widgets[task_name] = create_task_widget

@@ -648,7 +648,7 @@ class MotorBrick(BaseWidget):
         self.motor_position_label.setPalette(palette)
 
         if state == 2:  # start moving
-            self.move_box.set_old_position(self.motor_hwobj.getPosition())
+            self.move_box.set_old_position(self.motor_hwobj.get_value())
         elif state == 3:  # moving
             self.step_forward.setEnabled(False)
             self.step_backward.setEnabled(False)
@@ -677,7 +677,7 @@ class MotorBrick(BaseWidget):
 
     def step_forward_clicked(self, value):
         """Act when forward step button pressed."""
-        current_position = self.motor_hwobj.getPosition()
+        current_position = self.motor_hwobj.get_value()
         self.move_motor(current_position + value)
 
     def step_forward_value_changed(self, value):
@@ -691,7 +691,7 @@ class MotorBrick(BaseWidget):
 
     def step_backward_clicked(self, value):
         """Act when backward step button pressed."""
-        currentPosition = self.motor_hwobj.getPosition()
+        currentPosition = self.motor_hwobj.get_value()
         self.move_motor(currentPosition - value)
 
     def motor_ready(self):
@@ -750,9 +750,9 @@ class MotorBrick(BaseWidget):
             self.step_backward.set_value(step)
             self.step_forward.set_value(step)
 
-            if self.motor_hwobj.isReady():
+            if self.motor_hwobj.is_ready():
                 self.limit_changed(self.motor_hwobj.get_limits())
-                self.slot_position(self.motor_hwobj.getPosition())
+                self.slot_position(self.motor_hwobj.get_value())
                 self.slot_status(self.motor_hwobj.get_state())
                 self.motor_ready()
             else:
@@ -799,8 +799,8 @@ class MotorBrick(BaseWidget):
             
             self.slider.set_position_format_string(self["formatString"])
 
-            if self.motor_hwobj is not None and self.motor_hwobj.isReady():
-                self.slot_position(self.motor_hwobj.getPosition())
+            if self.motor_hwobj is not None and self.motor_hwobj.is_ready():
+                self.slot_position(self.motor_hwobj.get_value())
                 return
 
             self.slot_position(None)
@@ -850,9 +850,9 @@ class MotorBrick(BaseWidget):
                 self.step_backward.set_value(step)
                 self.step_forward.set_value(step)
 
-                if self.motor_hwobj.isReady():
+                if self.motor_hwobj.is_ready():
                     self.limit_changed(self.motor_hwobj.get_limits())
-                    self.slot_position(self.motor_hwobj.getPosition())
+                    self.slot_position(self.motor_hwobj.get_value())
                     self.slot_status(self.motor_hwobj.get_state())
                     self.motor_ready()
                 else:

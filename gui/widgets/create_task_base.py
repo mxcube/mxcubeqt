@@ -240,6 +240,9 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             return None
 
+    def get_task_node_name(self):
+        return self._task_node_name
+
     def get_acquisition_widget(self):
         return self._acq_widget
 
