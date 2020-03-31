@@ -404,7 +404,8 @@ class MotorSpinBoxBrick(BaseWidget):
         """Enables/disables controls based on the state
         """
         self.set_position_spinbox_color(state)
-        if state == self.motor_hwobj.motor_states.READY:
+
+        if state is self.motor_hwobj.STATES.READY:
             if self.demand_move == 1:
                 if self["invertButtons"]:
                     self.really_move_down()
@@ -494,7 +495,7 @@ class MotorSpinBoxBrick(BaseWidget):
                 )
                 limits = None
             try:
-                state_str = states[state]
+                state_str = state.name
             except IndexError:
                 state_str = "UNKNOWN"
 
