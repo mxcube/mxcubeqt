@@ -61,7 +61,7 @@
             connections:
             - {receiver: aperture_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
-            - {receiver: attenuators_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+            - {receiver: transmission_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
             - {receiver: camera_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
@@ -2601,10 +2601,10 @@
           hidden: false, name: kevFormatString, old_value: '##.####', type: formatString,
           value: '###.####'}
         type: EnergyBrick
-      - brick: {class: AttenuatorsBrick, name: attenuators_brick}
+      - brick: {class: TransmissionBrick, name: transmission_brick}
         children: []
         connections: []
-        name: attenuators_brick
+        name: transmission_brick
         properties:
         - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
           name: fixedHeight, old_value: -1, type: integer, value: -1}
@@ -2623,7 +2623,7 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        type: AttenuatorsBrick
+        type: TransmissionBrick
       - brick: {class: ResolutionBrick, name: resolution_brick}
         children: []
         connections: []

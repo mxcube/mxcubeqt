@@ -17,10 +17,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from gui.utils.QtImport import Qt, QColor, QPalette
-
 from random import randint, uniform
-
+from gui.utils.QtImport import Qt, QColor, QPalette
+from HardwareRepository.BaseHardwareObjects import HardwareObjectState
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -62,6 +61,14 @@ TREE_ITEM_COLLECTION = QColor(255, 230, 210)
 
 TASK_GROUP = [QColor("#B0DBFF"), QColor("#E57935"), QColor("#B1FF52")]
 
+COLOR_STATES = {
+    HardwareObjectState.UNKNOWN: DARK_GRAY,
+    HardwareObjectState.WARNING: LIGHT_ORANGE,
+    HardwareObjectState.READY: LIGHT_GREEN,
+    HardwareObjectState.BUSY: LIGHT_YELLOW,
+    HardwareObjectState.FAULT: LIGHT_RED,
+    HardwareObjectState.OFF: LIGHT_GRAY,
+}
 
 def set_widget_color(widget, color, color_role=None):
     if color_role is None:
