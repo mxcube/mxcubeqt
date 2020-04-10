@@ -577,7 +577,8 @@ class MotorSpinBoxBrick(BaseWidget):
                 self.state_changed,
                 instance_filter=True,
             )
-
+        # get motor position and set to brick
+        self.position_changed(self.motor_hwobj.get_value())
         self.position_history = []
         self.update_gui()
         # self['label'] = self['label']
