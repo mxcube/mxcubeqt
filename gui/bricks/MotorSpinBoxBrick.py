@@ -107,17 +107,10 @@ class MotorSpinBoxBrick(BaseWidget):
         self.move_left_button.setIcon(Icons.load_icon("Left2"))
         self.move_left_button.setToolTip("Moves the motor down (while pressed)")
         self.move_left_button.setFixedSize(27, 27)
-        self.move_left_button.setAutoRepeat(True)
-        self.move_left_button.setAutoRepeatDelay(500)
-        self.move_left_button.setAutoRepeatInterval(500)
         self.move_right_button = QtImport.QPushButton(self.main_gbox)
         self.move_right_button.setIcon(Icons.load_icon("Right2"))
         self.move_right_button.setToolTip("Moves the motor up (while pressed)")
         self.move_right_button.setFixedSize(27, 27)
-        self.move_right_button.setAutoRepeat(True)
-        self.move_right_button.setAutoRepeatDelay(500)
-        self.move_right_button.setAutoRepeatInterval(500)
-
 
         self.position_spinbox = QtImport.QDoubleSpinBox(self.main_gbox)
         self.position_spinbox.setMinimum(-10000)
@@ -440,10 +433,8 @@ class MotorSpinBoxBrick(BaseWidget):
             # self.update_history(self.motor_hwobj.get_value())
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(True)
-            buttons = QtImport.QApplication.mouseButtons()
-            if QtImport.QApplication.mouseButtons() != QtImport.Qt.LeftButton:
-                self.move_left_button.setEnabled(False)
-                self.move_right_button.setEnabled(False)
+            self.move_left_button.setEnabled(False)
+            self.move_right_button.setEnabled(False)
             self.step_combo.setEnabled(False)
         elif state in (
             self.motor_hwobj.motor_states.LOWLIMIT,
@@ -577,8 +568,7 @@ class MotorSpinBoxBrick(BaseWidget):
                 self.state_changed,
                 instance_filter=True,
             )
-        # get motor position and set to brick
-        self.position_changed(self.motor_hwobj.get_value())
+
         self.position_history = []
         self.update_gui()
         # self['label'] = self['label']
