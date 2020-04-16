@@ -137,7 +137,7 @@ class EnergyBrick(BaseWidget):
                 HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
             )
 
-            HWR.beamline.energy.update_values()
+            HWR.beamline.energy.update_value()
             if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
                 HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
             if HWR.beamline.energy.is_ready():
@@ -190,14 +190,13 @@ class EnergyBrick(BaseWidget):
             )
 
     def energy_changed(self, energy_value, wavelength_value):
-        print(energy_value, wavelength_value)
         energy_value_str = self["kevFormatString"] % energy_value
         wavelength_value_str = self["angFormatString"] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def state_changed(self, state):
-        self.setEnabled(state == "ready")
+        self.setEnabled(HWR.beamline.energy.is_ready())
         BaseWidget.set_status_info("status", "", "")
 
     def status_info_changed(self, status_info):

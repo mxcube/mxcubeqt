@@ -35,26 +35,6 @@ class MotorSpinBoxBrick(BaseWidget):
 
     """
 
-    STATE_COLORS = (
-        Colors.LIGHT_YELLOW,  # INITIALIZING
-        Colors.LIGHT_GREEN,  # ON
-        Colors.DARK_GRAY,  # OFF
-        Colors.LIGHT_GREEN,  # READY
-        Colors.LIGHT_YELLOW,  # MOVING
-        Colors.LIGHT_YELLOW,  # BUSY
-        Colors.LIGHT_YELLOW,  # MOVING
-        Colors.LIGHT_GREEN,  # STANDBY
-        Colors.DARK_GRAY,  # DISABLED
-        Colors.DARK_GRAY,  # UNKNOWN
-        Colors.LIGHT_RED,  # ALARM
-        Colors.LIGHT_RED,  # FAULT
-        Colors.LIGHT_RED,  # INVALID
-        Colors.DARK_GRAY,  # OFFLINE
-        Colors.LIGHT_RED,  # LOWLIMIT
-        Colors.LIGHT_RED,  # HIGHLIMIT
-        Colors.DARK_GRAY,
-    )  # NOTINITIALIZED
-
     MAX_HISTORY = 20
 
     def __init__(self, *args):
@@ -392,12 +372,8 @@ class MotorSpinBoxBrick(BaseWidget):
 
     def set_position_spinbox_color(self, state):
         """Changes color of the spinbox based on the state"""
-        if state in MotorSpinBoxBrick.STATE_COLORS:
-            color = MotorSpinBoxBrick.STATE_COLORS[state]
-        else:
-            color = Colors.DARK_GRAY
         Colors.set_widget_color(
-            self.position_spinbox.lineEdit(), color, QtImport.QPalette.Base
+            self.position_spinbox.lineEdit(), Colors.get_state_color(state), QtImport.QPalette.Base
         )
 
     def state_changed(self, state):
@@ -405,7 +381,7 @@ class MotorSpinBoxBrick(BaseWidget):
         """
         self.set_position_spinbox_color(state)
 
-        if state is self.motor_hwobj.STATES.READY:
+        if self.motor_hwobj.is_ready():
             if self.demand_move == 1:
                 if self["invertButtons"]:
                     self.really_move_down()
@@ -424,12 +400,12 @@ class MotorSpinBoxBrick(BaseWidget):
             self.move_left_button.setEnabled(True)
             self.move_right_button.setEnabled(True)
             self.step_combo.setEnabled(True)
-        elif state == self.motor_hwobj.motor_states.NOTINITIALIZED:
-            self.position_spinbox.setEnabled(False)
-            self.stop_button.setEnabled(False)
-            self.move_left_button.setEnabled(False)
-            self.move_right_button.setEnabled(False)
-        elif state == self.motor_hwobj.motor_states.MOVING:
+        #elif state == self.motor_hwobj.STATES.NOTINITIALIZED:
+        ##    self.position_spinbox.setEnabled(False)
+        #    self.stop_button.setEnabled(False)
+        #    self.move_left_button.setEnabled(False)
+        ##    self.move_right_button.setEnabled(False)
+        elif state == self.motor_hwobj.STATES.MOVING:
             # self.update_history(self.motor_hwobj.get_value())
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(True)
@@ -437,8 +413,8 @@ class MotorSpinBoxBrick(BaseWidget):
             self.move_right_button.setEnabled(False)
             self.step_combo.setEnabled(False)
         elif state in (
-            self.motor_hwobj.motor_states.LOWLIMIT,
-            self.motor_hwobj.motor_states.HIGHLIMIT,
+            self.motor_hwobj.STATES.LOWLIMIT,
+            self.motor_hwobj.STATES.HIGHLIMIT,
         ):
             self.position_spinbox.setEnabled(True)
             self.stop_button.setEnabled(False)

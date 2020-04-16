@@ -70,6 +70,9 @@ COLOR_STATES = {
     HardwareObjectState.OFF: LIGHT_GRAY,
 }
 
+def get_state_color(state):
+    return COLOR_STATES.get(state, LIGHT_GRAY)
+
 def set_widget_color(widget, color, color_role=None):
     if color_role is None:
         color_role = QPalette.Window
