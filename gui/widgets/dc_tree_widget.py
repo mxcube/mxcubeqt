@@ -572,7 +572,7 @@ class DataCollectTree(QtImport.QWidget):
                     logging.getLogger("GUI").error(msg)
 
                 robot_action_dict["endTime"] = time.strftime("%Y-%m-%d %H:%M:%S")
-                if not sample_changer.hasLoadedSample():
+                if not sample_changer.has_loaded_sample():
                     robot_action_dict['status'] = "SUCCESS"
                 else:
                     robot_action_dict['message'] = "Sample was not unloaded"
@@ -902,15 +902,15 @@ class DataCollectTree(QtImport.QWidget):
                 result = True
             elif HWR.beamline.diffractometer.in_plate_mode():
                 if HWR.beamline.plate_manipulator is not None:
-                    if not HWR.beamline.plate_manipulator.hasLoadedSample():
+                    if not HWR.beamline.plate_manipulator.has_loaded_sample():
                         result = False
                     # TODO remove :2 and check full location
-                    elif item.get_model().location == HWR.beamline.plate_manipulator.getLoadedSample().getCoords():
+                    elif item.get_model().location == HWR.beamline.plate_manipulator.get_loaded_sample().get_coords():
                         result = True
             elif HWR.beamline.sample_changer is not None:
-                if not HWR.beamline.sample_changer.hasLoadedSample():
+                if not HWR.beamline.sample_changer.has_loaded_sample():
                     result = False
-                elif item.get_model().location == HWR.beamline.sample_changer.getLoadedSample().getCoords():
+                elif item.get_model().location == HWR.beamline.sample_changer.get_loaded_sample().get_coords():
                     result = True
         return result
 

@@ -165,7 +165,7 @@ class EnergyBrick(BaseWidget):
 
     def connected(self):
         self.setEnabled(True)
-        tunable_energy = HWR.beamline.energy.tunable
+        tunable_energy = HWR.beamline.energy.is_tunable
         if tunable_energy is None:
             tunable_energy = False
         self.set_to_label.setEnabled(tunable_energy)
@@ -190,6 +190,7 @@ class EnergyBrick(BaseWidget):
             )
 
     def energy_changed(self, energy_value, wavelength_value):
+        print(energy_value, wavelength_value)
         energy_value_str = self["kevFormatString"] % energy_value
         wavelength_value_str = self["angFormatString"] % wavelength_value
         self.energy_ledit.setText("%s keV" % energy_value_str)

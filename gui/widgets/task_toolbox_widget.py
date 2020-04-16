@@ -416,7 +416,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-            task_list = self.tool_box.currentWidget().create_task(sample, task_node, shape)
+            task_list = self.tool_box.currentWidget().create_task(sample, shape)
 
             for child_task_node in task_list:
                 HWR.beamline.queue_model.add_child(task_node, child_task_node)

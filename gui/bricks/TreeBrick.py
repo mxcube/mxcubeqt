@@ -242,7 +242,7 @@ class TreeBrick(BaseWidget):
                 SampleChanger.INFO_CHANGED_EVENT,
                 self.plate_info_changed,
             )
-            HWR.beamline.plate_manipulator.update_values()
+            #HWR.beamline.plate_manipulator.update_values()
         else:
             logging.getLogger("GUI").debug(
                 "TreeBrick: plate manipulator hwobj not defined."
@@ -753,16 +753,16 @@ class TreeBrick(BaseWidget):
         sc_basket_content = []
         sc_sample_content = []
 
-        for basket in HWR.beamline.sample_changer.getBasketList():
-            basket_index = basket.getIndex()
-            basket_name = basket.getName()
+        for basket in HWR.beamline.sample_changer.get_basket_list():
+            basket_index = basket.get_index()
+            basket_name = basket.get_name()
             sc_basket_content.append((basket_index + 1, basket, basket_name))
 
-        for sample in HWR.beamline.sample_changer.getSampleList():
-            matrix = sample.getID() or ""
-            basket_index = sample.getContainer().getIndex()
-            sample_index = sample.getIndex()
-            sample_name = sample.getName()
+        for sample in HWR.beamline.sample_changer.get_sample_list():
+            matrix = sample.get_id() or ""
+            basket_index = sample.get_container().get_index()
+            sample_index = sample.get_index()
+            sample_name = sample.get_name()
             sc_sample_content.append(
                 (matrix, basket_index + 1, sample_index + 1, sample_name)
             )
@@ -774,16 +774,16 @@ class TreeBrick(BaseWidget):
         plate_row_content = []
         plate_sample_content = []
 
-        for row in HWR.beamline.plate_manipulator.getBasketList():
-            row_index = row.getIndex()
-            row_name = row.getName()
+        for row in HWR.beamline.plate_manipulator.get_basket_list():
+            row_index = row.get_index()
+            row_name = row.get_name()
             plate_row_content.append((row_index, row, row_name))
 
-        for sample in HWR.beamline.plate_manipulator.getSampleList():
-            row_index = sample.getCell().getRowIndex()
-            sample_name = sample.getName()
-            coords = sample.getCoords()
-            matrix = sample.getID() or ""
+        for sample in HWR.beamline.plate_manipulator.get_sample_list():
+            row_index = sample.get_cell().get_row_index()
+            sample_name = sample.get_name()
+            coords = sample.get_coords()
+            matrix = sample.get_id() or ""
             plate_sample_content.append((matrix, coords[0], coords[1], sample_name))
 
         return plate_row_content, plate_sample_content
