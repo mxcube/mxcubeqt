@@ -277,9 +277,7 @@ class MotorSpinBoxESRFBrick(BaseWidget):
     def move_up(self):
         # self.demand_move = 1
         self.update_gui()
-        print(f"MSBB move_up state 1:")
         state = self.motor_hwobj.get_state()
-        print(f"MSBB move_up state 2: {state}")
         if state == self.motor_hwobj.STATES.READY:
             if self["invertButtons"]:
                 self.really_move_down()
@@ -290,7 +288,6 @@ class MotorSpinBoxESRFBrick(BaseWidget):
         # self.demand_move = -1
         self.update_gui()
         state = self.motor_hwobj.get_state()
-        print(f"move_down state : {state}")
         if state == self.motor_hwobj.STATES.READY:
             if self["invertButtons"]:
                 self.really_move_up()
@@ -332,9 +329,7 @@ class MotorSpinBoxESRFBrick(BaseWidget):
     def update_gui(self):
         if self.motor_hwobj is not None:
             self.main_gbox.setEnabled(True)
-            print(f"MSBBrick update_gui1")
             if self.motor_hwobj.is_ready():
-                print(f"MSBBrick update_gui2 ")
                 self.motor_hwobj.update_values()
         else:
             self.main_gbox.setEnabled(False)
