@@ -161,9 +161,7 @@ class _Bar(QtImport.QWidget):
         self._bar_solid_percent = 0.8
         self._background_color = QtImport.QColor('black')
         self._padding = 4.0  # n-pixel gap around edge.
-        
-        #print(f" ****** ****** ***** _Bar parent max min: {self.parent().minimum()}, {self.parent().maximum()}")
-
+                
     def paintEvent(self, e):
         painter = QtImport.QPainter(self)
 

@@ -36,12 +36,12 @@ class MotorSpinBoxBrick(BaseWidget):
     """
 
     STATE_COLORS = (
-        Colors.LIGHT_YELLOW,  # INITIALIZING
-        Colors.LIGHT_GREEN,  # ON
-        Colors.DARK_GRAY,  # OFF
-        Colors.LIGHT_GREEN,  # READY
-        Colors.LIGHT_YELLOW,  # MOVING
+        Colors.DARK_GRAY,  # UNKNOWN
+        Colors.LIGHT_ORANGE,  # WARNING
         Colors.LIGHT_YELLOW,  # BUSY
+        Colors.LIGHT_GREEN,  # READY
+        Colors.LIGHT_RED,  # FAULT
+        Colors.LIGHT_GRAY,  # OFF
         Colors.LIGHT_YELLOW,  # MOVING
         Colors.LIGHT_GREEN,  # STANDBY
         Colors.DARK_GRAY,  # DISABLED
@@ -83,6 +83,7 @@ class MotorSpinBoxBrick(BaseWidget):
         self.add_property("showStepList", "boolean", False)
         self.add_property("showPosition", "boolean", True)
         self.add_property("invertButtons", "boolean", False)
+        self.add_property("oneClickPressButton", "boolean", False)
         self.add_property("delta", "string", "")
         self.add_property("decimals", "integer", 2)
         self.add_property("icons", "string", "")
@@ -107,11 +108,14 @@ class MotorSpinBoxBrick(BaseWidget):
         self.move_left_button.setIcon(Icons.load_icon("Left2"))
         self.move_left_button.setToolTip("Moves the motor down (while pressed)")
         self.move_left_button.setFixedSize(27, 27)
+        self.move_left_button.setAutoRepeatDelay(500)
+        self.move_left_button.setAutoRepeatInterval(500)
         self.move_right_button = QtImport.QPushButton(self.main_gbox)
         self.move_right_button.setIcon(Icons.load_icon("Right2"))
         self.move_right_button.setToolTip("Moves the motor up (while pressed)")
         self.move_right_button.setFixedSize(27, 27)
-
+        self.move_right_button.setAutoRepeatDelay(500)
+        self.move_right_button.setAutoRepeatInterval(500)
         self.position_spinbox = QtImport.QDoubleSpinBox(self.main_gbox)
         self.position_spinbox.setMinimum(-10000)
         self.position_spinbox.setMaximum(10000)
@@ -267,7 +271,7 @@ class MotorSpinBoxBrick(BaseWidget):
         # self.demand_move = 1
         self.update_gui()
         state = self.motor_hwobj.get_state()
-        if state == self.motor_hwobj.motor_states.READY:
+        if state == self.motor_hwobj.STATES.READY:
             if self["invertButtons"]:
                 self.really_move_down()
             else:
@@ -277,7 +281,7 @@ class MotorSpinBoxBrick(BaseWidget):
         # self.demand_move = -1
         self.update_gui()
         state = self.motor_hwobj.get_state()
-        if state == self.motor_hwobj.motor_states.READY:
+        if state == self.motor_hwobj.STATES.READY:
             if self["invertButtons"]:
                 self.really_move_up()
             else:
@@ -294,8 +298,8 @@ class MotorSpinBoxBrick(BaseWidget):
             step = float(self["delta"])
 
         if self.motor_hwobj.is_ready():
-            self.set_position_spinbox_color(self.motor_hwobj.motor_states.READY)
-            self.motor_hwobj.move_relative(step)
+            self.set_position_spinbox_color(self.motor_hwobj.STATES.READY)
+            self.motor_hwobj.set_value_relative(step)
 
     def really_move_down(self):
         step = 1.0
@@ -310,8 +314,8 @@ class MotorSpinBoxBrick(BaseWidget):
             step = float(self["delta"])
 
         if self.motor_hwobj.is_ready() and step:
-            self.set_position_spinbox_color(self.motor_hwobj.motor_states.READY)
-            self.motor_hwobj.move_relative(-step)
+            self.set_position_spinbox_color(self.motor_hwobj.STATES.READY)
+            self.motor_hwobj.set_value_relative(-step)
 
     def update_gui(self):
         if self.motor_hwobj is not None:
@@ -424,12 +428,12 @@ class MotorSpinBoxBrick(BaseWidget):
             self.move_left_button.setEnabled(True)
             self.move_right_button.setEnabled(True)
             self.step_combo.setEnabled(True)
-        elif state == self.motor_hwobj.motor_states.NOTINITIALIZED:
+        elif state == self.motor_hwobj.STATES.FAULT:
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(False)
             self.move_left_button.setEnabled(False)
             self.move_right_button.setEnabled(False)
-        elif state == self.motor_hwobj.motor_states.MOVING:
+        elif state == self.motor_hwobj.STATES.BUSY:
             # self.update_history(self.motor_hwobj.get_value())
             self.position_spinbox.setEnabled(False)
             self.stop_button.setEnabled(True)
@@ -437,8 +441,8 @@ class MotorSpinBoxBrick(BaseWidget):
             self.move_right_button.setEnabled(False)
             self.step_combo.setEnabled(False)
         elif state in (
-            self.motor_hwobj.motor_states.LOWLIMIT,
-            self.motor_hwobj.motor_states.HIGHLIMIT,
+            self.motor_hwobj.STATES.READY,
+            #self.motor_hwobj.STATES.HIGHLIMIT,
         ):
             self.position_spinbox.setEnabled(True)
             self.stop_button.setEnabled(False)
@@ -484,7 +488,7 @@ class MotorSpinBoxBrick(BaseWidget):
                     "%s: could not get motor state", self.objectName()
                 )
 
-                state = self.motor_hwobj.motor_states.INVALID
+                state = self.motor_hwobj.STATES.FAULT
 
             try:
                 if limits is None and self.motor_hwobj.is_ready():
@@ -569,6 +573,8 @@ class MotorSpinBoxBrick(BaseWidget):
                 instance_filter=True,
             )
 
+        # get motor position and set to brick
+        self.position_changed(self.motor_hwobj.get_value())
         self.position_history = []
         self.update_gui()
         # self['label'] = self['label']
@@ -578,6 +584,17 @@ class MotorSpinBoxBrick(BaseWidget):
         """Sets motor postion based on the slider value"""
         if self.motor_hwobj is not None:
             self.motor_hwobj.set_value(value)
+
+    def set_buttons_press_nature(self, new_state):
+        """Changes right/left buttons functionality
+        if new_state : buttons act while mouse button is pressed
+        if not : buttons stop acting even if mouse button is pressed
+        Args:
+            new_state (bool):
+        """
+
+        self.move_left_button.setAutoRepeat(new_state)
+        self.move_right_button.setAutoRepeat(new_state)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
@@ -650,6 +667,8 @@ class MotorSpinBoxBrick(BaseWidget):
             self.position_slider.setVisible(new_value)
         elif property_name == "enableSliderTracking":
             self.position_slider.setTracking(new_value)
+        elif property_name == "oneClickPressButton":
+            self.set_buttons_press_nature(new_value)
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
