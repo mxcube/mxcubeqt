@@ -136,7 +136,7 @@ class MultipleMotorsBrick(BaseWidget):
                     self.motor_hwobj_list.append(temp_motor_hwobj)
                     self.motor_widget_list.append(temp_motor_widget)
 
-                    temp_motor_hwobj.update_values()
+                    temp_motor_hwobj.re_emit_values()
                     temp_motor_widget.update_gui()
 
             self.enable_motors_buttons.setVisible(self["showEnableButtons"])

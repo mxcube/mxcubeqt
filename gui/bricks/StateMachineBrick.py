@@ -113,7 +113,7 @@ class StateMachineBrick(BaseWidget):
                 )
                 self.init_state_machine()
                 self.init_state_graph()
-                self.state_machine_hwobj.update_values()
+                self.state_machine_hwobj.re_emit_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 

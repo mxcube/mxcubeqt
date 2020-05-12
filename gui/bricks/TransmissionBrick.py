@@ -82,7 +82,7 @@ class TransmissionBrick(BaseWidget):
             self.connect(HWR.beamline.transmission, "stateChanged", self._state_changed)
             self.connect(HWR.beamline.transmission, "valueChanged", self._value_changed)
             self.connected()
-            HWR.beamline.transmission.update_values()  # It updates only the states
+            HWR.beamline.transmission.re_emit_values()  # It updates only the states
             HWR.beamline.transmission.update_value()
         else:
             self.disconnected()

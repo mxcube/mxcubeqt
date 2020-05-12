@@ -150,7 +150,7 @@ class ResolutionBrick(BaseWidget):
             )
 
             if HWR.beamline.detector.distance.is_ready():
-                HWR.beamline.detector.distance.update_values()
+                HWR.beamline.detector.distance.re_emit_values()
                 self.connected()
             else:
                 self.disconnected()
@@ -180,7 +180,7 @@ class ResolutionBrick(BaseWidget):
             )
 
             if HWR.beamline.resolution.is_ready():
-                HWR.beamline.resolution.update_values()
+                HWR.beamline.resolution.re_emit_values()
                 self.connected()
             else:
                 self.disconnected()
