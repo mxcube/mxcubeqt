@@ -121,7 +121,7 @@ class ALBA_MachineInfoBrick(BaseWidget):
                     QtImport.SIGNAL("valuesChanged"),
                     self.set_value,
                 )
-                self.mach_info_hwobj.update_values()
+                self.mach_info_hwobj.re_emit_values()
             else:
                 self.setEnabled(False)
         else:

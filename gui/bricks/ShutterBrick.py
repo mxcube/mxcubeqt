@@ -111,7 +111,7 @@ class ShutterBrick(BaseWidget):
                 self.connect(
                     self.shutter_hwobj, "shutterStateChanged", self.state_changed
                 )
-                self.shutter_hwobj.update_values()
+                self.shutter_hwobj.re_emit_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 

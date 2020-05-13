@@ -119,7 +119,7 @@ class ImageTrackingStatusBrick(BaseWidget):
                 self.connect(
                     self.image_tracking_hwobj, "stateChanged", self.state_changed
                 )
-                self.image_tracking_hwobj.update_values()
+                self.image_tracking_hwobj.re_emit_values()
                 self.setEnabled(True)
             else:
                 self.setEnabled(False)

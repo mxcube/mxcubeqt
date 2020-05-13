@@ -128,7 +128,7 @@ class VolpiBrick(BaseWidget):
         if self.volpi_hwobj is not None:
             self.frame.setEnabled(True)
             if self.volpi_hwobj.is_ready():
-                self.volpi_hwobj.update_values()
+                self.volpi_hwobj.re_emit_values()
         else:
             self.frame.setEnabled(False)
 

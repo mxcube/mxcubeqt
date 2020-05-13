@@ -224,7 +224,7 @@ class SlitsBrick(BaseWidget):
 
                 self.main_gbox.setEnabled(True)
                 self.initiate_spinboxes()
-                self.slitbox_hwobj.update_values()
+                self.slitbox_hwobj.re_emit_values()
             else:
                 self.main_gbox.setEnabled(False)
         else:

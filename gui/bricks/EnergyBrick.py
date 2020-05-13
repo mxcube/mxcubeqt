@@ -137,7 +137,7 @@ class EnergyBrick(BaseWidget):
                 HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
             )
 
-            HWR.beamline.energy.update_values()
+            HWR.beamline.energy.re_emit_values()
             if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
                 HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
             if HWR.beamline.energy.is_ready():

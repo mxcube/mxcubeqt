@@ -135,6 +135,6 @@ class TurretBrick(BaseWidget):
         if self.turret_hwobj is not None:
             self.frame.setEnabled(True)
             if self.turret_hwobj.is_ready():
-                self.turret_hwobj.update_values()
+                self.turret_hwobj.re_emit_values()
         else:
             self.frame.setEnabled(False)

@@ -108,7 +108,7 @@ class ALBA_ActuatorBrick(BaseWidget):
                     QtImport.SIGNAL("stateChanged"),
                     self.state_changed,
                 )
-                self.actuator_hwo.update_values()
+                self.actuator_hwo.re_emit_values()
                 logging.getLogger("HWR").info(
                     "User Name is: %s" % self.actuator_hwo.getUserName()
                 )
