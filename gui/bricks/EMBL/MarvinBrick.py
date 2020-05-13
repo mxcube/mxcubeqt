@@ -170,7 +170,7 @@ class MarvinBrick(BaseWidget):
             HWR.beamline.sample_changer, "infoDictChanged", self.info_dict_changed
         )
 
-        HWR.beamline.sample_changer.update_values()
+        HWR.beamline.sample_changer.re_emit_values()
 
     def init_tables(self):
         """

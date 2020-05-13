@@ -149,7 +149,7 @@ class CRLBrick(BaseWidget):
                     self.mode_combo.addItem(crl_mode)
                 self.connect(self.crl_hwobj, "crlModeChanged", self.crl_mode_changed)
                 self.connect(self.crl_hwobj, "crlValueChanged", self.crl_value_changed)
-                self.crl_hwobj.update_values()
+                self.crl_hwobj.re_emit_values()
         elif property_name == "lenseCount":
             self.crl_value_table.setColumnCount(new_value)
             for col_index in range(new_value):

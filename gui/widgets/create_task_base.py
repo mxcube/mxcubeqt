@@ -110,8 +110,8 @@ class CreateTaskBase(QtImport.QWidget):
                 "beamInfoChanged", self.set_beam_info
             )
 
-            HWR.beamline.resolution.update_values()
-            HWR.beamline.detector.update_values()
+            HWR.beamline.resolution.re_emit_values()
+            HWR.beamline.detector.re_emit_values()
             self.set_resolution_limits(HWR.beamline.resolution.get_limits())
         except AttributeError as ex:
             msg = "Could not connect to one or more hardware objects " + str(ex)

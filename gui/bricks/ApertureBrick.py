@@ -134,7 +134,7 @@ class ApertureBrick(BaseWidget):
                 self.connect(
                     self.aperture_hwobj, "valueChanged", self.position_changed
                 )
-                self.aperture_hwobj.update_values()
+                self.aperture_hwobj.re_emit_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 

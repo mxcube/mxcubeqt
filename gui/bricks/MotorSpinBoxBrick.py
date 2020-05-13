@@ -298,7 +298,7 @@ class MotorSpinBoxBrick(BaseWidget):
         if self.motor_hwobj is not None:
             self.main_gbox.setEnabled(True)
             if self.motor_hwobj.is_ready():
-                self.motor_hwobj.update_values()
+                self.motor_hwobj.re_emit_values()
         else:
             self.main_gbox.setEnabled(False)
 
