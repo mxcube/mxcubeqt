@@ -241,8 +241,9 @@ class CustomMenuBar(QtImport.QMenuBar):
                                 "Could not set %s to user mode" % widget.objectName()
                             )
                 except NameError:
-                    logging.getLogger().warning("Widget {} has no attribute {}"
-                                                .format(widget, "set_expert_mode"))
+                    pass
+                    #logging.getLogger().warning("Widget {} has no attribute {}"
+                    #                            .format(widget, "set_expert_mode"))
             if self.original_style:
                 self.setStyleSheet(self.original_style)
 

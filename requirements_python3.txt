@@ -9,3 +9,4 @@ matplotlib
 Pillow
 pylint
 lxml
+pyqtgraph

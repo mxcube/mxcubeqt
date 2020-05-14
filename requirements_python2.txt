@@ -9,3 +9,4 @@ pymca
 enum34
 lxml
 ruamel.yaml
+pyqtgraph

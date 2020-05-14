@@ -121,22 +121,21 @@ class MotorPredefPosBrick(BaseWidget):
         self.label.setToolTip(tip)
 
     def motor_state_changed(self, state):
-        # TODO remove this check and use motor_states as in AbstractMotor
-        if hasattr(self.motor_hwobj, "motor_states"):
-            s = state in (
-                self.motor_hwobj.motor_states.READY,
-                self.motor_hwobj.motor_states.LOWLIMIT,
-                self.motor_hwobj.motor_states.HIGHLIMIT,
-            )
+        self.positions_combo.setEnabled(self.motor_hwobj.is_ready())
+        if self.motor_hwobj.is_ready:
+            Colors.set_widget_color(
+                    self.positions_combo,
+                    Colors.LIGHT_GREEN,
+                    QtImport.QPalette.Button,
+                    )
         else:
-            s = state in (self.motor_hwobj.READY, self.motor_hwobj.ONLIMIT)
-        self.positions_combo.setEnabled(s)
-        Colors.set_widget_color(
-            self.positions_combo,
-            MotorPredefPosBrick.STATE_COLORS[state],
-            QtImport.QPalette.Button,
-        )
-        self.setToolTip(state=state)
+            Colors.set_widget_color(
+                    self.positions_combo,
+                    Colors.LIGHT_GRAY,
+                    QtImport.QPalette.Button,
+                    )
+
+        #self.setToolTip(state=state)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "label":
@@ -173,10 +172,10 @@ class MotorPredefPosBrick(BaseWidget):
                 self.fill_positions()
                 if self.motor_hwobj.is_ready():
                     self.predefined_position_changed(
-                        self.motor_hwobj.get_current_position_name(), 0
+                        self.motor_hwobj.get_value(), 0
                     )
                 if self["label"] == "":
-                    lbl = self.motor_hwobj.username
+                    lbl = self.motor_hwobj.user_name
                     self.label.setText("<i>" + lbl + ":</i>")
                 Colors.set_widget_color(
                     self.positions_combo,
@@ -205,24 +204,21 @@ class MotorPredefPosBrick(BaseWidget):
         self.positions_combo.clear()
         if self.motor_hwobj is not None:
             if positions is None:
-                positions = self.motor_hwobj.get_predefined_positions_list()
-        if positions is None:
-            positions = []
+                positions = [e.value for e in self.motor_hwobj.VALUES]
         for p in positions:
-            pos_list = str(p).split()
-            pos_name = pos_list[1]
-            self.positions_combo.addItem(str(pos_name))
+            if p != 'UNKNOWN':
+                self.positions_combo.addItem(str(p))
 
         self.positions = positions
         if self.motor_hwobj is not None:
             if self.motor_hwobj.is_ready():
                 self.predefined_position_changed(
-                    self.motor_hwobj.get_current_position_name(), 0
+                    self.motor_hwobj.get_value(), 0
                 )
 
     def position_selected(self, index):
         if index >= 0:
-            self.motor_hwobj.move_to_position(self.positions[index])
+            self.motor_hwobj.set_value(int(self.positions[index]))
         self.positions_combo.setCurrentIndex(-1)
         self.next_position_button.setEnabled(index < (len(self.positions) - 1))
         self.previous_position_button.setEnabled(index >= 0)

@@ -138,6 +138,7 @@ class EnergyBrick(BaseWidget):
             )
 
             HWR.beamline.energy.re_emit_values()
+
             if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
                 HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
             if HWR.beamline.energy.is_ready():
@@ -165,7 +166,7 @@ class EnergyBrick(BaseWidget):
 
     def connected(self):
         self.setEnabled(True)
-        tunable_energy = HWR.beamline.energy.tunable
+        tunable_energy = HWR.beamline.energy.is_tunable
         if tunable_energy is None:
             tunable_energy = False
         self.set_to_label.setEnabled(tunable_energy)
@@ -196,7 +197,7 @@ class EnergyBrick(BaseWidget):
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def state_changed(self, state):
-        self.setEnabled(state == "ready")
+        self.setEnabled(HWR.beamline.energy.is_ready())
         BaseWidget.set_status_info("status", "", "")
 
     def status_info_changed(self, status_info):
