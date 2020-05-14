@@ -561,10 +561,10 @@ class CustomSplitter(QtImport.QSplitter):
             self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
 
         if kwargs.get("layout") == "vertical":
-            self.setOrientation(QtImport.Qt.Horizontal)
+            self.setOrientation(QtImport.Qt.Vertical)
             __frame_layout = QtImport.QVBoxLayout(self)
         else:
-            self.setOrientation(QtImport.Qt.Vertical)
+            self.setOrientation(QtImport.Qt.Horizontal)
             __frame_layout = QtImport.QHBoxLayout(self)
 
 class CustomTabWidget(QtImport.QTabWidget):
