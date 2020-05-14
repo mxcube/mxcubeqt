@@ -547,6 +547,26 @@ class CustomFrame(QtImport.QFrame):
     def set_expert_mode(self, expert_mode):
         self.open_in_dialog_button.setVisible(expert_mode)
 
+class CustomSplitter(QtImport.QSplitter):
+
+    def __init__(self, *args, **kwargs):
+        """init"""
+        QtImport.QFrame.__init__(self, args[0])
+
+        self.setObjectName(args[1])
+        self.origin_parent = self.parent()
+        execution_mode = kwargs.get("execution_mode", False)
+
+        if not execution_mode:
+            self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
+
+        if kwargs.get("layout") == "vertical":
+            self.setOrientation(QtImport.Qt.Horizontal)
+            __frame_layout = QtImport.QVBoxLayout(self)
+        else:
+            self.setOrientation(QtImport.Qt.Vertical)
+            __frame_layout = QtImport.QHBoxLayout(self)
+
 class CustomTabWidget(QtImport.QTabWidget):
     """Tab widget"""
 
@@ -795,13 +815,14 @@ def get_horizontal_spacer(*args, **kwargs):
 
 def get_horizontal_splitter(*args, **kwargs):
     """Horizontal splitter"""
-
-    return QtImport.QSplitter(QtImport.Qt.Horizontal, *args)
+    kwargs["layout"] = "horizontal"
+    return CustomSplitter(*args, **kwargs)
 
 def get_vertical_splitter(*args, **kwargs):
     """Vertical splitter"""
 
-    return QtImport.QSplitter(QtImport.Qt.Vertical, *args)
+    kwargs["layout"] = "vertical"
+    return CustomSplitter(*args, **kwargs)
 
 def get_vertical_box(*args, **kwargs):
     """Vertical box"""
@@ -1131,7 +1152,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             new_item = klass(
                 parent, item_cfg["name"], execution_mode=self.execution_mode
             )
-            if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox"):
+            if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox", "hsplitter", "vsplitter"):
                 if item_cfg["properties"]["color"] is not None:
                     qtcolor = QtImport.QColor(item_cfg["properties"]["color"])
                     Colors.set_widget_color(new_item, qtcolor)
@@ -1233,8 +1254,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 new_item.close_tab_button.clicked.connect(close_current_page)
                 new_item.open_in_dialog_button.clicked.connect(open_in_dialog)
 
-            elif item_type == "vsplitter" or type == "hsplitter":
-                pass
+            #elif item_type == "vsplitter" or item_type == "hsplitter":
+            #    print(new_item)
+            #    pass
 
             new_item.show()
 
@@ -1384,6 +1406,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     new_item, child["properties"]["label"], child["properties"]["icon"]
                 )
                 new_tab.item_cfg = child
+            elif isinstance(parent_item, QtImport.QSplitter):
+                parent_item.addWidget(new_item)
             else:
                 parent_item.layout().addWidget(new_item)
             self.preview_items.append(new_item)
