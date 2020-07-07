@@ -552,9 +552,13 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     @staticmethod
     def update_widget(brick_name, widget_name, method_name, method_args, master_sync):
         for widget in QtImport.QApplication.allWidgets():
-            if hasattr(widget, "configuration"):
-                top_level_widget = widget
-                break
+            try:
+                if hasattr(widget, "configuration"):
+                    top_level_widget = widget
+                    break
+            except NameError:
+                continue
+
         if (
             not master_sync
             or BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER
