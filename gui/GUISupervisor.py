@@ -142,7 +142,7 @@ class GUISupervisor(QtImport.QWidget):
         self.user_settings = None
 
         self.launch_in_design_mode = design_mode
-        self.hardware_repository = HWR.getHardwareRepository()
+        self.hardware_repository = HWR.get_hardware_repository()
         self.show_maximized = show_maximized
         self.no_border = no_border
         self.windows = []
