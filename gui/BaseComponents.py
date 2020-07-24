@@ -27,7 +27,7 @@ import weakref
 import gui
 from gui.utils import PropertyBag, Connectable, Colors, QtImport
 
-from HardwareRepository import HardwareRepository as HWR
+from HardwareRepository import HardwareRepository
 from HardwareRepository.BaseHardwareObjects import HardwareObject
 
 try:
@@ -69,6 +69,16 @@ def emitter(ob):
 
 class InstanceEventFilter(QtImport.QObject):
     def eventFilter(self, widget, event):
+        """A test doc
+        
+        Arguments:
+            QtImport {[type]} -- [description]
+            widget {[type]} -- [description]
+            event {[type]} -- [description]
+        
+        Returns:
+            [type] -- [description]
+        """     
         obj = widget
         while obj is not None:
             if isinstance(obj, BaseWidget):
@@ -184,7 +194,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     _menubar = None
     _toolbar = None
     _statusbar = None
-    _warning_box = None
     _progressbar = None
     _progress_dialog = None
 
@@ -291,12 +300,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             BaseWidget._statusbar.parent().update_status_info(
                 info_type, info_message, info_status
             )
-
-    @staticmethod
-    def set_warning_box(warning_msg):
-        """Updates status bar"""
-        if BaseWidget._warning_box:
-            BaseWidget._warning_box.parent().show_warning_box(warning_msg)
 
     @staticmethod
     def init_progress_bar(progress_type, number_of_steps):
@@ -697,7 +700,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         dispatcher.connect(
             self.__hardware_object_discarded,
             "hardwareObjectDiscarded",
-            HWR.getHardwareRepository(),
+            HardwareRepository.getHardwareRepository(),
         )
         self.define_slot("enable_widget", ())
         self.define_slot("disable_widget", ())
@@ -706,7 +709,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         # This solution of redirecting methods works...
 
         self.connect = self.connect_hwobj
-        self.disconnect = self.disconnect_hwobj
+        self.diconnect = self.disconnect_hwobj
         # self.run_mode = QPushButton("Run mode", self)
 
     def __run(self):
@@ -786,8 +789,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             #                       slot)
 
         # workaround for PyQt lapse
-        # if hasattr(sender, "connectNotify"):
-        #    sender.connectNotify(QtCore.pyqtSignal(signal))
+        # if hasattr(sender, "connect_notify"):
+        #    sender.connect_notify(QtCore.pyqtSignal(signal))
 
     def disconnect_hwobj(self, sender, signal, slot):
         signal = str(signal)
@@ -802,8 +805,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             return
 
         # workaround for PyQt lapse
-        if hasattr(sender, "disconnectNotify"):
-            sender.disconnectNotify(signal)
+        if hasattr(sender, "disconnect_notify"):
+            sender.disconnect_notify(signal)
 
         if not isinstance(sender, QtImport.QObject):
             sender = emitter(sender)
@@ -932,7 +935,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 splash_screen.inc_progress_value()
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        hwobj = HWR.getHardwareRepository().getHardwareObject(
+        hwobj = HardwareRepository.getHardwareRepository().get_hardware_object(
             hardware_object_name
         )
 
@@ -941,7 +944,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
             self.connect(hwobj, "progressStep", self.progress_step)
             self.connect(hwobj, "progressStop", self.progress_stop)
             self.connect(hwobj, "statusMessage", self.status_message_changed)
-            self.connect(hwobj, "showWarning", self.show_warning)
 
         if hwobj is None and not optional:
             logging.getLogger("GUI").error(
@@ -970,9 +972,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def status_message_changed(self, info_type, message, state):
         BaseWidget.set_status_info(info_type, message, state)
 
-    def show_warning(self, warning_msg):
-        BaseWidget.set_warning_box(warning_msg)
-
     def __hardware_object_discarded(self, hardware_object_name):
         if hardware_object_name in self.__loaded_hardware_objects:
             # there is a high probability we need to reload this hardware object...
@@ -981,7 +980,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def get_hardware_objects_info(self):
         info_dict = {}
         for ho_name in self.__loaded_hardware_objects:
-            info = HWR.getHardwareRepository().getInfo(ho_name)
+            info = HardwareRepository.getHardwareRepository().getInfo(ho_name)
 
             if len(info) > 0:
                 info_dict[ho_name] = info
@@ -1034,8 +1033,6 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         elif property_name == "hide":
             if new_value:
                 self.setHidden(True)
-            #else:
-            #    self.setVisible(True)
         else:
             try:
                 self.property_changed(property_name, old_value, new_value)

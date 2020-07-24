@@ -190,9 +190,9 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        xx0 = next(HWR.beamline.gphl_workflow.getObjects("test_crystals"))
-        for test_crystal in xx0.getObjects("test_crystal"):
-            dd0 = test_crystal.getProperties()
+        xx0 = next(HWR.beamline.gphl_workflow.get_objects("test_crystals"))
+        for test_crystal in xx0.get_objects("test_crystal"):
+            dd0 = test_crystal.get_properties()
             self.test_crystals[dd0["name"]] = CrystalData(**dd0)
 
         row = 0
@@ -358,7 +358,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
-        strategy_names = HWR.beamline.gphl_workflow.getProperty(
+        strategy_names = HWR.beamline.gphl_workflow.get_property(
             "characterisation_strategies"
         ).split()
         self._pulldowns[field_name] = strategy_names

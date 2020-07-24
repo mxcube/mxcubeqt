@@ -513,7 +513,7 @@ if qt_variant in ("PyQt4", "PyQt5", "PySide"):
             self._min_value = 0.0
             self._max_value = 1.0
 
-            self.valueChanged.connect(self.value_changed)
+            self.value_changed.connect(self.value_changed)
 
         def value_changed(self, value):
             self.doubleValueChanged.emit(value / float(self._max_int))

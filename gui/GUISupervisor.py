@@ -289,7 +289,7 @@ class GUISupervisor(QtImport.QWidget):
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
 
-                    #self.hardware_repository.printReport()
+                    #self.hardware_repository.print_report()
 
                     if self.launch_in_design_mode:
                         self.framework = GUIBuilder.GUIBuilder()
@@ -504,7 +504,7 @@ class GUISupervisor(QtImport.QWidget):
                     "Timeout while connecting to Hardware "
                     + "Repository server.\nMake sure the Hardware "
                     + "Repository Server is running on host:\n%s."
-                    % str(self.hardware_repository.serverAddress).split(":")[0]
+                    % str(self.hardware_repository.server_address).split(":")[0]
                 )
                 if (
                     QtImport.QMessageBox.warning(
@@ -524,7 +524,7 @@ class GUISupervisor(QtImport.QWidget):
             else:
                 logging.getLogger().info(
                     "Connected to Hardware "
-                    + "Repository server %s" % self.hardware_repository.serverAddress
+                    + "Repository server %s" % self.hardware_repository.server_address
                 )
                 break
 
