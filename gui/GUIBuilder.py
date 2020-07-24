@@ -1500,7 +1500,7 @@ class GUIBuilder(QtImport.QMainWindow):
                     ):
                         try:
                             hwr_server = (
-                                HWR.getHardwareRepository().server_address
+                                HWR.get_hardware_repository().server_address
                             )
                         except BaseException:
                             hwr_server = ""
