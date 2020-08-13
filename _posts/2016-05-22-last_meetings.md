@@ -7,6 +7,7 @@ fa-icon: users
 
 # Past meetings
 
+- [15th. MXCuBE virtual meeting organized by ALBA, 29.-30.06.2020](doc/past_meetings/2020_alba/index.html)
 - [14th. MXCuBE meeting @ HZB  (Berlin, Germany), 31.10-02.11.2019](doc/past_meetings/2019_hzb/index.html)
 - [13th. MXCuBE meeting @ MAXIV  (Lund, Sweeden), 12-14.03.2019](doc/past_meetings/2019_maxiv/index.html)
 - [12th. MXCuBE meeting @ Elettra (Trieste, Italy), 11-13.09.2018](doc/past_meetings/2018_elettra/index.html)

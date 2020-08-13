@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next MXCuBE meeting @ ALBA  (Barcelona, Spain), 24th - 26th of June 2020
+# Next virtual MXCuBE meeting organized by MaxIV, November 2020
