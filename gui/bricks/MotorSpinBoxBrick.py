@@ -464,7 +464,7 @@ class MotorSpinBoxBrick(BaseWidget):
             )
         else:
             # restore last position from motor
-            self.update_me()
+            self.update_position(self.motor_hwobj.get_value())
 
     def set_tool_tip(self, name=None, state=None, limits=None):
         states = (
@@ -601,15 +601,11 @@ class MotorSpinBoxBrick(BaseWidget):
             )
 
         # get motor position and set to brick
-        self.update_me()
+        self.update_position(self.motor_hwobj.get_value())
         self.position_history = []
         self.update_gui()
         # self['label'] = self['label']
         # self['defaultStep']=self['defaultStep']
-
-    def update_me(self):
-        self.position_changed(self.motor_hwobj.get_value())
-        #self.state_changed(self.motor_hwobj.get_state())
 
     def position_slider_double_value_changed(self, value):
         """Sets motor postion based on the slider value"""
