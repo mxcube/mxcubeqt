@@ -149,8 +149,9 @@ class ResolutionBrick(BaseWidget):
                 self.detector_distance_limits_changed,
             )
 
+            HWR.beamline.detector.distance.re_emit_values()
+
             if HWR.beamline.detector.distance.is_ready():
-                HWR.beamline.detector.distance.re_emit_values()
                 self.connected()
             else:
                 self.disconnected()
@@ -391,7 +392,7 @@ class ResolutionBrick(BaseWidget):
 
             unit = self.units_combobox.currentText()
             if unit is chr(197):
-                if state == detector_distance.motor_states.READY:
+                if state == detector_distance.STATES.READY:
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")
                     self.new_value_ledit.blockSignals(False)
@@ -399,7 +400,7 @@ class ResolutionBrick(BaseWidget):
                 else:
                     self.new_value_ledit.setEnabled(False)
                 # or state == detector_distance.motor_states.MOVESTARTED:
-                if state == detector_distance.motor_states.MOVING:
+                if state == detector_distance.STATES.BUSY:
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
@@ -413,15 +414,20 @@ class ResolutionBrick(BaseWidget):
         detector_distance = HWR.beamline.detector.distance
         color = ResolutionBrick.STATE_COLORS[state.value]
         unit = self.units_combobox.currentText()
+
+        if state == detector_distance.STATES.FAULT:
+            self.setEnabled(False)
+            return
+
         if unit == "mm":
-            if state == detector_distance.motor_states.READY:
+            if state == detector_distance.STATES.READY:
                 self.new_value_ledit.blockSignals(True)
                 self.new_value_ledit.setText("")
                 self.new_value_ledit.blockSignals(False)
                 self.new_value_ledit.setEnabled(True)
             else:
                 self.new_value_ledit.setEnabled(False)
-            if state == detector_distance.motor_states.MOVING:
+            if state == detector_distance.STATES.BUSY:
                 # or \
                 # state == detector_distance.motor_states.MOVESTARTED:
                 self.stop_button.setEnabled(True)
