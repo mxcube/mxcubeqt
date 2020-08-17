@@ -40,11 +40,9 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __version__ = 2
 
-
 logger = logging.getLogger()
 gui_log_handler = GUILogHandler.GUILogHandler()
 logger.addHandler(gui_log_handler)
-
 
 def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)
@@ -193,13 +191,9 @@ def run(gui_config_file=None):
 
     (opts, args) = parser.parse_args()
 
-    logging.getLogger("HWR").info(
-        "=============================================================================="
-    )
-    logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
+    log_file = start_log(opts.logFile, opts.logLevel)
 
     # get config from arguments
-    log_file = opts.logFile
     log_template = opts.logTemplate
     hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
@@ -287,6 +281,7 @@ def run(gui_config_file=None):
         gui.add_custom_bricks_dirs(custom_bricks_directories)
 
     log_lockfile = None
+
     if len(log_file) > 0:
         if gui_config_file:
             gui.set_logging_name(os.path.basename(gui_config_file), log_template)
@@ -347,9 +342,13 @@ def run(gui_config_file=None):
 
         gui.set_log_file(log_file)
 
+    logging.getLogger("HWR").info(
+        "=============================================================================="
+    )
+    logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
+
+
     # log startup details
-    log_level = getattr(logging, opts.logLevel)
-    logging.getLogger().setLevel(log_level)
     # logging.getLogger().info("\n\n\n\n")
     logging.getLogger("HWR").info("Starting to load gui...")
     logging.getLogger("HWR").info("GUI file: %s" % (gui_config_file or "unnamed"))
@@ -377,6 +376,8 @@ def run(gui_config_file=None):
     logging.getLogger("HWR").info(
         "------------------------------------------------------------------------------"
     )
+
+    HWR.init_hardware_repository(configuration_path)
 
     QtImport.QApplication.setDesktopSettingsAware(False)
 
@@ -420,6 +421,16 @@ def run(gui_config_file=None):
             os.unlink(filename)
         except BaseException:
             logging.getLogger().exception("Problem removing the log lock file")
+
+
+def start_log(logfile, loglevel):
+    if not logfile:
+        logfile = os.environ.get("MXCUBE_LOG_FILE","")
+
+    log_level = getattr(logging, loglevel)
+    logging.getLogger().setLevel(log_level)
+
+    return logfile
 
 
 if __name__ == "__main__":
