@@ -444,6 +444,7 @@ class GUISupervisor(QtImport.QWidget):
         if BaseWidget._menubar:
             BaseWidget._menubar.set_exp_mode(False)
 
+        HWR.beamline.re_emit_values()
         return main_window
 
     def finalize(self):

@@ -47,8 +47,6 @@ class EnergyBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        self.energy_limits = None
-        self.wavelength_limits = None
 
         # Graphic elements ----------------------------------------------------
         self.group_box = QtImport.QGroupBox("Energy", self)
@@ -127,24 +125,20 @@ class EnergyBrick(BaseWidget):
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
     def run(self):
-        if HWR.beamline.energy is not None:
-            self.set_new_value_limits()
-            self.connect(HWR.beamline.energy, "deviceReady", self.connected)
-            self.connect(HWR.beamline.energy, "deviceNotReady", self.disconnected)
-            self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
-            self.connect(HWR.beamline.energy, "stateChanged", self.state_changed)
-            self.connect(
-                HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
-            )
+        self.set_new_value_limits()
+        self.connect(HWR.beamline.energy, "deviceReady", self.connected)
+        self.connect(HWR.beamline.energy, "deviceNotReady", self.disconnected)
+        self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
+        self.connect(HWR.beamline.energy, "stateChanged", self.state_changed)
+        self.connect(
+            HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
+        )
 
-            HWR.beamline.energy.re_emit_values()
+        if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
+            HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
 
-            if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
-                HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
-            if HWR.beamline.energy.is_ready():
-                self.connected()
-            else:
-                self.disconnected()
+        if HWR.beamline.energy.is_ready():
+            self.connected()
         else:
             self.disconnected()
 

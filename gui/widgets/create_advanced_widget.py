@@ -205,14 +205,17 @@ class CreateAdvancedWidget(CreateTaskBase):
         )
 
     def set_beam_info(self, beam_info):
-        self.spacing[0] = beam_info["size_x"]
-        self.spacing[1] = beam_info["size_y"]
-        self._advanced_methods_widget.hor_spacing_ledit.setText(
-            "%.1f" % (beam_info["size_x"] * 1000)
-        )
-        self._advanced_methods_widget.ver_spacing_ledit.setText(
-            "%.1f" % (beam_info["size_x"] * 1000)
-        )
+        try:
+            self.spacing[0] = beam_info["size_x"]
+            self.spacing[1] = beam_info["size_y"]
+            self._advanced_methods_widget.hor_spacing_ledit.setText(
+                "%.1f" % (beam_info["size_x"] * 1000)
+            )
+            self._advanced_methods_widget.ver_spacing_ledit.setText(
+                "%.1f" % (beam_info["size_x"] * 1000)
+            )
+        except:
+            pass
 
     def approve_creation(self):
         """

@@ -149,8 +149,6 @@ class ResolutionBrick(BaseWidget):
                 self.detector_distance_limits_changed,
             )
 
-            HWR.beamline.detector.distance.re_emit_values()
-
             if HWR.beamline.detector.distance.is_ready():
                 self.connected()
             else:
@@ -267,17 +265,17 @@ class ResolutionBrick(BaseWidget):
         self.new_value_ledit.setText("")
         self.new_value_ledit.blockSignals(False)
 
-    def update_gui(self, resolution_ready=None, detector_ready=None):
+    def update_gui(self, resolution_ready=None, detector_distance_ready=None):
         """
         Door interlock is optional, because not all sites might have it
         """
         groupbox_title = ""
         detector_distance = HWR.beamline.detector.distance
         if detector_distance is None:
-            detector_ready = False
-        elif detector_ready is None:
-            detector_ready = detector_distance.is_ready()
-        if detector_ready:
+            detector_distance_ready = False
+        elif detector_distance_ready is None:
+            detector_distance_ready = detector_distance.is_ready()
+        if detector_distance_ready:
             self.get_detector_distance_limits()
             curr_detector_distance = detector_distance.get_value()
             self.detector_distance_changed(curr_detector_distance)
@@ -291,6 +289,8 @@ class ResolutionBrick(BaseWidget):
                 )
         else:
             self.detector_distance_state_changed(None)
+
+         
 
         if HWR.beamline.resolution is None:
             resolution_ready = False
@@ -314,7 +314,7 @@ class ResolutionBrick(BaseWidget):
             groupbox_title += " (door is unlocked)"
         self.group_box.setTitle(groupbox_title)
         self.create_tool_tip()
-
+ 
     def resolution_ready(self):
         self.update_gui(resolution_ready=True)
 
@@ -322,10 +322,10 @@ class ResolutionBrick(BaseWidget):
         self.update_gui(resolution_ready=False)
 
     def detector_distance_ready(self):
-        self.update_gui(detector_ready=True)
+        self.update_gui(detector_distance_ready=True)
 
     def detector_distance_not_ready(self):
-        self.update_gui(detector_ready=False)
+        self.update_gui(detector_distance_ready=False)
 
     def set_resolution(self, value):
         if self.resolution_limits is not None:
@@ -361,11 +361,11 @@ class ResolutionBrick(BaseWidget):
         if self.detector_distance_limits is not None and force is False:
             return
 
-        detector_ready = False
+        detector_distance_ready = False
         detector_distance = HWR.beamline.detector.distance
         if detector_distance is not None:
-            detector_ready = detector_distance.is_ready()
-        if detector_ready:
+            detector_distance_ready = detector_distance.is_ready()
+        if detector_distance_ready:
             self.detector_distance_limits_changed(
                 detector_distance.get_limits()
             )

@@ -74,48 +74,43 @@ class CreateTaskBase(QtImport.QWidget):
         self._enable_compression = None
 
         self._in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
-        try:
-            HWR.beamline.energy.connect("energyChanged", self.set_energy)
-            HWR.beamline.energy.connect(
-                "energyLimitsChanged", self.set_energy_limits
-            )
-            HWR.beamline.transmission.connect(
-                "transmissionChanged", self.set_transmission
-            )
-            HWR.beamline.transmission.connect(
-                "limitsChanged", self.set_transmission_limits
-            )
-            HWR.beamline.resolution.connect(
-                "valueChanged", self.set_resolution
-            )
-            HWR.beamline.resolution.connect(
-                "limitsChanged", self.set_resolution_limits
-            )
-            HWR.beamline.diffractometer.omega.connect(
-                "valueChanged", self.set_osc_start
-            )
+        
+        HWR.beamline.energy.connect("valueChanged", self.set_energy)
+        HWR.beamline.energy.connect(
+            "limitsChanged", self.set_energy_limits
+        )
+        HWR.beamline.transmission.connect(
+            "valueChanged", self.set_transmission
+        )
+        HWR.beamline.transmission.connect(
+            "limitsChanged", self.set_transmission_limits
+        )
+        HWR.beamline.resolution.connect(
+            "valueChanged", self.set_resolution
+        )
+        HWR.beamline.resolution.connect(
+            "limitsChanged", self.set_resolution_limits
+        )
+        HWR.beamline.diffractometer.omega.connect(
+            "valueChanged", self.set_osc_start
+        )
+        HWR.beamline.detector.connect(
+            "detectorRoiModeChanged", self.set_detector_roi_mode
+        )
+        HWR.beamline.detector.connect(
+            "expTimeLimitsChanged", self.set_detector_exp_time_limits
+        )
+        HWR.beamline.beam.connect(
+            "beamInfoChanged", self.set_beam_info
+        )
+        if hasattr(HWR.beamline.diffractometer, 'kappa'):
             HWR.beamline.diffractometer.kappa.connect(
                 "valueChanged", self.set_kappa
             )
-            HWR.beamline.diffractometer.kappa_phi.connect(
+        if hasattr(HWR.beamline.diffractometer, 'kappa_phi'):
+            HWR.beamline.diffractometer.kappa.connect(
                 "valueChanged", self.set_kappa_phi
             )
-            HWR.beamline.detector.connect(
-                "detectorRoiModeChanged", self.set_detector_roi_mode
-            )
-            HWR.beamline.detector.connect(
-                "expTimeLimitsChanged", self.set_detector_exp_time_limits
-            )
-            HWR.beamline.beam.connect(
-                "beamInfoChanged", self.set_beam_info
-            )
-
-            HWR.beamline.resolution.re_emit_values()
-            HWR.beamline.detector.re_emit_values()
-            self.set_resolution_limits(HWR.beamline.resolution.get_limits())
-        except AttributeError as ex:
-            msg = "Could not connect to one or more hardware objects " + str(ex)
-            logging.getLogger("HWR").warning(msg)
 
     def set_expert_mode(self, state):
         if self._acq_widget:
@@ -273,13 +268,13 @@ class CreateTaskBase(QtImport.QWidget):
                 result = True
         return result
 
-    def set_energy(self, energy, wavelength):
+    def set_energy(self, energy):
         if not self._item_is_dc() and energy is not None:
             acq_widget = self.get_acquisition_widget()
 
             if acq_widget:
                 acq_widget.previous_energy = energy
-                acq_widget.update_energy(energy, wavelength)
+                acq_widget.update_energy(energy)
 
     def set_transmission(self, trans):
         if trans is not None:
@@ -642,7 +637,7 @@ class CreateTaskBase(QtImport.QWidget):
         if self._in_plate_mode:
             try:
                 sample_is_mounted = (
-                    HWR.beamline.plate_manipulator.getLoadedSample().getCoords()
+                    HWR.beamline.plate_manipulator.get_loaded_sample().get_coords()
                     == sample.location
                 )
             except BaseException:
@@ -650,7 +645,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             try:
                 sample_is_mounted = (
-                    HWR.beamline.sample_changer.getLoadedSample().getCoords()
+                    HWR.beamline.sample_changer.get_loaded_sample().get_coords()
                     == sample.location
                 )
 
@@ -664,7 +659,7 @@ class CreateTaskBase(QtImport.QWidget):
 
         if len(temp_tasks) == 0:
             return
-
+        print("create ", free_pin_mode, sample_is_mounted, shape)
         if (not free_pin_mode) and (not sample_is_mounted) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
