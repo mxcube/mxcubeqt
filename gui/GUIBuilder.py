@@ -1500,7 +1500,7 @@ class GUIBuilder(QtImport.QMainWindow):
                     ):
                         try:
                             hwr_server = (
-                                HWR.getHardwareRepository().serverAddress
+                                HWR.get_hardware_repository().server_address
                             )
                         except BaseException:
                             hwr_server = ""
@@ -1622,7 +1622,7 @@ class GUIBuilder(QtImport.QMainWindow):
         terminal = os.environ["TERM"] or "xterm"
 
         try:
-            hwr_server = HWR.getHardwareRepository().serverAddress
+            hwr_server = HWR.getHardwareRepository().server_address
         except BaseException:
             logging.getLogger().error(
                 "Sorry, could not find Hardware Repository server"

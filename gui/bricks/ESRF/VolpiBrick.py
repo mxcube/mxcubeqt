@@ -288,4 +288,4 @@ class PowerBar(QtImport.QWidget):
         self._bar.update()
 
     def slot_value_changed(self, new_value):
-        self.valueChanged.emit(new_value)
+        self.value_changed.emit(new_value)

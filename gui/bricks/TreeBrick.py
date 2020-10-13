@@ -242,7 +242,6 @@ class TreeBrick(BaseWidget):
                 SampleChanger.INFO_CHANGED_EVENT,
                 self.plate_info_changed,
             )
-
         else:
             logging.getLogger("GUI").debug(
                 "TreeBrick: plate manipulator hwobj not defined."
@@ -310,7 +309,6 @@ class TreeBrick(BaseWidget):
             self.connect(
                 HWR.beamline.safety_shutter, "shutterStateChanged", self.shutter_state_changed
             )
-
         if HWR.beamline.machine_info is not None:
             self.connect(
                 HWR.beamline.machine_info, "machineCurrentChanged", self.machine_current_changed

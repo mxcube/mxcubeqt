@@ -310,7 +310,7 @@ class MotorSpinBoxBrick(BaseWidget):
             self.main_gbox.setEnabled(False)
 
     def limits_changed(self, limits):
-        if limits and not (None in limits or float('nan') in limits):
+        if limits and not(None in limits or any(math.isnan(x) for x in limits)):
             #limits = self.make_limits_bounded(limits) 
             self.position_spinbox.blockSignals(True)
             self.position_spinbox.setMinimum(limits[0])
@@ -364,8 +364,8 @@ class MotorSpinBoxBrick(BaseWidget):
             self.step_editor.updateGeometry()
             self.step_editor.show()
 
-    def position_changed(self, new_position):
-        if not new_position in (None, float('nan'), float('inf')):
+    def position_changed(self, position):
+        if not(position is None or math.isinf(position) or math.isnan(position)):
             self.position_spinbox.blockSignals(True)
             self.position_slider.blockSignals(True)
             self.position_spinbox.setValue(position)
@@ -374,7 +374,7 @@ class MotorSpinBoxBrick(BaseWidget):
             self.position_slider.blockSignals(False)
         else:
             logging.getLogger("GUI").debug(
-                "Unable to set motor position: %s" % str(new_position)
+                "Unable to set motor position: %s" % str(position)
             )
 
     def set_position_spinbox_color(self, state):
@@ -455,7 +455,7 @@ class MotorSpinBoxBrick(BaseWidget):
             )
         else:
             # restore last position from motor
-            self.update_position(self.motor_hwobj.get_value())
+            self.position_changed(self.motor_hwobj.get_value())
 
     def set_tool_tip(self, name=None, state=None, limits=None):
         states = (
@@ -592,7 +592,7 @@ class MotorSpinBoxBrick(BaseWidget):
             )
 
         # get motor position and set to brick
-        self.update_position(self.motor_hwobj.get_value())
+        self.position_changed(self.motor_hwobj.get_value())
         self.position_history = []
         self.update_gui()
         # self['label'] = self['label']

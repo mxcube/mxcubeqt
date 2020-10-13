@@ -142,7 +142,7 @@ class GUISupervisor(QtImport.QWidget):
         self.user_settings = None
 
         self.launch_in_design_mode = design_mode
-        self.hardware_repository = HWR.getHardwareRepository()
+        self.hardware_repository = HWR.get_hardware_repository()
         self.show_maximized = show_maximized
         self.no_border = no_border
         self.windows = []
@@ -289,7 +289,7 @@ class GUISupervisor(QtImport.QWidget):
                     if len(self.configuration.windows) == 0:
                         return self.new_gui()
 
-                    #self.hardware_repository.printReport()
+                    #self.hardware_repository.print_report()
 
                     if self.launch_in_design_mode:
                         self.framework = GUIBuilder.GUIBuilder()
@@ -444,7 +444,8 @@ class GUISupervisor(QtImport.QWidget):
         if BaseWidget._menubar:
             BaseWidget._menubar.set_exp_mode(False)
 
-        HWR.beamline.re_emit_values()
+        #HWR.beamline.re_emit_values()
+        #TODO uncomment when PR# of re_emit_values has been merged
         return main_window
 
     def finalize(self):
@@ -505,7 +506,7 @@ class GUISupervisor(QtImport.QWidget):
                     "Timeout while connecting to Hardware "
                     + "Repository server.\nMake sure the Hardware "
                     + "Repository Server is running on host:\n%s."
-                    % str(self.hardware_repository.serverAddress).split(":")[0]
+                    % str(self.hardware_repository.server_address).split(":")[0]
                 )
                 if (
                     QtImport.QMessageBox.warning(
@@ -525,7 +526,7 @@ class GUISupervisor(QtImport.QWidget):
             else:
                 logging.getLogger().info(
                     "Connected to Hardware "
-                    + "Repository server %s" % self.hardware_repository.serverAddress
+                    + "Repository server %s" % self.hardware_repository.server_address
                 )
                 break
 

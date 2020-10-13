@@ -274,9 +274,9 @@ def run(gui_config_file=None):
     # configure modules
     if hwobj_directories:
         # Must be done before init_hardware_repository
-        HWR.addHardwareObjectsDirs(hwobj_directories)
-    # HWR.init_hardware_repository(configuration_path)
-    HWR.setUserFileDirectory(user_file_dir)
+        HWR.add_hardware_objects_dirs(hwobj_directories)
+    HWR.init_hardware_repository(configuration_path)
+    HWR.set_user_file_directory(user_file_dir)
     if custom_bricks_directories:
         gui.add_custom_bricks_dirs(custom_bricks_directories)
 
@@ -376,8 +376,6 @@ def run(gui_config_file=None):
     logging.getLogger("HWR").info(
         "------------------------------------------------------------------------------"
     )
-
-    HWR.init_hardware_repository(configuration_path)
 
     QtImport.QApplication.setDesktopSettingsAware(False)
 

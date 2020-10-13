@@ -193,7 +193,7 @@ class CreateCharWidget(CreateTaskBase):
         )
 
         self._char_params = (
-            HWR.beamline.get_default_characterisation_parameters()
+            HWR.beamline.characterisation.get_default_characterisation_parameters()
         )
         self._path_template.reference_image_prefix = "ref"
         # The num images drop down default value is 1
