@@ -659,7 +659,6 @@ class CreateTaskBase(QtImport.QWidget):
 
         if len(temp_tasks) == 0:
             return
-        print("create ", free_pin_mode, sample_is_mounted, shape)
         if (not free_pin_mode) and (not sample_is_mounted) or (not shape):
             # No centred positions selected, or selected sample not
             # mounted create sample centring task.
