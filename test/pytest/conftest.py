@@ -22,5 +22,5 @@ def hwr():
 
 @pytest.fixture(scope="session")
 def blsetup(hwr):
-    return hwr.getHardwareObject("beamline-setup")
+    return hwr.get_hardware_object("beamline-setup")
 """

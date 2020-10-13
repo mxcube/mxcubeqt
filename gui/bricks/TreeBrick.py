@@ -243,7 +243,7 @@ class TreeBrick(BaseWidget):
                 self.plate_info_changed,
             )
 
-            HWR.beamline.plate_manipulator.re_emit_values()
+            #HWR.beamline.plate_manipulator.re_emit_values()
 
         else:
             logging.getLogger("GUI").debug(
@@ -313,7 +313,7 @@ class TreeBrick(BaseWidget):
             self.connect(
                 HWR.beamline.safety_shutter, "shutterStateChanged", self.shutter_state_changed
             )
-            HWR.beamline.safety_shutter.re_emit_values()
+            #HWR.beamline.safety_shutter.re_emit_values()
 
         if HWR.beamline.machine_info is not None:
             self.connect(

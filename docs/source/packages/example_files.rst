@@ -15,16 +15,16 @@ Configuration xml file defines hardware object behaviour. Available configuratio
 
      --> 
      <!-- Channels -->    
-     <channel type="exporter" name="chanExporterChannelName">ExporterValueName</channel>
-     <channel type="spec" name="chanSpecChannelName">SpecValueName</channel>
-     <channel type="tine" name="chanTineChannelName" tinename="SpecificTineName">TineValueName</channel>
-     <channel type="tango" name="chanTangoChannelName" polling="events">ChannelValueName</channel>
-     <channel type="taco" name="chanTacoChannelName" taconame="TacoName" polling="3000" compare="False">TacoValueName</channel>
+     <channel type="exporter" name="chanExporterchannel_name">ExporterValueName</channel>
+     <channel type="spec" name="chanSpecchannel_name">SpecValueName</channel>
+     <channel type="tine" name="chanTinechannel_name" tinename="SpecificTineName">TineValueName</channel>
+     <channel type="tango" name="chanTangochannel_name" polling="events">ChannelValueName</channel>
+     <channel type="taco" name="chanTacochannel_name" taconame="TacoName" polling="3000" compare="False">TacoValueName</channel>
      
      <!-- Command -->
-     <command type="exporter" name="cmdExporterCmdName">ExporterValueName</command>
-     <command type="spec" name="cmdSpecCmdName">SpecValueName</command>
-     <command type="tine" name="cmdTineCmdName" tinename="TineName">TineValueName</command>
+     <command type="exporter" name="cmdExportercmd_name">ExporterValueName</command>
+     <command type="spec" name="cmdSpeccmd_name">SpecValueName</command>
+     <command type="tine" name="cmdTinecmd_name" tinename="TineName">TineValueName</command>
 
      <!-- Hardware objects -->
      <object href="/device-role" role="device_role"/>

@@ -83,7 +83,7 @@ Pogramming guidlines
             if self.test_hwobj is not None:
                 self.disconnect(self.test_hwobj, "testQtSignal", self.test_method)
 
-            # with method getHardwareObject necessary hardware object is initialized
+            # with method get_hardware_object necessary hardware object is initialized
             # The value of the property should be the name of xml file that
             # contains the configuration of the hardware object.
 
