@@ -444,8 +444,8 @@ class GUISupervisor(QtImport.QWidget):
         if BaseWidget._menubar:
             BaseWidget._menubar.set_exp_mode(False)
 
-        #HWR.beamline.re_emit_values()
-        #TODO uncomment when PR# of re_emit_values has been merged
+        HWR.beamline.force_emit_signals()
+
         return main_window
 
     def finalize(self):

@@ -11,8 +11,11 @@ if not MXCUBE_GUI_FILE:
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT,
                                    "configuration/example_mxcube_gui.yml")
 if not os.environ.get('HARDWARE_REPOSITORY_SERVER'):
-    hr_server = os.path.join(MXCUBE_ROOT,
-                             "HardwareRepository/configuration/xml-qt")
+    hr_server = "%s%s%s" % (
+        os.path.join(MXCUBE_ROOT, "HardwareRepository/configuration/mockup/qt"),
+        os.path.pathsep,
+        os.path.join(MXCUBE_ROOT, "HardwareRepository/configuration/mockup/")
+    )
     os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
 
 from gui import startGUI

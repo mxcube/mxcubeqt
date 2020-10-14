@@ -179,7 +179,6 @@ class ResolutionBrick(BaseWidget):
             )
 
             if HWR.beamline.resolution.is_ready():
-                HWR.beamline.resolution.re_emit_values()
                 self.connected()
             else:
                 self.disconnected()
