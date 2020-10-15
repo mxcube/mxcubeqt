@@ -90,7 +90,7 @@ class TaskToolBoxBrick(BaseWidget):
         #self.task_tool_box_widget.set_available_tasks(self["availableTasks"])
         self.request_tree_brick.emit()
         self.task_tool_box_widget.adjust_width(self.width())
-
+        
     def user_group_saved(self, new_user_group):
         HWR.beamline.session.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()

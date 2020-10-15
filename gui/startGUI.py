@@ -377,8 +377,6 @@ def run(gui_config_file=None):
         "------------------------------------------------------------------------------"
     )
 
-    HWR.init_hardware_repository(configuration_path)
-
     QtImport.QApplication.setDesktopSettingsAware(False)
 
     main_application.lastWindowClosed.connect(main_application.quit)

@@ -538,14 +538,14 @@ if qt_variant in ("PyQt4", "PyQt5", "PySide"):
                 raise ValueError("Minimum limit cannot be higher than maximum")
 
             self._min_value = value
-            self.setValue(self.value())
+            #self.setValue(self.value())
 
         def setMaximum(self, value):
             if value < self._min_value:
                 raise ValueError("Minimum limit cannot be higher than maximum")
 
             self._max_value = value
-            self.setValue(self.value())
+            #self.setValue(self.value())
 
         def minimum(self):
             return self._min_value

@@ -17,11 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import api
-
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons, QtImport
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
+
+from HardwareRepository import HardwareRepository as HWR
+
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -96,15 +97,15 @@ class SCViewBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
         self.camera_live_cbx.stateChanged.connect(self.camera_live_state_changed)
 
-        if api.sample_changer is not None:  
+        if HWR.beamline.sample_changer is not None:  
             self.connect(
-                api.sample_changer,
+                HWR.beamline.sample_changer,
                 SampleChanger.STATUS_CHANGED_EVENT,
                 self.sample_changer_status_changed,
             )
-            self.connect(api.sample_changer, "progressInit", self.init_progress)
-            self.connect(api.sample_changer, "progressStep", self.step_progress)
-            self.connect(api.sample_changer, "progressStop", self.stop_progress)
+            self.connect(HWR.beamline.sample_changer, "progressInit", self.init_progress)
+            self.connect(HWR.beamline.sample_changer, "progressStep", self.step_progress)
+            self.connect(HWR.beamline.sample_changer, "progressStop", self.stop_progress)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_axis_camera":

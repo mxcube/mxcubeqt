@@ -315,7 +315,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             )
             self._acquisition_mib.validate_all()
 
-    def update_energy(self, energy, wav):
+    def update_energy(self, energy):
         if (
             "energy" not in self.value_changed_list
             and not self.acq_widget_layout.energy_ledit.hasFocus()

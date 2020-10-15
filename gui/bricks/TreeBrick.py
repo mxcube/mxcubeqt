@@ -242,9 +242,6 @@ class TreeBrick(BaseWidget):
                 SampleChanger.INFO_CHANGED_EVENT,
                 self.plate_info_changed,
             )
-
-            #HWR.beamline.plate_manipulator.re_emit_values()
-
         else:
             logging.getLogger("GUI").debug(
                 "TreeBrick: plate manipulator hwobj not defined."
@@ -307,14 +304,11 @@ class TreeBrick(BaseWidget):
                 "ppuStatusChanged",
                 self.ppu_status_changed,
             )
-            HWR.beamline.ppu_control.re_emit_values()
 
         if HWR.beamline.safety_shutter is not None:
             self.connect(
                 HWR.beamline.safety_shutter, "shutterStateChanged", self.shutter_state_changed
             )
-            #HWR.beamline.safety_shutter.re_emit_values()
-
         if HWR.beamline.machine_info is not None:
             self.connect(
                 HWR.beamline.machine_info, "machineCurrentChanged", self.machine_current_changed
@@ -1138,7 +1132,7 @@ class TreeBrick(BaseWidget):
         #  Necessary because shutter states can be both 'opened', 'OPEN'. (and more?)
         # NBNB fixme
         #is_open = bool(state and state.lower().startswith('open'))
-        is_open = bool(state and state.name.lower().startswith('open'))
+        is_open = bool(state and state.lower().startswith('open'))
         if self.enable_collect_conditions.get("shutter") != is_open:
             self.enable_collect_conditions["shutter"] = is_open
             self.update_enable_collect()

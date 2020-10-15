@@ -75,7 +75,6 @@ class PhaseBrick(BaseWidget):
         self.connect(
             HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
-        HWR.beamline.diffractometer.re_emit_values()
 
     def init_phase_list(self):
         self.phase_combobox.clear()

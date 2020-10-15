@@ -89,8 +89,7 @@ class DoorInterlockBrick(BaseWidget):
             "doorInterlockStateChanged",
             self.state_changed
         )
-        HWR.beamline.hutch_interlock.re_emit_values()
-
+        
     def unlock_doors(self):
         self.unlock_door_button.setEnabled(False)
         HWR.beamline.hutch_interlock.unlock_door_interlock()

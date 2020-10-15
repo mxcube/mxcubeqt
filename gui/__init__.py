@@ -48,6 +48,10 @@ _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
 _formatter = logging.Formatter('%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s')
 
+
+mpl_logger = logging.getLogger("matplotlib")
+mpl_logger.setLevel(logging.WARNING)
+
 #
 # log to stdout
 #

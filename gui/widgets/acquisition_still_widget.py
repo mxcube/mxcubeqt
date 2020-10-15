@@ -265,7 +265,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
             self.value_changed_list.append("energy")
         self.emit_acq_parameters_changed()
 
-    def update_energy(self, energy, wav=None):
+    def update_energy(self, energy):
         """
         Updates energy QLineEdit
         :param energy: energy in keV (float)

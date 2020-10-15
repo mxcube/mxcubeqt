@@ -114,7 +114,7 @@ class CreateCharWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
-        if False:
+        if True:
             self._char_params_mib.bind_value_update(
                 "opt_sad", self._char_widget.optimised_sad_cbx, bool, None
             )
@@ -193,7 +193,7 @@ class CreateCharWidget(CreateTaskBase):
         )
 
         self._char_params = (
-            HWR.beamline.get_default_acquisition_parameters("characterisation")
+            HWR.beamline.characterisation.get_default_characterisation_parameters()
         )
         self._path_template.reference_image_prefix = "ref"
         # The num images drop down default value is 1

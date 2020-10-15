@@ -119,7 +119,7 @@ class ImageTrackingStatusBrick(BaseWidget):
                 self.connect(
                     self.image_tracking_hwobj, "stateChanged", self.state_changed
                 )
-                self.image_tracking_hwobj.re_emit_values()
+                self.image_tracking_hwobj.force_emit_signals()
                 self.setEnabled(True)
             else:
                 self.setEnabled(False)
@@ -136,7 +136,10 @@ class ImageTrackingStatusBrick(BaseWidget):
     def image_tracking_state_changed(self, state_dict):
         self.image_tracking_cbox.setChecked(state_dict["image_tracking"])
         self.filter_frames_cbox.setChecked(state_dict["filter_frames"])
-        self.spot_list_cbox.setChecked(state_dict["spot_list"])
+        if "spot_list" in state_dict.keys():
+            self.spot_list_cbox.setChecked(state_dict["spot_list"])
+        else:
+            self.spot_list_cbox.setEnabled(False)
 
     def spot_list_cbox_toggled(self, state):
         self.image_tracking_hwobj.set_spot_list_enabled(state)

@@ -53,10 +53,12 @@ except NameError:
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
+from HardwareRepository import HardwareRepository as HWR
+
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
-__category__ = "Beam definition"
+__category__ = "Beam"
 
 
 class ApertureBrick(BaseWidget):
@@ -65,12 +67,10 @@ class ApertureBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
-        self.aperture_hwobj = None
 
         # Internal values -----------------------------------------------------
 
         # Properties ----------------------------------------------------------
-        self.add_property("mnemonic", "string", "")
 
         # Signals ------------------------------------------------------------
 
@@ -114,45 +114,29 @@ class ApertureBrick(BaseWidget):
         self.aperture_diameter_combo.setMinimumWidth(100)
         self.aperture_position_combo.setMinimumWidth(100)
 
-    def property_changed(self, property_name, old_value, new_value):
-        if property_name == "mnemonic":
-            if self.aperture_hwobj is not None:
-                self.disconnect(
-                    self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
-                )
-                self.disconnect(
-                    self.aperture_hwobj, "valueChanged", self.position_changed
-                )
-
-            self.aperture_hwobj = self.get_hardware_object(new_value)
-
-            if self.aperture_hwobj is not None:
-                self.init_aperture()
-                self.connect(
-                    self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
-                )
-                self.connect(
-                    self.aperture_hwobj, "valueChanged", self.position_changed
-                )
-                self.aperture_hwobj.re_emit_values()
-        else:
-            BaseWidget.property_changed(self, property_name, old_value, new_value)
+        self.init_aperture()
+        self.connect(
+                HWR.beamline.beam.aperture, "diameterIndexChanged", self.diameter_changed
+        )
+        self.connect(
+                HWR.beamline.beam.aperture, "valueChanged", self.position_changed
+        )
 
     def change_diameter(self):
-        self.aperture_hwobj.set_diameter_index(
+        HWR.beamline.beam.aperture.set_diameter_index(
             self.aperture_diameter_combo.currentIndex()
         )
 
     def change_position(self):
-        self.aperture_hwobj.set_position(self.aperture_position_combo.currentIndex())
+        HWR.beamline.beam.aperture.set_position(self.aperture_position_combo.currentIndex())
 
     def init_aperture(self):
-        aperture_size_list = self.aperture_hwobj.get_diameter_size_list()
+        aperture_size_list = HWR.beamline.beam.aperture.get_diameter_size_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
             self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))
 
-        aperture_position_list = self.aperture_hwobj.get_position_list()
+        aperture_position_list = HWR.beamline.beam.aperture.get_position_list()
         self.aperture_position_combo.clear()
         for aperture_position in aperture_position_list:
             self.aperture_position_combo.addItem(aperture_position)
