@@ -552,9 +552,13 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     @staticmethod
     def update_widget(brick_name, widget_name, method_name, method_args, master_sync):
         for widget in QtImport.QApplication.allWidgets():
-            if hasattr(widget, "configuration"):
-                top_level_widget = widget
-                break
+            try:
+                if hasattr(widget, "configuration"):
+                    top_level_widget = widget
+                    break
+            except NameError:
+                continue
+
         if (
             not master_sync
             or BaseWidget._instance_mode == BaseWidget.INSTANCE_MODE_MASTER
@@ -697,7 +701,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         dispatcher.connect(
             self.__hardware_object_discarded,
             "hardwareObjectDiscarded",
-            HWR.getHardwareRepository(),
+            HWR.get_hardware_repository(),
         )
         self.define_slot("enable_widget", ())
         self.define_slot("disable_widget", ())
@@ -787,7 +791,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
         # workaround for PyQt lapse
         # if hasattr(sender, "connectNotify"):
-        #    sender.connectNotify(QtCore.pyqtSignal(signal))
+        #    sender.connect_notify(QtCore.pyqtSignal(signal))
 
     def disconnect_hwobj(self, sender, signal, slot):
         signal = str(signal)
@@ -803,7 +807,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
         # workaround for PyQt lapse
         if hasattr(sender, "disconnectNotify"):
-            sender.disconnectNotify(signal)
+            sender.disconnect_notify(signal)
 
         if not isinstance(sender, QtImport.QObject):
             sender = emitter(sender)
@@ -932,7 +936,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
                 splash_screen.inc_progress_value()
             self.__loaded_hardware_objects.append(hardware_object_name)
 
-        hwobj = HWR.getHardwareRepository().getHardwareObject(
+        hwobj = HWR.get_hardware_repository().get_hardware_object(
             hardware_object_name
         )
 
@@ -981,7 +985,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def get_hardware_objects_info(self):
         info_dict = {}
         for ho_name in self.__loaded_hardware_objects:
-            info = HWR.getHardwareRepository().getInfo(ho_name)
+            info = HWR.get_hardware_repository().get_info(ho_name)
 
             if len(info) > 0:
                 info_dict[ho_name] = info

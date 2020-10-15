@@ -279,7 +279,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
             wf.set_relative_rad_sensitivity(val)
             wf.set_characterisation_budget_fraction(
-                HWR.beamline.gphl_workflow.getProperty(
+                HWR.beamline.gphl_workflow.get_property(
                     "characterisation_budget_percent", 5.0
                 )
                 / 100.0

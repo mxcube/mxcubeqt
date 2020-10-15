@@ -14,10 +14,10 @@ Define xml:
 
    <object class="TestHardwareObject">
      <!-- Channels. Available: exporter, spec, tine, tango, taco -->    
-     <channel type="exporter" name="chanExporterChannelName">ExporterValueName</channel>
+     <channel type="exporter" name="chanExporterchannel_name">ExporterValueName</channel>
      
      <!-- Command. Available: exporter, spec, tine, tango, taco -->
-     <command type="exporter" name="cmdExporterCmdName">ExporterValueName</command>
+     <command type="exporter" name="cmdExportercmd_name">ExporterValueName</command>
 
      <!-- Hardware objects -->
      <object href="/device-role" role="device_role"/>
@@ -50,20 +50,20 @@ Write necessary hardware object:
        def init(self):
 
            # reads the value from xml. Returns None if property not found
-           self.internal_value = self.getProperty("propertyNameOne")
+           self.internal_value = self.get_property("propertyNameOne")
 
            # initiates hwobj
-           self.internal_hwobj = self.getObjectByRole("device_role")
+           self.internal_hwobj = self.get_object_by_role("device_role")
 
            # initiates channel
-           self.chan_test = self.getChannelObject("chanExporterChannelName")
+           self.chan_test = self.getChannelObject("chanExporterchannel_name")
            # connects to the update signal of the channel
            # method chan_test_value_changed is called when channel value changes
            if self.chan_test:
-               self.chan_test.connectSignal('update', self.chan_test_value_changed)
+               self.chan_test.connect_signal('update', self.chan_test_value_changed)
 
            # initiates command
-           self.cmd_test = self.getCommandObject("cmdExporterCmdName")
+           self.cmd_test = self.getCommandObject("cmdExportercmd_name")
 
        def chan_test_value_changed(self, channel_value):
            pass

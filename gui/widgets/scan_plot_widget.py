@@ -39,7 +39,7 @@ class ScanPlotWidget(QtImport.QWidget):
         self.ylabel = ""
 
         self.isRealTimePlot = None
-        self.isConnected = None
+        self.is_connected = None
         self.isScanning = None
 
         self.lblTitle = QtImport.QLabel(self)

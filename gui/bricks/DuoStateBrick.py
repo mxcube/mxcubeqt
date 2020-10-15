@@ -573,7 +573,7 @@ class WrapperHO(QtImport.QObject):
                 "1": "in",
                 "0": "out",
             }
-            self.stateChannel.connectSignal("update", self.channel_update)
+            self.stateChannel.connect_signal("update", self.channel_update)
         else:
             self.state_dict = {}
 
@@ -581,31 +581,31 @@ class WrapperHO(QtImport.QObject):
             if cmd.name() == "set in":
                 self.set_in_cmd = cmd
                 if self.stateChannel is not None:
-                    self.set_in_cmd.connectSignal(
+                    self.set_in_cmd.connect_signal(
                         "commandReplyArrived", self.procedureSetInEnded
                     )
-                    self.set_in_cmd.connectSignal(
+                    self.set_in_cmd.connect_signal(
                         "commandBeginWaitReply", self.procedure_started
                     )
-                    self.set_in_cmd.connectSignal(
+                    self.set_in_cmd.connect_signal(
                         "commandFailed", self.procedure_aborted
                     )
-                    self.set_in_cmd.connectSignal(
+                    self.set_in_cmd.connect_signal(
                         "commandAborted", self.procedure_aborted
                     )
             elif cmd.name() == "set out":
                 self.set_out_cmd = cmd
                 if self.stateChannel is not None:
-                    self.set_out_cmd.connectSignal(
+                    self.set_out_cmd.connect_signal(
                         "commandReplyArrived", self.procedure_set_out_ended
                     )
-                    self.set_out_cmd.connectSignal(
+                    self.set_out_cmd.connect_signal(
                         "commandBeginWaitReply", self.procedure_started
                     )
-                    self.set_out_cmd.connectSignal(
+                    self.set_out_cmd.connect_signal(
                         "commandFailed", self.procedure_aborted
                     )
-                    self.set_out_cmd.connectSignal(
+                    self.set_out_cmd.connect_signal(
                         "commandAborted", self.procedure_aborted
                     )
 
@@ -641,7 +641,7 @@ class WrapperHO(QtImport.QObject):
     def get_state_procedure(self):
         if self.stateChannel is not None:
             try:
-                state = self.stateChannel.getValue()
+                state = self.stateChannel.get_value()
             except BaseException:
                 state = "error"
             else:
