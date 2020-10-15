@@ -31,7 +31,6 @@ from gui.widgets.gphl_data_dialog import GphlDataDialog
 from HardwareRepository import ConvertUtils
 from HardwareRepository import HardwareRepository as HWR
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.queue_model_enumerables import States
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -207,7 +206,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template.compression = False
 
         workflow_hwobj = HWR.beamline.gphl_workflow
-        if workflow_hwobj.get_state() == States.OFF:
+        if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:
             # We will be setting up the connection now - time to connect to quit
             QtImport.QApplication.instance().aboutToQuit.connect(
                 workflow_hwobj.shutdown
@@ -219,7 +218,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     self.continue_button_click
                 )
 
-        wf = queue_model_objects.GphlWorkflow()
+        wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
         wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
