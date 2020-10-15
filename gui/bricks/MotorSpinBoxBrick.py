@@ -305,19 +305,17 @@ class MotorSpinBoxBrick(BaseWidget):
         if self.motor_hwobj is not None:
             self.main_gbox.setEnabled(True)
             if self.motor_hwobj.is_ready():
-                self.motor_hwobj.re_emit_values()
+                self.motor_hwobj.force_emit_signals()
         else:
             self.main_gbox.setEnabled(False)
 
     def limits_changed(self, limits):
-        # limits = self.make_limits_bounded(limits)
-        if limits and not None in limits:
-            
+        if limits and not(None in limits or any(math.isnan(x) for x in limits)):
+            #limits = self.make_limits_bounded(limits) 
             self.position_spinbox.blockSignals(True)
             self.position_spinbox.setMinimum(limits[0])
             self.position_spinbox.setMaximum(limits[1])
             self.position_spinbox.blockSignals(False)
-
             self.position_slider.blockSignals(True)
             self.position_slider.setMinimum(limits[0])
             self.position_slider.setMaximum(limits[1])
@@ -366,24 +364,17 @@ class MotorSpinBoxBrick(BaseWidget):
             self.step_editor.updateGeometry()
             self.step_editor.show()
 
-    def position_changed(self, new_position):
-
-        if self.editing:
-            return
-
-        self.update_position(new_position)
-
-    def update_position(self, position):
-        try:
+    def position_changed(self, position):
+        if not(position is None or math.isinf(position) or math.isnan(position)):
             self.position_spinbox.blockSignals(True)
             self.position_slider.blockSignals(True)
             self.position_spinbox.setValue(position)
             self.position_slider.setValue(position)
             self.position_spinbox.blockSignals(False)
             self.position_slider.blockSignals(False)
-        except BaseException:
-            logging.getLogger("user_level_log").debug(
-                "Unable to set motor position: %s" % str(new_position)
+        else:
+            logging.getLogger("GUI").debug(
+                "Unable to set motor position: %s" % str(position)
             )
 
     def set_position_spinbox_color(self, state):
@@ -431,8 +422,8 @@ class MotorSpinBoxBrick(BaseWidget):
             self.step_combo.setEnabled(False)
             self.set_editing(False)
         elif state in (
-            self.motor_hwobj.SPECIFIC_STATES.LOWLIMIT,
-            self.motor_hwobj.SPECIFIC_STATES.HIGHLIMIT,
+            #self.motor_hwobj.STATES.LOWLIMIT,
+            #self.motor_hwobj.STATES.HIGHLIMIT,
             self.motor_hwobj.STATES.READY,
         ):
             self.position_spinbox.setEnabled(True)
@@ -464,7 +455,7 @@ class MotorSpinBoxBrick(BaseWidget):
             )
         else:
             # restore last position from motor
-            self.update_position(self.motor_hwobj.get_value())
+            self.position_changed(self.motor_hwobj.get_value())
 
     def set_tool_tip(self, name=None, state=None, limits=None):
         states = (
@@ -601,7 +592,7 @@ class MotorSpinBoxBrick(BaseWidget):
             )
 
         # get motor position and set to brick
-        self.update_position(self.motor_hwobj.get_value())
+        self.position_changed(self.motor_hwobj.get_value())
         self.position_history = []
         self.update_gui()
         # self['label'] = self['label']

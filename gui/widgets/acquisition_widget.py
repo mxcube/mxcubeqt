@@ -618,7 +618,7 @@ class AcquisitionWidget(QtImport.QWidget):
             self.value_changed_list.append("energy")
         self.emit_acq_parameters_changed()
 
-    def update_energy(self, energy, wav=None):
+    def update_energy(self, energy):
         if (
             "energy" not in self.value_changed_list
             and not self.acq_widget_layout.energy_ledit.hasFocus()

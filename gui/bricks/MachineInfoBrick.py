@@ -70,7 +70,6 @@ class MachineInfoBrick(BaseWidget):
         if HWR.beamline.machine_info is not None:
             self.setEnabled(True)
             self.connect(HWR.beamline.machine_info, "valuesChanged", self.set_value)
-            HWR.beamline.machine_info.re_emit_values()
         else:
             self.setEnabled(False)
 

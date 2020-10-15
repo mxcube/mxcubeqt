@@ -140,7 +140,6 @@ class BeamPositionBrick(BaseWidget):
             HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
 
-        HWR.beamline.diffractometer.re_emit_values()
         self.update_gui()
 
     def enable_widget(self, state):
@@ -221,7 +220,7 @@ class BeamPositionBrick(BaseWidget):
                         )
 
                     temp_motor_widget.step_changed(None)
-                    temp_motor_hwobj.re_emit_values()
+                    temp_motor_hwobj.force_emit_signals()
                     temp_motor_widget.update_gui()
         elif property_name == "hwobj_beam_focusing":
             if self.beam_focusing_hwobj is not None:

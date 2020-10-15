@@ -350,7 +350,6 @@ class TaskToolBoxWidget(QtImport.QWidget):
                 for item in items:
                     shapes = HWR.beamline.sample_view.get_selected_points()
                     task_model = item.get_model()
-
                     # TODO Consider if GPhL workflow needs task-per-shape
                     # like xrf does
 

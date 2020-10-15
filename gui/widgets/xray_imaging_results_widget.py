@@ -74,12 +74,12 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.popup_menu.addAction(
             Icons.load_icon("VCRPlay2"),
             "Start 3-click centering",
-            self.start_centering_clicked,
+            start_centering_clicked,
         )
         self.popup_menu.addAction(
             Icons.load_icon("VCRPlay"),
             "Start n-click centering",
-            self.start_n_centering_clicked,
+            start_n_centering_clicked,
         )
         self.popup_menu.addAction(
             Icons.load_icon("ThumbUp"),
@@ -91,7 +91,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.measure_distance_action = self.popup_menu.addAction(
             Icons.load_icon("measure_distance"),
             "Distance and histogram",
-            self.measure_distance_clicked,
+            measure_distance_clicked,
         )
 
         # Layout --------------------------------------------------------------
