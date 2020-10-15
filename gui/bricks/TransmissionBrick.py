@@ -110,7 +110,7 @@ class TransmissionBrick(BaseWidget):
 
     def _state_changed(self, state):
         """Updates new value QLineEdit based on the state"""
-        if not HWR.beamline.transmission.is_ready():
+        if HWR.beamline.transmission.is_ready():
             self.connected()
         else:
             self.disconnected()

@@ -277,7 +277,7 @@ class MXCuBE_Test_Environment(object):
         if self.institute:
             inst_hwo_path = os.path.join(hwo_path, self.institute)
 
-        HardwareRepository.addHardwareObjectsDirs([hwo_path, inst_hwo_path, sc_hwo_path])
+        HardwareRepository.add_hardware_objects_dirs([hwo_path, inst_hwo_path, sc_hwo_path])
 
     def _do_gevent(self):
         if QtCore.QEventLoop():
@@ -329,7 +329,7 @@ class MXCuBE_Test_Environment(object):
     def get_hwo(self, hwo_name):
         if self.hwr_server is None:
             self._connect_hwserver()
-        obj = self.hwr_server.getHardwareObject(hwo_name)
+        obj = self.hwr_server.get_hardware_object(hwo_name)
         return obj
 
     def get_hwo_mod(self, filename, mnemonic):

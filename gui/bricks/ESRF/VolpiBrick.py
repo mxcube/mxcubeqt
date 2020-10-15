@@ -375,7 +375,6 @@ class PowerBar(QtImport.QWidget):
     def dialAndBarInvible(self):
         return (not self._bar.isVisible() and not self._dial.isVisible())
 
-
 class StepEditorDialog(QtImport.QDialog):
     def __init__(self, parent):
 

@@ -38,7 +38,7 @@ print "Hardware repository: %s" % hwr_server
 HardwareRepository.setHardwareRepositoryServer(hwr_server)
 hardware_repository = HardwareRepository.HardwareRepository()
 hardware_repository.connect()
-unittest_hwobj = hardware_repository.getHardwareObject("unittest")
+unittest_hwobj = hardware_repository.get_hardware_object("unittest")
 if unittest_hwobj is not None:
     print "UnitTest hardware object loaded"
 else:
