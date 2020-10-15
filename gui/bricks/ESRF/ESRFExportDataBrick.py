@@ -57,12 +57,10 @@ import logging
 import json
 import os
 from os.path import expanduser
-from pprint import pprint
 import copy
 import datetime
 from datetime import date
 import logging
-import pprint
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget

@@ -111,7 +111,7 @@ class ESRFCenteringBrick(BaseWidget):
         
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QtImport.QGroupBox("Sample centering", self)
-        self.ui_widgets_manager = QtImport.load_ui_file("centering.ui")
+        self.ui_widgets_manager = QtImport.load_ui_file("sample_centering.ui")
 
         # Size policy --------------------------------
         self.ui_widgets_manager.aligment_table.setSizePolicy(

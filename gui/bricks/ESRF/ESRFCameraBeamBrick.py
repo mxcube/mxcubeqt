@@ -197,7 +197,6 @@ class ESRFCameraBeamBrick(BaseWidget):
         clean cell background
         reload data from hardware object
         """
-        print(f"beam_cal_pos_data_cancelled")
         self.clean_cells_background()
         self.init_interface()
                 
