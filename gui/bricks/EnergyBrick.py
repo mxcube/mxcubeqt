@@ -171,7 +171,6 @@ class EnergyBrick(BaseWidget):
             )
 
     def energy_changed(self, energy_value):
-        print(energy_value)
         energy_value_str = self["kevFormatString"] % energy_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
 
