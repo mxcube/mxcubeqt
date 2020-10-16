@@ -410,9 +410,9 @@ class ESRFConfigurationBrick(BaseWidget):
         clean cell background
         reload data from hardware object
         """
-        self.clean_cells_background()
         self.fill_config_table()
-
+        self.clean_cells_background()
+    
     def init_interface(self):
         """
         Fill table and combobox and make them functional
@@ -561,12 +561,7 @@ class ESRFConfigurationBrick(BaseWidget):
         self.ui_widgets_manager.new_label_edit.setText(
                 ' '.join(label_text_list)
             )
-
-        # if selected_row != -1:
-        #     selected_item = self.ui_widgets_manager.label_list.item(selected_row)
-        #     self.ui_widgets_manager.new_label_edit.setText(
-        #         selected_item.text()
-        #     )
+   
 
     def clean_cells_background(self):
         """
@@ -613,15 +608,13 @@ class ESRFConfigurationBrick(BaseWidget):
         """
         self.multipos_hwobj.cancel_edited_data()
 
-        # self.load_zoom_positions_dict()
         self.fill_config_table()
+        self.clean_cells_background()
   
     def clear_table(self):
         """
         clean table of contents. keep headers
         """
-        #table = self.ui_widgets_manager.findChild(QtI
-        # mport.QTableWidget, "aligment_table")
         self.ui_widgets_manager.configuration_table.clearContents()
     
     def from_text_to_int(self, input_str, factor=1):
