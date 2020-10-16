@@ -899,7 +899,7 @@ class TreeBrick(BaseWidget):
         self.populate_workflow_tab(item, running=running)
 
     def populate_workflow_tab(self, item, running=False):
-        self.populate_workflow_widget.emit(item, running)
+        self.populate_workflow_widget.emit((item, running))
 
     def show_xray_imaging_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show SC-details")

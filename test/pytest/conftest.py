@@ -16,7 +16,7 @@ from HardwareRepository import HardwareRepository as HWR
 @pytest.fixture(scope="session")
 def hwr():
     HWR.init_hardware_repository(HWR_XML_FILES)
-    hwr = HWR.getHardwareRepository()
+    hwr = HWR.get_hardware_repository()
     hwr.connect()
     return hwr
 
