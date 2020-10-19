@@ -26,6 +26,7 @@ import logging
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
+from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -41,7 +42,7 @@ class VolpiBrick(BaseWidget):
         """VolpiBrick constructor
 
         Arguments:
-        :params args: 
+        :params args:
         """
         super(VolpiBrick, self).__init__(*args)
 
@@ -54,31 +55,73 @@ class VolpiBrick(BaseWidget):
         self.frame = QtImport.QGroupBox()
         self.frame_layout = QtImport.QVBoxLayout()
         
-        self.dial = PowerBar(["#5e4fa2", "#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d53e4f", "#9e0142"])
-        self.dial.setMinimum(0)
-        self.dial.setMaximum(100)
-        self.dial.setSingleStep(1)
-        self.dial.setNotchesVisible(True)
+        self.power_bar = PowerBar(["#5e4fa2", "#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d53e4f", "#9e0142",
+        "#006837", "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b", "#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"])
+        self.power_bar.setMinimum(0)
+        self.power_bar.setMaximum(100)
+        self.power_bar.setSingleStep(1)
+        self.power_bar.setNotchesVisible(True)
+
+        self.position_spinbox = QtImport.QSpinBox()
+        self.position_spinbox.setMinimum(0)
+        self.position_spinbox.setMaximum(100)
+        self.position_spinbox.setFixedSize(75, 27)
         
+        self.step_button = QtImport.QPushButton()
+        self.step_button_icon = Icons.load_icon("TileCascade2")
+        self.step_button.setIcon(self.step_button_icon)
+        self.step_button.setToolTip("Changes the volpi step")
+        self.step_button.setFixedSize(27, 27)
+
         # Layout --------------------------------------------------------------
         
-        self.frame_layout.addWidget(self.dial)
+        self.frame_layout.addWidget(self.power_bar)
         self.frame.setLayout(self.frame_layout)
         
-        self.main_layout = QtImport.QVBoxLayout()
+        self.main_layout = QtImport.QHBoxLayout()
         self.main_layout.addWidget(self.frame, 0, QtImport.Qt.AlignCenter)
+        self.main_layout.addWidget(self.position_spinbox)
+        self.main_layout.addWidget(self.step_button)
 
         self.setLayout(self.main_layout)
 
         # Qt signal/slot connections -----------------------------------------
-        self.dial.valueChanged.connect(self.value_changed)
+        self.power_bar.value_changed.connect(self.value_changed)
+        self.position_spinbox.valueChanged.connect(self.value_changed)
+
+        self.step_button.clicked.connect(self.open_step_editor)
         
         # define properties
         self.add_property("mnemonic", "string", "")
+        self.add_property("showBar", "boolean", False)
+        self.add_property("showDial", "boolean", False)
+        self.add_property("showStep", "boolean", True)
+        self.add_property("stepValue", "string", 5)
+
+        # Internal values -----------------------------------------------------
+        self.step_editor = None
+        self.move_step = 1
+
+        # slots -------------------------------------------
+        self.define_slot("zoom_changed", ())
+
+        # initialization -------------------
+
+    def zoom_changed(self, new_position_dict):
+        new_light_value = new_position_dict['light']
+        self.value_changed(new_light_value)
 
     def value_changed(self, new_intensity):
         """set volpi to new value."""
+        self.power_bar.blockSignals(True)
+        self.position_spinbox.blockSignals(True)
+        
+        self.power_bar.setValue(new_intensity)
+        self.position_spinbox.setValue(new_intensity)
         self.volpi_hwobj.set_value(new_intensity)
+        
+        self.power_bar.blockSignals(False)
+        self.position_spinbox.blockSignals(True)
         
     def set_mnemonic(self, mne):
         """set mnemonic."""
@@ -115,12 +158,29 @@ class VolpiBrick(BaseWidget):
         self.setEnabled(False)
     
     def slot_intensity(self, new_intensity):
-        self.dial._dial.setValue(new_intensity)
+        self.value_changed(new_intensity)
     
     def property_changed(self, property_name, old_value, new_value):
         """Property changed in GUI designer and when launching app."""
         if property_name == "mnemonic":
                 self.set_volpi_object(new_value)
+        
+        elif property_name == "showBar":
+            self.power_bar.setBarVisible(new_value)
+            if self.power_bar.dialAndBarInvible():
+                self.frame.setVisible(False)
+            if new_value:
+                self.frame.setVisible(True)
+        elif property_name == "showDial":
+            self.power_bar.setDialVisible(new_value)
+            if self.power_bar.dialAndBarInvible():
+                self.frame.setVisible(False)
+            if new_value:
+                self.frame.setVisible(True)
+        elif property_name == "showStep":
+            self.step_button.show()
+        elif property_name == "stepValue":
+            self.position_spinbox.setSingleStep(int(new_value))
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
     
@@ -128,9 +188,23 @@ class VolpiBrick(BaseWidget):
         if self.volpi_hwobj is not None:
             self.frame.setEnabled(True)
             if self.volpi_hwobj.is_ready():
-                self.volpi_hwobj.re_emit_values()
+                self.volpi_hwobj.update_values()
         else:
             self.frame.setEnabled(False)
+
+    def open_step_editor(self):
+        if self.is_running():
+            if self.step_editor is None:
+                self.step_editor = StepEditorDialog(self)
+            self.step_editor.set_motor(
+                self.motor_hwobj, self, self["label"], self["default_steps"]
+            )
+            s = self.font().pointSize()
+            f = self.step_editor.font()
+            f.setPointSize(s)
+            self.step_editor.setFont(f)
+            self.step_editor.updateGeometry()
+            self.step_editor.show()
 
 
 class _Bar(QtImport.QWidget):
@@ -234,8 +308,7 @@ class PowerBar(QtImport.QWidget):
     right-clicking resets the color to None (no-color).
     """
 
-    colorChanged = QtImport.pyqtSignal()
-    valueChanged = QtImport.pyqtSignal(int)
+    value_changed = QtImport.pyqtSignal(int)
 
     def __init__(self, steps=5, *args, **kwargs):
         super(PowerBar, self).__init__(*args, **kwargs)
@@ -266,6 +339,9 @@ class PowerBar(QtImport.QWidget):
 
         return getattr(self._dial, name)
 
+    def setValue(self, new_value):
+        self._dial.setValue(new_value)
+
     def setColor(self, color):
         self._bar.steps = [color] * self._bar.n_steps
         self._bar.update()
@@ -289,3 +365,85 @@ class PowerBar(QtImport.QWidget):
 
     def slot_value_changed(self, new_value):
         self.value_changed.emit(new_value)
+    
+    def setDialVisible(self, visible):
+        self._dial.setVisible(visible)
+
+    def setBarVisible(self, visible):
+        self._bar.setVisible(visible)
+    
+    def dialAndBarInvible(self):
+        return (not self._bar.isVisible() and not self._dial.isVisible())
+
+class StepEditorDialog(QtImport.QDialog):
+    def __init__(self, parent):
+
+        QtImport.QDialog.__init__(self, parent)
+        # Graphic elements-----------------------------------------------------
+        # self.main_gbox = QtGui.QGroupBox('Motor step', self)
+        # box2 = QtGui.QWidget(self)
+        self.grid = QtImport.QWidget(self)
+        label1 = QtImport.QLabel("Current:", self)
+        self.current_step = QtImport.QLineEdit(self)
+        self.current_step.setEnabled(False)
+        label2 = QtImport.QLabel("Set to:", self)
+        self.new_step = QtImport.QLineEdit(self)
+        self.new_step.setAlignment(QtImport.Qt.AlignRight)
+        self.new_step.setValidator(QtImport.QDoubleValidator(self))
+
+        self.button_box = QtImport.QWidget(self)
+        self.apply_button = QtImport.QPushButton("Apply", self.button_box)
+        self.close_button = QtImport.QPushButton("Dismiss", self.button_box)
+
+        # Layout --------------------------------------------------------------
+        self.button_box_layout = QtImport.QHBoxLayout(self.button_box)
+        self.button_box_layout.addWidget(self.apply_button)
+        self.button_box_layout.addWidget(self.close_button)
+
+        self.grid_layout = QtImport.QGridLayout(self.grid)
+        self.grid_layout.addWidget(label1, 0, 0)
+        self.grid_layout.addWidget(self.current_step, 0, 1)
+        self.grid_layout.addWidget(label2, 1, 0)
+        self.grid_layout.addWidget(self.new_step, 1, 1)
+
+        self.main_layout = QtImport.QVBoxLayout(self)
+        self.main_layout.addWidget(self.grid)
+        self.main_layout.addWidget(self.button_box)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Qt signal/slot connections -----------------------------------------
+        self.new_step.returnPressed.connect(self.apply_clicked)
+        self.apply_button.clicked.connect(self.apply_clicked)
+        self.close_button.clicked.connect(self.accept)
+
+        # SizePolicies --------------------------------------------------------
+        self.close_button.setSizePolicy(
+            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
+        )
+        self.setSizePolicy(QtImport.QSizePolicy.Minimum, QtImport.QSizePolicy.Minimum)
+
+        # Other ---------------------------------------------------------------
+        self.setWindowTitle("Motor step editor")
+        self.apply_button.setIcon(Icons.load_icon("Check"))
+        self.close_button.setIcon(Icons.load_icon("Delete"))
+
+    def set_motor(self, motor, brick, name, default_step):
+        self.motor_hwobj = motor
+        self.brick = brick
+
+        if name is None or name == "":
+            name = motor.username
+        self.setWindowTitle(name)
+        self.setWindowTitle("%s step editor" % name)
+        self.current_step.setText(str(brick.get_line_step()))
+
+    def apply_clicked(self):
+        try:
+            val = float(str(self.new_step.text()))
+        except ValueError:
+            return
+        self.brick.set_line_step(val)
+        self.new_step.setText("")
+        self.current_step.setText(str(val))
+        self.close()
