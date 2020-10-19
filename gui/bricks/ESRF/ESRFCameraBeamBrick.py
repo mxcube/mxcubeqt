@@ -137,19 +137,19 @@ class ESRFCameraBeamBrick(BaseWidget):
         # self.multipos_hwobj.init() is executed : create a pass by way
         # not very elegant...
 
-        if HWR.beamline.sample_view is not None:
-            self.connect(HWR.beamline.sample_view,
-                        "beam_position_data_changed",
-                        self.beam_position_data_changed
-            )
-        else:
-            logging.getLogger("HWR").warning("CameraBeamBrick : HWR.beamline.sample_view NONE")
+        # if HWR.beamline.sample_view is not None:
+        #     self.connect(HWR.beamline.sample_view,
+        #                 "beam_position_data_changed",
+        #                 self.beam_position_data_changed
+        #     )
+        # else:
+        #     logging.getLogger("HWR").warning("CameraBeamBrick : HWR.beamline.sample_view NONE")
 
-    def beam_position_data_changed(self, new_beam_data):
-        """
-        auxiliar function to link HWR.beamline.sample_view to multipos_hwobj
-        """        
-        self.multipos_hwobj.beam_position_data_changed(new_beam_data)
+    # def beam_position_data_changed(self, new_beam_data):
+    #     """
+    #     auxiliar function to link HWR.beamline.sample_view to multipos_hwobj
+    #     """        
+    #     self.multipos_hwobj.beam_position_data_changed(new_beam_data)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "zoom":
@@ -197,8 +197,8 @@ class ESRFCameraBeamBrick(BaseWidget):
         clean cell background
         reload data from hardware object
         """
-        self.clean_cells_background()
         self.init_interface()
+        self.clean_cells_background()
                 
     def beam_cal_pos_data_changed(self, who_changed, new_data_dict):
         """
