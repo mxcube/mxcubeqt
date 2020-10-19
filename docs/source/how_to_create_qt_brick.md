@@ -206,19 +206,28 @@ In this case ui file is used in the brick. If it was used in the widget then rem
 ### Signals and slots between bricks
 
 * Use `Signals` and `Slots` to define interface and interactions between bricks. The only way how two separate bricks can communicate is via this signal and slot mechanism.
-* Following [Qt's signal and slots system](https://doc.qt.io/qt-5/signalsandslots.html), any Qt object can send signals that can be connected to any object slots (simple member functions) to create interaction between them: when a signal is **emited** then the slot will execute.
+* Following [Qt's signal and slots system](https://doc.qt.io/qt-5/signalsandslots.html) implemented for PyQt in [PyQt Support for Signals and Slots](https://www.riverbankcomputing.com/static/Docs/PyQt5/signals_slots.html), any Qt object can send signals that can be connected to any object slots (simple member functions) to create interaction between them: when a signal is **emited** then the slot will execute.
 
 For custom widgets, like user defined Bricks, custom signals can be created and then emitted.
-See [PyQt Support for Signals and Slots](https://www.riverbankcomputing.com/static/Docs/PyQt5/signals_slots.html)
 
+Example with TestBrick1.py (signal emitter) and TestBrick2.py signal receiver.
 ```
-  
-   # in the code use method "emit" to emit neccessary signal
-   self.emit("testBrickSignal", value_to_send)
+import QtImport
 
-   # define method with slot name to receive emited value
-   self.test_brick_slot(self, received_value):
-        pass
+from gui.BaseComponents import BaseWidget
+
+__category__ = "General"
+
+# signal definition
+beam_position_edited = QtImport.pyqtSignal(list)
+
+class TestBrick1(BaseWidget):
+
+    def __init__(self):
+        BaseWidget.__init__(self)
+    ...
+    def
+
 
 ```
 
