@@ -210,30 +210,61 @@ In this case ui file is used in the brick. If it was used in the widget then rem
 
 For custom widgets, like user defined Bricks, custom signals can be created and then emitted.
 
-Example with TestBrick1.py (signal emitter) and TestBrick2.py signal receiver.
+In the 'emitter' brick:
+
+* First, declare the signal as a class static member
+* Then, through the `define_signal` function, define it in the `__init__()` function 
+* Emit the signal when needed
+
 ```
 import QtImport
-
 from gui.BaseComponents import BaseWidget
 
 __category__ = "General"
 
 # signal definition
-beam_position_edited = QtImport.pyqtSignal(list)
+signal_with_list = QtImport.pyqtSignal(list)
 
-class TestBrick1(BaseWidget):
+class EmitterBrick(BaseWidget):
 
     def __init__(self):
         BaseWidget.__init__(self)
+        self.define_signal("signal_with_list", ())
     ...
-    def
-
+    def emit_signal(self):
+        list_to_be_sent = self.create_list()
+        self.signal_with_list.emit(list_to_be_sent)
 
 ```
 
-In the GUI builder define signal/slot connection:
+In the 'receiver' brick:
+
+* Define the slot through the `define_signal` function in the `__init__()` function 
+* Then, create the code of the slot as it was a simple member function
+
+```
+import QtImport
+from gui.BaseComponents import BaseWidget
+
+__category__ = "General"
+
+class ReceiverBrick(BaseWidget):
+
+    def __init__(self):
+        BaseWidget.__init__(self)
+        self.define_slot("callback_function", ())
+    ...
+    def callback_function(self, received_list):
+        # do something with the data on list
+
+```
+
+Finally, in the GUI builder define the signal/slot connection between EmitterBrick and ReceiverBrick.
 
 ![alt text](images/qt_signals_slots.png "qt signal slots")
+
+Example with TestBrick1.py (signal emitter) and TestBrick2.py signal receiver.
+
 
 _**warning**_ : The number of variables emited via signal should much the number of variables received by a slot.
 
