@@ -104,7 +104,7 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         try:
             self._periodic_table_widget.set_elements(
-                HWR.beamline.energy_scan.getElements()
+                HWR.beamline.energy_scan.get_elements()
             )
 
             max_transmission_value = (

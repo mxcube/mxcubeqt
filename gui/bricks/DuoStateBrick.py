@@ -548,7 +548,7 @@ class WrapperHO(QtImport.QObject):
         return "error"
 
     def new_predefined_spec_motor_wspec_positions(self):
-        self.positions = self.dev.getPredefinedPositionsList()
+        self.positions = self.dev.get_predefined_positions_list()
         self.position_changed_spec_motor_wspec_positions(
             self.dev.get_current_position_name(), self.dev.get_value()
         )
