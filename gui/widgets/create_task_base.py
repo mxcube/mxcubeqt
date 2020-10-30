@@ -127,7 +127,7 @@ class CreateTaskBase(QtImport.QWidget):
                 self._acq_widget.acq_widget_layout.first_image_label.setEnabled(state)
                 self._acq_widget.acq_widget_layout.first_image_ledit.setEnabled(state)
 
-    def set_run_processing_parallel(self, state):
+    def set_run_online_processing(self, state):
         pass
 
     def enable_compression(self, state):
@@ -190,13 +190,13 @@ class CreateTaskBase(QtImport.QWidget):
         if self._item_is_group_or_sample() and acq_widget:
             acq_widget.update_osc_start(new_value)
 
-    def _run_processing_toggled(self, run_processing_after, run_processing_parallel):
+    def _run_processing_toggled(self, run_processing_after, run_online_processing):
         if len(self._current_selected_items) > 0:
             item = self._current_selected_items[0]
             model = item.get_model()
             if isinstance(model, queue_model_objects.DataCollection):
                 model.run_processing_after = run_processing_after
-                model.run_processing_parallel = run_processing_parallel
+                model.run_online_processing = run_online_processing
 
     def acq_parameters_changed(self, conflict):
         if self._tree_brick:
@@ -723,7 +723,7 @@ class CreateTaskBase(QtImport.QWidget):
                     # TODO add dg_group for XrayCentering
                     # dc_group = self._tree_brick.dc_tree_widget.create_task_group(sample)
                     mesh_dc = self._create_dc_from_grid(sample)
-                    mesh_dc.run_processing_parallel = "XrayCentering"
+                    mesh_dc.run_online_processing = "XrayCentering"
                     sc = queue_model_objects.XrayCentering(mesh_dc)
                 if sc:
                     tasks.append(sc)

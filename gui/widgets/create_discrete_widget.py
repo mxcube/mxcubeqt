@@ -100,8 +100,8 @@ class CreateDiscreteWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
-        self._processing_widget.processing_widget.run_processing_parallel_cbox.\
-            setChecked(HWR.beamline.run_processing_parallel)
+        self._processing_widget.processing_widget.run_online_processing_cbox.\
+            setChecked(HWR.beamline.run_online_processing)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -235,11 +235,11 @@ class CreateDiscreteWidget(CreateTaskBase):
         data_collection.set_number(acq.path_template.run_number)
         data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.NATIVE
 
-        run_processing_after, run_processing_parallel = \
+        run_processing_after, run_online_processing = \
             self._processing_widget.get_processing_state()
         data_collection.run_processing_after = run_processing_after
-        if run_processing_parallel:
-            data_collection.run_processing_parallel = "Undefined"
+        if run_online_processing:
+            data_collection.run_online_processing = "Undefined"
 
         tasks.append(data_collection)
 

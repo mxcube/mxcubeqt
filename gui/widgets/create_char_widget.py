@@ -298,7 +298,7 @@ class CreateCharWidget(CreateTaskBase):
 
         dc.acquisitions[0] = acq
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF
-        dc.run_processing_parallel = False
+        dc.run_online_processing = False
 
         char = queue_model_objects.Characterisation(dc, char_params)
         char.set_name(dc.acquisitions[0].path_template.get_prefix())

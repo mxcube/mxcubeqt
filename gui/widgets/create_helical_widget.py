@@ -120,11 +120,11 @@ class CreateHelicalWidget(CreateTaskBase):
         for col in range(self._lines_widget.lines_treewidget.columnCount()):
             self._lines_widget.lines_treewidget.resizeColumnToContents(col)
         # self._processing_widget.processing_widget.\
-        #     run_processing_parallel_cbox.setChecked(False)
+        #     run_online_processing_cbox.setChecked(False)
 
 
-        self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-            HWR.beamline.run_processing_parallel
+        self._processing_widget.processing_widget.run_online_processing_cbox.setChecked(
+            HWR.beamline.run_online_processing
         )
         self.enable_widgets(False)
 
@@ -311,9 +311,9 @@ class CreateHelicalWidget(CreateTaskBase):
                 self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
             )
             if (
-                self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked()
+                self._processing_widget.processing_widget.run_online_processing_cbox.isChecked()
             ):
-                dc.run_processing_parallel = "LineScan"
+                dc.run_online_processing = "LineScan"
 
             data_collections.append(dc)
             self._path_template.run_number += 1
