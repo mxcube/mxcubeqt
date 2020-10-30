@@ -1149,7 +1149,7 @@ class DataCollectTree(QtImport.QWidget):
                                   queue_item.SampleQueueItem,
                                   queue_item.DataCollectionGroupQueueItem):
                 new_node = HWR.beamline.queue_model.copy_node(item.get_model())
-                new_node.set_snapshot(HWR.beamline.sample_view.get_scene_snapshot())
+                new_node.set_snapshot(HWR.beamline.sample_view.get_snapshot())
                 HWR.beamline.queue_model.add_child(
                     item.get_model().get_parent(), new_node)
         self.sample_tree_widget_selection()
@@ -1488,7 +1488,7 @@ class DataCollectTree(QtImport.QWidget):
                     HWR.beamline.queue_model.get_next_run_number(
                     new_node.acquisitions[0].path_template)
 
-            new_node.set_snapshot(HWR.beamline.sample_view.get_scene_snapshot())
+            new_node.set_snapshot(HWR.beamline.sample_view.get_snapshot())
 
             if isinstance(item, queue_item.DataCollectionQueueItem):
                 parent_nodes = [item.get_model().get_parent()]
@@ -1612,7 +1612,7 @@ class DataCollectTree(QtImport.QWidget):
         if len(filename) > 0:
             self.sample_tree_widget.clear()
             loaded_model = HWR.beamline.queue_model.load_queue(filename,
-                                                             HWR.beamline.sample_view.get_scene_snapshot())
+                                                             HWR.beamline.sample_view.get_snapshot())
             return loaded_model
 
     def save_history_queue(self):
@@ -1702,7 +1702,7 @@ class DataCollectTree(QtImport.QWidget):
         task_node = self.create_task_group(sample_model, "Diffraction plan")
         prefix = HWR.beamline.session.get_default_prefix(
             sample_model)
-        snapshot = HWR.beamline.sample_view.get_scene_snapshot()
+        snapshot = HWR.beamline.sample_view.get_snapshot()
 
         if sample_model.diffraction_plan.experimentKind in ("OSC", "Default"):
             acq = queue_model_objects.Acquisition()

@@ -412,7 +412,7 @@ class CreateTaskBase(QtImport.QWidget):
             self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
             self._acquisition_parameters.centred_position.snapshot_image = (
-                HWR.beamline.sample_view.get_scene_snapshot()
+                HWR.beamline.sample_view.get_snapshot()
             )
 
             # Sample with lims information, use values from lims
@@ -579,8 +579,8 @@ class CreateTaskBase(QtImport.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = HWR.beamline.sample_view.get_scene_snapshot(
-                            position
+                        snapshot = HWR.beamline.sample_view.get_snapshot(
+                            shape=position
                         )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
@@ -823,7 +823,7 @@ class CreateTaskBase(QtImport.QWidget):
         parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
         self._acquisition_parameters.centred_position.snapshot_image = (
-            HWR.beamline.sample_view.get_scene_snapshot()
+            HWR.beamline.sample_view.get_snapshot()
         )
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE

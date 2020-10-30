@@ -274,7 +274,7 @@ class CreateHelicalWidget(CreateTaskBase):
         data_collections = []
 
         for shape in self.get_selected_shapes():
-            snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot(shape=shape)
 
             # Acquisition for start position
             start_acq = self._create_acq(sample)

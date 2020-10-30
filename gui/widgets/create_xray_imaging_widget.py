@@ -180,7 +180,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape, comments=None):
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot(shape=shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:

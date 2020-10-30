@@ -423,7 +423,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         else:
             new_node = HWR.beamline.queue_model.copy_node(task_node)
             new_snapshot = (
-                HWR.beamline.sample_view.get_scene_snapshot()
+                HWR.beamline.sample_view.get_snapshot()
             )
 
             if isinstance(task_node, queue_model_objects.Characterisation):
@@ -453,10 +453,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         will_mount_sample = False
 
         for item in selected_items:
-            if isinstance(item, (
-                queue_item.SampleQueueItem,
-                queue_item.OpticalCentringQueueItem,
-                queue_item.XrayCenteringQueueItem)):
+            if isinstance(item, queue_item.SampleQueueItem):
                 if item != mounted_sample_item:
                     will_mount_sample = True
             else:
@@ -480,10 +477,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.create_task_button_click()
         collect_items = []
         for item in self.tree_brick.dc_tree_widget.get_collect_items():
-            if isinstance(item, (
-                queue_item.SampleCentringQueueItem,
-                queue_item.OpticalCentringQueueItem,
-                queue_item.XrayCenteringQueueItem)):
+            if isinstance(item, queue_item.SampleCentringQueueItem):
                 item.setOn(False)
                 item.setText(1, "Skipped")
                 item.set_strike_out(True)

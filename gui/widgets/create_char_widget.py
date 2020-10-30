@@ -277,11 +277,11 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.sample_view.get_scene_snapshot()
+            cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 

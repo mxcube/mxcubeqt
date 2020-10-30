@@ -101,11 +101,11 @@ class ProcessingWidget(QtImport.QWidget):
         self.processing_widget.space_group_combo.activated.connect(
             self._space_group_change
         )
-        self.processing_widget.run_processing_after_cbox.stateChanged.connect(
-            self._run_processing_after_toggled
+        self.processing_widget.run_offline_processing_cbox.stateChanged.connect(
+            self._run_offline_processing_toggled
         )
-        self.processing_widget.run_processing_parallel_cbox.stateChanged.connect(
-            self._run_processing_parallel_toggled
+        self.processing_widget.run_online_processing_cbox.stateChanged.connect(
+            self._run_online_processing_toggled
         )
         self.processing_widget.pdb_file_browse_button.clicked.connect(self._browse_clicked)
 
@@ -132,16 +132,16 @@ class ProcessingWidget(QtImport.QWidget):
         self._model_mib.set_model(model)
         self._set_space_group(model.space_group)
 
-    def _run_processing_after_toggled(self, state):
+    def _run_offline_processing_toggled(self, state):
         self.enableProcessingSignal.emit(
-            self.processing_widget.run_processing_after_cbox.isChecked(),
-            self.processing_widget.run_processing_parallel_cbox.isChecked(),
+            self.processing_widget.run_offline_processing_cbox.isChecked(),
+            self.processing_widget.run_online_processing_cbox.isChecked(),
         )
 
-    def _run_processing_parallel_toggled(self, state):
+    def _run_online_processing_toggled(self, state):
         self.enableProcessingSignal.emit(
-            self.processing_widget.run_processing_after_cbox.isChecked(),
-            self.processing_widget.run_processing_parallel_cbox.isChecked(),
+            self.processing_widget.run_offline_processing_cbox.isChecked(),
+            self.processing_widget.run_online_processing_cbox.isChecked(),
         )
 
     def _browse_clicked(self):
@@ -156,5 +156,5 @@ class ProcessingWidget(QtImport.QWidget):
         self.processing_widget.pdb_file_ledit.setText(pdb_filename)
 
     def get_processing_state(self):
-        return self.processing_widget.run_processing_after_cbox.isChecked(), \
-               self.processing_widget.run_processing_parallel_cbox.isChecked()
+        return self.processing_widget.run_offline_processing_cbox.isChecked(), \
+               self.processing_widget.run_online_processing_cbox.isChecked()
