@@ -453,7 +453,10 @@ class TaskToolBoxWidget(QtImport.QWidget):
         will_mount_sample = False
 
         for item in selected_items:
-            if isinstance(item, queue_item.SampleQueueItem):
+            if isinstance(item, (
+                queue_item.SampleQueueItem,
+                queue_item.OpticalCentringQueueItem,
+                queue_item.XrayCenteringQueueItem)):
                 if item != mounted_sample_item:
                     will_mount_sample = True
             else:
@@ -477,7 +480,10 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.create_task_button_click()
         collect_items = []
         for item in self.tree_brick.dc_tree_widget.get_collect_items():
-            if isinstance(item, queue_item.SampleCentringQueueItem):
+            if isinstance(item, (
+                queue_item.SampleCentringQueueItem,
+                queue_item.OpticalCentringQueueItem,
+                queue_item.XrayCenteringQueueItem)):
                 item.setOn(False)
                 item.setText(1, "Skipped")
                 item.set_strike_out(True)
