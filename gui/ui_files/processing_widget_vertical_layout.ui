@@ -330,7 +330,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="run_processing_after_cbox">
+         <widget class="QCheckBox" name="run_offline_processing_cbox">
           <property name="maximumSize">
            <size>
             <width>450</width>
@@ -349,7 +349,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="run_processing_parallel_cbox">
+         <widget class="QCheckBox" name="run_online_processing_cbox">
           <property name="enabled">
            <bool>true</bool>
           </property>

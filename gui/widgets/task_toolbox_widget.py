@@ -423,7 +423,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
         else:
             new_node = HWR.beamline.queue_model.copy_node(task_node)
             new_snapshot = (
-                HWR.beamline.sample_view.get_scene_snapshot()
+                HWR.beamline.sample_view.get_snapshot()
             )
 
             if isinstance(task_node, queue_model_objects.Characterisation):

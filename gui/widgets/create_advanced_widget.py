@@ -331,7 +331,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             logging.getLogger("GUI").warning(
                 "Method %s does not exist in queue_model_objects" % exp_type
             )
-        mesh_dc.run_processing_parallel = exp_type
+        mesh_dc.run_online_processing = exp_type
 
         return tasks
 

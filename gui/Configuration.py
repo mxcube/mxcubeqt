@@ -446,12 +446,20 @@ class Configuration:
         """Prints window list"""
         wl = []
         for window_cfg in self.windows_list:
+            try:
+                signals = window_cfg.signals
+            except AttributeError:
+                signals = []
+            try:
+                connections =  window_cfg.connections
+            except AttributeError:
+                connections = []
             window_cfg_dict = {
                 "type": "window",
                 "name": window_cfg["name"],
                 "properties": [],
-                "signals": window_cfg.signals,
-                "connections": window_cfg.connections,
+                "signals": signals,
+                "connections": connections,
             }
             for prop in window_cfg.properties:
                 window_cfg_dict["properties"].append(prop.__getstate__())
