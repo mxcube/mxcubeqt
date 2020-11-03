@@ -25,6 +25,7 @@ import operator
 import weakref
 
 import gui
+from gui import gui_supervisor
 from gui.utils import PropertyBag, Connectable, Colors, QtImport
 
 from HardwareRepository import HardwareRepository as HWR
@@ -925,7 +926,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         return self.property_bag.del_property(property_name)
 
     def get_hardware_object(self, hardware_object_name, optional=False):
-        splash_screen = gui.get_splash_screen()
+        splash_screen = gui_supervisor.get_splash_screen()
         if splash_screen:
             splash_screen.set_message(
                 "Loading hardware object defined in %s.xml" % hardware_object_name

@@ -28,8 +28,8 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-_logHandler = None
-_timer = None
+GUI_LOG_HANDLER = None
+TIMER = None
 
 
 class LogEvent(QtImport.QEvent):
@@ -39,53 +39,47 @@ class LogEvent(QtImport.QEvent):
         QtImport.QEvent.__init__(self, QtImport.QEvent.User)
         self.record = record
 
-def processLogMessages():
+def process_log_messages():
     i = 0
     while i < 10:
-        if len(_logHandler.buffer) <= i:
+        if len(GUI_LOG_HANDLER.buffer) <= i:
             break
 
-        record = _logHandler.buffer[i]
+        record = GUI_LOG_HANDLER.buffer[i]
 
-        for viewer in _logHandler.registeredViewers:
+        for viewer in GUI_LOG_HANDLER.registeredViewers:
             QtImport.QApplication.postEvent(viewer, LogEvent(record))
 
         i += 1
 
-    del _logHandler.buffer[0:i]
+    del GUI_LOG_HANDLER.buffer[0:i]
 
 
 def do_process_log_messages(sleep_time):
     while True:
-        processLogMessages()
+        process_log_messages()
         time.sleep(sleep_time)
 
 
 def GUILogHandler():
 
-    global _logHandler
-    global _timer
+    global GUI_LOG_HANDLER
+    global TIMER
 
-    if _logHandler is None:
-        _logHandler = __GUILogHandler()
+    if GUI_LOG_HANDLER is None:
+        GUI_LOG_HANDLER = __GUILogHandler()
 
-        _timer = gevent.spawn(do_process_log_messages, 0.2)
+        TIMER = gevent.spawn(do_process_log_messages, 0.2)
         # _timer = QtImport.QtCore.QTimer()
         # QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
         # _timer.start(10)
 
-    return _logHandler
+    return GUI_LOG_HANDLER
 
 
 class LogRecord:
-    """
-    Descript. :
-    """
 
     def __init__(self, record):
-        """
-        Descript. :
-        """
         self.name = record.name
         self.levelno = record.levelno
         self.levelname = record.levelname
@@ -93,67 +87,37 @@ class LogRecord:
         self.message = record.getMessage()
 
     def getName(self):
-        """
-        Descript. :
-        """
         return self.name
 
     def getLevel(self):
-        """
-        Descript. :
-        """
         return self.levelno
 
     def getLevelName(self):
-        """
-        Descript. :
-        """
         return self.levelname
 
     def getDate(self):
-        """
-        Descript. :
-        """
         return time.strftime("%Y-%m-%d", time.localtime(self.time))
 
     def getTime(self):
-        """
-        Descript. :
-        """
         return time.strftime("%H:%M:%S", time.localtime(self.time))
 
     def getMessage(self):
-        """
-        Descript. :
-        """
         return self.message
 
 
 class __GUILogHandler(logging.Handler):
-    """
-    Descript. :
-    """
+
 
     def __init__(self):
-        """
-        Descript. :
-        """
         logging.Handler.__init__(self)
 
         self.buffer = []
-
         self.registeredViewers = weakref.WeakKeyDictionary()
 
     def register(self, viewer):
-        """
-        Descript. :
-        """
         self.registeredViewers[viewer] = ""
         for rec in self.buffer:
             viewer.append_log_record(rec)
 
     def emit(self, record):
-        """
-        Descript. :
-        """
         self.buffer.append(LogRecord(record))

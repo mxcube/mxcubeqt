@@ -18,5 +18,5 @@ if not os.environ.get('HARDWARE_REPOSITORY_SERVER'):
     )
     os.environ['HARDWARE_REPOSITORY_SERVER'] = hr_server
 
-from gui import startGUI
-startGUI.run(MXCUBE_GUI_FILE)
+from gui import create_app
+create_app(MXCUBE_GUI_FILE)

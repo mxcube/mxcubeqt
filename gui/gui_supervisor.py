@@ -31,7 +31,6 @@ try:
 except ImportError:
     import yaml
 
-from gui import set_splash_screen
 from gui import Configuration, GUIBuilder
 from gui.utils import GUIDisplay, Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget, NullBrick
@@ -45,6 +44,18 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 
+
+SPLASH_SCREEN = None
+
+
+def set_splash_screen(screen):
+    global SPLASH_SCREEN
+    SPLASH_SCREEN = screen
+
+
+def get_splash_screen():
+    global SPLASH_SCREEN
+    return SPLASH_SCREEN
 
 class SplashScreen(QtImport.QSplashScreen):
     """Splash screen when mxcube is loading"""

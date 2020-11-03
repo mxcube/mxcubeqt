@@ -24,6 +24,6 @@ def close_app():
 
 gevent.spawn_later(10, close_app)
 
-from gui import startGUI
+from gui import create_app
 print("MXCuBE gui file: %s" % MXCUBE_GUI_FILE)
-startGUI.run(MXCUBE_GUI_FILE)
+app = create_app(MXCUBE_GUI_FILE)
