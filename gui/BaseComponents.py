@@ -24,7 +24,6 @@ import time
 import operator
 import weakref
 
-from gui import gui_supervisor
 import gui
 from gui.utils import PropertyBag, Connectable, Colors, QtImport
 
@@ -753,6 +752,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def connect_hwobj(
         self, sender, signal, slot, instance_filter=False, should_cache=True
     ):
+
         if sys.version_info > (3, 0):
             signal = str(signal.decode("utf8") if isinstance(signal, bytes) else signal)
         else:
@@ -766,6 +766,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
         if not isinstance(sender, QtImport.QObject):
             if isinstance(sender, HardwareObject):
+
                 sender.connect(signal, slot)
                 return
             else:
@@ -926,7 +927,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         return self.property_bag.del_property(property_name)
 
     def get_hardware_object(self, hardware_object_name, optional=False):
-        splash_screen = gui_supervisor.get_splash_screen()
+        splash_screen = gui.get_splash()
         if splash_screen:
             splash_screen.set_message(
                 "Loading hardware object defined in %s.xml" % hardware_object_name

@@ -86,6 +86,7 @@ class ProgressBarBrick(BaseWidget):
         # f self.use_dialog:
         #   BaseWidget.open_progress_dialog(progress_type, number_of_steps)
         # lse:
+        print("init progress ", progress_type, number_of_steps)
         self.setEnabled(True)
         self.progress_bar.reset()
         self.progress_type_label.setText(progress_type)

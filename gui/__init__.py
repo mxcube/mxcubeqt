@@ -31,7 +31,7 @@ import gevent
 import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 
-from gui.gui_supervisor import GUISupervisor, LOAD_GUI_EVENT
+from gui.gui_supervisor import GUISupervisor, LOAD_GUI_EVENT, get_splash_screen, set_splash_screen
 from gui.utils import gui_log_handler, ErrorHandler, QtImport
 from HardwareRepository import HardwareRepository as HWR
 
@@ -72,6 +72,11 @@ LOGGING_NAME = ""
 mxcube_root = os.path.dirname(__file__)
 sys.path.insert(0, mxcube_root)
 
+def get_splash():
+    return get_splash_screen()
+
+def set_splash(screen):
+    set_splash_screen(screen)
 
 def get_base_bricks_path():
     std_bricks_pkg = __import__(STD_BRICKS_LOCATION, globals(), locals(), [""])
