@@ -31,7 +31,7 @@ import subprocess
 
 import gui
 from gui.configuration import Configuration
-from gui.utils import Icons, ConnectionEditor, PropertyEditor, gui_display, QtImport
+from gui.utils import Icons, connection_editor, property_editor, gui_display, QtImport
 from gui.bricks import LogViewBrick
 from gui.base_layout_items import ContainerCfg
 
@@ -336,8 +336,8 @@ class PropertyEditorWindow(QtImport.QWidget):
 
         self.setWindowTitle("Properties")
 
-        self.properties_table = PropertyEditor.ConfigurationTable(self)
-        self.hwobj_properties_table = PropertyEditor.ConfigurationTable(self)
+        self.properties_table = property_editor.ConfigurationTable(self)
+        self.hwobj_properties_table = property_editor.ConfigurationTable(self)
 
         self.__property_changed_cb = weakref.WeakKeyDictionary()
 
@@ -517,7 +517,7 @@ class GUIEditorWindow(QtImport.QWidget):
         self.root_element.setText(0, "GUI tree")
         self.root_element.setExpanded(True)
 
-        self.connection_editor_window = ConnectionEditor.ConnectionEditor(
+        self.connection_editor_window = connection_editor.ConnectionEditor(
             self.configuration
         )
 

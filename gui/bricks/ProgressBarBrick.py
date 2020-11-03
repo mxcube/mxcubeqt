@@ -86,27 +86,20 @@ class ProgressBarBrick(BaseWidget):
         # f self.use_dialog:
         #   BaseWidget.open_progress_dialog(progress_type, number_of_steps)
         # lse:
-        print("init progress ", progress_type, number_of_steps)
         self.setEnabled(True)
         self.progress_bar.reset()
         self.progress_type_label.setText(progress_type)
         self.progress_bar.setMaximum(number_of_steps)
-
-        print("init progress ", progress_type, number_of_steps)
         # lissWidget.set_status_info("status", progress_type)
         # lissWidget.init_progress_bar(progress_type, number_of_steps)
 
     def property_changed(self, property_name, old_value, new_value):
-        print(property_name, old_value, new_value)
         if property_name == "mnemonicList":
             hwobj_role_list = new_value.split()
             self.hwobj_list = []
             for hwobj_role in hwobj_role_list:
-                print(hwobj_role)
                 hwobj = self.get_hardware_object(hwobj_role)
                 if hwobj is not None:
-                    print(111111111111111)
-                    print(hwobj)
                     self.hwobj_list.append(hwobj)
                     self.connect(
                         self.hwobj_list[-1], "progressInit", self.init_progress

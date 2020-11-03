@@ -32,7 +32,7 @@ import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 
 from gui.gui_supervisor import GUISupervisor, LOAD_GUI_EVENT, get_splash_screen, set_splash_screen
-from gui.utils import gui_log_handler, ErrorHandler, QtImport
+from gui.utils import gui_log_handler, error_handler, QtImport
 from HardwareRepository import HardwareRepository as HWR
 
 
@@ -502,7 +502,7 @@ def create_app(gui_config_file=None, run_mode='prod'):
     )
 
     # redirect errors to logger
-    ErrorHandler.enable_std_err_redirection()
+    error_handler.enable_std_err_redirection()
 
     gevent_timer = QtImport.QTimer()
     gevent_timer.timeout.connect(do_gevent)
@@ -547,4 +547,3 @@ def start_log(logfile, loglevel):
 
 if __name__ == "__main__":
     app = create_app()
-    app.exec_()

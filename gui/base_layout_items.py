@@ -19,7 +19,7 @@
 
 """Module contains classes defining graphical objects in MXCuBE"""
 
-from gui.utils import PropertyBag, QtImport
+from gui.utils import property_bag, QtImport
 
 DEFAULT_MARGIN = 2
 DEFAULT_SPACING = 2
@@ -41,7 +41,7 @@ class _CfgItem(object):
         self.signals = {}
         self.slots = {}
 
-        self.properties = PropertyBag.PropertyBag()
+        self.properties = property_bag.PropertyBag()
         self.properties.add_property(
             "alignment",
             "combo",

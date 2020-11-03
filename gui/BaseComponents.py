@@ -25,7 +25,7 @@ import operator
 import weakref
 
 import gui
-from gui.utils import PropertyBag, Connectable, Colors, QtImport
+from gui.utils import property_bag, connectable, Colors, QtImport
 
 from HardwareRepository import HardwareRepository as HWR
 from HardwareRepository.BaseHardwareObjects import HardwareObject
@@ -142,7 +142,7 @@ class SignalSlotFilter:
             s(*args)
 
 
-class BaseWidget(Connectable.Connectable, QtImport.QFrame):
+class BaseWidget(connectable.Connectable, QtImport.QFrame):
     """Base class for MXCuBE bricks"""
 
     (
@@ -660,10 +660,10 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     def __init__(self, parent=None, widget_name=""):
 
-        Connectable.Connectable.__init__(self)
+        connectable.Connectable.__init__(self)
         QtImport.QFrame.__init__(self, parent)
         self.setObjectName(widget_name)
-        self.property_bag = PropertyBag.PropertyBag()
+        self.property_bag = property_bag.PropertyBag()
 
         self.__enabled_state = True
         self.__loaded_hardware_objects = []
@@ -764,13 +764,8 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         else:
             pysignal = True
 
-        if signal == "progressInit":
-             print(3333, sender,  isinstance(sender, QtImport.QObject), signal, slot)
         if not isinstance(sender, QtImport.QObject):
             if isinstance(sender, HardwareObject):
-                if signal == "progressInit":
-                    print(4444)
-                    print(sender, signal, slot)
                 sender.connect(signal, slot)
                 return
             else:
@@ -1092,7 +1087,7 @@ class NullBrick(BaseWidget):
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        self.property_bag = PropertyBag.PropertyBag()
+        self.property_bag = property_bag.PropertyBag()
 
     def set_persistent_property_bag(self, persistent_property_bag):
         self.property_bag = persistent_property_bag

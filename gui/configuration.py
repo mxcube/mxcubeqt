@@ -34,7 +34,7 @@ except ImportError:
 
 
 from gui import base_layout_items
-from gui.utils import PropertyBag
+from gui.utils.property_bag import PropertyBag
 from gui.BaseComponents import NullBrick
 
 
@@ -591,7 +591,7 @@ class Configuration:
                                 "Error: could not load properties " + "for %s",
                                 child["name"],
                             )
-                            new_item.properties = PropertyBag.PropertyBag()
+                            new_item.properties = PropertyBag()
                     else:
                         new_item.set_properties(child["properties"])
 
