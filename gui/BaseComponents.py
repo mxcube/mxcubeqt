@@ -24,8 +24,8 @@ import time
 import operator
 import weakref
 
-import gui
 from gui import gui_supervisor
+import gui
 from gui.utils import PropertyBag, Connectable, Colors, QtImport
 
 from HardwareRepository import HardwareRepository as HWR
