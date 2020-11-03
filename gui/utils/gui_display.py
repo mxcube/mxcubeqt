@@ -29,7 +29,7 @@ from functools import partial
 
 from gui.utils import Icons, Colors, PropertyEditor, QtImport
 from gui.BaseComponents import BaseWidget
-from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
+from gui.base_layout_items import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
 from HardwareRepository import HardwareRepository as HWR
 

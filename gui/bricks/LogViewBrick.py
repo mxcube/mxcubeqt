@@ -70,7 +70,7 @@ import logging
 from datetime import datetime
 import smtplib
 
-from gui.utils import Icons, Colors, GUILogHandler, QtImport
+from gui.utils import Icons, Colors, gui_log_handler, QtImport
 from gui.BaseComponents import BaseWidget
 
 
@@ -344,7 +344,7 @@ class LogViewBrick(BaseWidget):
 
         self.filter_level = logging.NOTSET
         # Register to GUI log handler
-        GUILogHandler.GUILogHandler().register(self)
+        gui_log_handler.GUILogHandler().register(self)
 
     def run(self):
         # Register to GUI log handler
@@ -374,7 +374,6 @@ class LogViewBrick(BaseWidget):
                 return
 
         tab = self.tab_levels[rec_level]
-        level = None
         tab.add_log_line(record)
 
         if self["appearance"] == "tabs":

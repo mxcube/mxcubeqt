@@ -31,8 +31,8 @@ try:
 except ImportError:
     import yaml
 
-from gui import Configuration, GUIBuilder
-from gui.utils import GUIDisplay, Icons, Colors, QtImport
+from gui import configuration, gui_builder
+from gui.utils import gui_display, Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget, NullBrick
 
 from HardwareRepository import HardwareRepository as HWR
@@ -172,7 +172,7 @@ class GUISupervisor(QtImport.QWidget):
 
     def load_gui(self, gui_config_file):
         """Loads gui"""
-        self.configuration = Configuration.Configuration()
+        self.configuration = configuration.Configuration()
         self.gui_config_file = gui_config_file
         load_from_dict = gui_config_file.endswith(".json") or gui_config_file.endswith(
             ".yml"
@@ -273,7 +273,7 @@ class GUISupervisor(QtImport.QWidget):
                     try:
                         self.splash_screen.set_message("Building GUI configuration...")
                         self.splash_screen.set_progress_value(20)
-                        config = Configuration.Configuration(raw_config)
+                        config = configuration.Configuration(raw_config)
                     except BaseException:
                         logging.getLogger("GUI").exception(failed_msg)
                         QtImport.QMessageBox.warning(
@@ -329,7 +329,7 @@ class GUISupervisor(QtImport.QWidget):
         self.time_stamp = 0
         self.launch_in_design_mode = True
 
-        self.framework = GUIBuilder.GUIBuilder()
+        self.framework = gui_builder.GUIBuilder()
 
         QtImport.QApplication.setActiveWindow(self.framework)
         self.framework.show()
@@ -341,7 +341,7 @@ class GUISupervisor(QtImport.QWidget):
         """Shows all defined windows"""
         self.windows = []
         for window in self.configuration.windows_list:
-            display = GUIDisplay.WindowDisplayWidget(
+            display = gui_display.WindowDisplayWidget(
                 None, window["name"], execution_mode=True, no_border=self.no_border
             )
             self.windows.append(display)

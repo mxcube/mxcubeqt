@@ -31,8 +31,8 @@ import gevent
 import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 
-from gui import gui_supervisor
-from gui.utils import GUILogHandler, ErrorHandler, QtImport
+from gui.gui_supervisor import GUISupervisor, LOAD_GUI_EVENT
+from gui.utils import gui_log_handler, ErrorHandler, QtImport
 from HardwareRepository import HardwareRepository as HWR
 
 
@@ -54,7 +54,7 @@ HWR_LOGGER = logging.getLogger("HWR")
 for handler in HWR_LOGGER.handlers:
     HWR_LOGGER.removeHandler(handler)
 
-GUI_LOG_HANDLER = GUILogHandler.GUILogHandler()
+GUI_LOG_HANDLER = gui_log_handler.GUILogHandler()
 LOGGER.addHandler(GUI_LOG_HANDLER)
 
 
@@ -153,7 +153,7 @@ class MyCustomEvent(QtImport.QEvent):
         self.data = data
 
 
-def create_app(gui_config_file=None):
+def create_app(gui_config_file=None, run_mode='prod'):
     """Main run method"""
 
     default_configuration_path = "localhost:hwr"
@@ -480,7 +480,7 @@ def create_app(gui_config_file=None):
     QtImport.QApplication.setDesktopSettingsAware(False)
 
     main_application.lastWindowClosed.connect(main_application.quit)
-    supervisor = gui_supervisor.GUISupervisor(
+    supervisor = GUISupervisor(
         design_mode=opts.designMode,
         show_maximized=opts.showMaximized,
         no_border=opts.noBorder,
@@ -491,7 +491,7 @@ def create_app(gui_config_file=None):
     main_application.postEvent(
         supervisor,
         MyCustomEvent(
-            gui_supervisor.LOAD_GUI_EVENT,
+            LOAD_GUI_EVENT,
             gui_config_file
             )
     )
@@ -512,10 +512,12 @@ def create_app(gui_config_file=None):
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
     # app.setWindowIcon(QtImport.QIcon("images/icon.png"))
-    main_application.exec_()
-
+    
     supervisor.finalize()
+    #main_application.exec_()
 
+    
+    """
     if log_lockfile is not None:
         filename = log_lockfile.name
         try:
@@ -523,6 +525,7 @@ def create_app(gui_config_file=None):
             os.unlink(filename)
         except BaseException:
             logging.getLogger().exception("Problem removing the log lock file")
+    """
     
     return main_application
 
@@ -539,3 +542,4 @@ def start_log(logfile, loglevel):
 
 if __name__ == "__main__":
     app = create_app()
+    app.exec_()

@@ -30,10 +30,10 @@ import logging
 import subprocess
 
 import gui
-from gui import Configuration
-from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay, QtImport
+from gui.configuration import Configuration
+from gui.utils import Icons, ConnectionEditor, PropertyEditor, gui_display, QtImport
 from gui.bricks import LogViewBrick
-from gui.BaseLayoutItems import ContainerCfg
+from gui.base_layout_items import ContainerCfg
 
 from HardwareRepository import HardwareRepository as HWR
 from HardwareRepository.ConvertUtils import string_types
@@ -424,7 +424,7 @@ class GUIEditorWindow(QtImport.QWidget):
         QtImport.QWidget.__init__(self, *args)
 
         # Internal values -----------------------------------------------------
-        self.configuration = Configuration.Configuration()
+        self.configuration = Configuration()
 
         # Graphic elements ----------------------------------------------------
         _tools_widget = QtImport.QWidget(self)
@@ -1409,7 +1409,7 @@ class GUIBuilder(QtImport.QMainWindow):
     def new_clicked(self, filename=None):
         """Creates a new gui"""
 
-        self.configuration = Configuration.Configuration()
+        self.configuration = Configuration()
         self.filename = filename
 
         if self.filename:
