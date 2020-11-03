@@ -21,4 +21,5 @@ if not os.environ.get('HARDWARE_REPOSITORY_SERVER'):
 from gui import create_app
 
 app = create_app(MXCUBE_GUI_FILE)
-app.exec_()
+
+print(app)

@@ -51,8 +51,6 @@
               old_value: '', type: string, value: ''}
             - {comment: '', default_value: 500, hidden: false, name: serverStartDelay,
               old_value: 500, type: integer, value: 500}
-            - {comment: '', default_value: /session, hidden: false, name: session,
-              old_value: /session, type: string, value: /session}
             - {comment: '', default_value: '', hidden: false, name: titlePrefix, old_value: '',
               type: string, value: MXCuBE}
             type: ProposalBrick
@@ -309,6 +307,8 @@
                       old_value: '', type: string, value: Omega}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /diff-omega-mockup}
+                    - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
+                      old_value: null, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
@@ -323,6 +323,10 @@
                       old_value: 0, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showStop,
                       old_value: 1, type: boolean, value: 1}
+                    - {comment: '', default_value: 0, hidden: false, name: show_units,
+                      old_value: null, type: boolean, value: 0}
+                    - {comment: '', default_value: mm, hidden: false, name: unit,
+                      old_value: null, type: string, value: mm}
                     type: MotorSpinBoxBrick
                   - brick: {class: MotorSpinBoxBrick, name: kappa_phi_brick}
                     children: []
@@ -371,6 +375,8 @@
                       old_value: '', type: string, value: Phi}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /diff-kappaphi-mockup}
+                    - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
+                      old_value: null, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
@@ -385,6 +391,10 @@
                       old_value: 0, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showStop,
                       old_value: 1, type: boolean, value: 1}
+                    - {comment: '', default_value: 0, hidden: false, name: show_units,
+                      old_value: null, type: boolean, value: 0}
+                    - {comment: '', default_value: mm, hidden: false, name: unit,
+                      old_value: null, type: string, value: mm}
                     type: MotorSpinBoxBrick
                   - children: []
                     connections: []
@@ -512,6 +522,8 @@
                       old_value: '', type: string, value: Kappa}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /diff-kappa-mockup}
+                    - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
+                      old_value: null, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
@@ -526,6 +538,10 @@
                       old_value: 0, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showStop,
                       old_value: 1, type: boolean, value: 1}
+                    - {comment: '', default_value: 0, hidden: false, name: show_units,
+                      old_value: null, type: boolean, value: 0}
+                    - {comment: '', default_value: mm, hidden: false, name: unit,
+                      old_value: null, type: string, value: mm}
                     type: MotorSpinBoxBrick
                   - brick: {class: MotorPredefPosBrick, name: zoom_brick}
                     children: []
@@ -670,8 +686,8 @@
                       - {comment: Allow to control brick in slave mode, default_value: 0,
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
-                      - {comment: '', default_value: /sample-view, hidden: false, name: mnemonic,
-                        old_value: /sample-view, type: string, value: /sample-view}
+                      - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
+                        old_value: /graphics, type: string, value: /sample-view}
                       type: CameraBrick
                     - children: []
                       connections: []
@@ -961,8 +977,6 @@
                     - {comment: Allow to control brick in slave mode, default_value: 0,
                       hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                       value: 0}
-                    - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /diff-aperture-mockup}
                     type: ApertureBrick
                   - children: []
                     connections: []
@@ -988,6 +1002,8 @@
                     connections: []
                     name: phase_brick
                     properties:
+                    - {comment: '', default_value: 0, hidden: false, name: confirmPhaseChange,
+                      old_value: null, type: boolean, value: 0}
                     - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
                       name: fixedHeight, old_value: -1, type: integer, value: -1}
                     - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -2051,8 +2067,6 @@
               - {comment: Allow to control brick in slave mode, default_value: 0,
                 hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                 value: 0}
-              - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-                type: string, value: /plate-manipulator}
               type: PlateManipulatorBrick
             connections: []
             name: plate_manipulator_tab
@@ -2718,38 +2732,6 @@
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
         type: ShutterBrick
-      - brick: {class: InstanceListBrick, name: instance_list_brick}
-        children: []
-        connections: []
-        name: instance_list_brick
-        properties:
-        - {comment: '', default_value: '', hidden: false, name: controlEmails, old_value: '',
-          type: string, value: ''}
-        - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
-          name: fixedHeight, old_value: -1, type: integer, value: -1}
-        - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
-          old_value: -1, type: integer, value: -1}
-        - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',
-          type: string, value: '9'}
-        - {comment: Draw a frame around the widget, default_value: 0, hidden: false,
-          name: frame, old_value: 0, type: boolean, value: 1}
-        - {comment: '', default_value: 30, hidden: false, name: giveControlTimeout,
-          old_value: 30, type: integer, value: 30}
-        - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
-          type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: hwobj_hutch_trigger,
-          old_value: '', type: string, value: /door-interlock-mockup}
-        - {comment: '', default_value: /instanceconnection, hidden: false, name: hwobj_instance_connection,
-          old_value: /instanceconnection, type: string, value: /instanceconnection}
-        - {comment: '', default_value: /xml-rpc-server, hidden: false, name: hwobj_xmlrpc_server,
-          old_value: /xml-rpc-server, type: string, value: /xml-rpc-server}
-        - {comment: '', default_value: 0, hidden: false, name: initializeServer, old_value: 0,
-          type: boolean, value: 0}
-        - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
-          name: instanceAllowAlways, old_value: 0, type: boolean, value: 1}
-        - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
-          name: instanceAllowConnected, old_value: 0, type: boolean, value: 1}
-        type: InstanceListBrick
       connections: []
       name: right_info_hbox
       properties:
@@ -2899,32 +2881,6 @@
       value: both
     type: GraphicsToolsBrick
   - children:
-    - brick: {class: ChatBrick, name: chat_brick}
-      children: []
-      connections: []
-      name: chat_brick
-      properties:
-      - {comment: Set fixed height in pixels, default_value: -1, hidden: false, name: fixedHeight,
-        old_value: -1, type: integer, value: -1}
-      - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
-        old_value: -1, type: integer, value: -1}
-      - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',
-        type: string, value: '9'}
-      - {comment: Draw a frame around the widget, default_value: 0, hidden: false,
-        name: frame, old_value: 0, type: boolean, value: 0}
-      - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
-        type: boolean, value: 0}
-      - {comment: '', default_value: '', hidden: false, name: icons, old_value: '',
-        type: string, value: ''}
-      - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
-        name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
-      - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
-        name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-      - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-        type: string, value: /instanceconnection}
-      - {comment: '', default_value: '', hidden: false, name: myTabLabel, old_value: '',
-        type: string, value: ''}
-      type: ChatBrick
     - brick: {class: LogBarBrick, name: log_bar_brick}
       children: []
       connections: []
@@ -3050,6 +3006,8 @@
     value: default
   - {comment: '', default_value: '', hidden: false, name: icon, old_value: null, type: string,
     value: ''}
+  - {comment: '', default_value: 0, hidden: false, name: keepOpen, old_value: null,
+    type: boolean, value: 0}
   - {comment: '', default_value: '', hidden: false, name: label, old_value: null,
     type: string, value: ''}
   - {comment: '', default_value: 2, hidden: false, name: margin, old_value: null,
@@ -3085,11 +3043,7 @@
     old_value: null
     type: combo
     value: default
-#  signals:
-#    enableExpertMode: !!python/tuple []
-#    isHidden: !!python/tuple []
-#    isShown: !!python/tuple []
-#    quit: !!python/tuple []
+  signals: []
   type: window
 - children:
   - children:
@@ -3232,6 +3186,8 @@
     value: default
   - {comment: '', default_value: '', hidden: false, name: icon, old_value: null, type: string,
     value: ''}
+  - {comment: '', default_value: 0, hidden: false, name: keepOpen, old_value: null,
+    type: boolean, value: 0}
   - {comment: '', default_value: '', hidden: false, name: label, old_value: null,
     type: string, value: ''}
   - {comment: '', default_value: 2, hidden: false, name: margin, old_value: null,
@@ -3267,9 +3223,5 @@
     old_value: null
     type: combo
     value: default
-#  signals:
-#    enableExpertMode: !!python/tuple []
-#    isHidden: !!python/tuple []
-#    isShown: !!python/tuple []
-#    quit: !!python/tuple []
+  signals: []
   type: window

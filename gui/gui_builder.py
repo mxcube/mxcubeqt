@@ -1169,7 +1169,7 @@ class GUIPreviewWindow(QtImport.QWidget):
 
         self.setWindowTitle("GUI Preview")
         self.window_preview_box = QtImport.QGroupBox("Preview window", self)
-        self.window_preview = GUIDisplay.WindowDisplayWidget(self.window_preview_box)
+        self.window_preview = gui_display.WindowDisplayWidget(self.window_preview_box)
 
         self.window_preview_box_layout = QtImport.QVBoxLayout(self.window_preview_box)
         self.window_preview_box_layout.addWidget(self.window_preview)

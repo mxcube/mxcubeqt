@@ -518,10 +518,10 @@ def create_app(gui_config_file=None, run_mode='prod'):
     main_application.setApplicationName("MXCuBE")
     # app.setWindowIcon(QtImport.QIcon("images/icon.png"))
     
-    supervisor.finalize()
-    #main_application.exec_()
-
     
+    main_application.exec_()
+
+    supervisor.finalize()
     """
     if log_lockfile is not None:
         filename = log_lockfile.name

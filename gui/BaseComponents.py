@@ -764,9 +764,13 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         else:
             pysignal = True
 
+        if signal == "progressInit":
+             print(3333, sender,  isinstance(sender, QtImport.QObject), signal, slot)
         if not isinstance(sender, QtImport.QObject):
             if isinstance(sender, HardwareObject):
-
+                if signal == "progressInit":
+                    print(4444)
+                    print(sender, signal, slot)
                 sender.connect(signal, slot)
                 return
             else:

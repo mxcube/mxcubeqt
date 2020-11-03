@@ -303,7 +303,7 @@ class GUISupervisor(QtImport.QWidget):
                     #self.hardware_repository.print_report()
 
                     if self.launch_in_design_mode:
-                        self.framework = GUIBuilder.GUIBuilder()
+                        self.framework = gui_builder.GUIBuilder()
 
                         QtImport.QApplication.setActiveWindow(self.framework)
 
