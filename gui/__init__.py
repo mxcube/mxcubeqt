@@ -17,35 +17,41 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import os
 import sys
 import types
 import fcntl
 import string
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import tempfile
 import platform
 from optparse import OptionParser
 
 import gevent
 import gevent.monkey
+
 gevent.monkey.patch_all(thread=False)
 
-from gui.gui_supervisor import GUISupervisor, LOAD_GUI_EVENT, get_splash_screen, set_splash_screen
-from gui.utils import gui_log_handler, error_handler, QtImport
 from HardwareRepository import HardwareRepository as HWR
-
+from gui.utils import gui_log_handler, error_handler, QtImport
+from gui.gui_supervisor import (
+    GUISupervisor,
+    LOAD_GUI_EVENT,
+    get_splash_screen,
+    set_splash_screen,
+)
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-
 STD_BRICKS_LOCATION = "gui.bricks"
 BRICKS_DIR_LIST = []
 LOG_FORMATTER = logging.Formatter(
-    '%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s'
-    )
+    "%(asctime)s |%(name)-5s|%(levelname)-7s| %(message)s"
+)
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.DEBUG)
@@ -72,15 +78,19 @@ LOGGING_NAME = ""
 mxcube_root = os.path.dirname(__file__)
 sys.path.insert(0, mxcube_root)
 
+
 def get_splash():
     return get_splash_screen()
+
 
 def set_splash(screen):
     set_splash_screen(screen)
 
+
 def get_base_bricks_path():
     std_bricks_pkg = __import__(STD_BRICKS_LOCATION, globals(), locals(), [""])
     return os.path.dirname(std_bricks_pkg.__file__)
+
 
 def add_custom_bricks_dirs(bricks_dirs):
 
@@ -98,15 +108,18 @@ def add_custom_bricks_dirs(bricks_dirs):
 
         BRICKS_DIR_LIST += new_bricks_dirs
 
+
 base_bricks_path = get_base_bricks_path()
 sys.path.insert(0, base_bricks_path)
 # add 'EMBL' 'ESRF' 'ALBA' ... subfolders to path
 for root, dirs, files in os.walk(base_bricks_path):
-    if root[root.rfind("/"):] != "/__pycache__" and root != base_bricks_path:
+    if root[root.rfind("/") :] != "/__pycache__" and root != base_bricks_path:
         sys.path.insert(0, root)
+
 
 def get_custom_bricks_dirs():
     return BRICKS_DIR_LIST
+
 
 def set_logging_name(name, logging_formatter=""):
     global LOG_FORMATTER, HWR_LOG_HANDLER, LOGIN_NAME
@@ -117,27 +130,22 @@ def set_logging_name(name, logging_formatter=""):
     HWR_LOG_HANDLER.setFormatter(LOG_FORMATTER)
     LOGIN_NAME = name
 
+
 def set_log_file(filename):
     global HWR_LOG_HANDLER
-    from logging.handlers import TimedRotatingFileHandler
-
     LOGGER.info("Logging to file %s" % filename)
 
     LOGGER.removeHandler(HWR_LOG_HANDLER)
     # _hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file,
     # 10 files max.
-    HWR_LOG_HANDLER = TimedRotatingFileHandler(
-        filename,
-        when="midnight",
-        backupCount=1)
+    HWR_LOG_HANDLER = TimedRotatingFileHandler(filename, when="midnight", backupCount=1)
     os.chmod(filename, 0o666)
     HWR_LOG_HANDLER.setFormatter(LOG_FORMATTER)
     LOGGER.addHandler(HWR_LOG_HANDLER)
 
 
 def do_gevent():
-    """Can't call gevent.run inside inner event loops (message boxes...)
-    """
+    """Can't call gevent.run inside inner event loops (message boxes...)"""
 
     if QtImport.QEventLoop():
         try:
@@ -147,6 +155,7 @@ def do_gevent():
     else:
         # all that I tried with gevent here fails! => seg fault
         pass
+
 
 class MyCustomEvent(QtImport.QEvent):
     """Custom event"""
@@ -158,7 +167,7 @@ class MyCustomEvent(QtImport.QEvent):
         self.data = data
 
 
-def create_app(gui_config_file=None, run_mode='prod'):
+def create_app(gui_config_file=None):
     """Main run method"""
 
     default_configuration_path = "localhost:hwr"
@@ -275,24 +284,9 @@ def create_app(gui_config_file=None, run_mode='prod'):
         default=None,
     )
 
-    parser.add_option(
-        "",
-        "--pyqt4",
-        action="store_true",
-        default=None
-        )
-    parser.add_option(
-        "",
-        "--pyqt5",
-        action="store_true",
-        default=None
-        )
-    parser.add_option(
-        "",
-        "--pyside",
-        action="store_true",
-        default=None
-        )
+    parser.add_option("", "--pyqt4", action="store_true", default=None)
+    parser.add_option("", "--pyqt5", action="store_true", default=None)
+    parser.add_option("", "--pyside", action="store_true", default=None)
 
     (opts, args) = parser.parse_args()
 
@@ -357,16 +351,16 @@ def create_app(gui_config_file=None, run_mode='prod'):
             sys.exit(1)
 
     if (
-            len(
-                os.popen(
-                    "ps -aef | grep 'python' -i | grep 'hardwareRepository'" +\
-                    "  | grep -v 'grep' | awk '{ print $3 }'"
-                )
-                .read()
-                .strip()
-                .split("\n")
+        len(
+            os.popen(
+                "ps -aef | grep 'python' -i | grep 'hardwareRepository'"
+                + "  | grep -v 'grep' | awk '{ print $3 }'"
             )
-            > 1
+            .read()
+            .strip()
+            .split("\n")
+        )
+        > 1
     ):
         QtImport.QMessageBox.warning(
             None,
@@ -374,7 +368,7 @@ def create_app(gui_config_file=None, run_mode='prod'):
             "Another instance of MXCuBE is running.\n",
             QtImport.QMessageBox.Ok,
         )
-        #sys.exit(1)
+        # sys.exit(1)
 
     # configure modules
     if hwobj_directories:
@@ -452,7 +446,6 @@ def create_app(gui_config_file=None, run_mode='prod'):
     )
     HWR_LOGGER.info("Starting MXCuBE Qt")
 
-
     # log startup details
     # logging.getLogger().info("\n\n\n\n")
     HWR_LOGGER.info("Starting to load gui...")
@@ -494,11 +487,7 @@ def create_app(gui_config_file=None, run_mode='prod'):
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(
-        supervisor,
-        MyCustomEvent(
-            LOAD_GUI_EVENT,
-            gui_config_file
-            )
+        supervisor, MyCustomEvent(LOAD_GUI_EVENT, gui_config_file)
     )
 
     # redirect errors to logger
@@ -517,12 +506,11 @@ def create_app(gui_config_file=None, run_mode='prod'):
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
     # app.setWindowIcon(QtImport.QIcon("images/icon.png"))
-    
-    
+
     main_application.exec_()
 
     supervisor.finalize()
-    """
+
     if log_lockfile is not None:
         filename = log_lockfile.name
         try:
@@ -530,8 +518,7 @@ def create_app(gui_config_file=None, run_mode='prod'):
             os.unlink(filename)
         except BaseException:
             logging.getLogger().exception("Problem removing the log lock file")
-    """
-    
+
     return main_application
 
 
