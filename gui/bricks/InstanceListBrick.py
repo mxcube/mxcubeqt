@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mx3core.HardwareObjects import InstanceServer
+from mx3core.hardware_objects import InstanceServer
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons, QtImport
 import os

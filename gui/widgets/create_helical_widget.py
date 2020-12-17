@@ -27,9 +27,9 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.processing_widget import ProcessingWidget
 from gui.widgets.comments_widget import CommentsWidget
 
-from mx3core.HardwareObjects import queue_model_objects
-from mx3core.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
-from mx3core.HardwareObjects.QtGraphicsLib import GraphicsItemLine
+from mx3core.hardware_objects import queue_model_objects
+from mx3core.hardware_objects.queue_model_enumerables import EXPERIMENT_TYPE
+from mx3core.hardware_objects.QtGraphicsLib import GraphicsItemLine
 
 from mx3core import HardwareRepository as HWR
 

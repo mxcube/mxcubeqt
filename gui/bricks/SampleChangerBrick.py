@@ -21,7 +21,7 @@ import gui.utils.sample_changer_helper as sc_helper
 from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
 
-from mx3core.HardwareObjects.abstract.sample_changer import Container
+from mx3core.hardware_objects.abstract.sample_changer import Container
 from mx3core import HardwareRepository as HWR
 
 

@@ -22,7 +22,7 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.mca_spectrum_widget import McaSpectrumWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from mx3core.HardwareObjects import queue_model_objects
+from mx3core.hardware_objects import queue_model_objects
 
 from mx3core import HardwareRepository as HWR
 

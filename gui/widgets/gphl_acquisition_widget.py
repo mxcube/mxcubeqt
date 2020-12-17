@@ -30,7 +30,7 @@ from collections import OrderedDict
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
-from mx3core.HardwareObjects import queue_model_enumerables
+from mx3core.hardware_objects import queue_model_enumerables
 from mx3core.dispatcher import dispatcher
 
 from mx3core import HardwareRepository as HWR

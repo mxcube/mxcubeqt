@@ -25,7 +25,7 @@ from gui.utils import queue_item, Colors, QtImport
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from gui.widgets.dc_tree_widget import DataCollectTree
 
-from mx3core.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
+from mx3core.hardware_objects.queue_model_enumerables import CENTRING_METHOD
 
 from mx3core import HardwareRepository as HWR
 

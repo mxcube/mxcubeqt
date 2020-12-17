@@ -30,7 +30,7 @@ from gui.widgets.processing_widget import ProcessingWidget
 #from gui.widgets.comment_widget import CommentWidget
 
 
-from mx3core.HardwareObjects import (
+from mx3core.hardware_objects import (
     queue_model_objects,
     queue_model_enumerables,
 )
