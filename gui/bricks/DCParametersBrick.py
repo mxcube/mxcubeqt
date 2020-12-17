@@ -24,7 +24,7 @@ from gui.widgets.image_tracking_widget import ImageTrackingWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

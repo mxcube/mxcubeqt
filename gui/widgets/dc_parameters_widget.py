@@ -25,7 +25,7 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.processing_widget import ProcessingWidget
 from gui.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

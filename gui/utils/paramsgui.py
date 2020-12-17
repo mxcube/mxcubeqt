@@ -28,7 +28,7 @@ import os.path
 import logging
 import sys
 
-from HardwareRepository import ConvertUtils
+from mx3core import ConvertUtils
 
 from gui.utils import QtImport, Colors
 

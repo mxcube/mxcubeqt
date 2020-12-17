@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import Colors
-from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import (
+from mx3core.HardwareObjects.abstract.AbstractSampleChanger import (
     SampleChangerState,
     SampleChangerMode,
     SampleChanger,

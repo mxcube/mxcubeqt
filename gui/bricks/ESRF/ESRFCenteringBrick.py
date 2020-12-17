@@ -83,8 +83,8 @@ import matplotlib.pyplot as plt
 
 
 from gui.BaseComponents import BaseWidget
-from HardwareRepository import HardwareRepository as HWR
-from HardwareRepository.HardwareObjects import sample_centring
+from mx3core import HardwareRepository as HWR
+from mx3core.HardwareObjects import sample_centring
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -376,4 +376,3 @@ class ESRFCenteringBrick(BaseWidget):
             for column in range(table.columnCount()):
                 table.item(row, column).setText("")
                 table.item(row, column).setData(QtImport.Qt.BackgroundRole, None)
-            

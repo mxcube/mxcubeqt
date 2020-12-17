@@ -23,12 +23,12 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from HardwareRepository import ConvertUtils
+from mx3core import ConvertUtils
 
 from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"

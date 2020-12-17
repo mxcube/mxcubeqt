@@ -80,7 +80,7 @@ import os
 import copy
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 from bliss.config import get_sessions_list
 

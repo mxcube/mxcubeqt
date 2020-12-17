@@ -25,10 +25,10 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
 
-from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mx3core.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+from mx3core.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

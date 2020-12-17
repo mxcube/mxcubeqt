@@ -30,10 +30,10 @@ from collections import OrderedDict
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository.HardwareObjects import queue_model_enumerables
-from HardwareRepository.dispatcher import dispatcher
+from mx3core.HardwareObjects import queue_model_enumerables
+from mx3core.dispatcher import dispatcher
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 __category__ = "TaskToolbox_Tabs"
 

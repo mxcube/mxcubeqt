@@ -19,7 +19,7 @@
 
 from random import randint, uniform
 from gui.utils.QtImport import Qt, QColor, QPalette
-from HardwareRepository.BaseHardwareObjects import HardwareObjectState
+from mx3core.BaseHardwareObjects import HardwareObjectState
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

@@ -20,7 +20,7 @@
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

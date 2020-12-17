@@ -5,13 +5,13 @@ import os
 
 TESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 MXCUBE = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-HWR_XML_FILES = os.path.join(MXCUBE, "HardwareRepository/configuration/xml-qt")
+HWR_XML_FILES = os.path.join(MXCUBE, "mx3core/configuration/xml-qt")
 
 sys.path.insert(0, MXCUBE)
 print ("MXCuBE root: %s" % MXCUBE)
 print ("Config path: %s" % HWR_XML_FILES)
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 @pytest.fixture(scope="session")
 def hwr():

@@ -25,7 +25,7 @@ from gui.widgets.optimisation_parameters_widget_layout import (
     OptimisationParametersWidgetLayout,
 )
 
-from HardwareRepository.HardwareObjects import (
+from mx3core.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )

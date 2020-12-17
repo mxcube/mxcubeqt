@@ -19,9 +19,9 @@
 
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mx3core.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

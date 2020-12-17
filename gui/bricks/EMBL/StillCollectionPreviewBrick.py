@@ -26,9 +26,9 @@ from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
 from gui.widgets.pyqtgraph_widget import PlotWidget
 
-from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsView
+from mx3core.HardwareObjects.QtGraphicsLib import GraphicsView
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

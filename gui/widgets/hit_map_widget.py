@@ -26,7 +26,7 @@ try:
 except:
    from gui.widgets.matplot_widget import PlotWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

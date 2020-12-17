@@ -27,15 +27,15 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget_simple import AcquisitionWidgetSimple
 from gui.widgets.comments_widget import CommentsWidget
 
-from HardwareRepository.HardwareObjects import (
+from mx3core.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )
-from HardwareRepository.HardwareObjects.queue_model_enumerables import XTAL_SPACEGROUPS
-from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-from HardwareRepository.HardwareObjects.abstract.AbstractCharacterisation import AbstractCharacterisation
+from mx3core.HardwareObjects.queue_model_enumerables import XTAL_SPACEGROUPS
+from mx3core.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+from mx3core.HardwareObjects.abstract.AbstractCharacterisation import AbstractCharacterisation
 
-from HardwareRepository import HardwareRepository as HWR
+from mx3core import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
