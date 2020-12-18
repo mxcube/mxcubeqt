@@ -5,8 +5,8 @@ python:
   - "3.6"
 
 before_install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 bash bin/install_pyqt4.sh; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 bash bin/install_pyqt5.sh; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 bash scripts/install_pyqt4.sh; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 bash scripts/install_pyqt5.sh; fi
 
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev; fi
