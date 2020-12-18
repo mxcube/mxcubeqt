@@ -20,6 +20,11 @@ if not os.environ.get('HARDWARE_REPOSITORY_SERVER'):
 
 # print('MXCUBE_GUI_FILE: %s' % MXCUBE_GUI_FILE)
 
+
 def run():
     from mxcubeqt import create_app
     app = create_app(MXCUBE_GUI_FILE)
+
+
+if __name__ == '__main__':
+    run()
