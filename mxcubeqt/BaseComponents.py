@@ -203,7 +203,7 @@ class BaseWidget(connectable.Connectable, QtImport.QFrame):
                         widget.set_expert_mode(False)
                     except BaseException:
                         logging.getLogger().exception(
-                            "Could not set %s to user mode", 'rrr'#widget.name#()
+                            "Could not set %s to user mode", widget.name()
                         )
 
         else:
