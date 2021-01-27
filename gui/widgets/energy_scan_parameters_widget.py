@@ -23,9 +23,9 @@ from gui.widgets.periodic_table_widget import PeriodicTableWidget
 from gui.widgets.pyqtgraph_widget import PlotWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from mx3core.hardware_objects import queue_model_objects
+from mxcubecore.hardware_objects import queue_model_objects
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

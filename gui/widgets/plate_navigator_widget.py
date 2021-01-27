@@ -19,7 +19,7 @@
 
 from gui.utils import Icons, QtImport
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

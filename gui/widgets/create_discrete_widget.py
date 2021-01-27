@@ -26,13 +26,13 @@ from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.comments_widget import CommentsWidget
 
-from mx3core.hardware_objects import (
+from mxcubecore.hardware_objects import (
     queue_model_objects,
     queue_model_enumerables,
 )
-from mx3core.hardware_objects.QtGraphicsLib import GraphicsItemPoint
+from mxcubecore.hardware_objects.QtGraphicsLib import GraphicsItemPoint
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

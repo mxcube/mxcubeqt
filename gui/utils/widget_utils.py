@@ -19,8 +19,8 @@
 
 
 from gui.utils import Colors, QtImport
-from mx3core.dispatcher import dispatcher
-from mx3core.ConvertUtils import string_types
+from mxcubecore.dispatcher import dispatcher
+from mxcubecore.ConvertUtils import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]

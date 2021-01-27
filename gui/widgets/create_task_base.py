@@ -23,12 +23,12 @@ import logging
 from copy import deepcopy
 
 from gui.utils import queue_item, QtImport
-from mx3core.hardware_objects import (
+from mxcubecore.hardware_objects import (
     queue_model_objects,
     queue_model_enumerables,
 )
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

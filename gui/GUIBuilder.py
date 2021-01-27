@@ -35,8 +35,8 @@ from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay, QtImp
 from gui.bricks import LogViewBrick
 from gui.BaseLayoutItems import ContainerCfg
 
-from mx3core import HardwareRepository as HWR
-from mx3core.ConvertUtils import string_types
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.ConvertUtils import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]

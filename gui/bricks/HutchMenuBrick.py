@@ -23,7 +23,7 @@ from os.path import expanduser
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, Icons, QtImport
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

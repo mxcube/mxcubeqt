@@ -36,7 +36,7 @@ from gui import Configuration, GUIBuilder
 from gui.utils import GUIDisplay, Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget, NullBrick
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
 

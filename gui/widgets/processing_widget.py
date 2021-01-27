@@ -22,7 +22,7 @@ from os.path import expanduser
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
-from mx3core.hardware_objects import (
+from mxcubecore.hardware_objects import (
     queue_model_objects,
     queue_model_enumerables,
 )

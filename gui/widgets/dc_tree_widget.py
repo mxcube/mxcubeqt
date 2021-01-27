@@ -35,11 +35,11 @@ from gui.utils import Colors, Icons, queue_item, QtImport
 from gui.widgets.confirm_dialog import ConfirmDialog
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 
-from mx3core.hardware_objects import queue_entry
-from mx3core.hardware_objects import queue_model_objects
-from mx3core.hardware_objects.queue_model_enumerables import CENTRING_METHOD
+from mxcubecore.hardware_objects import queue_entry
+from mxcubecore.hardware_objects import queue_model_objects
+from mxcubecore.hardware_objects.queue_model_enumerables import CENTRING_METHOD
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MxCuBE collaboration"]

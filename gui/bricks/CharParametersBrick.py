@@ -22,7 +22,7 @@ from gui.BaseComponents import BaseWidget
 from gui.widgets.char_parameters_widget import CharParametersWidget
 from gui.widgets.webview_widget import WebViewWidget
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

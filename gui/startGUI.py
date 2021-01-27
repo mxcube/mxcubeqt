@@ -33,7 +33,7 @@ gevent.monkey.patch_all(thread=False)
 import gui
 from gui import GUISupervisor
 from gui.utils import GUILogHandler, ErrorHandler, QtImport
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

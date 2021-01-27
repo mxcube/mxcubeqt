@@ -30,12 +30,12 @@ from gui.widgets.processing_widget import ProcessingWidget
 #from gui.widgets.comment_widget import CommentWidget
 
 
-from mx3core.hardware_objects import (
+from mxcubecore.hardware_objects import (
     queue_model_objects,
     queue_model_enumerables,
 )
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

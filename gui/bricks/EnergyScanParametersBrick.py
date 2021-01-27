@@ -21,7 +21,7 @@ from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
 
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

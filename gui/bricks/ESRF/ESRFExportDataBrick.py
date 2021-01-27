@@ -64,7 +64,7 @@ import logging
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
-from mx3core import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 from bliss.config import get_sessions_list
 from bliss.scanning.scan_saving import ESRFScanSaving

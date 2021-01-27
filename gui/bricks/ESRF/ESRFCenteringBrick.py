@@ -83,8 +83,8 @@ import matplotlib.pyplot as plt
 
 
 from gui.BaseComponents import BaseWidget
-from mx3core import HardwareRepository as HWR
-from mx3core.hardware_objects import sample_centring
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.hardware_objects import sample_centring
 
 
 __credits__ = ["MXCuBE collaboration"]
