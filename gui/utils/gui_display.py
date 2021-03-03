@@ -31,7 +31,7 @@ from gui.utils import Icons, Colors, property_editor, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.base_layout_items import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

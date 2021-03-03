@@ -25,9 +25,9 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
 from gui.widgets.comments_widget import CommentsWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.hardware_objects import queue_model_objects
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -20,7 +20,7 @@
 from gui.BaseComponents import BaseWidget
 from gui.utils import Colors, QtImport
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
