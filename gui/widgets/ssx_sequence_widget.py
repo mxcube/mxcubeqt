@@ -21,7 +21,7 @@
 from gui.utils import Colors, Icons, QtImport
 
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

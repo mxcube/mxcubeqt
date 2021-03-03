@@ -22,7 +22,7 @@ from gui.BaseComponents import BaseWidget
 from gui.utils.sample_changer_helper import SampleChanger
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

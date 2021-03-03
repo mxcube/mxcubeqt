@@ -22,9 +22,9 @@ from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.mca_spectrum_widget import McaSpectrumWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.hardware_objects import queue_model_objects
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

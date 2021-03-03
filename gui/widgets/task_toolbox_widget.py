@@ -31,9 +31,9 @@ from gui.widgets.create_advanced_widget import CreateAdvancedWidget
 from gui.widgets.create_xray_imaging_widget import CreateXrayImagingWidget
 from gui.widgets.create_still_scan_widget import CreateStillScanWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.hardware_objects import queue_model_objects
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -4,7 +4,7 @@ import os
 import gevent
 
 MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
-HWR_DIR = os.path.join(MXCUBE_ROOT, "HardwareRepository")
+HWR_DIR = os.path.join(MXCUBE_ROOT, "mxcubecore")
 
 print("MXCuBE root: %s" % MXCUBE_ROOT)
 

@@ -21,7 +21,7 @@ from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 from gui.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.hardware_objects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]

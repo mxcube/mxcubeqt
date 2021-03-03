@@ -26,7 +26,7 @@ import logging
 
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
