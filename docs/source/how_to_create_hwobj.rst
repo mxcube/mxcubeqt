@@ -31,7 +31,7 @@ Write necessary hardware object:
 .. code-block:: python
 
    # Available types are: Object, Device, Equipment and Procedure
-   from HardwareRepository.BaseHardwareObjects import HardwareObject
+   from mxcubecore.BaseHardwareObjects import HardwareObject
 
    class TestHardwareObject(HardwareObject)
 
