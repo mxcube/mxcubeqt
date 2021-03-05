@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import Icons, QtImport
+from mxcubeqt.utils import icons, qt_import
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -27,11 +27,11 @@ __license__ = "LGPLv3+"
 __category__ = "Sample changer"
 
 
-class PlateNavigatorWidget(QtImport.QWidget):
+class PlateNavigatorWidget(qt_import.QWidget):
 
     def __init__(self, parent, realtime_plot=False):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         # Hardware objects ----------------------------------------------------
 
@@ -39,11 +39,11 @@ class PlateNavigatorWidget(QtImport.QWidget):
         self.__current_location = [0, 0]
 
         # Graphic elements ----------------------------------------------------
-        self.plate_navigator_table = QtImport.QTableWidget(self)
-        self.plate_navigator_cell = QtImport.QGraphicsView(self)
+        self.plate_navigator_table = qt_import.QTableWidget(self)
+        self.plate_navigator_cell = qt_import.QGraphicsView(self)
 
         # Layout --------------------------------------------------------------
-        _main_hlayout = QtImport.QHBoxLayout(self)
+        _main_hlayout = qt_import.QHBoxLayout(self)
         _main_hlayout.addWidget(self.plate_navigator_table)
         _main_hlayout.addWidget(self.plate_navigator_cell)
         _main_hlayout.addStretch()
@@ -58,7 +58,7 @@ class PlateNavigatorWidget(QtImport.QWidget):
             connect(self.navigation_table_double_clicked)
 
         # Other ---------------------------------------------------------------
-        self.navigation_graphicsscene = QtImport.QGraphicsScene(self)
+        self.navigation_graphicsscene = qt_import.QGraphicsScene(self)
         self.plate_navigator_cell.setScene(self.navigation_graphicsscene)
         self.navigation_item = NavigationItem(self)
         # self.navigation_item.mouseDoubleClickedSignal.connect(\
@@ -70,16 +70,16 @@ class PlateNavigatorWidget(QtImport.QWidget):
         # font.setPointSize(8)
         # self.plate_navigator_table.setFont(font)
         self.plate_navigator_table.setEditTriggers(
-            QtImport.QAbstractItemView.NoEditTriggers)
+            qt_import.QAbstractItemView.NoEditTriggers)
 
         self.plate_navigator_table.setHorizontalScrollBarPolicy(
-            QtImport.Qt.ScrollBarAlwaysOff)
+            qt_import.Qt.ScrollBarAlwaysOff)
         self.plate_navigator_table.setVerticalScrollBarPolicy(
-            QtImport.Qt.ScrollBarAlwaysOff)
+            qt_import.Qt.ScrollBarAlwaysOff)
         self.plate_navigator_cell.setHorizontalScrollBarPolicy(
-            QtImport.Qt.ScrollBarAlwaysOff)
+            qt_import.Qt.ScrollBarAlwaysOff)
         self.plate_navigator_cell.setVerticalScrollBarPolicy(
-            QtImport.Qt.ScrollBarAlwaysOff)
+            qt_import.Qt.ScrollBarAlwaysOff)
     
         if HWR.beamline.plate_manipulator is not None:
             self.init_plate_view()
@@ -96,11 +96,11 @@ class PlateNavigatorWidget(QtImport.QWidget):
             self.navigation_item.set_navigation_pos(pos_x, pos_y)
             self.plate_navigator_cell.update()
             if self.__current_location != new_location:
-                empty_item = QtImport.QTableWidgetItem(QtImport.QIcon(), "")
+                empty_item = qt_import.QTableWidgetItem(qt_import.QIcon(), "")
                 self.plate_navigator_table.setItem(self.__current_location[0],
                                                    self.__current_location[1],
                                                    empty_item)
-                new_item = QtImport.QTableWidgetItem(Icons.load_icon("sample_axis"), "")
+                new_item = qt_import.QTableWidgetItem(icons.load_icon("sample_axis"), "")
                 self.plate_navigator_table.setItem(row, col, new_item)
                 self.__current_location = new_location
             
@@ -121,20 +121,20 @@ class PlateNavigatorWidget(QtImport.QWidget):
         self.plate_navigator_table.setRowCount(self.num_rows)
 
         for col in range(self.num_cols):
-            temp_header_item = QtImport.QTableWidgetItem("%d" % (col + 1))
+            temp_header_item = qt_import.QTableWidgetItem("%d" % (col + 1))
             self.plate_navigator_table.setHorizontalHeaderItem(
                 col, temp_header_item)
             self.plate_navigator_table.setColumnWidth(col, cell_width)
 
         for row in range(self.num_rows):
-            temp_header_item = QtImport.QTableWidgetItem(chr(65 + row))
+            temp_header_item = qt_import.QTableWidgetItem(chr(65 + row))
             self.plate_navigator_table.setVerticalHeaderItem(
                 row, temp_header_item)
             self.plate_navigator_table.setRowHeight(row, cell_height)
 
         for col in range(self.num_cols):
             for row in range(self.num_rows):
-                temp_item = QtImport.QTableWidgetItem()
+                temp_item = qt_import.QTableWidgetItem()
                 self.plate_navigator_table.setItem(row, col, temp_item)
 
         table_width = cell_width * (self.num_cols + 1)
@@ -170,14 +170,14 @@ class PlateNavigatorWidget(QtImport.QWidget):
     #    self.navigation_item.rect.setWidth(width)
 
 
-class NavigationItem(QtImport.QGraphicsItem):
+class NavigationItem(qt_import.QGraphicsItem):
 
     def __init__(self, parent=None):
 
-        QtImport.QGraphicsItem.__init__(self)
+        qt_import.QGraphicsItem.__init__(self)
 
         self.parent = parent
-        self.rect = QtImport.QRectF(0, 0, 0, 0)
+        self.rect = qt_import.QRectF(0, 0, 0, 0)
         self.setPos(0, 0)
         #self.setMatrix = QtGui.QMatrix()
 
@@ -195,9 +195,9 @@ class NavigationItem(QtImport.QGraphicsItem):
             self.rect.setHeight(height)
 
     def paint(self, painter, option, widget):
-        pen = QtImport.QPen(QtImport.Qt.SolidLine)
+        pen = qt_import.QPen(qt_import.Qt.SolidLine)
         pen.setWidth(1)
-        pen.setColor(QtImport.Qt.black)
+        pen.setColor(qt_import.Qt.black)
         painter.setPen(pen)
 
         if self.__num_drops:
@@ -210,7 +210,7 @@ class NavigationItem(QtImport.QGraphicsItem):
                 painter.drawLine(pos_x + 4, pos_y - 4,
                                  pos_x - 4, pos_y + 4)
                 
-        pen.setColor(QtImport.Qt.blue)
+        pen.setColor(qt_import.Qt.blue)
         pen.setWidth(2)
         #        painter.drawLine(pos_x - 2, pos_y - 2,
         #                         pos_x + 2, pos_y + 2)
@@ -235,7 +235,7 @@ class NavigationItem(QtImport.QGraphicsItem):
         self.__num_drops = num_drops
 
     def mouseDoubleClickEvent(self, event):
-        position = QtImport.QPointF(event.pos())
+        position = qt_import.QPointF(event.pos())
         # this is ugly.
         self.parent.navigation_item_double_clicked(
             0.5 + 0.5 * position.x() / self.scene().width(),

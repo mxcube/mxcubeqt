@@ -17,13 +17,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class OptimisationParametersWidgetLayout(QtImport.QWidget):
+class OptimisationParametersWidgetLayout(qt_import.QWidget):
     """
     Widget is used to define characterisation optimization parameters like maximum
     resolution, aimed multiplicity, and etc.
@@ -31,7 +31,7 @@ class OptimisationParametersWidgetLayout(QtImport.QWidget):
 
     def __init__(self, parent=None, name=None, window_flags=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(window_flags))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(window_flags))
 
         if not name:
             self.setObjectName("OptimisationParametersWidgetLayout")
@@ -41,12 +41,12 @@ class OptimisationParametersWidgetLayout(QtImport.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.opt_param_widget = QtImport.load_ui_file(
+        self.opt_param_widget = qt_import.load_ui_file(
             "optimization_parameters_widget_layout.ui"
         )
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.opt_param_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -54,4 +54,4 @@ class OptimisationParametersWidgetLayout(QtImport.QWidget):
         # Size policies -------------------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.setAttribute(QtImport.Qt.WA_WState_Polished)
+        self.setAttribute(qt_import.Qt.WA_WState_Polished)

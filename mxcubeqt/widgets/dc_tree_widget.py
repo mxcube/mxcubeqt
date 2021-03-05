@@ -31,7 +31,7 @@ import webbrowser
 from datetime import datetime
 from collections import namedtuple
 
-from mxcubeqt.utils import Colors, Icons, queue_item, QtImport
+from mxcubeqt.utils import colors, icons, queue_item, qt_import
 from mxcubeqt.widgets.confirm_dialog import ConfirmDialog
 from mxcubeqt.widgets.plate_navigator_widget import PlateNavigatorWidget
 
@@ -55,14 +55,14 @@ SCFilterOptions = namedtuple('SCFilterOptions',
 SC_FILTER_OPTIONS = SCFilterOptions(0, 1, 2, 3)
 
 
-class DataCollectTree(QtImport.QWidget):
+class DataCollectTree(qt_import.QWidget):
 
-    enableCollectSignal = QtImport.pyqtSignal(bool)
+    enableCollectSignal = qt_import.pyqtSignal(bool)
 
     def __init__(self, parent=None, name="data_collect",
                  selection_changed=None):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.setObjectName(name)
 
@@ -97,60 +97,60 @@ class DataCollectTree(QtImport.QWidget):
         self.confirm_dialog = ConfirmDialog(self, 'Confirm Dialog')
         self.confirm_dialog.setModal(True)
 
-        self.pin_icon = Icons.load_icon("sample_axis.png")
-        self.task_icon = Icons.load_icon("task.png")
-        self.play_icon = Icons.load_icon("VCRPlay.png")
-        self.stop_icon = Icons.load_icon("Stop.png")
-        self.ispyb_icon = Icons.load_icon("SampleChanger2.png")
-        self.ispyb_diff_plan_icon = Icons.load_icon("NewDocument.png")
-        self.star_icon = Icons.load_icon("star")
-        self.caution_icon = Icons.load_icon("Caution2.png")
+        self.pin_icon = icons.load_icon("sample_axis.png")
+        self.task_icon = icons.load_icon("task.png")
+        self.play_icon = icons.load_icon("VCRPlay.png")
+        self.stop_icon = icons.load_icon("Stop.png")
+        self.ispyb_icon = icons.load_icon("SampleChanger2.png")
+        self.ispyb_diff_plan_icon = icons.load_icon("NewDocument.png")
+        self.star_icon = icons.load_icon("star")
+        self.caution_icon = icons.load_icon("Caution2.png")
 
-        self.button_widget = QtImport.QWidget(self)
-        self.up_button = QtImport.QPushButton(self.button_widget)
-        self.up_button.setIcon(Icons.load_icon("Up2.png"))
+        self.button_widget = qt_import.QWidget(self)
+        self.up_button = qt_import.QPushButton(self.button_widget)
+        self.up_button.setIcon(icons.load_icon("Up2.png"))
         self.up_button.setFixedHeight(25)
-        self.down_button = QtImport.QPushButton(self.button_widget)
-        self.down_button.setIcon(Icons.load_icon("Down2.png"))
+        self.down_button = qt_import.QPushButton(self.button_widget)
+        self.down_button.setIcon(icons.load_icon("Down2.png"))
         self.down_button.setFixedHeight(25)
 
-        self.copy_button = QtImport.QPushButton(self.button_widget)
-        self.copy_button.setIcon(Icons.load_icon("copy.png"))
+        self.copy_button = qt_import.QPushButton(self.button_widget)
+        self.copy_button.setIcon(icons.load_icon("copy.png"))
         self.copy_button.setDisabled(True)
         self.copy_button.setToolTip("Copy highlighted queue entries")
 
-        self.delete_button = QtImport.QPushButton(self.button_widget)
-        self.delete_button.setIcon(Icons.load_icon("bin_small.png"))
+        self.delete_button = qt_import.QPushButton(self.button_widget)
+        self.delete_button.setIcon(icons.load_icon("bin_small.png"))
         self.delete_button.setDisabled(True)
         self.delete_button.setToolTip("Delete highlighted queue entries")
 
-        self.collect_button = QtImport.QPushButton(self.button_widget)
+        self.collect_button = qt_import.QPushButton(self.button_widget)
         self.collect_button.setText("Collect Queue")
         #elf.collect_button.setFixedWidth(125)
         self.collect_button.setIcon(self.play_icon)
         self.collect_button.setDisabled(True)
-        Colors.set_widget_color(self.collect_button,
-                                Colors.LIGHT_GREEN,
-                                QtImport.QPalette.Button)
+        colors.set_widget_color(self.collect_button,
+                                colors.LIGHT_GREEN,
+                                qt_import.QPalette.Button)
 
-        self.continue_button = QtImport.QPushButton(self.button_widget)
+        self.continue_button = qt_import.QPushButton(self.button_widget)
         self.continue_button.setText('Pause')
         self.continue_button.setDisabled(True)
         self.continue_button.setToolTip("Pause after current data collection")
 
-        self.tree_splitter = QtImport.QSplitter(QtImport.Qt.Vertical, self)
-        self.sample_tree_widget = QtImport.QTreeWidget(self.tree_splitter)
-        self.history_tree_widget = QtImport.QTreeWidget(self.tree_splitter)
+        self.tree_splitter = qt_import.QSplitter(qt_import.Qt.Vertical, self)
+        self.sample_tree_widget = qt_import.QTreeWidget(self.tree_splitter)
+        self.history_tree_widget = qt_import.QTreeWidget(self.tree_splitter)
         self.history_tree_widget.setHidden(True)
-        self.history_enable_cbox = QtImport.QCheckBox("Queue history", self)
+        self.history_enable_cbox = qt_import.QCheckBox("Queue history", self)
         self.history_enable_cbox.setChecked(False)
 
-        self.plate_navigator_cbox = QtImport.QCheckBox("Plate navigator", self)
+        self.plate_navigator_cbox = qt_import.QCheckBox("Plate navigator", self)
         self.plate_navigator_widget = PlateNavigatorWidget(self)
         self.plate_navigator_widget.hide()
 
         # Layout --------------------------------------------------------------
-        button_widget_grid_layout = QtImport.QGridLayout(self.button_widget)
+        button_widget_grid_layout = qt_import.QGridLayout(self.button_widget)
         button_widget_grid_layout.addWidget(self.up_button, 0, 0)
         button_widget_grid_layout.addWidget(self.down_button, 0, 1)
         button_widget_grid_layout.addWidget(self.collect_button, 1, 0, 1, 2)
@@ -161,7 +161,7 @@ class DataCollectTree(QtImport.QWidget):
         button_widget_grid_layout.setContentsMargins(0, 0, 0, 0)
         button_widget_grid_layout.setSpacing(1)
 
-        main_layout = QtImport.QVBoxLayout(self)
+        main_layout = qt_import.QVBoxLayout(self)
         # main_layout.addWidget(self.sample_tree_widget)
         main_layout.addWidget(self.tree_splitter)
         main_layout.addWidget(self.history_enable_cbox)
@@ -210,24 +210,24 @@ class DataCollectTree(QtImport.QWidget):
         self.sample_tree_widget.setRootIsDecorated(1)
         self.sample_tree_widget.setCurrentItem(self.sample_tree_widget.topLevelItem(0))
         self.sample_tree_widget.setSelectionMode(
-            QtImport.QAbstractItemView.ExtendedSelection)
-        self.setAttribute(QtImport.Qt.WA_WState_Polished)
+            qt_import.QAbstractItemView.ExtendedSelection)
+        self.setAttribute(qt_import.Qt.WA_WState_Polished)
         self.sample_tree_widget.viewport().installEventFilter(self)
 
         self.history_tree_widget.setEditTriggers(
-            QtImport.QAbstractItemView.NoEditTriggers)
+            qt_import.QAbstractItemView.NoEditTriggers)
         self.history_tree_widget.setColumnCount(5)
         self.history_tree_widget.setHeaderLabels(
             ("Date/Time", "Sample", "Type", "Status", "Details"))
         self.tree_splitter.setSizes([200, 20])
 
     def setFont(self, font):
-        QtImport.QWidget.setFont(self, font)
+        qt_import.QWidget.setFont(self, font)
         self.confirm_dialog.setFont(font)
 
     def eventFilter(self, _object, event):
         """Custom event filter"""
-        if event.type() == QtImport.QEvent.MouseButtonDblClick:
+        if event.type() == qt_import.QEvent.MouseButtonDblClick:
             self.show_details()
             return True
         else:
@@ -249,7 +249,7 @@ class DataCollectTree(QtImport.QWidget):
         if len(self.get_selected_items()) > 1:
             return
 
-        self.item_menu = QtImport.QMenu(self.sample_tree_widget)
+        self.item_menu = qt_import.QMenu(self.sample_tree_widget)
         item = self.sample_tree_widget.currentItem()
 
         if item:
@@ -336,7 +336,7 @@ class DataCollectTree(QtImport.QWidget):
                 open_in_ispyb_action = self.item_menu.addAction(
                     "View results in ISPyB", self.open_ispyb_link)
                 open_in_ispyb_action.setEnabled(item.get_model().id > 0)
-            self.item_menu.popup(QtImport.QCursor.pos())
+            self.item_menu.popup(qt_import.QCursor.pos())
 
     def item_double_click(self):
         """Shows more details of a double clicked tree item"""
@@ -425,12 +425,12 @@ class DataCollectTree(QtImport.QWidget):
         """Rename treewidget item"""
         items = self.get_selected_items()
         if len(items) == 1:
-            items[0].setFlags(QtImport.Qt.ItemIsSelectable |
-                              QtImport.Qt.ItemIsEnabled |
-                              QtImport.Qt.ItemIsEditable)
+            items[0].setFlags(qt_import.Qt.ItemIsSelectable |
+                              qt_import.Qt.ItemIsEnabled |
+                              qt_import.Qt.ItemIsEditable)
             self.sample_tree_widget.editItem(items[0])
-            items[0].setFlags(QtImport.Qt.ItemIsSelectable |
-                              QtImport.Qt.ItemIsEnabled)
+            items[0].setFlags(qt_import.Qt.ItemIsSelectable |
+                              qt_import.Qt.ItemIsEnabled)
             items[0].get_model().set_name(items[0].text(0))
 
     def add_star_treewidget_item(self):
@@ -450,7 +450,7 @@ class DataCollectTree(QtImport.QWidget):
                 if self.is_mounted_sample_item(item):
                     item.set_mounted_style(True)
                 else:
-                    item.setIcon(0, QtImport.QIcon())
+                    item.setIcon(0, qt_import.QIcon())
 
     def scroll_to_item(self, item=None):
         if not item:
@@ -460,7 +460,7 @@ class DataCollectTree(QtImport.QWidget):
 
         if item:
             self.sample_tree_widget.scrollToItem(
-                item, QtImport.QAbstractItemView.PositionAtCenter)
+                item, qt_import.QAbstractItemView.PositionAtCenter)
             self.sample_tree_widget.horizontalScrollBar().setValue(0)
 
     def mount_sample(self):
@@ -623,7 +623,7 @@ class DataCollectTree(QtImport.QWidget):
     def get_item_by_model(self, parent_node):
         """Returns tree item by its model
         """
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
@@ -690,11 +690,11 @@ class DataCollectTree(QtImport.QWidget):
 
     def de_select_items(self):
         """De selects all items"""
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
-            item.setCheckState(0, QtImport.Qt.Unchecked)
+            item.setCheckState(0, qt_import.Qt.Unchecked)
             it += 1
             item = it.value()
 
@@ -743,7 +743,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def get_mounted_sample_item(self):
         """Returns mounted sample item"""
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
@@ -788,7 +788,7 @@ class DataCollectTree(QtImport.QWidget):
                     loaded_sample_loc = loaded_sample.getCoords()
                 except BaseException:
                     pass
-            it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+            it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
             item = it.value()
 
             while item:
@@ -838,19 +838,19 @@ class DataCollectTree(QtImport.QWidget):
         """Pause handlers"""
         if state:
             self.continue_button.setText('Continue')
-            QtImport.QToolTip.showText(self.continue_button.mapToGlobal(
-                QtImport.QPoint(0, 10)),
+            qt_import.QToolTip.showText(self.continue_button.mapToGlobal(
+                qt_import.QPoint(0, 10)),
                 "If necessary please center a new point.\n\n" +
                 "Press 'Continue' to continue.")
-            Colors.set_widget_color(self.continue_button,
-                                    Colors.LIGHT_YELLOW,
-                                    QtImport.QPalette.Button)
+            colors.set_widget_color(self.continue_button,
+                                    colors.LIGHT_YELLOW,
+                                    qt_import.QPalette.Button)
         else:
             self.continue_button.setText('Pause')
-            Colors.set_widget_color(
+            colors.set_widget_color(
                 self.continue_button,
-                Colors.BUTTON_ORIGINAL,
-                QtImport.QPalette.Button)
+                colors.BUTTON_ORIGINAL,
+                qt_import.QPalette.Button)
 
     def collect_stop_toggle(self):
         """Stops queue"""
@@ -885,7 +885,7 @@ class DataCollectTree(QtImport.QWidget):
                     message = "No data collections selected, please select one" + \
                               " or more data collections"
 
-                    QtImport.QMessageBox.information(self, "Data collection",
+                    qt_import.QMessageBox.information(self, "Data collection",
                                                      message, "OK")
 
     def enable_sample_changer_widget(self, state):
@@ -951,10 +951,10 @@ class DataCollectTree(QtImport.QWidget):
         self.enable_sample_changer_widget(False)
         self.collecting = True
         self.collect_button.setText(" Stop   ")
-        Colors.set_widget_color(
+        colors.set_widget_color(
             self.collect_button,
-            Colors.LIGHT_RED,
-            QtImport.QPalette.Button)
+            colors.LIGHT_RED,
+            qt_import.QPalette.Button)
         self.collect_button.setIcon(self.stop_icon)
         self.continue_button.setEnabled(True)
         self.parent().set_condition_state("confirmation_window_accepted",
@@ -1040,7 +1040,7 @@ class DataCollectTree(QtImport.QWidget):
                 date_item = self.history_tree_widget.topLevelItem(item_index)
                 break
         if not date_item:
-            date_item = QtImport.QTreeWidgetItem()
+            date_item = qt_import.QTreeWidgetItem()
             date_item.setText(0, date)
             self.history_tree_widget.insertTopLevelItem(0, date_item)
 
@@ -1050,11 +1050,11 @@ class DataCollectTree(QtImport.QWidget):
                 time_item = date_item.child(item_index)
 
         if not time_item:
-            time_item = QtImport.QTreeWidgetItem()
+            time_item = qt_import.QTreeWidgetItem()
             time_item.setText(0, time.split(":")[0] + "h")
             date_item.insertChild(0, time_item)
 
-        entry_item = QtImport.QTreeWidgetItem()
+        entry_item = qt_import.QTreeWidgetItem()
         entry_item.setText(0, time)
         entry_item.setText(1, sample_name)
         entry_item.setText(2, entry_type)
@@ -1062,9 +1062,9 @@ class DataCollectTree(QtImport.QWidget):
         entry_item.setText(4, entry_details)
 
         if status == "Successful":
-            entry_item.setBackground(3, QtImport.QBrush(Colors.LIGHT_GREEN))
+            entry_item.setBackground(3, qt_import.QBrush(colors.LIGHT_GREEN))
         else:
-            entry_item.setBackground(3, QtImport.QBrush(Colors.LIGHT_RED))
+            entry_item.setBackground(3, qt_import.QBrush(colors.LIGHT_RED))
 
         time_item.insertChild(0, entry_item)
 
@@ -1090,10 +1090,10 @@ class DataCollectTree(QtImport.QWidget):
         self.collect_button.setText("Collect Queue")
         self.collect_button.setIcon(self.play_icon)
         self.continue_button.setEnabled(False)
-        Colors.set_widget_color(
+        colors.set_widget_color(
             self.collect_button,
-            Colors.LIGHT_GREEN,
-            QtImport.QPalette.Button)
+            colors.LIGHT_GREEN,
+            qt_import.QPalette.Button)
         self.delete_button.setEnabled(True)
         self.enable_sample_changer_widget(True)
         # self.parent().enable_hutch_menu(True)
@@ -1110,7 +1110,7 @@ class DataCollectTree(QtImport.QWidget):
     def get_checked_items(self):
         """Returns all checked items"""
         checked_items = []
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
         while item:
             if item.checkState(0) > 0 and not \
@@ -1125,7 +1125,7 @@ class DataCollectTree(QtImport.QWidget):
            Do not include samples without data collection(s)
         """
         checked_items = []
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
         while item:
             append = False
@@ -1193,7 +1193,7 @@ class DataCollectTree(QtImport.QWidget):
         """Selects first element from the tree"""
         selected_items = self.get_selected_items()
         if len(selected_items) == 0:
-            it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+            it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
             #item = it.current()
             item = it.value()
             if item.get_model().free_pin_mode:
@@ -1340,7 +1340,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def set_sample_pin_icon(self):
         """Updates sample icon"""
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
@@ -1375,13 +1375,13 @@ class DataCollectTree(QtImport.QWidget):
                 """
 
             if item.has_star():
-                item.setIcon(0, Icons.load_icon("star"))
+                item.setIcon(0, icons.load_icon("star"))
 
             it += 1
             item = it.value()
 
     def update_basket_selection(self):
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
@@ -1394,11 +1394,11 @@ class DataCollectTree(QtImport.QWidget):
     def check_for_path_collisions(self):
         """Checks for path conflicts"""
         conflict = False
-        it = QtImport.QTreeWidgetItemIterator(self.sample_tree_widget)
+        it = qt_import.QTreeWidgetItemIterator(self.sample_tree_widget)
         item = it.value()
 
         while item:
-            if item.checkState(0) == QtImport.Qt.Checked:
+            if item.checkState(0) == qt_import.Qt.Checked:
                 pt = item.get_model().get_path_template()
 
                 if pt:
@@ -1412,7 +1412,7 @@ class DataCollectTree(QtImport.QWidget):
                         if item.has_star():
                             item.setIcon(0, self.star_icon)
                         else:
-                            item.setIcon(0, QtImport.QIcon())
+                            item.setIcon(0, qt_import.QIcon())
 
             it += 1
             item = it.value()
@@ -1428,7 +1428,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def hide_empty_baskets(self):
         """Hides empty baskets after the tree filtering"""
-        self.item_iterator = QtImport.QTreeWidgetItemIterator(
+        self.item_iterator = qt_import.QTreeWidgetItemIterator(
             self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
@@ -1448,7 +1448,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def delete_empty_finished_items(self):
         """Deletes collected items"""
-        self.item_iterator = QtImport.QTreeWidgetItemIterator(
+        self.item_iterator = qt_import.QTreeWidgetItemIterator(
             self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:
@@ -1511,7 +1511,7 @@ class DataCollectTree(QtImport.QWidget):
     def save_item(self):
         """Saves a single item in a file"""
 
-        filename = str(QtImport.QFileDialog.getSaveFileName(
+        filename = str(qt_import.QFileDialog.getSaveFileName(
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
@@ -1539,7 +1539,7 @@ class DataCollectTree(QtImport.QWidget):
     def insert_item(self, apply_once=False):
         """Inserts item from a file"""
 
-        filename = str(QtImport.QFileDialog.getOpenFileName(self,
+        filename = str(qt_import.QFileDialog.getOpenFileName(self,
                                                             "Open file", os.environ["HOME"],
                                                             "Item file (*.dat)", "Choose a itemfile to open"))
         if len(filename) > 0:
@@ -1597,7 +1597,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def save_queue_in_file(self):
         """Saves queue in the file"""
-        filename = str(QtImport.QFileDialog.getSaveFileName(
+        filename = str(qt_import.QFileDialog.getSaveFileName(
             self, "Choose a filename to save selected item",
             os.environ["HOME"]))
         if not filename.endswith(".dat"):
@@ -1606,7 +1606,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def load_queue_from_file(self):
         """Loads queue from file"""
-        filename = str(QtImport.QFileDialog.getOpenFileName(self,
+        filename = str(qt_import.QFileDialog.getOpenFileName(self,
                                                             "Open file", os.environ["HOME"],
                                                             "Item file (*.dat)", "Choose queue file to open"))
         if len(filename) > 0:
@@ -1667,7 +1667,7 @@ class DataCollectTree(QtImport.QWidget):
 
     def shape_changed(self, shape, shape_type):
         """Updates tree item if its related shape has changed"""
-        self.item_iterator = QtImport.QTreeWidgetItemIterator(
+        self.item_iterator = qt_import.QTreeWidgetItemIterator(
             self.sample_tree_widget)
         item = self.item_iterator.value()
         while item:

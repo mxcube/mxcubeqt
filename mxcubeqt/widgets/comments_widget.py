@@ -17,29 +17,29 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class CommentsWidget(QtImport.QWidget):
+class CommentsWidget(qt_import.QWidget):
 
     def __init__(self, parent=None, name=None, fl=0, data_model=None):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
 
-        main_gbox = QtImport.QGroupBox("Comments", self)
-        self.comment_textbox = QtImport.QTextEdit(main_gbox)
+        main_gbox = qt_import.QGroupBox("Comments", self)
+        self.comment_textbox = qt_import.QTextEdit(main_gbox)
 
-        main_gbox_vbox = QtImport.QVBoxLayout(main_gbox)
+        main_gbox_vbox = qt_import.QVBoxLayout(main_gbox)
         main_gbox_vbox.addWidget(self.comment_textbox)
         main_gbox_vbox.setSpacing(0)
         main_gbox_vbox.setContentsMargins(0, 0, 0, 0)
 
-        self.main_layout = QtImport.QVBoxLayout(self)
+        self.main_layout = qt_import.QVBoxLayout(self)
         self.main_layout.addWidget(main_gbox)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)

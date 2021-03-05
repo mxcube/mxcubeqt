@@ -21,7 +21,7 @@ import os
 import string
 import logging
 
-from mxcubeqt.utils import Colors, QtImport
+from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
 from mxcubecore.HardwareObjects import queue_model_objects
@@ -31,13 +31,13 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class DataPathWidget(QtImport.QWidget):
+class DataPathWidget(qt_import.QWidget):
 
-    pathTemplateChangedSignal = QtImport.pyqtSignal()
+    pathTemplateChangedSignal = qt_import.pyqtSignal()
 
     def __init__(self, parent=None, name="", fl=0, data_model=None, layout=None):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
@@ -60,16 +60,16 @@ class DataPathWidget(QtImport.QWidget):
 
         # Graphic elements ----------------------------------------------------
         if layout == "vertical":
-            self.data_path_layout = QtImport.load_ui_file(
+            self.data_path_layout = qt_import.load_ui_file(
                 "data_path_widget_vertical_layout.ui"
             )
         else:
-            self.data_path_layout = QtImport.load_ui_file(
+            self.data_path_layout = qt_import.load_ui_file(
                 "data_path_widget_horizontal_layout.ui"
             )
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.data_path_layout)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -98,7 +98,7 @@ class DataPathWidget(QtImport.QWidget):
             "run_number",
             self.data_path_layout.run_number_ledit,
             int,
-            QtImport.QIntValidator(0, 1000, self),
+            qt_import.QIntValidator(0, 1000, self),
         )
 
         self._data_model_pm.bind_value_update(
@@ -106,12 +106,12 @@ class DataPathWidget(QtImport.QWidget):
         )
 
     def _browse_clicked(self):
-        file_dialog = QtImport.QFileDialog(self)
+        file_dialog = qt_import.QFileDialog(self)
         file_dialog.setNameFilter("%s*" % self._base_image_dir)
 
         selected_dir = str(
             file_dialog.getExistingDirectory(
-                self, "Select a directory", str(self._base_image_dir), QtImport.QFileDialog.ShowDirsOnly
+                self, "Select a directory", str(self._base_image_dir), qt_import.QFileDialog.ShowDirsOnly
             )
         )
         if selected_dir is not None and len(selected_dir) > 0 and selected_dir.startswith(self._base_image_dir):
@@ -155,8 +155,8 @@ class DataPathWidget(QtImport.QWidget):
             self.pathTemplateChangedSignal.emit()
         else:
             # self.data_path_layout.run_number_ledit.setText(str(self._data_model.run_number))
-            Colors.set_widget_color(
-                self.data_path_layout.folder_ledit, Colors.LIGHT_YELLOW
+            colors.set_widget_color(
+                self.data_path_layout.folder_ledit, colors.LIGHT_YELLOW
             )
 
     def _folder_ledit_change(self, new_value):
@@ -189,7 +189,7 @@ class DataPathWidget(QtImport.QWidget):
 
         self._data_model.directory = new_image_directory
         self._data_model.process_directory = new_proc_dir
-        Colors.set_widget_color(self.data_path_layout.folder_ledit, Colors.WHITE)
+        colors.set_widget_color(self.data_path_layout.folder_ledit, colors.WHITE)
 
         self.pathTemplateChangedSignal.emit()
 
@@ -276,20 +276,20 @@ class DataPathWidget(QtImport.QWidget):
 
     def indicate_path_conflict(self, conflict):
         if conflict:
-            Colors.set_widget_color(
+            colors.set_widget_color(
                 self.data_path_layout.prefix_ledit,
-                Colors.LIGHT_RED,
-                QtImport.QPalette.Base,
+                colors.LIGHT_RED,
+                qt_import.QPalette.Base,
             )
-            Colors.set_widget_color(
+            colors.set_widget_color(
                 self.data_path_layout.run_number_ledit,
-                Colors.LIGHT_RED,
-                QtImport.QPalette.Base,
+                colors.LIGHT_RED,
+                qt_import.QPalette.Base,
             )
-            Colors.set_widget_color(
+            colors.set_widget_color(
                 self.data_path_layout.folder_ledit,
-                Colors.LIGHT_RED,
-                QtImport.QPalette.Base,
+                colors.LIGHT_RED,
+                qt_import.QPalette.Base,
             )
 
             logging.getLogger("GUI").error(
@@ -302,19 +302,19 @@ class DataPathWidget(QtImport.QWidget):
             if self.path_conflict_state:
                 logging.getLogger("GUI").info("Path valid")
 
-                Colors.set_widget_color(
+                colors.set_widget_color(
                     self.data_path_layout.prefix_ledit,
-                    Colors.WHITE,
-                    QtImport.QPalette.Base,
+                    colors.WHITE,
+                    qt_import.QPalette.Base,
                 )
-                Colors.set_widget_color(
+                colors.set_widget_color(
                     self.data_path_layout.run_number_ledit,
-                    Colors.WHITE,
-                    QtImport.QPalette.Base,
+                    colors.WHITE,
+                    qt_import.QPalette.Base,
                 )
-                Colors.set_widget_color(
+                colors.set_widget_color(
                     self.data_path_layout.folder_ledit,
-                    Colors.WHITE,
-                    QtImport.QPalette.Base,
+                    colors.WHITE,
+                    qt_import.QPalette.Base,
                 )
         self.path_conflict_state = conflict

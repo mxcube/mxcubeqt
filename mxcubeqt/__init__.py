@@ -38,7 +38,7 @@ import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 
 from mxcubecore import HardwareRepository as HWR
-from mxcubeqt.utils import gui_log_handler, error_handler, QtImport
+from mxcubeqt.utils import gui_log_handler, error_handler, qt_import
 from mxcubeqt.gui_supervisor import (
     GUISupervisor,
     LOAD_GUI_EVENT,
@@ -150,7 +150,7 @@ def set_log_file(filename):
 def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)"""
 
-    if QtImport.QEventLoop():
+    if qt_import.QEventLoop():
         try:
             gevent.wait(timeout=0.01)
         except AssertionError:
@@ -160,13 +160,13 @@ def do_gevent():
         pass
 
 
-class MyCustomEvent(QtImport.QEvent):
+class MyCustomEvent(qt_import.QEvent):
     """Custom event"""
 
     def __init__(self, event_type, data):
         """init"""
 
-        QtImport.QEvent.__init__(self, event_type)
+        qt_import.QEvent.__init__(self, event_type)
         self.data = data
 
 
@@ -355,7 +355,7 @@ def create_app(gui_config_file=None):
     ]
     hwobj_directories = [_directory for _directory in hwobj_directories if _directory]
 
-    main_application = QtImport.QApplication([])
+    main_application = qt_import.QApplication([])
     if app_style:
         main_application.setStyle(app_style)
 
@@ -378,11 +378,11 @@ def create_app(gui_config_file=None):
         )
         > 1
     ):
-        QtImport.QMessageBox.warning(
+        qt_import.QMessageBox.warning(
             None,
             "Warning",
             "Another instance of MXCuBE is running.\n",
-            QtImport.QMessageBox.Ok,
+            qt_import.QMessageBox.Ok,
         )
         # sys.exit(1)
 
@@ -476,14 +476,14 @@ def create_app(gui_config_file=None):
     HWR_LOGGER.info(
         "    - Qt %s - %s %s"
         % (
-            "%d.%d.%d" % tuple(QtImport.qt_version_no),
-            QtImport.qt_variant,
-            "%d.%d.%d" % tuple(QtImport.pyqt_version_no),
+            "%d.%d.%d" % tuple(qt_import.qt_version_no),
+            qt_import.qt_variant,
+            "%d.%d.%d" % tuple(qt_import.pyqt_version_no),
         )
     )
-    if QtImport.mpl_imported:
+    if qt_import.mpl_imported:
         HWR_LOGGER.info(
-            "    - Matplotlib %s" % "%d.%d.%d" % tuple(QtImport.mpl_version_no)
+            "    - Matplotlib %s" % "%d.%d.%d" % tuple(qt_import.mpl_version_no)
         )
     else:
         HWR_LOGGER.info("    - Matplotlib not available")
@@ -491,7 +491,7 @@ def create_app(gui_config_file=None):
         "------------------------------------------------------------------------------"
     )
 
-    QtImport.QApplication.setDesktopSettingsAware(False)
+    qt_import.QApplication.setDesktopSettingsAware(False)
 
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = GUISupervisor(
@@ -509,19 +509,19 @@ def create_app(gui_config_file=None):
     # redirect errors to logger
     error_handler.enable_std_err_redirection()
 
-    gevent_timer = QtImport.QTimer()
+    gevent_timer = qt_import.QTimer()
     gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 
     palette = main_application.palette()
-    palette.setColor(QtImport.QPalette.ToolTipBase, QtImport.QColor(255, 241, 204))
-    palette.setColor(QtImport.QPalette.ToolTipText, QtImport.Qt.black)
+    palette.setColor(qt_import.QPalette.ToolTipBase, qt_import.QColor(255, 241, 204))
+    palette.setColor(qt_import.QPalette.ToolTipText, qt_import.Qt.black)
     main_application.setPalette(palette)
 
     main_application.setOrganizationName("MXCuBE")
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
-    # app.setWindowIcon(QtImport.QIcon("images/icon.png"))
+    # app.setWindowIcon(qt_import.QIcon("images/icon.png"))
 
     main_application.exec_()
 

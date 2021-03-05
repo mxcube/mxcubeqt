@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.periodic_table_widget import PeriodicTableWidget
 from mxcubeqt.widgets.pyqtgraph_widget import PlotWidget
@@ -32,9 +32,9 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class EnergyScanParametersWidget(QtImport.QWidget):
+class EnergyScanParametersWidget(qt_import.QWidget):
     def __init__(self, parent=None, name="energy_scan_tab_widget"):
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -44,8 +44,8 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        _top_widget = QtImport.QWidget(self)
-        _parameters_widget = QtImport.QWidget(_top_widget)
+        _top_widget = qt_import.QWidget(self)
+        _parameters_widget = qt_import.QWidget(_top_widget)
         self.periodic_table_widget = PeriodicTableWidget(_parameters_widget)
         self.data_path_widget = DataPathWidget(_parameters_widget)
         self.data_path_widget.data_path_layout.file_name_label.setText("")
@@ -56,7 +56,7 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         self.chooch_plot_widget = PlotWidget(self)
 
         # Layout -------------------------------------------------------------
-        _parameters_widget_layout = QtImport.QVBoxLayout()
+        _parameters_widget_layout = qt_import.QVBoxLayout()
         _parameters_widget_layout.addWidget(self.periodic_table_widget)
         _parameters_widget_layout.addWidget(self.data_path_widget)
         _parameters_widget_layout.addStretch(0)
@@ -64,7 +64,7 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
         _parameters_widget.setLayout(_parameters_widget_layout)
 
-        _top_widget_hlayout = QtImport.QHBoxLayout(self)
+        _top_widget_hlayout = qt_import.QHBoxLayout(self)
         _top_widget_hlayout.addWidget(_parameters_widget)
         _top_widget_hlayout.addWidget(self.snapshot_widget)
         _top_widget_hlayout.addStretch(0)
@@ -72,7 +72,7 @@ class EnergyScanParametersWidget(QtImport.QWidget):
         _top_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         _top_widget.setLayout(_top_widget_hlayout)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.scan_plot_widget)
         #_main_vlayout.addWidget(self.scan_result_plot_widget)
@@ -85,10 +85,10 @@ class EnergyScanParametersWidget(QtImport.QWidget):
 
         # SizePolicies --------------------------------------------------------
         self.scan_plot_widget.setSizePolicy(
-            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Expanding
         )
         self.chooch_plot_widget.setSizePolicy(
-            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Expanding
         )
 
         # Qt signal/slot connections ------------------------------------------

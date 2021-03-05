@@ -20,7 +20,7 @@
 import copy
 import logging
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
@@ -52,7 +52,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._lines_map = {}
 
         # Graphic elements ----------------------------------------------------
-        self._lines_widget = QtImport.load_ui_file("helical_line_widget_layout.ui")
+        self._lines_widget = qt_import.load_ui_file("helical_line_widget_layout.ui")
 
         self._acq_widget = AcquisitionWidget(
             self,
@@ -76,7 +76,7 @@ class CreateHelicalWidget(CreateTaskBase):
         self._comments_widget = CommentsWidget(self) 
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._lines_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
@@ -165,7 +165,7 @@ class CreateHelicalWidget(CreateTaskBase):
             info_str_list.append("%d" % shape.get_points_index()[0])
             info_str_list.append("%d" % shape.get_points_index()[1])
 
-            lines_treewidget_item = QtImport.QTreeWidgetItem(
+            lines_treewidget_item = qt_import.QTreeWidgetItem(
                 self._lines_widget.lines_treewidget, info_str_list
             )
             lines_treewidget_item.setSelected(True)

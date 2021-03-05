@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import Colors, queue_item, QtImport
+from mxcubeqt.utils import colors, queue_item, qt_import
 from mxcubeqt.widgets.matplot_widget import PolarScaterWidget
 
 
@@ -25,10 +25,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class DCGroupWidget(QtImport.QWidget):
+class DCGroupWidget(qt_import.QWidget):
     def __init__(self, parent=None, name="dc_group_widget"):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
         if name is not None:
             self.setObjectName(name)
 
@@ -45,20 +45,20 @@ class DCGroupWidget(QtImport.QWidget):
         self.add_dc_cb = None
         self._tree_view_item = None
 
-        _subwedge_widget = QtImport.QGroupBox("Summary", self)
+        _subwedge_widget = qt_import.QGroupBox("Summary", self)
         self.polar_scater_widget = PolarScaterWidget()
-        self.subwedge_table = QtImport.QTableWidget(_subwedge_widget)
-        self.position_widget = QtImport.load_ui_file("snapshot_widget_layout.ui")
+        self.subwedge_table = qt_import.QTableWidget(_subwedge_widget)
+        self.position_widget = qt_import.load_ui_file("snapshot_widget_layout.ui")
 
         # Layout --------------------------------------------------------------
-        _subwedge_widget_vlayout = QtImport.QVBoxLayout(_subwedge_widget)
+        _subwedge_widget_vlayout = qt_import.QVBoxLayout(_subwedge_widget)
         _subwedge_widget_vlayout.addWidget(self.polar_scater_widget)
         _subwedge_widget_vlayout.addWidget(self.subwedge_table)
         _subwedge_widget_vlayout.setContentsMargins(0, 4, 0, 0)
         _subwedge_widget_vlayout.setSpacing(6)
         _subwedge_widget_vlayout.addStretch(0)
 
-        _main_hlayout = QtImport.QHBoxLayout(self)
+        _main_hlayout = qt_import.QHBoxLayout(self)
         _main_hlayout.addWidget(_subwedge_widget)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.setSpacing(2)
@@ -73,7 +73,7 @@ class DCGroupWidget(QtImport.QWidget):
         font = self.subwedge_table.font()
         font.setPointSize(8)
         self.subwedge_table.setFont(font)
-        self.subwedge_table.setEditTriggers(QtImport.QAbstractItemView.NoEditTriggers)
+        self.subwedge_table.setEditTriggers(qt_import.QAbstractItemView.NoEditTriggers)
         self.subwedge_table.setColumnCount(7)
         self.subwedge_table.horizontalHeader().setStretchLastSection(False)
 
@@ -88,7 +88,7 @@ class DCGroupWidget(QtImport.QWidget):
         ]
         for index, header in enumerate(horizontal_headers):
             self.subwedge_table.setHorizontalHeaderItem(
-                index, QtImport.QTableWidgetItem(header)
+                index, qt_import.QTableWidgetItem(header)
             )
 
     def populate_widget(self, item):
@@ -120,7 +120,7 @@ class DCGroupWidget(QtImport.QWidget):
                     )
 
         for sw in sw_list:
-            color = Colors.get_random_numpy_color()
+            color = colors.get_random_numpy_color()
             sw.append(color)
 
         self.subwedge_table.setRowCount(0)
@@ -137,17 +137,17 @@ class DCGroupWidget(QtImport.QWidget):
                 str(acq_par.transmission),
                 str(acq_par.resolution),
             )
-            # color = Colors.get_random_color()
+            # color = colors.get_random_color()
             # sw.append(color)
             for col in range(7):
                 self.subwedge_table.setItem(
-                    row, col, QtImport.QTableWidgetItem(param_list[col])
+                    row, col, qt_import.QTableWidgetItem(param_list[col])
                 )
-                color = QtImport.QColor(
+                color = qt_import.QColor(
                     int(sw[-1][0] * 255), int(sw[-1][0] * 255), int(sw[-1][0] * 255)
                 )
                 color.setAlpha(100)
                 self.subwedge_table.item(row, col).setBackground(color)
-                #     QtGui.QColor(Colors.TASK_GROUP[sw[0]]))
+                #     QtGui.QColor(colors.TASK_GROUP[sw[0]]))
 
         self.polar_scater_widget.draw_multiwedge_scater(sw_list)

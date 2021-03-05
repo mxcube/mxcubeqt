@@ -25,18 +25,18 @@ try:
 except BaseException:
    from mxcubeqt.widgets.matplot_widget import TwoAxisPlotWidget as Plot
 
-from mxcubeqt.utils import Colors, QtImport
+from mxcubeqt.utils import colors, qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class PymcaPlotWidget(QtImport.QWidget):
+class PymcaPlotWidget(qt_import.QWidget):
 
     def __init__(self, parent, realtime_plot=False):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.axis_x_array = []
         self.axis_y_array = []
@@ -45,27 +45,27 @@ class PymcaPlotWidget(QtImport.QWidget):
 
         self.pymca_graph = Plot(self)
         self.pymca_graph.showGrid()
-        self.info_label = QtImport.QLabel("", self)
-        self.info_label.setAlignment(QtImport.Qt.AlignRight)
+        self.info_label = qt_import.QLabel("", self)
+        self.info_label.setAlignment(qt_import.Qt.AlignRight)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.pymca_graph)
         _main_vlayout.addWidget(self.info_label)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
         if PYMCA_EXISTS:
-            QtImport.QObject.connect(
+            qt_import.QObject.connect(
                 self.pymca_graph,
-                QtImport.SIGNAL("QtBlissGraphSignal"),
+                qt_import.SIGNAL("QtBlissGraphSignal"),
                 self.handle_graph_signal,
             )
 
-        Colors.set_widget_color(self, Colors.WHITE)
+        colors.set_widget_color(self, colors.WHITE)
 
     def clear(self):
         self.pymca_graph.clearcurves()

@@ -25,7 +25,7 @@ from __future__ import print_function, unicode_literals
 
 from mxcubecore import ConvertUtils
 
-from mxcubeqt.utils import Colors, QtImport
+from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.paramsgui import FieldsWidget
 
 from mxcubecore import HardwareRepository as HWR
@@ -35,30 +35,30 @@ __license__ = "LGPLv3+"
 __author__ = "Rasmus H Fogh"
 
 
-class SelectionTable(QtImport.QTableWidget):
+class SelectionTable(qt_import.QTableWidget):
     """Read-only table for data display and selection"""
 
     def __init__(self, parent=None, name="selection_table", header=None):
-        QtImport.QTableWidget.__init__(self, parent)
+        qt_import.QTableWidget.__init__(self, parent)
         if not header:
             raise ValueError("DisplayTable must be initialised with header")
 
         self.setObjectName(name)
-        self.setFrameShape(QtImport.QFrame.StyledPanel)
-        self.setFrameShadow(QtImport.QFrame.Sunken)
+        self.setFrameShape(qt_import.QFrame.StyledPanel)
+        self.setFrameShadow(qt_import.QFrame.Sunken)
         self.setContentsMargins(0, 3, 0, 3)
         self.setColumnCount(len(header))
-        self.setSelectionMode(QtImport.QTableWidget.SingleSelection)
+        self.setSelectionMode(qt_import.QTableWidget.SingleSelection)
         self.setHorizontalHeaderLabels(header)
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
-        self.setFont(QtImport.QFont("Courier"))
+        self.setFont(qt_import.QFont("Courier"))
 
         hdr = self.horizontalHeader()
-        hdr.setResizeMode(0, QtImport.QHeaderView.Stretch)
+        hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
         for ii in range(1, len(header)):
-            hdr.setResizeMode(ii, QtImport.QHeaderView.ResizeToContents)
+            hdr.setResizeMode(ii, qt_import.QHeaderView.ResizeToContents)
 
     def resizeData(self, ii):
         """Dummy method, recommended by docs when not using std cell widgets"""
@@ -69,17 +69,17 @@ class SelectionTable(QtImport.QTableWidget):
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
         for rowNum, text in enumerate(values):
-            wdg = QtImport.QLineEdit(self)
-            wdg.setFont(QtImport.QFont("Courier"))
+            wdg = qt_import.QLineEdit(self)
+            wdg.setFont(qt_import.QFont("Courier"))
             wdg.setReadOnly(True)
             wdg.setText(ConvertUtils.text_type(text))
             if colours:
                 colour = colours[rowNum]
                 if colour:
-                    Colors.set_widget_color(
-                        wdg, getattr(Colors, colour), QtImport.QPalette.Base
+                    colors.set_widget_color(
+                        wdg, getattr(colors, colour), qt_import.QPalette.Base
                     )
-                    # wdg.setBackground(getattr(QtImport.QColor, colour))
+                    # wdg.setBackground(getattr(qt_import.QColor, colour))
             self.setCellWidget(rowNum, colNum, wdg)
 
     def get_value(self):
@@ -88,12 +88,12 @@ class SelectionTable(QtImport.QTableWidget):
         return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
 
 
-class GphlDataDialog(QtImport.QDialog):
+class GphlDataDialog(qt_import.QDialog):
 
-    continueClickedSignal = QtImport.pyqtSignal()
+    continueClickedSignal = qt_import.pyqtSignal()
 
     def __init__(self, parent=None, name=None, fl=0):
-        QtImport.QDialog.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QDialog.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
@@ -103,59 +103,59 @@ class GphlDataDialog(QtImport.QDialog):
         self._async_result = None
 
         # Layout
-        QtImport.QVBoxLayout(self)
+        qt_import.QVBoxLayout(self)
         main_layout = self.layout()
         main_layout.setSpacing(10)
         main_layout.setMargin(6)
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
         self.setWindowTitle("GPhL Workflow parameters")
 
         # Info box
-        self.info_gbox = QtImport.QGroupBox("Info", self)
-        QtImport.QVBoxLayout(self.info_gbox)
+        self.info_gbox = qt_import.QGroupBox("Info", self)
+        qt_import.QVBoxLayout(self.info_gbox)
         main_layout.addWidget(self.info_gbox)
-        self.info_text = QtImport.QTextEdit(self.info_gbox)
-        self.info_text.setFont(QtImport.QFont("Courier"))
+        self.info_text = qt_import.QTextEdit(self.info_gbox)
+        self.info_text.setFont(qt_import.QFont("Courier"))
         self.info_text.setReadOnly(True)
         self.info_gbox.layout().addWidget(self.info_text)
 
         # Special parameter box
-        self.cplx_gbox = QtImport.QGroupBox("Indexing solution", self)
-        QtImport.QVBoxLayout(self.cplx_gbox)
+        self.cplx_gbox = qt_import.QGroupBox("Indexing solution", self)
+        qt_import.QVBoxLayout(self.cplx_gbox)
         main_layout.addWidget(self.cplx_gbox)
         self.cplx_gbox.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         self.cplx_widget = None
 
         # Parameter box
-        self.parameter_gbox = QtImport.QGroupBox("Parameters", self)
+        self.parameter_gbox = qt_import.QGroupBox("Parameters", self)
         main_layout.addWidget(self.parameter_gbox)
         self.parameter_gbox.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         self.params_widget = None
 
         # Button bar
-        button_layout = QtImport.QHBoxLayout(None)
-        hspacer = QtImport.QSpacerItem(
-            1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
+        button_layout = qt_import.QHBoxLayout(None)
+        hspacer = qt_import.QSpacerItem(
+            1, 20, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum
         )
         button_layout.addItem(hspacer)
-        self.continue_button = QtImport.QPushButton("Continue", self)
+        self.continue_button = qt_import.QPushButton("Continue", self)
         button_layout.addWidget(self.continue_button)
-        self.cancel_button = QtImport.QPushButton("Abort", self)
+        self.cancel_button = qt_import.QPushButton("Abort", self)
         button_layout.addWidget(self.cancel_button)
         main_layout.addLayout(button_layout)
 
         self.continue_button.clicked.connect(self.continue_button_click)
         self.cancel_button.clicked.connect(self.cancel_button_click)
 
-        self.resize(QtImport.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
-        # self.clearWState(QtImport.WState_Polished)
+        self.resize(qt_import.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
+        # self.clearWState(qt_import.WState_Polished)
 
     def continue_button_click(self):
         result = {}

@@ -17,18 +17,18 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class SADWidgetLayout(QtImport.QWidget):
+class SADWidgetLayout(qt_import.QWidget):
 
     def __init__(self, parent=None, name=None, flags=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(flags))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("SADWidgetLayout")
@@ -38,27 +38,27 @@ class SADWidgetLayout(QtImport.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.optimised_sad_cbx = QtImport.QCheckBox("Optimised SAD", self)
-        self.automatic_resolution_radio = QtImport.QRadioButton(self)
-        _optimal_sad_widget = QtImport.QWidget(self)
-        self.optimal_sad_radio = QtImport.QRadioButton(
+        self.optimised_sad_cbx = qt_import.QCheckBox("Optimised SAD", self)
+        self.automatic_resolution_radio = qt_import.QRadioButton(self)
+        _optimal_sad_widget = qt_import.QWidget(self)
+        self.optimal_sad_radio = qt_import.QRadioButton(
             "Optimal SAD for given resolution:", _optimal_sad_widget
         )
-        self.sad_bgroup = QtImport.QButtonGroup(self)
+        self.sad_bgroup = qt_import.QButtonGroup(self)
         self.sad_bgroup.addButton(self.automatic_resolution_radio)
         self.sad_bgroup.addButton(self.optimal_sad_radio)
-        self.sad_resolution_ledit = QtImport.QLineEdit(_optimal_sad_widget)
+        self.sad_resolution_ledit = qt_import.QLineEdit(_optimal_sad_widget)
         self.sad_resolution_ledit.setMinimumSize(50, 0)
         self.sad_resolution_ledit.setMaximumSize(50, 32767)
 
         # Layout --------------------------------------------------------------
-        _optimal_sad_widget_hlayout = QtImport.QHBoxLayout(_optimal_sad_widget)
+        _optimal_sad_widget_hlayout = qt_import.QHBoxLayout(_optimal_sad_widget)
         _optimal_sad_widget_hlayout.addWidget(self.optimal_sad_radio)
         _optimal_sad_widget_hlayout.addWidget(self.sad_resolution_ledit)
         _optimal_sad_widget_hlayout.setSpacing(0)
         _optimal_sad_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.optimised_sad_cbx)
         _main_vlayout.addWidget(self.automatic_resolution_radio)
         _main_vlayout.addWidget(_optimal_sad_widget)
@@ -73,4 +73,4 @@ class SADWidgetLayout(QtImport.QWidget):
         )
 
     def trUtf8(self, s, c=None):
-        return QtImport.QApplication.translate("SADWidgetLayout", s, c)
+        return qt_import.QApplication.translate("SADWidgetLayout", s, c)

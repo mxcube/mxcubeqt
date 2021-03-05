@@ -20,7 +20,7 @@
 import copy
 import logging
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
@@ -38,7 +38,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
 
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(fl), "XRF spectrum"
+            self, parent, name, qt_import.Qt.WindowFlags(fl), "XRF spectrum"
         )
 
         if name is not None:
@@ -57,11 +57,11 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
             self, data_model=self._path_template, layout="vertical"
         )
 
-        _parameters_gbox = QtImport.QGroupBox("Parameters", self)
-        _count_time_label = QtImport.QLabel("Count time (sec.):", _parameters_gbox)
-        self.count_time_ledit = QtImport.QLineEdit("1", _parameters_gbox)
+        _parameters_gbox = qt_import.QGroupBox("Parameters", self)
+        _count_time_label = qt_import.QLabel("Count time (sec.):", _parameters_gbox)
+        self.count_time_ledit = qt_import.QLineEdit("1", _parameters_gbox)
         # self.count_time_ledit.setMaximumWidth(75)
-        self.adjust_transmission_cbox = QtImport.QCheckBox(
+        self.adjust_transmission_cbox = qt_import.QCheckBox(
             "Adjust transmission", _parameters_gbox
         )
         self.adjust_transmission_cbox.setChecked(True)
@@ -69,7 +69,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         self._comments_widget = CommentsWidget(self)
 
         # Layout --------------------------------------------------------------
-        _parameters_gbox_hlayout = QtImport.QHBoxLayout(_parameters_gbox)
+        _parameters_gbox_hlayout = qt_import.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
         _parameters_gbox_hlayout.addWidget(self.count_time_ledit)
         _parameters_gbox_hlayout.addWidget(self.adjust_transmission_cbox)
@@ -77,7 +77,7 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _parameters_gbox_hlayout.setSpacing(2)
         _parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(_parameters_gbox)
         _main_vlayout.addWidget(self._comments_widget)

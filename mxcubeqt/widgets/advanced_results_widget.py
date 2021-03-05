@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.widgets.hit_map_widget import HitMapWidget
 
 from mxcubecore import HardwareRepository as HWR
@@ -27,10 +27,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class AdvancedResultsWidget(QtImport.QWidget):
+class AdvancedResultsWidget(qt_import.QWidget):
 
     def __init__(self, parent=None):
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
         self.setObjectName("advanced_results_widget")
 
         # Hardware objects ----------------------------------------------------
@@ -41,7 +41,7 @@ class AdvancedResultsWidget(QtImport.QWidget):
         self.hit_map_widget = HitMapWidget(self)
 
         # Layout --------------------------------------------------------------
-        _main_hlayout = QtImport.QHBoxLayout(self)
+        _main_hlayout = qt_import.QHBoxLayout(self)
         _main_hlayout.addWidget(self.hit_map_widget)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)

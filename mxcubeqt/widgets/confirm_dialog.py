@@ -19,7 +19,7 @@
 
 import os
 
-from mxcubeqt.utils import Colors, queue_item, QtImport
+from mxcubeqt.utils import colors, queue_item, qt_import
 from mxcubecore.HardwareObjects import queue_model_objects
 
 
@@ -27,16 +27,16 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class ConfirmDialog(QtImport.QDialog):
+class ConfirmDialog(qt_import.QDialog):
 
-    continueClickedSignal = QtImport.pyqtSignal(list, list)
+    continueClickedSignal = qt_import.pyqtSignal(list, list)
 
     def __init__(self, parent=None, name=None, flags=0):
 
-        QtImport.QDialog.__init__(
+        qt_import.QDialog.__init__(
             self,
             parent,
-            QtImport.Qt.WindowFlags(flags | QtImport.Qt.WindowStaysOnTopHint),
+            qt_import.Qt.WindowFlags(flags | qt_import.Qt.WindowStaysOnTopHint),
         )
 
         if name is not None:
@@ -47,10 +47,10 @@ class ConfirmDialog(QtImport.QDialog):
         self.sample_items = []
 
         # Graphic elements ----------------------------------------------------
-        self.conf_dialog_layout = QtImport.load_ui_file("confirmation_dialog_layout.ui")
+        self.conf_dialog_layout = qt_import.load_ui_file("confirmation_dialog_layout.ui")
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.conf_dialog_layout)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(0)
@@ -124,23 +124,23 @@ class ConfirmDialog(QtImport.QDialog):
                     info_str_list.append("Already mounted")
                 else:
                     info_str_list.append("Sample mounting")
-                sample_treewidget_item = QtImport.QTreeWidgetItem(
+                sample_treewidget_item = qt_import.QTreeWidgetItem(
                     self.conf_dialog_layout.summary_treewidget, info_str_list
                 )
                 for col in range(13):
                     sample_treewidget_item.setBackground(
-                        col, QtImport.QBrush(Colors.TREE_ITEM_SAMPLE)
+                        col, qt_import.QBrush(colors.TREE_ITEM_SAMPLE)
                     )
                 sample_treewidget_item.setExpanded(True)
             elif isinstance(item, queue_item.DataCollectionGroupQueueItem):
                 info_str_list.append(item_type_name)
-                collection_group_treewidget_item = QtImport.QTreeWidgetItem(
+                collection_group_treewidget_item = qt_import.QTreeWidgetItem(
                     sample_treewidget_item, info_str_list
                 )
                 collection_group_treewidget_item.setExpanded(True)
             elif isinstance(item, queue_item.SampleCentringQueueItem):
                 info_str_list.append(item_type_name)
-                QtImport.QTreeWidgetItem(
+                qt_import.QTreeWidgetItem(
                     collection_group_treewidget_item, info_str_list
                 )
             elif isinstance(item, queue_item.DataCollectionQueueItem):
@@ -189,12 +189,12 @@ class ConfirmDialog(QtImport.QDialog):
                     "%s s" % str(acq_parameters.num_images * acq_parameters.exp_time)
                 )
 
-                collection_treewidget_item = QtImport.QTreeWidgetItem(
+                collection_treewidget_item = qt_import.QTreeWidgetItem(
                     collection_group_treewidget_item, info_str_list
                 )
                 for col in range(13):
                     collection_treewidget_item.setBackground(
-                        col, QtImport.QBrush(Colors.TREE_ITEM_COLLECTION)
+                        col, qt_import.QBrush(colors.TREE_ITEM_COLLECTION)
                     )
 
                 collection_items.append(item)
@@ -215,11 +215,11 @@ class ConfirmDialog(QtImport.QDialog):
                         file_str_list.append(dir_name)
                         file_str_list.append(file_name)
 
-                        file_treewidgee_item = QtImport.QTreeWidgetItem(
+                        file_treewidgee_item = qt_import.QTreeWidgetItem(
                             self.conf_dialog_layout.file_treewidget, file_str_list
                         )
-                        file_treewidgee_item.setTextColor(1, QtImport.Qt.red)
-                        file_treewidgee_item.setTextColor(2, QtImport.Qt.red)
+                        file_treewidgee_item.setTextColor(1, qt_import.Qt.red)
+                        file_treewidgee_item.setTextColor(2, qt_import.Qt.red)
                         file_exists = True
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)

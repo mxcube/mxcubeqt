@@ -19,7 +19,7 @@
 
 """AcquisitionStillWidget is customized for ssx type acquisitions"""
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
 from mxcubecore.HardwareObjects import queue_model_objects
@@ -31,9 +31,9 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class AcquisitionStillWidget(QtImport.QWidget):
+class AcquisitionStillWidget(qt_import.QWidget):
 
-    acqParametersChangedSignal = QtImport.pyqtSignal(list)
+    acqParametersChangedSignal = qt_import.pyqtSignal(list)
 
     def __init__(
             self,
@@ -56,7 +56,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
         :param layout:
         """
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
@@ -83,11 +83,11 @@ class AcquisitionStillWidget(QtImport.QWidget):
 
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
-        self.acq_widget_layout = QtImport.load_ui_file(
+        self.acq_widget_layout = qt_import.load_ui_file(
             "acquisition_widget_vertical_still_layout.ui"
         )
         # Layout --------------------------------------------------------------
-        __main_vlayout = QtImport.QVBoxLayout(self)
+        __main_vlayout = qt_import.QVBoxLayout(self)
         __main_vlayout.addWidget(self.acq_widget_layout)
         __main_vlayout.setSpacing(0)
         __main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -119,28 +119,28 @@ class AcquisitionStillWidget(QtImport.QWidget):
         )
 
         # Other ---------------------------------------------------------------
-        self.energy_validator = QtImport.QDoubleValidator(
+        self.energy_validator = qt_import.QDoubleValidator(
             4, 25, 4, self.acq_widget_layout.energy_ledit
         )
-        self.resolution_validator = QtImport.QDoubleValidator(
+        self.resolution_validator = qt_import.QDoubleValidator(
             0, 15, 3, self.acq_widget_layout.resolution_ledit
         )
-        self.transmission_validator = QtImport.QDoubleValidator(
+        self.transmission_validator = qt_import.QDoubleValidator(
             0, 100, 3, self.acq_widget_layout.transmission_ledit
         )
-        self.exp_time_validator = QtImport.QDoubleValidator(
+        self.exp_time_validator = qt_import.QDoubleValidator(
             0.0001, 10000, 7, self.acq_widget_layout.exp_time_ledit
         )
-        self.num_triggers_validator = QtImport.QIntValidator(
+        self.num_triggers_validator = qt_import.QIntValidator(
             1, 9999999, self.acq_widget_layout.num_triggers_ledit
         )
-        self.num_images_per_trigger_validator = QtImport.QIntValidator(
+        self.num_images_per_trigger_validator = qt_import.QIntValidator(
             1, 9999999, self.acq_widget_layout.num_images_per_trigger_ledit
         )
-        self.num_img_validator = QtImport.QIntValidator(
+        self.num_img_validator = qt_import.QIntValidator(
             1, 9999999, self.acq_widget_layout.num_images_ledit
         )
-        self.hare_num_validator = QtImport.QIntValidator(
+        self.hare_num_validator = qt_import.QIntValidator(
             1, 9999999, self.acq_widget_layout.hare_num_ledit
         )
 

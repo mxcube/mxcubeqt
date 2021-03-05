@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import Colors, Icons, QtImport
+from mxcubeqt.utils import colors, icons, qt_import
 
 
 from mxcubecore import HardwareRepository as HWR
@@ -28,11 +28,11 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class SSXSequenceWidget(QtImport.QWidget):
+class SSXSequenceWidget(qt_import.QWidget):
 
     def __init__(self, parent=None, name=None, fl=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         # Internal values -----------------------------------------------------
         self.chan_config = {}
@@ -44,16 +44,16 @@ class SSXSequenceWidget(QtImport.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        _main_gbox = QtImport.QGroupBox("Channels", self)
-        self.chan_table = QtImport.QTableWidget(_main_gbox)
+        _main_gbox = qt_import.QGroupBox("Channels", self)
+        self.chan_table = qt_import.QTableWidget(_main_gbox)
 
         # Layout --------------------------------------------------------------
-        _gbox_vlayout = QtImport.QGridLayout(_main_gbox)
+        _gbox_vlayout = qt_import.QGridLayout(_main_gbox)
         _gbox_vlayout.addWidget(self.chan_table, 0, 0)
         _gbox_vlayout.setSpacing(0)
         _gbox_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(_main_gbox)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -78,7 +78,7 @@ class SSXSequenceWidget(QtImport.QWidget):
         self.chan_table.setColumnCount(3)
         for index, header_text in enumerate(("Name", "Delay", "Length")):
             self.chan_table.setHorizontalHeaderItem(
-                index, QtImport.QTableWidgetItem(header_text)
+                index, qt_import.QTableWidgetItem(header_text)
             )
             if index > 0:
                 self.chan_table.resizeColumnToContents(index)
@@ -90,7 +90,7 @@ class SSXSequenceWidget(QtImport.QWidget):
         
 
         for index in range(self.chan_config["num_channels"]):
-            combo = QtImport.QComboBox()
+            combo = qt_import.QComboBox()
             combo.activated.connect(self.chan_seq_combo_activated)
 
             for chan_name in self.chan_config["channels"].keys():
@@ -102,14 +102,14 @@ class SSXSequenceWidget(QtImport.QWidget):
             self.chan_combo_items.append(combo)
 
             for col in (1, 2):
-                self.chan_table.setItem(index, col,  QtImport.QTableWidgetItem("")) 
+                self.chan_table.setItem(index, col,  qt_import.QTableWidgetItem("")) 
 
             if index < len(self.chan_config["default_seq"]):
                 def_chan_item_name = self.chan_config["default_seq"][index]
                 combo.setCurrentIndex(combo.findText(def_chan_item_name))
-                self.chan_table.setItem(index, 1, QtImport.QTableWidgetItem(
+                self.chan_table.setItem(index, 1, qt_import.QTableWidgetItem(
                     str(self.chan_config["channels"][def_chan_item_name][0])))
-                self.chan_table.setItem(index, 2, QtImport.QTableWidgetItem(
+                self.chan_table.setItem(index, 2, qt_import.QTableWidgetItem(
                     str(self.chan_config["channels"][def_chan_item_name][1])))
 
         self.chan_table.blockSignals(False)

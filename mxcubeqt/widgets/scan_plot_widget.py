@@ -19,18 +19,18 @@
 
 from PyMca.QtBlissGraph import QtBlissGraph
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class ScanPlotWidget(QtImport.QWidget):
+class ScanPlotWidget(qt_import.QWidget):
 
     def __init__(self, parent=None, name="scan_plot_widget"):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -42,14 +42,14 @@ class ScanPlotWidget(QtImport.QWidget):
         self.is_connected = None
         self.isScanning = None
 
-        self.lblTitle = QtImport.QLabel(self)
-        self.lblPosition = QtImport.QLabel(self)
+        self.lblTitle = qt_import.QLabel(self)
+        self.lblPosition = qt_import.QLabel(self)
         self.graph = QtBlissGraph(self)
 
         self.graph.canvas().setMouseTracking(True)
         self.graph.enableLegend(False)
         self.graph.enableZoom(False)
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.lblTitle)
         _main_vlayout.addWidget(self.lblPosition)
         _main_vlayout.addWidget(self.graph)

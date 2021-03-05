@@ -21,30 +21,30 @@ import os
 import weakref
 import logging
 
-from mxcubeqt.utils import Icons, property_bag, Colors, QtImport
+from mxcubeqt.utils import icons, property_bag, colors, qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class ConfigurationTable(QtImport.QTableWidget):
+class ConfigurationTable(qt_import.QTableWidget):
 
-    propertyChangedSignal = QtImport.pyqtSignal(str, object, object)
+    propertyChangedSignal = qt_import.pyqtSignal(str, object, object)
 
     def __init__(self, parent):
 
-        QtImport.QTableWidget.__init__(self, parent)
+        qt_import.QTableWidget.__init__(self, parent)
 
         self.display_hwobj = False
         self.property_bag = None
 
         self.setObjectName("configurationTable")
-        self.setFrameShape(QtImport.QFrame.StyledPanel)
-        self.setFrameShadow(QtImport.QFrame.Sunken)
+        self.setFrameShape(qt_import.QFrame.StyledPanel)
+        self.setFrameShadow(qt_import.QFrame.Sunken)
         self.setContentsMargins(0, 3, 0, 3)
         self.setColumnCount(4)
-        self.setSelectionMode(QtImport.QTableWidget.NoSelection)
+        self.setSelectionMode(qt_import.QTableWidget.NoSelection)
 
         # self.setHorizontalHeaderLabels([self.trUtf8('Property'),
         #                                self.trUtf8('Value'),
@@ -53,9 +53,9 @@ class ConfigurationTable(QtImport.QTableWidget):
         self.setHorizontalHeaderLabels(["Property", "Value", "", "Comment"])
 
         self.setSizePolicy(
-            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed
+            qt_import.QSizePolicy.MinimumExpanding, qt_import.QSizePolicy.Fixed
         )
-        self.setHorizontalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(qt_import.Qt.ScrollBarAlwaysOff)
 
         self.cellChanged.connect(self.on_cell_changed)
 
@@ -94,14 +94,14 @@ class ConfigurationTable(QtImport.QTableWidget):
                         continue
 
                 self.setRowCount(i + 1)
-                temp_table_item = QtImport.QTableWidgetItem(prop_name)
-                temp_table_item.setFlags(QtImport.Qt.ItemIsEnabled)
+                temp_table_item = qt_import.QTableWidgetItem(prop_name)
+                temp_table_item.setFlags(qt_import.Qt.ItemIsEnabled)
                 self.blockSignals(True)
                 self.setItem(i, 0, temp_table_item)
                 self.set_widget_from_property(i, prop)
 
-                temp_table_item = QtImport.QTableWidgetItem(prop.comment)
-                temp_table_item.setFlags(QtImport.Qt.ItemIsEnabled)
+                temp_table_item = qt_import.QTableWidgetItem(prop.comment)
+                temp_table_item.setFlags(qt_import.Qt.ItemIsEnabled)
                 self.setItem(i, 3, temp_table_item)
 
                 self.blockSignals(False)
@@ -128,12 +128,12 @@ class ConfigurationTable(QtImport.QTableWidget):
         :type prop: dict
         """
         if prop.get_type() == "boolean":
-            new_property_item = QtImport.QTableWidgetItem("")
+            new_property_item = qt_import.QTableWidgetItem("")
             self.setItem(row, 1, new_property_item)
             if prop.get_user_value():
-                self.item(row, 1).setCheckState(QtImport.Qt.Checked)
+                self.item(row, 1).setCheckState(qt_import.Qt.Checked)
             else:
-                self.item(row, 1).setCheckState(QtImport.Qt.Unchecked)
+                self.item(row, 1).setCheckState(qt_import.Qt.Unchecked)
         elif prop.get_type() == "combo":
             choices_list = []
             choices = prop.get_choices()
@@ -154,9 +154,9 @@ class ConfigurationTable(QtImport.QTableWidget):
             self.setCellWidget(row, 1, new_property_item)
         else:
             if prop.get_user_value() is None:
-                temp_table_item = QtImport.QTableWidgetItem("")
+                temp_table_item = qt_import.QTableWidgetItem("")
             else:
-                temp_table_item = QtImport.QTableWidgetItem(str(prop.get_user_value()))
+                temp_table_item = qt_import.QTableWidgetItem(str(prop.get_user_value()))
             self.setItem(row, 1, temp_table_item)
         self.resizeColumnsToContents()
         # self.parent().adjustSize()
@@ -227,7 +227,7 @@ class ConfigurationTable(QtImport.QTableWidget):
         if col == 1 and row >= 0:
             self.item(row, 2).setEnabled(1)
 
-        return QtImport.QTable.beginEdit(self, row, col, replace)
+        return qt_import.QTable.beginEdit(self, row, col, replace)
 
     def endEdit(self, row, col, accept, replace):
         if col == 1 and row >= 0:
@@ -265,26 +265,26 @@ class ConfigurationTable(QtImport.QTableWidget):
                     # self.emit(QtCore.SIGNAL('propertyChanged'),
                     # (prop_name, old_value, prop.get_user_value(), ))
 
-        return QtImport.QTable.endEdit(self, row, col, accept, replace)
+        return qt_import.QTable.endEdit(self, row, col, accept, replace)
 
 
-class ValidationTableItem(QtImport.QWidget):
+class ValidationTableItem(qt_import.QWidget):
     def __init__(self, parent=None):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
-        self.ok_button = QtImport.QToolButton(parent)
+        self.ok_button = qt_import.QToolButton(parent)
         self.ok_button.setAutoRaise(True)
-        self.ok_button.setIcon(Icons.load_icon("button_ok_small"))
-        self.cancel_button = QtImport.QToolButton(parent)
+        self.ok_button.setIcon(icons.load_icon("button_ok_small"))
+        self.cancel_button = qt_import.QToolButton(parent)
         self.cancel_button.setAutoRaise(True)
-        self.cancel_button.setIcon(Icons.load_icon("button_cancel_small"))
-        self.reset_button = QtImport.QToolButton(parent)
-        self.reset_button.setIcon(Icons.load_icon("button_default_small"))
+        self.cancel_button.setIcon(icons.load_icon("button_cancel_small"))
+        self.reset_button = qt_import.QToolButton(parent)
+        self.reset_button.setIcon(icons.load_icon("button_default_small"))
         self.reset_button.setAutoRaise(True)
         self.setEnabled(False)
 
-        _main_layout = QtImport.QHBoxLayout(self)
+        _main_layout = qt_import.QHBoxLayout(self)
         _main_layout.addWidget(self.ok_button)
         _main_layout.addWidget(self.cancel_button)
         _main_layout.addWidget(self.reset_button)
@@ -302,9 +302,9 @@ class ValidationTableItem(QtImport.QWidget):
             self.cancel_button.setEnabled(False)
 
 
-class ComboBoxTableItem(QtImport.QComboBox):
+class ComboBoxTableItem(qt_import.QComboBox):
     def __init__(self, parent, row, col, items_list=None):
-        QtImport.QComboBox.__init__(self)
+        qt_import.QComboBox.__init__(self)
         if items_list is not None:
             self.addItems(items_list)
         self.col = col
@@ -316,18 +316,18 @@ class ComboBoxTableItem(QtImport.QComboBox):
         self.parent.cellChanged.emit(self.row, self.col)
 
 
-class FileTableItem(QtImport.QWidget):
+class FileTableItem(qt_import.QWidget):
     def __init__(self, parent, row, col, filename, file_filter):
-        QtImport.QWidget.__init__(self)
+        qt_import.QWidget.__init__(self)
 
         self.file_filter = file_filter
         self.parent = parent
         self.col = col
         self.row = row
 
-        self.cmdBrowse = QtImport.QPushButton("Browse", self.parent.viewport())
+        self.cmdBrowse = qt_import.QPushButton("Browse", self.parent.viewport())
 
-        main_layout = QtImport.QHBoxLayout()
+        main_layout = qt_import.QHBoxLayout()
         main_layout.addWidget(self.cmdBrowse)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -348,7 +348,7 @@ class FileTableItem(QtImport.QWidget):
         return self.filename
 
     def browse_clicked(self):
-        new_filename = QtImport.QFileDialog.getOpenFileName(
+        new_filename = qt_import.QFileDialog.getOpenFileName(
             self,
             os.path.dirname(self.filename) or os.getcwd(),
             self.file_filter,
@@ -360,21 +360,21 @@ class FileTableItem(QtImport.QWidget):
             self.set_filename(new_filename)
 
 
-class ColorTableItem(QtImport.QWidget):
+class ColorTableItem(qt_import.QWidget):
 
     # cellChangedSignal = QtCore.pyqtSignal(int, int)
 
     def __init__(self, parent, row, col, color):
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.col = col
         self.row = row
         self.parent = parent
 
-        self.change_color_button = QtImport.QPushButton("Color...", parent)
-        self.reset_color_button = QtImport.QPushButton("reset", parent)
+        self.change_color_button = qt_import.QPushButton("Color...", parent)
+        self.reset_color_button = qt_import.QPushButton("reset", parent)
 
-        main_layout = QtImport.QHBoxLayout(self)
+        main_layout = qt_import.QHBoxLayout(self)
         main_layout.addWidget(self.change_color_button)
         main_layout.addWidget(self.reset_color_button)
         main_layout.setSpacing(0)
@@ -392,19 +392,19 @@ class ColorTableItem(QtImport.QWidget):
         if not color:
             self.qtcolor = None
             self.color = None
-            Colors.set_widget_color(
+            colors.set_widget_color(
                 self.change_color_button,
-                Colors.BUTTON_ORIGINAL,
-                QtImport.QPalette.Button,
+                colors.BUTTON_ORIGINAL,
+                qt_import.QPalette.Button,
             )
         else:
             try:
                 rgb = color.rgb()
             except BaseException:
                 try:
-                    self.qtcolor = QtImport.QColor(color)
+                    self.qtcolor = qt_import.QColor(color)
                 except BaseException:
-                    self.qtcolor = QtImport.QtColor(QtImport.Qt.green)
+                    self.qtcolor = qt_import.QtColor(qt_import.Qt.green)
                     self.color = self.qtcolor.rgb()
                 else:
                     self.color = self.qtcolor.rgb()
@@ -412,16 +412,16 @@ class ColorTableItem(QtImport.QWidget):
                 self.qtcolor = color
                 self.color = rgb
 
-            Colors.set_widget_color(
-                self.change_color_button, self.qtcolor, QtImport.QPalette.Button
+            colors.set_widget_color(
+                self.change_color_button, self.qtcolor, qt_import.QPalette.Button
             )
         self.parent.cellChanged.emit(self.row, self.col)
 
     def change_color_clicked(self):
         """Opens color dialog to choose color"""
 
-        new_color = QtImport.QColorDialog.getColor(
-            self.qtcolor or QtImport.QColor("white"), None, "Select a color"
+        new_color = qt_import.QColorDialog.getColor(
+            self.qtcolor or qt_import.QColor("white"), None, "Select a color"
         )
         if new_color.isValid():
             self.set_color(new_color)

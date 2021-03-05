@@ -20,7 +20,7 @@
 import copy
 import logging
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.periodic_table_widget import PeriodicTableWidget
@@ -54,28 +54,28 @@ class CreateEnergyScanWidget(CreateTaskBase):
             self, data_model=self._path_template, layout="vertical"
         )
 
-        _parameters_gbox = QtImport.QGroupBox("Parameters", self)
-        self._adjust_transmission_cbox = QtImport.QCheckBox(
+        _parameters_gbox = qt_import.QGroupBox("Parameters", self)
+        self._adjust_transmission_cbox = qt_import.QCheckBox(
             "Adjust transmission", _parameters_gbox
         )
         self._adjust_transmission_cbox.setChecked(False)
         self._adjust_transmission_cbox.setEnabled(True)
-        self._max_transmission_label = QtImport.QLabel("Maximum transmission:")
-        self._max_transmission_ledit = QtImport.QLineEdit("20", _parameters_gbox)
+        self._max_transmission_label = qt_import.QLabel("Maximum transmission:")
+        self._max_transmission_ledit = qt_import.QLineEdit("20", _parameters_gbox)
         self._max_transmission_ledit.setFixedWidth(80)
         self._max_transmission_ledit.setEnabled(False)
 
         self._comments_widget = CommentsWidget(self)
 
         # Layout --------------------------------------------------------------
-        _parameters_gbox_hlayout = QtImport.QGridLayout(_parameters_gbox)
+        _parameters_gbox_hlayout = qt_import.QGridLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(self._adjust_transmission_cbox, 0, 0)
         _parameters_gbox_hlayout.addWidget(self._max_transmission_label, 1, 0)
         _parameters_gbox_hlayout.addWidget(self._max_transmission_ledit, 1, 1)
         _parameters_gbox_hlayout.setColumnStretch(2, 1)
         _parameters_gbox_hlayout.setSpacing(2)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._periodic_table_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(_parameters_gbox)

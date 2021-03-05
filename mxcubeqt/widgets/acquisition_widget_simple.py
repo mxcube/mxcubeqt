@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 from mxcubecore.HardwareObjects import queue_model_objects
 
@@ -28,10 +28,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class AcquisitionWidgetSimple(QtImport.QWidget):
+class AcquisitionWidgetSimple(qt_import.QWidget):
 
-    acqParametersChangedSignal = QtImport.pyqtSignal(list)
-    madEnergySelectedSignal = QtImport.pyqtSignal(str, float, bool)
+    acqParametersChangedSignal = qt_import.pyqtSignal(list)
+    madEnergySelectedSignal = qt_import.pyqtSignal(str, float, bool)
 
     def __init__(
         self,
@@ -43,7 +43,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         layout=None,
     ):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
 
@@ -67,12 +67,12 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             self._path_template = path_template
 
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
-        self.acq_widget_layout = QtImport.load_ui_file(
+        self.acq_widget_layout = qt_import.load_ui_file(
             "acquisition_widget_vertical_simple_layout.ui"
         )
 
         # Layout --------------------------------------------------------------
-        main_layout = QtImport.QVBoxLayout(self)
+        main_layout = qt_import.QVBoxLayout(self)
         main_layout.addWidget(self.acq_widget_layout)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -87,28 +87,28 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
         )
 
         # Other ---------------------------------------------------------------
-        self.osc_start_validator = QtImport.QDoubleValidator(
+        self.osc_start_validator = qt_import.QDoubleValidator(
             -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit
         )
-        self.osc_range_validator = QtImport.QDoubleValidator(
+        self.osc_range_validator = qt_import.QDoubleValidator(
             -10000, 10000, 4, self.acq_widget_layout.osc_range_ledit
         )
-        self.kappa_validator = QtImport.QDoubleValidator(
+        self.kappa_validator = qt_import.QDoubleValidator(
             0, 360, 4, self.acq_widget_layout.kappa_ledit
         )
-        self.kappa_phi_validator = QtImport.QDoubleValidator(
+        self.kappa_phi_validator = qt_import.QDoubleValidator(
             0, 360, 4, self.acq_widget_layout.kappa_phi_ledit
         )
-        self.energy_validator = QtImport.QDoubleValidator(
+        self.energy_validator = qt_import.QDoubleValidator(
             0, 25, 5, self.acq_widget_layout.energy_ledit
         )
-        self.resolution_validator = QtImport.QDoubleValidator(
+        self.resolution_validator = qt_import.QDoubleValidator(
             0, 15, 3, self.acq_widget_layout.resolution_ledit
         )
-        self.transmission_validator = QtImport.QDoubleValidator(
+        self.transmission_validator = qt_import.QDoubleValidator(
             0, 100, 3, self.acq_widget_layout.transmission_ledit
         )
-        self.exp_time_validator = QtImport.QDoubleValidator(
+        self.exp_time_validator = qt_import.QDoubleValidator(
             0, 10000, 6, self.acq_widget_layout.exp_time_ledit
         )
         self.acq_widget_layout.num_images_cbox.setCurrentIndex(1)

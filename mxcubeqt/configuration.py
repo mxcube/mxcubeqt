@@ -35,7 +35,7 @@ except ImportError:
 
 from mxcubeqt import base_layout_items
 from mxcubeqt.utils.property_bag import PropertyBag
-from mxcubeqt.BaseComponents import NullBrick
+from mxcubeqt.base_components import NullBrick
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -59,23 +59,29 @@ def load_module(brick_name):
 
 def load_brick(brick_type, brick_name):
     """Loads brick"""
+ 
     module = load_module(brick_type)
+    temp = brick_type.split('_') 
+    brick_class_name = temp[0].title() + ''.join(ele.title() for ele in temp[1:])
 
     if module is not None:
         try:
             # classObj = getattr(module, brick_type)
-            class_obj = getattr(module, brick_type)
+            class_obj = getattr(module, brick_class_name)
         except AttributeError:
-            logging.getLogger().error(
-                "Cannot load brick %s : " % brick_name
-                + "cannot found class %s in module" % brick_type
+            logging.getLogger("HWR").error(
+                "Cannot load brick %s : cannot find class %s in module %s" % (
+                    brick_name,
+                    brick_class_name,
+                    brick_type
+                )
             )
             return NullBrick(None, brick_name)
         else:
             try:
                 new_instance = class_obj(None, brick_name)
             except BaseException:
-                logging.getLogger().exception(
+                logging.getLogger("HWR").exception(
                     "Cannot load brick %s : initialization failed", brick_name
                 )
                 return NullBrick(None, brick_name)
@@ -83,8 +89,8 @@ def load_brick(brick_type, brick_name):
                 new_instance._BaseWidget__stop()
                 return new_instance
     else:
-        logging.getLogger().error(
-            "Cannot load brick %s : " % brick_name + "module could not be loaded."
+        logging.getLogger("HWR").error(
+            "Cannot load brick %s : " % brick_name
         )
         return NullBrick(None, brick_name)
 

@@ -20,7 +20,7 @@
 import numpy as np
 from copy import deepcopy
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 try:
    from widgets.pyqtgraph_widget import PlotWidget
 except:
@@ -33,11 +33,11 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class HitMapWidget(QtImport.QWidget):
+class HitMapWidget(qt_import.QWidget):
 
     def __init__(self, parent=None, show_aligned_results=False):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.setObjectName("hit_map_widget")
 
@@ -68,42 +68,42 @@ class HitMapWidget(QtImport.QWidget):
         self.selected_image_serial = None
 
         # Graphic elements ----------------------------------------------------
-        self._hit_map_gbox = QtImport.QGroupBox("Hit map", self)
+        self._hit_map_gbox = qt_import.QGroupBox("Hit map", self)
         self._hit_map_plot = PlotWidget(self._hit_map_gbox)
-        self._hit_map_popup_menu = QtImport.QMenu(self._hit_map_gbox)
+        self._hit_map_popup_menu = qt_import.QMenu(self._hit_map_gbox)
         
 
-        hit_map_info_widget = QtImport.QWidget(self._hit_map_gbox)
-        score_type_label = QtImport.QLabel("Result: ", hit_map_info_widget)
-        self._score_type_cbox = QtImport.QComboBox(hit_map_info_widget)
-        self._autoscale_button = QtImport.QPushButton("Auto scale", hit_map_info_widget)
-        image_display_cbox = QtImport.QCheckBox("Display image in ADxV", hit_map_info_widget)
-        self._image_info_label = QtImport.QLabel(
+        hit_map_info_widget = qt_import.QWidget(self._hit_map_gbox)
+        score_type_label = qt_import.QLabel("Result: ", hit_map_info_widget)
+        self._score_type_cbox = qt_import.QComboBox(hit_map_info_widget)
+        self._autoscale_button = qt_import.QPushButton("Auto scale", hit_map_info_widget)
+        image_display_cbox = qt_import.QCheckBox("Display image in ADxV", hit_map_info_widget)
+        self._image_info_label = qt_import.QLabel(
             "Image: #, value #", hit_map_info_widget
         )
 
-        self._hit_map_tools_widget = QtImport.QWidget(self._hit_map_gbox)
+        self._hit_map_tools_widget = qt_import.QWidget(self._hit_map_gbox)
 
-        _threshold_label = QtImport.QLabel("Threshold: ", self._hit_map_tools_widget)
-        self._threshold_slider = QtImport.QSlider(
-            QtImport.Qt.Horizontal, self._hit_map_tools_widget
+        _threshold_label = qt_import.QLabel("Threshold: ", self._hit_map_tools_widget)
+        self._threshold_slider = qt_import.QSlider(
+            qt_import.Qt.Horizontal, self._hit_map_tools_widget
         )
-        self._relaunch_processing_button = QtImport.QPushButton(
+        self._relaunch_processing_button = qt_import.QPushButton(
             "Relaunch processing", self._hit_map_tools_widget
         )
-        self._create_points_button = QtImport.QPushButton(
+        self._create_points_button = qt_import.QPushButton(
             "Create centring points", self._hit_map_tools_widget
         )
 
-        self._summary_gbox = QtImport.QGroupBox("Summary", self)
-        self._summary_textbrowser = QtImport.QTextBrowser(self._summary_gbox)
-        self._best_pos_gbox = QtImport.QGroupBox("Best positions", self)
-        self._best_pos_table = QtImport.QTableWidget(self._best_pos_gbox)
-        self._best_pos_popup_menu = QtImport.QMenu(self._hit_map_gbox)
+        self._summary_gbox = qt_import.QGroupBox("Summary", self)
+        self._summary_textbrowser = qt_import.QTextBrowser(self._summary_gbox)
+        self._best_pos_gbox = qt_import.QGroupBox("Best positions", self)
+        self._best_pos_table = qt_import.QTableWidget(self._best_pos_gbox)
+        self._best_pos_popup_menu = qt_import.QMenu(self._hit_map_gbox)
         self._best_pos_gbox.setHidden(True)
 
         # Layout --------------------------------------------------------------
-        _hit_map_info_hlayout = QtImport.QHBoxLayout(hit_map_info_widget)
+        _hit_map_info_hlayout = qt_import.QHBoxLayout(hit_map_info_widget)
         _hit_map_info_hlayout.addWidget(score_type_label)
         _hit_map_info_hlayout.addWidget(self._score_type_cbox)
         _hit_map_info_hlayout.addWidget(self._autoscale_button)
@@ -113,7 +113,7 @@ class HitMapWidget(QtImport.QWidget):
         _hit_map_info_hlayout.setSpacing(2)
         _hit_map_info_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _hit_map_tools_hlayout = QtImport.QHBoxLayout(self._hit_map_tools_widget)
+        _hit_map_tools_hlayout = qt_import.QHBoxLayout(self._hit_map_tools_widget)
         _hit_map_tools_hlayout.addWidget(_threshold_label)
         _hit_map_tools_hlayout.addWidget(self._threshold_slider)
         _hit_map_tools_hlayout.addStretch(0)
@@ -122,24 +122,24 @@ class HitMapWidget(QtImport.QWidget):
         _hit_map_tools_hlayout.setSpacing(2)
         _hit_map_tools_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _hit_map_gbox_vlayout = QtImport.QVBoxLayout(self._hit_map_gbox)
+        _hit_map_gbox_vlayout = qt_import.QVBoxLayout(self._hit_map_gbox)
         _hit_map_gbox_vlayout.addWidget(self._hit_map_plot)
         _hit_map_gbox_vlayout.addWidget(hit_map_info_widget)
         _hit_map_gbox_vlayout.addWidget(self._hit_map_tools_widget)
         _hit_map_gbox_vlayout.setSpacing(2)
         _hit_map_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _summary_gbox_vlayout = QtImport.QVBoxLayout(self._summary_gbox)
+        _summary_gbox_vlayout = qt_import.QVBoxLayout(self._summary_gbox)
         _summary_gbox_vlayout.addWidget(self._summary_textbrowser)
         _summary_gbox_vlayout.setSpacing(2)
         _summary_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _best_postition_gbox_vlayout = QtImport.QVBoxLayout(self._best_pos_gbox)
+        _best_postition_gbox_vlayout = qt_import.QVBoxLayout(self._best_pos_gbox)
         _best_postition_gbox_vlayout.addWidget(self._best_pos_table)
         _best_postition_gbox_vlayout.setSpacing(2)
         _best_postition_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_hlayout = QtImport.QVBoxLayout(self)
+        _main_hlayout = qt_import.QVBoxLayout(self)
         _main_hlayout.addWidget(self._hit_map_gbox)
         _main_hlayout.addWidget(self._summary_gbox)
         _main_hlayout.addWidget(self._best_pos_gbox)
@@ -147,9 +147,9 @@ class HitMapWidget(QtImport.QWidget):
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        #self._image_info_label.setAlignment(QtImport.Qt.AlignLeft)
+        #self._image_info_label.setAlignment(qt_import.Qt.AlignLeft)
         #self._image_info_label.setSizePolicy(
-        #    QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed
+        #    qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed
         #)
 
         # Qt signals and slots ------------------------------------------------
@@ -212,22 +212,22 @@ class HitMapWidget(QtImport.QWidget):
         #font = self._best_pos_table.font()
         #font.setPointSize(8)
         #self._best_pos_table.setFont(font)
-        self._best_pos_table.setEditTriggers(QtImport.QAbstractItemView.NoEditTriggers)
+        self._best_pos_table.setEditTriggers(qt_import.QAbstractItemView.NoEditTriggers)
         self._best_pos_table.setColumnCount(9)
         self._best_pos_table.setAlternatingRowColors(True)
         self._best_pos_table.setWordWrap(False)
         self._best_pos_table.horizontalHeader().setSortIndicatorShown(True)
         self._best_pos_table.setHorizontalHeaderItem(
-            0, QtImport.QTableWidgetItem("No.")
+            0, qt_import.QTableWidgetItem("No.")
         )
         for index, result_type in enumerate(self.__result_types):
             self._best_pos_table.setHorizontalHeaderItem(
-                index + 1, QtImport.QTableWidgetItem(result_type["descr"])
+                index + 1, qt_import.QTableWidgetItem(result_type["descr"])
             )
 
         for index, header_text in enumerate(("Path", "Col", "Row", "Motor positions")):
             self._best_pos_table.setHorizontalHeaderItem(
-                5 + index, QtImport.QTableWidgetItem(header_text)
+                5 + index, qt_import.QTableWidgetItem(header_text)
             )
 
         self._best_pos_popup_menu.addAction(
@@ -235,7 +235,7 @@ class HitMapWidget(QtImport.QWidget):
         )
         self._best_pos_table.contextMenuEvent = self.open_best_pos_popup_menu
 
-        screen_shape = QtImport.QDesktopWidget().screenGeometry()
+        screen_shape = qt_import.QDesktopWidget().screenGeometry()
         self.__hit_map_max_size = (screen_shape.width() / 2, screen_shape.height() / 2)
 
     def set_plot_type(self, plot_type):
@@ -300,12 +300,12 @@ class HitMapWidget(QtImport.QWidget):
         self._hit_map_tools_widget.setHidden(not toggle)
 
     def open_hit_map_popup_menu(self, context_event):
-        point = QtImport.QPoint(context_event.globalX(), context_event.globalY())
+        point = qt_import.QPoint(context_event.globalX(), context_event.globalY())
         self._hit_map_popup_menu.popup(point)
 
     def open_best_pos_popup_menu(self, context_event):
         if self._best_pos_table.rowCount() > 0:
-            point = QtImport.QPoint(context_event.globalX(), context_event.globalY())
+            point = qt_import.QPoint(context_event.globalX(), context_event.globalY())
             self._best_pos_popup_menu.popup(point)
 
     def score_type_changed(self, index):
@@ -643,36 +643,36 @@ class HitMapWidget(QtImport.QWidget):
         )
         for row, best_pos in enumerate(self.__results_raw.get("best_positions", [])):
             self._best_pos_table.setItem(
-                row, 0, QtImport.QTableWidgetItem("%d" % (best_pos.get("index") + 1))
+                row, 0, qt_import.QTableWidgetItem("%d" % (best_pos.get("index") + 1))
             )
             self._best_pos_table.setItem(
-                row, 1, QtImport.QTableWidgetItem("%.2f" % (best_pos.get("score")))
+                row, 1, qt_import.QTableWidgetItem("%.2f" % (best_pos.get("score")))
             )
             self._best_pos_table.setItem(
-                row, 2, QtImport.QTableWidgetItem("%d" % (best_pos.get("spots_num")))
+                row, 2, qt_import.QTableWidgetItem("%d" % (best_pos.get("spots_num")))
             )
             self._best_pos_table.setItem(
                 row,
                 3,
-                QtImport.QTableWidgetItem("%.2f" % (best_pos.get("spots_int_aver"))),
+                qt_import.QTableWidgetItem("%.2f" % (best_pos.get("spots_int_aver"))),
             )
             self._best_pos_table.setItem(
                 row,
                 4,
-                QtImport.QTableWidgetItem("%.2f" % (best_pos.get("spots_resolution"))),
+                qt_import.QTableWidgetItem("%.2f" % (best_pos.get("spots_resolution"))),
             )
             self._best_pos_table.setItem(
-                row, 5, QtImport.QTableWidgetItem(str(best_pos.get("filename")))
+                row, 5, qt_import.QTableWidgetItem(str(best_pos.get("filename")))
             )
             self._best_pos_table.setItem(
-                row, 6, QtImport.QTableWidgetItem("%d" % (best_pos.get("col")))
+                row, 6, qt_import.QTableWidgetItem("%d" % (best_pos.get("col")))
             )
             self._best_pos_table.setItem(
-                row, 7, QtImport.QTableWidgetItem("%d" % (best_pos.get("row")))
+                row, 7, qt_import.QTableWidgetItem("%d" % (best_pos.get("row")))
             )
             if best_pos["cpos"]:
                 self._best_pos_table.setItem(
-                    row, 8, QtImport.QTableWidgetItem(str(best_pos["cpos"]))
+                    row, 8, qt_import.QTableWidgetItem(str(best_pos["cpos"]))
                 )
         self._best_pos_table.setSortingEnabled(True)
 

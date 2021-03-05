@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.widgets.routine_dc_char_widget_layout import RoutineDCWidgetLayout
 from mxcubeqt.widgets.sad_char_widget_layout import SADWidgetLayout
 from mxcubeqt.widgets.radiation_damage_char_widget_layout import RadiationDamageWidgetLayout
@@ -27,10 +27,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class CharTypeWidget(QtImport.QWidget):
+class CharTypeWidget(qt_import.QWidget):
     def __init__(self, parent=None, name=None, fl=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
         self.setObjectName("char_type_widget")
 
         # Hardware objects ----------------------------------------------------
@@ -38,14 +38,14 @@ class CharTypeWidget(QtImport.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.charact_type_gbox = QtImport.QGroupBox(self)
+        self.charact_type_gbox = qt_import.QGroupBox(self)
 
         # Fix the widths of the widgets to make the layout look nicer,
         # and beacuse the qt layout engine is so tremendosly good.
         self.charact_type_gbox.setFixedWidth(800)
         self.charact_type_gbox.setFixedHeight(220)
 
-        self.charact_type_tbox = QtImport.QToolBox(self.charact_type_gbox)
+        self.charact_type_tbox = qt_import.QToolBox(self.charact_type_gbox)
         self.routine_dc_page = RoutineDCWidgetLayout(self.charact_type_tbox)
         self.sad_page = SADWidgetLayout(self.charact_type_tbox)
         self.rad_damage_page = RadiationDamageWidgetLayout(self.charact_type_tbox)
@@ -55,13 +55,13 @@ class CharTypeWidget(QtImport.QWidget):
         self.charact_type_tbox.addItem(self.rad_damage_page, "Radiation damage")
 
         # Layout --------------------------------------------------------------
-        _charact_type_gbox_vlayout = QtImport.QVBoxLayout(self.charact_type_gbox)
+        _charact_type_gbox_vlayout = qt_import.QVBoxLayout(self.charact_type_gbox)
         _charact_type_gbox_vlayout.addWidget(self.charact_type_tbox)
         _charact_type_gbox_vlayout.addStretch(0)
         _charact_type_gbox_vlayout.setSpacing(0)
         _charact_type_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.charact_type_gbox)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(0)

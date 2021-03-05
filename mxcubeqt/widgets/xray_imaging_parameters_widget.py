@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
 
@@ -25,10 +25,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class XrayImagingParametersWidget(QtImport.QWidget):
+class XrayImagingParametersWidget(qt_import.QWidget):
     def __init__(self, parent=None, name=None, fl=0, xray_imaging_params=None):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
@@ -45,11 +45,11 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         self._xray_imaging_parameters = xray_imaging_params
         self._xray_imaging_mib = DataModelInputBinder(self._xray_imaging_parameters)
 
-        self._parameters_widget = QtImport.load_ui_file(
+        self._parameters_widget = qt_import.load_ui_file(
             "xray_imaging_parameters_widget_layout.ui"
         )
         # Layout --------------------------------------------------------------
-        __main_vlayout = QtImport.QVBoxLayout(self)
+        __main_vlayout = qt_import.QVBoxLayout(self)
         __main_vlayout.addWidget(self._parameters_widget)
         __main_vlayout.setSpacing(0)
         __main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -63,10 +63,10 @@ class XrayImagingParametersWidget(QtImport.QWidget):
         self._parameters_widget.remove_button.pressed.connect(self.remove_distance_pressed)
 
         # Other ---------------------------------------------------------------
-        # self.detector_distance_validator = QtImport.QIntValidator(
+        # self.detector_distance_validator = qt_import.QIntValidator(
         #     0, 99999, self._parameters_widget.detector_distance_ledit
         # )
-        self.detector_distance_validator = QtImport.QDoubleValidator(
+        self.detector_distance_validator = qt_import.QDoubleValidator(
             0, 99999, 2, self._parameters_widget.detector_distance_ledit
         )
 

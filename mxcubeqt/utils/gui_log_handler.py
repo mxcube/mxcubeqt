@@ -22,7 +22,7 @@ import time
 import weakref
 import gevent
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -32,11 +32,11 @@ GUI_LOG_HANDLER = None
 TIMER = None
 
 
-class LogEvent(QtImport.QEvent):
+class LogEvent(qt_import.QEvent):
 
     def __init__(self, record):
 
-        QtImport.QEvent.__init__(self, QtImport.QEvent.User)
+        qt_import.QEvent.__init__(self, qt_import.QEvent.User)
         self.record = record
 
 def process_log_messages():
@@ -48,7 +48,7 @@ def process_log_messages():
         record = GUI_LOG_HANDLER.buffer[i]
 
         for viewer in GUI_LOG_HANDLER.registeredViewers:
-            QtImport.QApplication.postEvent(viewer, LogEvent(record))
+            qt_import.QApplication.postEvent(viewer, LogEvent(record))
 
         i += 1
 
@@ -70,7 +70,7 @@ def GUILogHandler():
         GUI_LOG_HANDLER = __GUILogHandler()
 
         TIMER = gevent.spawn(do_process_log_messages, 0.2)
-        # _timer = QtImport.QtCore.QTimer()
+        # _timer = qt_import.QtCore.QTimer()
         # QtCore.QObject.connect(_timer, QtCore.SIGNAL("timeout()"), processLogMessages)
         # _timer.start(10)
 
