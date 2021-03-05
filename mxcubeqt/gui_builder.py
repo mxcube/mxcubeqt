@@ -35,8 +35,8 @@ from mxcubeqt.utils import Icons, connection_editor, property_editor, gui_displa
 from mxcubeqt.bricks import LogViewBrick
 from mxcubeqt.base_layout_items import ContainerCfg
 
-from HardwareRepository import HardwareRepository as HWR
-from HardwareRepository.ConvertUtils import string_types
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.ConvertUtils import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -25,10 +25,10 @@ from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
+from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

@@ -25,7 +25,7 @@ import logging
 from mxcubeqt.utils import Colors, Icons, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

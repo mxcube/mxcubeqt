@@ -38,7 +38,7 @@ from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.utils import Colors, QtImport
 from mxcubeqt.utils import sample_changer_helper as sc_helper
 from mxcubeqt.bricks.SampleChangerBrick import SampleChangerBrick, BasketView, VialView
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

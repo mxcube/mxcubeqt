@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from mxcubeqt.utils import Colors
-from HardwareRepository.HardwareObjects.abstract.AbstractSampleChanger import (
+from mxcubecore.HardwareObjects.abstract.AbstractSampleChanger import (
     SampleChangerState,
     SampleChangerMode,
     SampleChanger,

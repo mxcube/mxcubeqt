@@ -27,8 +27,8 @@ import weakref
 import mxcubeqt
 from mxcubeqt.utils import property_bag, connectable, Colors, QtImport
 
-from HardwareRepository import HardwareRepository as HWR
-from HardwareRepository.BaseHardwareObjects import HardwareObject
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.BaseHardwareObjects import HardwareObject
 
 try:
     from louie import dispatcher

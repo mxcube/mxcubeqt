@@ -51,7 +51,7 @@ Sizes are estimated by related HO
 from mxcubeqt.utils import QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 try:
     unichr

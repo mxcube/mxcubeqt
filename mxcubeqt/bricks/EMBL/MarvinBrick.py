@@ -22,7 +22,7 @@
 from mxcubeqt.utils import Colors, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

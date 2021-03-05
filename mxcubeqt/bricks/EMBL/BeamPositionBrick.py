@@ -27,7 +27,7 @@ from mxcubeqt.utils import Icons, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

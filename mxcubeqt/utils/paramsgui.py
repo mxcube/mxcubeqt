@@ -28,7 +28,7 @@ import os.path
 import logging
 import sys
 
-from HardwareRepository import ConvertUtils
+from mxcubecore import ConvertUtils
 
 from mxcubeqt.utils import QtImport, Colors
 

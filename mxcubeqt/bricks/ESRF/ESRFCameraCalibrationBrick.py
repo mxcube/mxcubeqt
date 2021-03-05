@@ -68,7 +68,7 @@ import os
 from mxcubeqt.utils import Icons, Colors, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 try:
     from xml.etree import cElementTree  # python2.5

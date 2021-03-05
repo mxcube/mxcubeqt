@@ -28,9 +28,9 @@ from mxcubeqt.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from mxcubeqt.widgets.gphl_data_dialog import GphlDataDialog
 
-from HardwareRepository import ConvertUtils
-from HardwareRepository import HardwareRepository as HWR
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore import ConvertUtils
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.HardwareObjects import queue_model_objects
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"

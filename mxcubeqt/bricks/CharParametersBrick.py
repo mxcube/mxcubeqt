@@ -22,7 +22,7 @@ from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.widgets.char_parameters_widget import CharParametersWidget
 from mxcubeqt.widgets.webview_widget import WebViewWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

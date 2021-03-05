@@ -25,9 +25,9 @@ from mxcubeqt.utils import queue_item, Colors, QtImport
 from mxcubeqt.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from mxcubeqt.widgets.dc_tree_widget import DataCollectTree
 
-from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
+from mxcubecore.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -21,7 +21,7 @@ from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.utils import Icons, Colors, QtImport
 from mxcubeqt.widgets.matplot_widget import TwoAxisPlotWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}

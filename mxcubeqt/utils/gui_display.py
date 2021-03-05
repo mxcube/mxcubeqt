@@ -31,7 +31,7 @@ from mxcubeqt.utils import Icons, Colors, property_editor, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.base_layout_items import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

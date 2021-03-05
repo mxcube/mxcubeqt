@@ -23,7 +23,7 @@ from mxcubeqt.utils import QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.widgets.task_toolbox_widget import TaskToolBoxWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

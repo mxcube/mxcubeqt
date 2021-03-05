@@ -20,7 +20,7 @@
 from mxcubeqt.utils import QtImport
 from mxcubeqt.widgets.hit_map_widget import HitMapWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

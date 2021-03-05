@@ -21,7 +21,7 @@ from mxcubeqt.utils import QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.widgets.xrf_spectrum_parameters_widget import XRFSpectrumParametersWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -24,7 +24,7 @@ from mxcubeqt.utils.widget_utils import DataModelInputBinder
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

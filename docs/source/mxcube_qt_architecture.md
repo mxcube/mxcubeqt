@@ -64,7 +64,7 @@ Example, for the `ESRFCenteringBrick.py`
 
 ```
 ...
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 ...
 class ESRFCenteringBrick(BaseWidget):
     def __init__(self, *args):

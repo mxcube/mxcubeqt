@@ -23,7 +23,7 @@ import time
 from mxcubeqt.utils import Icons, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 
-from HardwareRepository.HardwareObjects import InstanceServer
+from mxcubecore.HardwareObjects import InstanceServer
 
 
 __credits__ = ["MXCuBE collaboration"]

@@ -23,7 +23,7 @@ from mxcubeqt.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from mxcubeqt.widgets.advanced_results_widget import AdvancedResultsWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

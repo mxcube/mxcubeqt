@@ -22,9 +22,9 @@
 from mxcubeqt.utils import QtImport
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.HardwareObjects import queue_model_objects
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

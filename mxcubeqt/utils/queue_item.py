@@ -19,7 +19,7 @@
 
 from mxcubeqt.utils import Icons, Colors, QtImport
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]

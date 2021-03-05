@@ -218,7 +218,7 @@ except:
     print("Cannot import Qt4.  Testing Hardware Objects is still possible")
     qt_imported = False
 
-from HardwareRepository import HardwareRepository
+from mxcubecore import HardwareRepository
 
 class MXCuBE_Test_Environment(object):
     hwr_server = None

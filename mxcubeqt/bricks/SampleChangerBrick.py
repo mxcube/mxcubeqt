@@ -21,8 +21,8 @@ import mxcubeqt.utils.sample_changer_helper as sc_helper
 from mxcubeqt.utils import Colors, Icons, QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 
-from HardwareRepository.HardwareObjects.abstract.sample_changer import Container
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore.HardwareObjects.abstract.sample_changer import Container
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

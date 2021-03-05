@@ -21,7 +21,7 @@ from mxcubeqt.utils import QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.widgets.energy_scan_parameters_widget import EnergyScanParametersWidget
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]

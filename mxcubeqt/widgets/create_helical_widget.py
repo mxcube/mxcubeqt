@@ -27,11 +27,11 @@ from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
-from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemLine
+from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
+from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemLine
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"

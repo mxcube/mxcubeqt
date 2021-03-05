@@ -37,7 +37,7 @@ import gevent.monkey
 
 gevent.monkey.patch_all(thread=False)
 
-from HardwareRepository import HardwareRepository as HWR
+from mxcubecore import HardwareRepository as HWR
 from mxcubeqt.utils import gui_log_handler, error_handler, QtImport
 from mxcubeqt.gui_supervisor import (
     GUISupervisor,

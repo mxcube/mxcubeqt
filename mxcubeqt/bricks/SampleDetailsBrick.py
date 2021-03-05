@@ -21,7 +21,7 @@ from mxcubeqt.utils import QtImport
 from mxcubeqt.BaseComponents import BaseWidget
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository.HardwareObjects import queue_model_objects
+from mxcubecore.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]

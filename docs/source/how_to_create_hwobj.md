@@ -36,7 +36,7 @@ Hardware Object description xml file:
             initialize other intern variables
  ```
  # Available types are: Equipment, AbstractActuator and Procedure
-from HardwareRepository.BaseHardwareObjects import HardwareObject
+from mxcubecore.BaseHardwareObjects import HardwareObject
 
 class TestHardwareObject(HardwareObject)
 
