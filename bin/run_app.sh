@@ -49,7 +49,7 @@
 MXCUBE_BRICKS_PATH=$MXCUBE_ROOT/gui/bricks # (This could be exported from python script)
 MXCUBE_HWOBJS_PATH=$MXCUBE_ROOT/HardwareRepository/HardwareObjects # (This could be exported from python script)
 MXCUBE_DEFAULT_GUI_FILE=$MXCUBE_ROOT/configuration/example_mxcube_gui.yml
-MXCUBE_DEFAULT_XML_PATH=$MXCUBE_ROOT/HardwareRepository/configuration/xml-qt
+MXCUBE_DEFAULT_XML_PATH=$MXCUBE_ROOT/HardwareRepository/configuration/mockup,$MXCUBE_ROOT/HardwareRepository/configuration/mockup/qt
 
 export PYTHONPATH=$PYTHONPATH:$MXCUBE_ROOT
 export PYTHONPATH=$PYTHONPATH:$MXCUBE_BRICKS_PATH
@@ -82,7 +82,7 @@ echo " GUI_FILE:    $GUI_FILE"
 echo "######################################################################"
 
 # Running the application
-$MXCUBE_ROOT/bin/Qt4_startGUI --hardwareRepository=$XML_PATH \
-			      --bricksDir=$MXCUBE_BRICKS_PATH \
-			      --logFile=$MXCUBE_LOG_PATH/$APP_NAME-$USER.log \
-			      $GUI_FILE $* > $MXCUBE_LOG_PATH/$APP_NAME-$USER.out 2> $MXCUBE_LOGS_PATH/$APP_NAME-$USER.err
+$MXCUBE_ROOT/bin/mxcube --hardwareRepository=$XML_PATH \
+			--bricksDir=$MXCUBE_BRICKS_PATH \
+			--logFile=$MXCUBE_LOG_PATH/$APP_NAME-$USER.log \
+			$GUI_FILE $* > $MXCUBE_LOG_PATH/$APP_NAME-$USER.out 2> $MXCUBE_LOGS_PATH/$APP_NAME-$USER.err

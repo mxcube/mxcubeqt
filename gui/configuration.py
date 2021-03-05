@@ -33,8 +33,8 @@ except ImportError:
     import yaml
 
 
-from gui import BaseLayoutItems
-from gui.utils import PropertyBag
+from gui import base_layout_items
+from gui.utils.property_bag import PropertyBag
 from gui.BaseComponents import NullBrick
 
 
@@ -93,17 +93,17 @@ class Configuration:
     """Configuration of a BaseWidget"""
 
     classes = {
-        "hbox": BaseLayoutItems.ContainerCfg,
-        "vbox": BaseLayoutItems.ContainerCfg,
-        "vgroupbox": BaseLayoutItems.GroupBoxCfg,
-        "hgroupbox": BaseLayoutItems.GroupBoxCfg,
-        "hspacer": BaseLayoutItems.SpacerCfg,
-        "vspacer": BaseLayoutItems.SpacerCfg,
-        "label": BaseLayoutItems.LabelCfg,
-        "icon": BaseLayoutItems.IconCfg,
-        "tab": BaseLayoutItems.TabCfg,
-        "hsplitter": BaseLayoutItems.SplitterCfg,
-        "vsplitter": BaseLayoutItems.SplitterCfg,
+        "hbox": base_layout_items.ContainerCfg,
+        "vbox": base_layout_items.ContainerCfg,
+        "vgroupbox": base_layout_items.GroupBoxCfg,
+        "hgroupbox": base_layout_items.GroupBoxCfg,
+        "hspacer": base_layout_items.SpacerCfg,
+        "vspacer": base_layout_items.SpacerCfg,
+        "label": base_layout_items.LabelCfg,
+        "icon": base_layout_items.IconCfg,
+        "tab": base_layout_items.TabCfg,
+        "hsplitter": base_layout_items.SplitterCfg,
+        "vsplitter": base_layout_items.SplitterCfg,
     }
 
     def __init__(self, config=None):
@@ -144,7 +144,7 @@ class Configuration:
             i += 1
             window_name = "window%d" % i
 
-        self.windows_list.append(BaseLayoutItems.WindowCfg(window_name))
+        self.windows_list.append(base_layout_items.WindowCfg(window_name))
         self.windows[window_name] = self.windows_list[-1]
         self.has_changed = True
 
@@ -197,7 +197,7 @@ class Configuration:
             brick_name = "%s%d" % (brick_type, i)
 
         brick = load_brick(brick_type, brick_name)
-        error = parent.add_child(BaseLayoutItems.BrickCfg(brick_name, brick_type, brick))
+        error = parent.add_child(base_layout_items.BrickCfg(brick_name, brick_type, brick))
 
         if len(error) == 0:
             self.bricks[brick_name] = parent["children"][-1]
@@ -252,7 +252,7 @@ class Configuration:
            Valid types are: brick, container, splitter...
         """
         try:
-            t = getattr(BaseLayoutItems, "%sCfg" % str(item_type).title())
+            t = getattr(base_layout_items, "%sCfg" % str(item_type).title())
         except AttributeError:
             return {}
 
@@ -567,13 +567,13 @@ class Configuration:
                     brick = load_brick(child["type"], child["name"])
                     child["brick"] = brick
 
-                    new_item = BaseLayoutItems.BrickCfg(child["name"], child["type"])
+                    new_item = base_layout_items.BrickCfg(child["name"], child["type"])
 
                     new_item["brick"] = brick
                     self.bricks[child["name"]] = new_item
                 else:
                     if child["type"] == "window":
-                        new_item = BaseLayoutItems.WindowCfg(child["name"])
+                        new_item = base_layout_items.WindowCfg(child["name"])
                         self.windows[child["name"]] = new_item
                     else:
                         NewItemClass = Configuration.classes[child["type"]]
@@ -591,7 +591,7 @@ class Configuration:
                                 "Error: could not load properties " + "for %s",
                                 child["name"],
                             )
-                            new_item.properties = PropertyBag.PropertyBag()
+                            new_item.properties = PropertyBag()
                     else:
                         new_item.set_properties(child["properties"])
 
@@ -618,25 +618,25 @@ class Configuration:
         """
         :returns: True if item is container
         """
-        return isinstance(item, BaseLayoutItems.ContainerCfg)
+        return isinstance(item, base_layout_items.ContainerCfg)
 
     def is_spacer(self, item):
         """
         :returns: True if item is a spacer
         """
-        return isinstance(item, BaseLayoutItems.SpacerCfg)
+        return isinstance(item, base_layout_items.SpacerCfg)
 
     def is_window(self, item):
         """
         :returns: True if item is a window
         """
-        return isinstance(item, BaseLayoutItems.WindowCfg)
+        return isinstance(item, base_layout_items.WindowCfg)
 
     def is_brick(self, item):
         """
         :returns: True if item is a brick
         """
-        return isinstance(item, BaseLayoutItems.BrickCfg)
+        return isinstance(item, base_layout_items.BrickCfg)
 
     def reload_brick(self, brick_cfg):
         """Reloads brick
@@ -653,7 +653,7 @@ class Configuration:
             brick = load_brick(brick_type, brick_name)
 
             old_brick_cfg = parent["children"][index]
-            new_brick_cfg = BaseLayoutItems.BrickCfg(brick_name, brick_type, brick)
+            new_brick_cfg = base_layout_items.BrickCfg(brick_name, brick_type, brick)
             parent["children"][index] = new_brick_cfg
             new_brick_cfg.set_properties(old_brick_cfg["properties"])
 

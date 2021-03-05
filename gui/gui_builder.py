@@ -30,10 +30,10 @@ import logging
 import subprocess
 
 import gui
-from gui import Configuration
-from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay, QtImport
+from gui.configuration import Configuration
+from gui.utils import Icons, connection_editor, property_editor, gui_display, QtImport
 from gui.bricks import LogViewBrick
-from gui.BaseLayoutItems import ContainerCfg
+from gui.base_layout_items import ContainerCfg
 
 from mxcubecore import HardwareRepository as HWR
 from mxcubecore.ConvertUtils import string_types
@@ -336,8 +336,8 @@ class PropertyEditorWindow(QtImport.QWidget):
 
         self.setWindowTitle("Properties")
 
-        self.properties_table = PropertyEditor.ConfigurationTable(self)
-        self.hwobj_properties_table = PropertyEditor.ConfigurationTable(self)
+        self.properties_table = property_editor.ConfigurationTable(self)
+        self.hwobj_properties_table = property_editor.ConfigurationTable(self)
 
         self.__property_changed_cb = weakref.WeakKeyDictionary()
 
@@ -424,7 +424,7 @@ class GUIEditorWindow(QtImport.QWidget):
         QtImport.QWidget.__init__(self, *args)
 
         # Internal values -----------------------------------------------------
-        self.configuration = Configuration.Configuration()
+        self.configuration = Configuration()
 
         # Graphic elements ----------------------------------------------------
         _tools_widget = QtImport.QWidget(self)
@@ -517,7 +517,7 @@ class GUIEditorWindow(QtImport.QWidget):
         self.root_element.setText(0, "GUI tree")
         self.root_element.setExpanded(True)
 
-        self.connection_editor_window = ConnectionEditor.ConnectionEditor(
+        self.connection_editor_window = connection_editor.ConnectionEditor(
             self.configuration
         )
 
@@ -1169,7 +1169,7 @@ class GUIPreviewWindow(QtImport.QWidget):
 
         self.setWindowTitle("GUI Preview")
         self.window_preview_box = QtImport.QGroupBox("Preview window", self)
-        self.window_preview = GUIDisplay.WindowDisplayWidget(self.window_preview_box)
+        self.window_preview = gui_display.WindowDisplayWidget(self.window_preview_box)
 
         self.window_preview_box_layout = QtImport.QVBoxLayout(self.window_preview_box)
         self.window_preview_box_layout.addWidget(self.window_preview)
@@ -1409,7 +1409,7 @@ class GUIBuilder(QtImport.QMainWindow):
     def new_clicked(self, filename=None):
         """Creates a new gui"""
 
-        self.configuration = Configuration.Configuration()
+        self.configuration = Configuration()
         self.filename = filename
 
         if self.filename:

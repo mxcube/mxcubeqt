@@ -19,7 +19,7 @@
 
 import logging
 
-from gui.utils import GUILogHandler, QtImport
+from gui.utils import gui_log_handler, QtImport
 from gui.widgets.log_bar_widget import LogBarWidget
 from gui.BaseComponents import BaseWidget
 
@@ -70,7 +70,7 @@ class LogBarBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        GUILogHandler.GUILogHandler().register(self)
+        gui_log_handler.GUILogHandler().register(self)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "maxLogLines":

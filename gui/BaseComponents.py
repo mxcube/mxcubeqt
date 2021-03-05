@@ -25,7 +25,7 @@ import operator
 import weakref
 
 import gui
-from gui.utils import PropertyBag, Connectable, Colors, QtImport
+from gui.utils import property_bag, connectable, Colors, QtImport
 
 from mxcubecore import HardwareRepository as HWR
 from mxcubecore.BaseHardwareObjects import HardwareObject
@@ -142,7 +142,7 @@ class SignalSlotFilter:
             s(*args)
 
 
-class BaseWidget(Connectable.Connectable, QtImport.QFrame):
+class BaseWidget(connectable.Connectable, QtImport.QFrame):
     """Base class for MXCuBE bricks"""
 
     (
@@ -660,10 +660,10 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
 
     def __init__(self, parent=None, widget_name=""):
 
-        Connectable.Connectable.__init__(self)
+        connectable.Connectable.__init__(self)
         QtImport.QFrame.__init__(self, parent)
         self.setObjectName(widget_name)
-        self.property_bag = PropertyBag.PropertyBag()
+        self.property_bag = property_bag.PropertyBag()
 
         self.__enabled_state = True
         self.__loaded_hardware_objects = []
@@ -752,6 +752,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
     def connect_hwobj(
         self, sender, signal, slot, instance_filter=False, should_cache=True
     ):
+
         if sys.version_info > (3, 0):
             signal = str(signal.decode("utf8") if isinstance(signal, bytes) else signal)
         else:
@@ -925,7 +926,7 @@ class BaseWidget(Connectable.Connectable, QtImport.QFrame):
         return self.property_bag.del_property(property_name)
 
     def get_hardware_object(self, hardware_object_name, optional=False):
-        splash_screen = gui.get_splash_screen()
+        splash_screen = gui.get_splash()
         if splash_screen:
             splash_screen.set_message(
                 "Loading hardware object defined in %s.xml" % hardware_object_name
@@ -1086,7 +1087,7 @@ class NullBrick(BaseWidget):
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
-        self.property_bag = PropertyBag.PropertyBag()
+        self.property_bag = property_bag.PropertyBag()
 
     def set_persistent_property_bag(self, persistent_property_bag):
         self.property_bag = persistent_property_bag

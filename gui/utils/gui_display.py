@@ -27,9 +27,9 @@ import webbrowser
 import collections
 from functools import partial
 
-from gui.utils import Icons, Colors, PropertyEditor, QtImport
+from gui.utils import Icons, Colors, property_editor, QtImport
 from gui.BaseComponents import BaseWidget
-from gui.BaseLayoutItems import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
+from gui.base_layout_items import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -1554,7 +1554,7 @@ class BricksPropertiesEditor(QtImport.QWidget):
         self.property_edited = False
 
         self.bricks_listwidget = QtImport.QListWidget()
-        self.properties_table = PropertyEditor.ConfigurationTable(self)
+        self.properties_table = property_editor.ConfigurationTable(self)
 
         _main_vlayout = QtImport.QHBoxLayout(self)
         _main_vlayout.addWidget(self.bricks_listwidget)
