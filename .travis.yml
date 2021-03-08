@@ -6,8 +6,7 @@ python:
   - "3.8"
 
 env:
-  - PYTHONPATH=$PYTHONPATH:$(pwd)
-  - HARDWARE_REPOSITORY_SERVER=$(pwd)/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/configuration/mockup 
+  - PYTHONPATH=$PYTHONPATH:$(pwd) HARDWARE_REPOSITORY_SERVER=$(pwd)/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/configuration/mockup 
 
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev python-pyqt5; fi
