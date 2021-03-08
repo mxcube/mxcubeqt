@@ -37,7 +37,7 @@ import logging
 from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils import sample_changer_helper as sc_helper
-from mxcubeqt.bricks.SampleChangerBrick import SampleChangerBrick, BasketView, VialView
+from mxcubeqt.bricks.sample_changer_brick import SampleChangerBrick, BasketView, VialView
 from mxcubecore import HardwareRepository as HWR
 
 

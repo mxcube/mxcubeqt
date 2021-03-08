@@ -13,6 +13,9 @@ install:
   - 
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt pytest==4.0.1 PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
+  - git clone https://github.com/mxcube/mxcubecore
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)
+  - export HARDWARE_REPOSITORY_SERVER=$(pwd)/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/configuration/mockup
 
 before_script:
   - "export DISPLAY=:99.0"
