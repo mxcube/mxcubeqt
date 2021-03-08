@@ -6,9 +6,9 @@ python:
   - "3.8"
 
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev python-pyqt5; fi
   - 
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt PyQt4 pytest==4.0.1 PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt pytest==4.0.1 PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
   - git clone https://github.com/mxcube/mxcubecore
   - ln -s mxcubecore HardwareRepository 
