@@ -174,11 +174,11 @@ class GUISupervisor(qt_import.QWidget):
         """Loads gui"""
         self.configuration = configuration.Configuration()
         self.gui_config_file = gui_config_file
-        load_from_dict = gui_config_file.endswith(".json") or gui_config_file.endswith(
-            ".yml"
-        )
 
         if self.gui_config_file:
+            load_from_dict = gui_config_file.endswith(".json") or gui_config_file.endswith(
+                ".yml"
+            )
             if hasattr(self, "splash_screen"):
                 self.splash_screen.set_gui_name(
                     os.path.splitext(os.path.basename(gui_config_file))[0]

@@ -22,7 +22,7 @@ extras_requirements = {} # {
     # 'gui': ['PyQt4', 'taurus', 'taurus-pyqtgraph', 'sardana', 'matplotlib']
 #}
 
-console_scripts = ['mxcube = mxcubeqt.apps.mxcube:run']
+console_scripts = ['mxcube = mxcubeqt:run']
 
 gui_scripts = []
 
@@ -47,7 +47,7 @@ setup(
     package_data={'mxcubeqt': ['ui_files/*.ui',
                                'icons/*.png',
                                'examples/*'],
-                  'HardwareRepository': ['configuration/mockup/*.xml',
+                  'mxcubecore': ['configuration/mockup/*.xml',
                                          'configuration/mockup/*.jpg',
                                          'configuration/mockup/qt/*.xml',
                                          'configuration/mockup/qt/*.yml']
