@@ -95,7 +95,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "ESRF"
 
-class ESRFConfigurationBrick(BaseWidget):
+class EsrfConfigurationBrick(BaseWidget):
  
     operation_modes_edited = qt_import.pyqtSignal(list)
     operation_modes_saved = qt_import.pyqtSignal(list)

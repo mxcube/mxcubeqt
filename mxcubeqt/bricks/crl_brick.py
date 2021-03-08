@@ -29,7 +29,7 @@ __license__ = "LGPLv3+"
 __category__ = "Beam definition"
 
 
-class CRLBrick(BaseWidget):
+class CrlBrick(BaseWidget):
     """Inherited from BaseWidget"""
 
     def __init__(self, *args):

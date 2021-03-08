@@ -3,7 +3,7 @@
     - children:
       - children:
         - children:
-          - brick: {class: proposal_brick, name: proposal_brick}
+          - brick: {class: ProposalBrick, name: proposal_brick}
             children: []
             connections:
             - {receiver: '', receiverWindow: mxCuBE, signal: loggedIn, slot: exitExpertMode}
@@ -14,8 +14,6 @@
               slot: set_session}
             - {receiver: tree_brick, receiverWindow: mxCuBE, signal: sessionSelected,
               slot: set_session}
-            - {receiver: instance_list_brick, receiverWindow: mxCuBE, signal: sessionSelected,
-              slot: setSession}
             - {receiver: task_toolbox_brick, receiverWindow: mxCuBE, signal: userGroupSaved,
               slot: user_group_saved}
             name: proposal_brick
@@ -54,7 +52,7 @@
             - {comment: '', default_value: '', hidden: false, name: titlePrefix, old_value: '',
               type: string, value: MXCuBE}
             type: proposal_brick
-          - brick: {class: tree_brick, name: tree_brick}
+          - brick: {class: TreeBrick, name: tree_brick}
             children: []
             connections:
             - {receiver: aperture_brick, receiverWindow: mxCuBE, signal: enable_widgets,
@@ -174,7 +172,7 @@
             - {comment: '', default_value: /xml_rpc_server, hidden: false, name: xml_rpc_server,
               old_value: /xml_rpc_server, type: string, value: /xml-rpc-server}
             type: tree_brick
-          - brick: {class: progress_bar_brick, name: progress_bar_brick}
+          - brick: {class: ProgressBarBrick, name: progress_bar_brick}
             children: []
             connections: []
             name: progress_bar_brick
@@ -260,7 +258,7 @@
             - children:
               - children:
                 - children:
-                  - brick: {class: motor_spinbox_brick, name: omega_brick}
+                  - brick: {class: MotorSpinboxBrick, name: omega_brick}
                     children: []
                     connections: []
                     name: omega_brick
@@ -308,7 +306,7 @@
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /diff-omega-mockup}
                     - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
@@ -324,11 +322,11 @@
                     - {comment: '', default_value: 1, hidden: false, name: showStop,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 0, hidden: false, name: show_units,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: mm, hidden: false, name: unit,
-                      old_value: null, type: string, value: mm}
+                      old_value: mm, type: string, value: mm}
                     type: motor_spinbox_brick
-                  - brick: {class: motor_spinbox_brick, name: kappa_phi_brick}
+                  - brick: {class: MotorSpinboxBrick, name: kappa_phi_brick}
                     children: []
                     connections: []
                     name: kappa_phi_brick
@@ -376,7 +374,7 @@
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /diff-kappaphi-mockup}
                     - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
@@ -392,9 +390,9 @@
                     - {comment: '', default_value: 1, hidden: false, name: showStop,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 0, hidden: false, name: show_units,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: mm, hidden: false, name: unit,
-                      old_value: null, type: string, value: mm}
+                      old_value: mm, type: string, value: mm}
                     type: motor_spinbox_brick
                   - children: []
                     connections: []
@@ -475,7 +473,7 @@
                     value: default
                   type: hbox
                 - children:
-                  - brick: {class: motor_spinbox_brick, name: kappa_brick}
+                  - brick: {class: MotorSpinboxBrick, name: kappa_brick}
                     children: []
                     connections: []
                     name: kappa_brick
@@ -523,7 +521,7 @@
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /diff-kappa-mockup}
                     - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
@@ -539,11 +537,11 @@
                     - {comment: '', default_value: 1, hidden: false, name: showStop,
                       old_value: 1, type: boolean, value: 1}
                     - {comment: '', default_value: 0, hidden: false, name: show_units,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: mm, hidden: false, name: unit,
-                      old_value: null, type: string, value: mm}
+                      old_value: mm, type: string, value: mm}
                     type: motor_spinbox_brick
-                  - brick: {class: motor_predef_pos_brick, name: zoom_brick}
+                  - brick: {class: MotorPredefPosBrick, name: zoom_brick}
                     children: []
                     connections: []
                     name: zoom_brick
@@ -653,7 +651,7 @@
                   type: hbox
                 - children:
                   - children:
-                    - brick: {class: sample_view_brick, name: camera_brick}
+                    - brick: {class: SampleViewBrick, name: camera_brick}
                       children: []
                       connections: []
                       name: camera_brick
@@ -686,8 +684,8 @@
                       - {comment: Allow to control brick in slave mode, default_value: 0,
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
-                      - {comment: '', default_value: /sample_view, hidden: false, name: mnemonic,
-                        old_value: /sample_view, type: string, value: /sample-view}
+                      - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
+                        old_value: /graphics, type: string, value: /sample-view}
                       type: sample_view_brick
                     - children: []
                       connections: []
@@ -708,7 +706,7 @@
                       - {comment: '', default_value: 100, hidden: false, name: size,
                         old_value: null, type: integer, value: 100}
                       type: vspacer
-                    - brick: {class: graphics_manager_brick, name: graphics_manager_brick}
+                    - brick: {class: GraphicsManagerBrick, name: graphics_manager_brick}
                       children: []
                       connections: []
                       name: graphics_manager_brick
@@ -790,7 +788,7 @@
                       type: combo
                       value: default
                     type: vbox
-                  - brick: {class: sample_control_brick, name: hutchmenu_brick}
+                  - brick: {class: SampleControlBrick, name: hutchmenu_brick}
                     children: []
                     connections: []
                     name: hutchmenu_brick
@@ -904,7 +902,7 @@
                     type: integer, value: 100}
                   type: vspacer
                 - children:
-                  - brick: {class: beam_size_brick, name: beam_size_brick}
+                  - brick: {class: BeamSizeBrick, name: beam_size_brick}
                     children: []
                     connections: []
                     name: beam_size_brick
@@ -929,7 +927,7 @@
                       hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                       value: 0}
                     type: beam_size_brick
-                  - brick: {class: slits_brick, name: slits_brick}
+                  - brick: {class: SlitsBrick, name: slits_brick}
                     children: []
                     connections: []
                     name: slits_brick
@@ -956,7 +954,7 @@
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
                       old_value: '', type: string, value: /slits-mockup}
                     type: slits_brick
-                  - brick: {class: aperture_brick, name: aperture_brick}
+                  - brick: {class: ApertureBrick, name: aperture_brick}
                     children: []
                     connections: []
                     name: aperture_brick
@@ -997,13 +995,13 @@
                     - {comment: '', default_value: 100, hidden: false, name: size,
                       old_value: null, type: integer, value: 100}
                     type: hspacer
-                  - brick: {class: pahse_brick, name: phase_brick}
+                  - brick: {class: PhaseBrick, name: phase_brick}
                     children: []
                     connections: []
                     name: phase_brick
                     properties:
                     - {comment: '', default_value: 0, hidden: false, name: confirmPhaseChange,
-                      old_value: null, type: boolean, value: 0}
+                      old_value: 0, type: boolean, value: 0}
                     - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
                       name: fixedHeight, old_value: -1, type: integer, value: -1}
                     - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -1139,7 +1137,7 @@
                   type: combo
                   value: default
                 type: vbox
-              - brick: {class: task_toolbox_brick, name: task_toolbox_brick}
+              - brick: {class: TaskToolboxBrick, name: task_toolbox_brick}
                 children: []
                 connections:
                 - {receiver: tree_brick, receiverWindow: mxCuBE, signal: request_tree_brick,
@@ -1298,7 +1296,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: data_collection_parameters_brick, name: dc_parameters_brick}
+            - brick: {class: DataCollectionParametersBrick, name: dc_parameters_brick}
               children: []
               connections: []
               name: dc_parameters_brick
@@ -1381,7 +1379,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: data_collection_group_brick, name: dcgroup_brick}
+            - brick: {class: DataCollectionGroupBrick, name: dcgroup_brick}
               children: []
               connections: []
               name: dcgroup_brick
@@ -1463,7 +1461,7 @@
             type: vbox
           - children:
             - children:
-              - brick: {class: sample_changer_brick, name: sample_changer_brick}
+              - brick: {class: SampleChangerBrick, name: sample_changer_brick}
                 children: []
                 connections: []
                 name: sample_changer_brick
@@ -1638,7 +1636,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: char_parameters_brick, name: char_parameters_brick}
+            - brick: {class: CharParametersBrick, name: char_parameters_brick}
               children: []
               connections: []
               name: char_parameters_brick
@@ -1721,7 +1719,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: sample_details_brick, name: sample_details_brick}
+            - brick: {class: SampleDetailsBrick, name: sample_details_brick}
               children: []
               connections: []
               name: sample_details_brick
@@ -1802,7 +1800,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: energy_scan_parameters_brick, name: energy_scan_brick}
+            - brick: {class: EnergyScanParametersBrick, name: energy_scan_brick}
               children: []
               connections: []
               name: energy_scan_brick
@@ -1883,7 +1881,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: xrf_spectrum_parameters_brick, name: xrf_spectrum_parameters}
+            - brick: {class: XrfSpectrumParametersBrick, name: xrf_spectrum_parameters}
               children: []
               connections: []
               name: xrf_spectrum_parameters
@@ -1964,7 +1962,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: advaced_brick, name: advanced_brick}
+            - brick: {class: AdvancedBrick, name: advanced_brick}
               children: []
               connections: []
               name: advanced_brick
@@ -2045,7 +2043,7 @@
               value: default
             type: vbox
           - children:
-            - brick: {class: plate_manipulator_brick, name: plate_brick}
+            - brick: {class: PlateManipulatorBrick, name: plate_brick}
               children: []
               connections: []
               name: plate_brick
@@ -2288,7 +2286,7 @@
           value: default
         type: hbox
       - children:
-        - brick: {class: log_view_brick, name: log_view_brick}
+        - brick: {class: LogViewBrick, name: log_view_brick}
           children: []
           connections: []
           name: log_view_brick
@@ -2398,7 +2396,7 @@
           value: default
         type: hbox
       - children:
-        - brick: {class: beamline_test_brick, name: beamline_test_brick}
+        - brick: {class: BeamlineTestBrick, name: beamline_test_brick}
           children: []
           connections: []
           name: beamline_test_brick
@@ -2555,7 +2553,7 @@
         value: default
       type: tab
     - children:
-      - brick: {class: machine_info_brick, name: mach_info_brick}
+      - brick: {class: MachineInfoBrick, name: mach_info_brick}
         children: []
         connections: []
         name: mach_info_brick
@@ -2577,7 +2575,7 @@
         - {comment: Maximal number of plot points, default_value: 100, hidden: false,
           name: maxPlotPoints, old_value: 100, type: integer, value: 100}
         type: machine_info_brick
-      - brick: {class: energy_brick, name: energy_brick}
+      - brick: {class: EnergyBrick, name: energy_brick}
         children: []
         connections: []
         name: energy_brick
@@ -2615,7 +2613,7 @@
           hidden: false, name: kevFormatString, old_value: '##.####', type: formatString,
           value: '###.####'}
         type: energy_brick
-      - brick: {class: transmission_brick, name: transmission_brick}
+      - brick: {class: TransmissionBrick, name: transmission_brick}
         children: []
         connections: []
         name: transmission_brick
@@ -2638,7 +2636,7 @@
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
         type: transmission_brick
-      - brick: {class: resolution_brick, name: resolution_brick}
+      - brick: {class: ResolutionBrick, name: resolution_brick}
         children: []
         connections: []
         name: resolution_brick
@@ -2690,7 +2688,7 @@
         - {comment: '', default_value: 100, hidden: false, name: size, old_value: null,
           type: integer, value: 100}
         type: vspacer
-      - brick: {class: door_interlock_brick, name: door_interlock_brick}
+      - brick: {class: DoorInterlockBrick, name: door_interlock_brick}
         children: []
         connections: []
         name: door_interlock_brick
@@ -2710,7 +2708,7 @@
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
         type: door_interlock_brick
-      - brick: {class: shutter_brick, name: shutter_brick}
+      - brick: {class: ShutterBrick, name: shutter_brick}
         children: []
         connections: []
         name: shutter_brick
@@ -2850,7 +2848,7 @@
       type: combo
       value: default
     type: hbox
-  - brick: {class: graphics_tools_brick, name: graphics_tools_brick}
+  - brick: {class: GraphicsToolsBrick, name: graphics_tools_brick}
     children: []
     connections: []
     name: graphics_tools_brick
@@ -2881,7 +2879,13 @@
       value: both
     type: graphics_tools_brick
   - children:
-    - brick: {class: log_bar_brick, name: log_bar_brick}
+    - brick: {class: NullBrick, name: online_processing_brick}
+      children: []
+      connections: []
+      name: online_processing_brick
+      properties: []
+      type: online_processing_brick
+    - brick: {class: LogBarBrick, name: log_bar_brick}
       children: []
       connections: []
       name: log_bar_brick
@@ -3047,7 +3051,7 @@
   type: window
 - children:
   - children:
-    - brick: {class: sample_changer_brick, name: sc_brick_two}
+    - brick: {class: SampleChangerBrick, name: sc_brick_two}
       children: []
       connections: []
       name: sc_brick_two

@@ -28,7 +28,7 @@ __license__ = "LGPLv3+"
 __category__ = "Motor"
 
 
-class KappaPhiMotorsBrick(BaseWidget):
+class KappaPhiBrick(BaseWidget):
 
     STATE_COLORS = (
         colors.LIGHT_RED,

@@ -91,7 +91,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "ESRF"
 
-class ESRFCenteringBrick(BaseWidget):
+class EsrfCenteringBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)

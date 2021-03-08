@@ -28,7 +28,7 @@ __license__ = "LGPLv3+"
 __category__ = "General"
 
 
-class DetectorStatusBrick(BaseWidget):
+class DetectorBrick(BaseWidget):
 
     STATES = {
         "unknown": colors.LIGHT_GRAY,

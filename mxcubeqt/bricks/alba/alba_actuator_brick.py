@@ -50,7 +50,7 @@ STATES = {
 }
 
 
-class ALBA_ActuatorBrick(BaseWidget):
+class AlbaActuatorBrick(BaseWidget):
     def __init__(self, *args):
         """
         Descript. :

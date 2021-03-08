@@ -48,7 +48,7 @@ STATES = {
 }
 
 
-class ALBA_LightControlBrick(BaseWidget):
+class AlbaLightControlBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)

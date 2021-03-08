@@ -31,7 +31,7 @@ __category__ = "ALBA"
 STATES = {"unknown": colors.GRAY, "ready": colors.LIGHT_BLUE, "error": colors.LIGHT_RED}
 
 
-class ALBA_MachineInfoBrick(BaseWidget):
+class AlbaMachineInfoBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)

@@ -25,7 +25,7 @@ __credits__ = ["MXCuBE collaboration"]
 __category__ = "General"
 
 
-class ImageTrackingStatusBrick(BaseWidget):
+class ImageTrackingBrick(BaseWidget):
 
     STATES = {
         "unknown": colors.LIGHT_GRAY,

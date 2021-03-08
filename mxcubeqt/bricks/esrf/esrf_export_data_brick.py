@@ -75,7 +75,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "ESRF"
 
-class ESRFExportDataBrick(BaseWidget):
+class EsrfExportDataBrick(BaseWidget):
 
     def __init__(self, *args):
 

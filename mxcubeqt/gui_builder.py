@@ -214,8 +214,8 @@ class ToolboxWidget(qt_import.QWidget):
 
         return brick_text_label
 
-    def add_bricks(self, brickDir):
-        """Add the bricks found in the 'brickDir' directory to the
+    def add_bricks(self, bricks_directory):
+        """Add the bricks found in the 'bricks_directory' directory to the
            bricks tab widget
         """
 
@@ -223,8 +223,8 @@ class ToolboxWidget(qt_import.QWidget):
         find_docstring_re = re.compile('^"""(.*?)"""?$', re.M | re.S)
         full_filenames = []
 
-        for file_or_dir in os.listdir(brickDir):
-            full_path = os.path.join(brickDir, file_or_dir)
+        for file_or_dir in os.listdir(bricks_directory):
+            full_path = os.path.join(bricks_directory, file_or_dir)
             if os.path.isdir(full_path):
                 path_with_trunk = os.path.join(full_path, "trunk")
                 if os.path.isdir(path_with_trunk):
@@ -261,15 +261,24 @@ class ToolboxWidget(qt_import.QWidget):
                             brick_name, [directory_name]
                         )
                     except BaseException:
+                        logging.getLogger("GUI").exception("Unable to import module %s" % brick_name)
                         if brick_module_file:
                             brick_module_file.close()
                         continue
                     module_contents = brick_module_file.read()
+                    temp = brick_name.split('_')
+                    class_name = temp[0].title() + ''.join(ele.title() for ele in temp[1:])
 
                     check_if_it_Brick = re.compile(
-                        "^\s*class\s+%s.+?:\s*$" % brick_name, re.M
+                        "^\s*class\s+%s.+?:\s*$" % class_name, re.M
                     )
                     if not check_if_it_Brick.search(module_contents):
+                        logging.getLogger("GUI").exception(
+                            "Unable to find class %s in module %s" % (
+                                class_name,
+                                brick_name
+                            )
+                        )
                         continue
 
                     match = find_category_re.search(module_contents)

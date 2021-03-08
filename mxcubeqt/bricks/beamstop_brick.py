@@ -30,7 +30,7 @@ __license__ = "LGPLv3+"
 __category__ = "General"
 
 
-class BeamstopDistanceBrick(BaseWidget):
+class BeamstopBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)

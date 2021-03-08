@@ -28,7 +28,7 @@ __license__ = "LGPLv3+"
 __category__ = "Task"
 
 
-class OnlineProcessingPreviewBrick(BaseWidget):
+class OnlineProcessingBrick(BaseWidget):
 
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)

@@ -51,7 +51,7 @@ STATES = {
 }
 
 
-class ALBA_ShuttersBrick(BaseWidget):
+class AlbaShuttersBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
