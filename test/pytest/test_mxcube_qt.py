@@ -7,9 +7,9 @@ MXCUBE_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__fi
 
 print("MXCuBE root: %s" % MXCUBE_ROOT)
 
-sys.path.insert(0, MXCUBE_ROOT)
+#sys.path.insert(0, MXCUBE_ROOT)
 MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT,
-                               "configuration/example_mxcube_gui.yml")
+                               "mxcubeqt/example_config.yml")
 def close_app():
     sys.exit(0)
 

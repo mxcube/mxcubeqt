@@ -13,7 +13,7 @@ install:
   - 
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt pytest==4.0.1 PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt pytest==4.0.1 pytest-xvfb PyYAML pylint; fi
-  - git clone https://github.com/mxcube/mxcubecore
+  - git clone https://github.com/mxcube/mxcubecore mxcubecore
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
   - export HARDWARE_REPOSITORY_SERVER=$(pwd)/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/configuration/mockup
 
@@ -21,10 +21,8 @@ before_script:
   - "export DISPLAY=:99.0"
 
 script:
-  - cd test
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 python -m pytest; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 python3 -m pytest; fi
-  - cd ..
     #- pylint -E gui/*py --extension-pkg-whitelist=PyQt5,PyQt4
     #- travis_wait 20 pylint -E gui/bricks --extension-pkg-whitelist=PyQt5,PyQt4
     #- travis_wait 20 pylint -E gui/widgets --extension-pkg-whitelist=PyQt5,PyQt4
