@@ -20,7 +20,7 @@
 #  Please user PEP 0008 -- "Style Guide for Python Code" to format code
 #  https://www.python.org/dev/peps/pep-0008/
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -28,11 +28,11 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class ImageTrackingWidget(QtImport.QWidget):
+class ImageTrackingWidget(qt_import.QWidget):
 
     def __init__(self, parent=None, name="image_tracking_widget"):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.setObjectName(name)
 
@@ -45,12 +45,12 @@ class ImageTrackingWidget(QtImport.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.image_tracking_widget_layout = QtImport.load_ui_file(
+        self.image_tracking_widget_layout = qt_import.load_ui_file(
             "image_tracking_widget_layout.ui"
         )
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.image_tracking_widget_layout)
         _main_vlayout.setSpacing(0)
         _main_vlayout.addStretch(10)
@@ -137,9 +137,9 @@ class ImageTrackingWidget(QtImport.QWidget):
             )
 
             self.image_tracking_widget_layout.first_image_label.setPixmap(
-                QtImport.QPixmap(paths[0])
+                qt_import.QPixmap(paths[0])
             )
             if len(paths) > 1:
                 self.image_tracking_widget_layout.last_image_label.setPixmap(
-                    QtImport.QPixmap(paths[1])
+                    qt_import.QPixmap(paths[1])
                 )

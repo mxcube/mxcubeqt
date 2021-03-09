@@ -35,7 +35,7 @@ _USE_THREAD = True
 #mother class of Oxidis plugins
 #@see Qub::Plugins
 #
-#@section icons Icons
+#@section icons icons
 #Icon's library used by Qub
 #
 #@section tools Tools

@@ -31,8 +31,8 @@ import subprocess
 
 import mxcubeqt
 from mxcubeqt.configuration import Configuration
-from mxcubeqt.utils import Icons, connection_editor, property_editor, gui_display, QtImport
-from mxcubeqt.bricks import LogViewBrick
+from mxcubeqt.utils import icons, connection_editor, property_editor, gui_display, qt_import
+from mxcubeqt.bricks import log_view_brick
 from mxcubeqt.base_layout_items import ContainerCfg
 
 from mxcubecore import HardwareRepository as HWR
@@ -43,33 +43,33 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class HorizontalSpacer(QtImport.QWidget):
+class HorizontalSpacer(qt_import.QWidget):
     """Horizontal spacer class"""
 
     def __init__(self, *args, **kwargs):
         """__init__
         """
 
-        QtImport.QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
 
         h_size = kwargs.get("size", None)
         if h_size is not None:
             self.setFixedWidth(h_size)
-            self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
+            self.setSizePolicy(qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed)
         else:
-            self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
+            self.setSizePolicy(qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed)
 
 
-class CustomListWidget(QtImport.QListWidget):
+class CustomListWidget(qt_import.QListWidget):
     """Custom ListWidget
     """
 
     def __init__(self, *args):
         """__init__ method"""
 
-        QtImport.QListWidget.__init__(self, *args)
-        self.setVerticalScrollBarPolicy(QtImport.Qt.ScrollBarAsNeeded)
-        self.setSelectionMode(QtImport.QAbstractItemView.SingleSelection)
+        qt_import.QListWidget.__init__(self, *args)
+        self.setVerticalScrollBarPolicy(qt_import.Qt.ScrollBarAsNeeded)
+        self.setSelectionMode(qt_import.QAbstractItemView.SingleSelection)
 
     def addToolTip(self, item, text):
         """Sets tool tip"""
@@ -77,15 +77,15 @@ class CustomListWidget(QtImport.QListWidget):
         self.setToolTip(text)
 
 
-class GUITreeWidget(QtImport.QTreeWidget):
+class GUITreeWidget(qt_import.QTreeWidget):
     """Gui config tree"""
 
-    dragDropSignal = QtImport.pyqtSignal(object, object)
+    dragDropSignal = qt_import.pyqtSignal(object, object)
 
     def __init__(self, *args):
         """__init__ method"""
 
-        QtImport.QTreeWidget.__init__(self, *args)
+        qt_import.QTreeWidget.__init__(self, *args)
 
         self.setColumnCount(2)
         self.setColumnWidth(0, 200)
@@ -93,9 +93,9 @@ class GUITreeWidget(QtImport.QTreeWidget):
         self.setHeaderLabels(["Element", "Type"])
         self.setAcceptDrops(True)
         self.viewport().setAcceptDrops(True)
-        self.setSelectionMode(QtImport.QAbstractItemView.SingleSelection)
+        self.setSelectionMode(qt_import.QAbstractItemView.SingleSelection)
         self.setItemsExpandable(True)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding)
 
         self.drag_source_item = None
         self.drag_target_item = None
@@ -117,29 +117,29 @@ class GUITreeWidget(QtImport.QTreeWidget):
         event.accept()
 
 
-class ToolboxWidget(QtImport.QWidget):
+class ToolboxWidget(qt_import.QWidget):
     """Toolbox windget"""
 
-    addBrickSignal = QtImport.pyqtSignal(str)
+    addBrickSignal = qt_import.pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """Init"""
 
-        QtImport.QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
 
         # Internal variables --------------------------------------------------
         self.bricks_tab_dict = {}
         self.bricks_dict = {}
 
         # Graphic elements ----------------------------------------------------
-        _top_frame = QtImport.QFrame(self)
-        _refresh_toolbutton = QtImport.QToolButton(_top_frame)
-        _refresh_toolbutton.setIcon(Icons.load_icon("reload"))
-        self._bricks_toolbox = QtImport.QToolBox(self)
+        _top_frame = qt_import.QFrame(self)
+        _refresh_toolbutton = qt_import.QToolButton(_top_frame)
+        _refresh_toolbutton.setIcon(icons.load_icon("reload"))
+        self._bricks_toolbox = qt_import.QToolBox(self)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
-        _main_vlayout.addWidget(QtImport.QLabel("Available bricks", _top_frame))
+        _main_vlayout = qt_import.QVBoxLayout(self)
+        _main_vlayout.addWidget(qt_import.QLabel("Available bricks", _top_frame))
         _main_vlayout.addWidget(_refresh_toolbutton)
         _main_vlayout.addWidget(self._bricks_toolbox)
         _main_vlayout.setSpacing(2)
@@ -214,8 +214,8 @@ class ToolboxWidget(QtImport.QWidget):
 
         return brick_text_label
 
-    def add_bricks(self, brickDir):
-        """Add the bricks found in the 'brickDir' directory to the
+    def add_bricks(self, bricks_directory):
+        """Add the bricks found in the 'bricks_directory' directory to the
            bricks tab widget
         """
 
@@ -223,8 +223,8 @@ class ToolboxWidget(QtImport.QWidget):
         find_docstring_re = re.compile('^"""(.*?)"""?$', re.M | re.S)
         full_filenames = []
 
-        for file_or_dir in os.listdir(brickDir):
-            full_path = os.path.join(brickDir, file_or_dir)
+        for file_or_dir in os.listdir(bricks_directory):
+            full_path = os.path.join(bricks_directory, file_or_dir)
             if os.path.isdir(full_path):
                 path_with_trunk = os.path.join(full_path, "trunk")
                 if os.path.isdir(path_with_trunk):
@@ -261,15 +261,24 @@ class ToolboxWidget(QtImport.QWidget):
                             brick_name, [directory_name]
                         )
                     except BaseException:
+                        logging.getLogger("GUI").exception("Unable to import module %s" % brick_name)
                         if brick_module_file:
                             brick_module_file.close()
                         continue
                     module_contents = brick_module_file.read()
+                    temp = brick_name.split('_')
+                    class_name = temp[0].title() + ''.join(ele.title() for ele in temp[1:])
 
                     check_if_it_Brick = re.compile(
-                        "^\s*class\s+%s.+?:\s*$" % brick_name, re.M
+                        "^\s*class\s+%s.+?:\s*$" % class_name, re.M
                     )
                     if not check_if_it_Brick.search(module_contents):
+                        logging.getLogger("GUI").exception(
+                            "Unable to find class %s in module %s" % (
+                                class_name,
+                                brick_name
+                            )
+                        )
                         continue
 
                     match = find_category_re.search(module_contents)
@@ -307,7 +316,7 @@ class ToolboxWidget(QtImport.QWidget):
                 bricks_listwidget = self.add_brick_tab(category)
 
             for brick_name, directory_name, description in bricks_list:
-                brick_list_widget_item = QtImport.QListWidgetItem(
+                brick_list_widget_item = qt_import.QListWidgetItem(
                     self.get_brick_text_label(brick_name), bricks_listwidget
                 )
                 bricks_listwidget.addToolTip(brick_list_widget_item, description)
@@ -323,7 +332,7 @@ class ToolboxWidget(QtImport.QWidget):
         self.addBrickSignal.emit(brick_name)
 
 
-class PropertyEditorWindow(QtImport.QWidget):
+class PropertyEditorWindow(qt_import.QWidget):
     """Property editor window contains two tables:
        One for properties to link hardware objects (property name
        start with hwobj_) and the second one for all other properties
@@ -332,7 +341,7 @@ class PropertyEditorWindow(QtImport.QWidget):
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
 
         self.setWindowTitle("Properties")
 
@@ -343,14 +352,14 @@ class PropertyEditorWindow(QtImport.QWidget):
 
         self.properties_table.propertyChangedSignal.connect(self.property_changed)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.properties_table)
-        _main_vlayout.addWidget(QtImport.QLabel("Hardware objects:", self))
+        _main_vlayout.addWidget(qt_import.QLabel("Hardware objects:", self))
         _main_vlayout.addWidget(self.hwobj_properties_table)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum)
+        self.setSizePolicy(qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum)
 
     def edit_properties(self, property_bag):
         """Edits property"""
@@ -376,22 +385,22 @@ class PropertyEditorWindow(QtImport.QWidget):
         self.edit_properties(property_bag)
 
 
-class ToolButton(QtImport.QToolButton):
+class ToolButton(qt_import.QToolButton):
     """Custom ToolButton"""
 
     def __init__(self, parent, icon, text=None, callback=None, tooltip=None):
         """init"""
 
-        QtImport.QToolButton.__init__(self, parent)
+        qt_import.QToolButton.__init__(self, parent)
 
-        self.setIcon(Icons.load_icon(icon))
+        self.setIcon(icons.load_icon(icon))
 
         if not isinstance(text, bytes):
             tooltip = callback
             callback = text
         else:
             self.setTextLabel(text)
-            self.setToolButtonStyle(QtImport.Qt.ToolButtonTextBesideIcon)
+            self.setToolButtonStyle(qt_import.Qt.ToolButtonTextBesideIcon)
             self.setUsesTextLabel(True)
 
         if callback is not None:
@@ -399,35 +408,35 @@ class ToolButton(QtImport.QToolButton):
 
         if tooltip is not None:
             self.setToolTip(tooltip)
-            # QtImport.QToolTip.add(self, tooltip)
+            # qt_import.QToolTip.add(self, tooltip)
 
-        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
+        self.setSizePolicy(qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed)
 
 
-class GUIEditorWindow(QtImport.QWidget):
+class GUIEditorWindow(qt_import.QWidget):
     """Gui editor window"""
 
-    editPropertiesSignal = QtImport.pyqtSignal(object)
-    newItemSignal = QtImport.pyqtSignal(object, object)
-    drawPreviewSignal = QtImport.pyqtSignal(object, int, list, object)
-    updatePreviewSignal = QtImport.pyqtSignal(object, object, object, object)
-    addWidgetSignal = QtImport.pyqtSignal(object, object)
-    removeWidgetSignal = QtImport.pyqtSignal(object, object)
-    moveWidgetSignal = QtImport.pyqtSignal(object, object)
-    showProperyEditorWindowSignal = QtImport.pyqtSignal()
-    hidePropertyEditorWindowSignal = QtImport.pyqtSignal()
-    showPreviewSignal = QtImport.pyqtSignal()
+    editPropertiesSignal = qt_import.pyqtSignal(object)
+    newItemSignal = qt_import.pyqtSignal(object, object)
+    drawPreviewSignal = qt_import.pyqtSignal(object, int, list, object)
+    updatePreviewSignal = qt_import.pyqtSignal(object, object, object, object)
+    addWidgetSignal = qt_import.pyqtSignal(object, object)
+    removeWidgetSignal = qt_import.pyqtSignal(object, object)
+    moveWidgetSignal = qt_import.pyqtSignal(object, object)
+    showProperyEditorWindowSignal = qt_import.pyqtSignal()
+    hidePropertyEditorWindowSignal = qt_import.pyqtSignal()
+    showPreviewSignal = qt_import.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
 
         # Internal values -----------------------------------------------------
         self.configuration = Configuration()
 
         # Graphic elements ----------------------------------------------------
-        _tools_widget = QtImport.QWidget(self)
+        _tools_widget = qt_import.QWidget(self)
         _add_window_toolbutton = ToolButton(
             _tools_widget,
             "window_new",
@@ -492,7 +501,7 @@ class GUIEditorWindow(QtImport.QWidget):
             _tools_widget, "label", self.add_label_clicked, "add a new label"
         )
 
-        _tree_handling_widget = QtImport.QWidget(self)
+        _tree_handling_widget = qt_import.QWidget(self)
         _show_connections_toolbutton = ToolButton(
             _tree_handling_widget,
             "connect_creating",
@@ -513,7 +522,7 @@ class GUIEditorWindow(QtImport.QWidget):
         )
 
         self.tree_widget = GUITreeWidget(self)
-        self.root_element = QtImport.QTreeWidgetItem(self.tree_widget)
+        self.root_element = qt_import.QTreeWidgetItem(self.tree_widget)
         self.root_element.setText(0, "GUI tree")
         self.root_element.setExpanded(True)
 
@@ -522,7 +531,7 @@ class GUIEditorWindow(QtImport.QWidget):
         )
 
         # Layout --------------------------------------------------------------
-        _toolbox_hlayout = QtImport.QHBoxLayout(_tools_widget)
+        _toolbox_hlayout = qt_import.QHBoxLayout(_tools_widget)
         _toolbox_hlayout.addWidget(_add_window_toolbutton)
         _toolbox_hlayout.addWidget(_add_tab_toolbutton)
         _toolbox_hlayout.addWidget(_add_hbox_toolbutton)
@@ -539,7 +548,7 @@ class GUIEditorWindow(QtImport.QWidget):
         _toolbox_hlayout.setSpacing(2)
         _toolbox_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _tree_handling_widget_hlayout = QtImport.QHBoxLayout(_tree_handling_widget)
+        _tree_handling_widget_hlayout = qt_import.QHBoxLayout(_tree_handling_widget)
         _tree_handling_widget_hlayout.addWidget(_show_connections_toolbutton)
         _tree_handling_widget_hlayout.addWidget(_move_up_toolbutton)
         _tree_handling_widget_hlayout.addWidget(_move_down_toolbutton)
@@ -548,7 +557,7 @@ class GUIEditorWindow(QtImport.QWidget):
         _tree_handling_widget_hlayout.setSpacing(2)
         _tree_handling_widget_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(_tools_widget)
         _main_vlayout.addWidget(_tree_handling_widget)
         _main_vlayout.addWidget(self.tree_widget)
@@ -556,7 +565,7 @@ class GUIEditorWindow(QtImport.QWidget):
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        _tools_widget.setSizePolicy(QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed)
+        _tools_widget.setSizePolicy(qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed)
 
         # Qt signal/slot connections ------------------------------------------
         self.tree_widget.itemSelectionChanged.connect(self.item_selected)
@@ -580,9 +589,9 @@ class GUIEditorWindow(QtImport.QWidget):
     ):
         """Creates an action"""
 
-        action = QtImport.QAction(text, self)
+        action = qt_import.QAction(text, self)
         if icon is not None:
-            action.setIcon(Icons.load_icon(icon))
+            action.setIcon(icons.load_icon(icon))
         if shortcut is not None:
             action.setShortcut(shortcut)
         if tip is not None:
@@ -663,7 +672,7 @@ class GUIEditorWindow(QtImport.QWidget):
     def append_item(self, parent_item, column1_text, column2_text, icon=None):
         """Appends an item to the tree"""
 
-        new_treewidget_item = QtImport.QTreeWidgetItem(parent_item)
+        new_treewidget_item = qt_import.QTreeWidgetItem(parent_item)
         new_treewidget_item.setText(0, str(column1_text))
         new_treewidget_item.setText(1, str(column2_text))
         new_treewidget_item.setExpanded(True)
@@ -671,10 +680,10 @@ class GUIEditorWindow(QtImport.QWidget):
         self.tree_widget.setAcceptDrops(True)
 
         if isinstance(icon, string_types):
-            new_treewidget_item.setIcon(0, Icons.load_icon(icon))
+            new_treewidget_item.setIcon(0, icons.load_icon(icon))
         self.tree_widget.setCurrentItem(new_treewidget_item)
         self.tree_widget.scrollToItem(
-            new_treewidget_item, QtImport.QAbstractItemView.EnsureVisible
+            new_treewidget_item, qt_import.QAbstractItemView.EnsureVisible
         )
 
         return new_treewidget_item
@@ -689,15 +698,15 @@ class GUIEditorWindow(QtImport.QWidget):
             children_count = current_item.childCount()
             if children_count > 0:
                 if (
-                    QtImport.QMessageBox.warning(
+                    qt_import.QMessageBox.warning(
                         self,
                         "Please confirm",
                         "Are you sure you want to remove %s ?\n" % item_name
                         + "%d children will be removed." % children_count,
-                        QtImport.QMessageBox.Yes,
-                        QtImport.QMessageBox.No,
+                        qt_import.QMessageBox.Yes,
+                        qt_import.QMessageBox.No,
                     )
-                    == QtImport.QMessageBox.No
+                    == qt_import.QMessageBox.No
                 ):
                     return
 
@@ -739,7 +748,7 @@ class GUIEditorWindow(QtImport.QWidget):
     def prepare_window_preview(self, item_name, item_cfg=None, selected_item=""):
         """Prepares window"""
 
-        item_list = self.tree_widget.findItems(str(item_name), QtImport.Qt.MatchRecursive, 0)
+        item_list = self.tree_widget.findItems(str(item_name), qt_import.Qt.MatchRecursive, 0)
         item = item_list[0]
         item_type = str(item.text(1))
 
@@ -839,21 +848,21 @@ class GUIEditorWindow(QtImport.QWidget):
         new_list_item = None
 
         try:
-            QtImport.QApplication.setOverrideCursor(QtImport.QCursor(QtImport.Qt.WaitCursor))
+            qt_import.QApplication.setOverrideCursor(qt_import.QCursor(qt_import.Qt.WaitCursor))
 
             if item_type == "window":
                 new_item = self.configuration.add_window()
 
                 if isinstance(new_item, bytes):
-                    QtImport.QMessageBox.warning(
-                        self, "Cannot add item", new_item, QtImport.QMessageBox.Ok
+                    qt_import.QMessageBox.warning(
+                        self, "Cannot add item", new_item, qt_import.QMessageBox.Ok
                     )
                 else:
                     new_item["properties"].get_property("w").set_value(
-                        QtImport.QApplication.desktop().width()
+                        qt_import.QApplication.desktop().width()
                     )
                     new_item["properties"].get_property("h").set_value(
-                        QtImport.QApplication.desktop().height()
+                        qt_import.QApplication.desktop().height()
                     )
                     new_list_item = self.append_item(
                         parent_list_item,
@@ -866,7 +875,7 @@ class GUIEditorWindow(QtImport.QWidget):
                 new_item = self.configuration.add_brick(brick_type, parent)
 
                 if isinstance(new_item, bytes):
-                    QtImport.QMessageBox.warning(self, "Cannot add", new_item, QtImport.QMessageBox.Ok)
+                    qt_import.QMessageBox.warning(self, "Cannot add", new_item, qt_import.QMessageBox.Ok)
                 else:
                     brick_name = new_item["name"]
                     brick = new_item["brick"]
@@ -877,7 +886,7 @@ class GUIEditorWindow(QtImport.QWidget):
                 new_item = self.configuration.add_item(item_type, parent)
 
                 if isinstance(new_item, bytes):
-                    QtImport.QMessageBox.warning(self, "Cannot add", new_item, QtImport.QMessageBox.Ok)
+                    qt_import.QMessageBox.warning(self, "Cannot add", new_item, qt_import.QMessageBox.Ok)
                 else:
                     item_name = new_item["name"]
                     new_list_item = self.append_item(
@@ -888,7 +897,7 @@ class GUIEditorWindow(QtImport.QWidget):
                 new_item = self.configuration.add_item(item_subtype, parent)
 
                 if isinstance(new_item, bytes):
-                    QtImport.QMessageBox.warning(self, "Cannot add", new_item, QtImport.QMessageBox.Ok)
+                    qt_import.QMessageBox.warning(self, "Cannot add", new_item, qt_import.QMessageBox.Ok)
                 else:
                     item_name = new_item["name"]
                     new_list_item = self.append_item(
@@ -899,7 +908,7 @@ class GUIEditorWindow(QtImport.QWidget):
                 self.connect_item(parent, new_item, new_list_item)
                 self.addWidgetSignal.emit(new_item, parent)
         finally:
-            QtImport.QApplication.restoreOverrideCursor()
+            qt_import.QApplication.restoreOverrideCursor()
 
     def add_brick(self, brick_type):
         """Adds bricks to the gui"""
@@ -925,11 +934,11 @@ class GUIEditorWindow(QtImport.QWidget):
                     parent_item = current_item.parent()
                     self._add_item(parent_item, item_type, item_subtype)
             except BaseException:
-                QtImport.QMessageBox.warning(
+                qt_import.QMessageBox.warning(
                     self,
                     "Cannot add %s" % item_type,
                     "Please select a suitable parent container",
-                    QtImport.QMessageBox.Ok,
+                    qt_import.QMessageBox.Ok,
                 )
 
     def add_hbox_clicked(self):
@@ -993,10 +1002,10 @@ class GUIEditorWindow(QtImport.QWidget):
            Refreshes property table
         """
 
-        item = self.tree_widget.findItems(str(item_name), QtImport.Qt.MatchRecursive, 0)
+        item = self.tree_widget.findItems(str(item_name), qt_import.Qt.MatchRecursive, 0)
         if item is not None:
             self.tree_widget.setCurrentItem(item[0])
-            self.tree_widget.scrollToItem(item[0], QtImport.QAbstractItemView.EnsureVisible)
+            self.tree_widget.scrollToItem(item[0], qt_import.QAbstractItemView.EnsureVisible)
 
     def item_double_clicked(self, item, column):
         """Item double click event"""
@@ -1006,11 +1015,11 @@ class GUIEditorWindow(QtImport.QWidget):
             item_cfg = self.configuration.find_item(item_name)
             if item_cfg:
                 item.setFlags(
-                    QtImport.Qt.ItemIsSelectable | QtImport.Qt.ItemIsEnabled | QtImport.Qt.ItemIsEditable
+                    qt_import.Qt.ItemIsSelectable | qt_import.Qt.ItemIsEnabled | qt_import.Qt.ItemIsEditable
                 )
                 self.item_rename_started = True
                 self.tree_widget.editItem(item)
-                item.setFlags(QtImport.Qt.ItemIsSelectable | QtImport.Qt.ItemIsEnabled)
+                item.setFlags(qt_import.Qt.ItemIsSelectable | qt_import.Qt.ItemIsEnabled)
 
     def item_selected(self):
         """Item selected"""
@@ -1037,11 +1046,11 @@ class GUIEditorWindow(QtImport.QWidget):
             )
             if old_name is not None:
                 item.setText(0, old_name)
-                QtImport.QMessageBox.warning(
+                qt_import.QMessageBox.warning(
                     self,
                     "Cannot rename item",
                     "New name %s conflicts\nwith another item name." % new_item_name,
-                    QtImport.QMessageBox.Ok,
+                    qt_import.QMessageBox.Ok,
                 )
 
     def item_drag_dropped(self, source_item, target_item):
@@ -1093,7 +1102,7 @@ class GUIEditorWindow(QtImport.QWidget):
         # source_item.setSelected(True)
         source_item.setSelected(True)
         self.tree_widget.setCurrentItem(source_item)
-        self.tree_widget.scrollToItem(source_item, QtImport.QAbstractItemView.EnsureVisible)
+        self.tree_widget.scrollToItem(source_item, qt_import.QAbstractItemView.EnsureVisible)
 
     def move_item(self, direction):
         """Moves item
@@ -1112,7 +1121,7 @@ class GUIEditorWindow(QtImport.QWidget):
 
                 if new_parent is not None:
                     new_parent_item_list = self.tree_widget.findItems(
-                        str(new_parent), QtImport.Qt.MatchRecursive, 0
+                        str(new_parent), qt_import.Qt.MatchRecursive, 0
                     )
                     new_parent_item = new_parent_item_list[0]
 
@@ -1128,7 +1137,7 @@ class GUIEditorWindow(QtImport.QWidget):
 
                 if new_parent is not None:
                     new_parent_item_list = self.tree_widget.findItems(
-                        str(new_parent), QtImport.Qt.MatchRecursive, 0
+                        str(new_parent), qt_import.Qt.MatchRecursive, 0
                     )
                     new_parent_item = new_parent_item_list[0]
 
@@ -1144,7 +1153,7 @@ class GUIEditorWindow(QtImport.QWidget):
                 self.update_window_preview(new_parent)
 
             self.tree_widget.setCurrentItem(item)
-            self.tree_widget.scrollToItem(item, QtImport.QAbstractItemView.EnsureVisible)
+            self.tree_widget.scrollToItem(item, qt_import.QAbstractItemView.EnsureVisible)
             self.moveWidgetSignal.emit(item_name, direction)
 
     def move_up_clicked(self):
@@ -1157,24 +1166,24 @@ class GUIEditorWindow(QtImport.QWidget):
         self.move_item("down")
 
 
-class GUIPreviewWindow(QtImport.QWidget):
+class GUIPreviewWindow(qt_import.QWidget):
     """Main Gui preview"""
 
-    previewItemClickedSignal = QtImport.pyqtSignal(str)
+    previewItemClickedSignal = qt_import.pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
 
         self.setWindowTitle("GUI Preview")
-        self.window_preview_box = QtImport.QGroupBox("Preview window", self)
+        self.window_preview_box = qt_import.QGroupBox("Preview window", self)
         self.window_preview = gui_display.WindowDisplayWidget(self.window_preview_box)
 
-        self.window_preview_box_layout = QtImport.QVBoxLayout(self.window_preview_box)
+        self.window_preview_box_layout = qt_import.QVBoxLayout(self.window_preview_box)
         self.window_preview_box_layout.addWidget(self.window_preview)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.window_preview_box)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
         _main_vlayout.setSpacing(2)
@@ -1231,28 +1240,28 @@ class GUIPreviewWindow(QtImport.QWidget):
         self.window_preview.move_widget(item_widget, direction)
 
 
-class GUIBuilder(QtImport.QMainWindow):
+class GUIBuilder(qt_import.QMainWindow):
     """GUI Builder window"""
 
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QMainWindow.__init__(self, *args)
+        qt_import.QMainWindow.__init__(self, *args)
 
         self.filename = None
         self.setWindowTitle("GUI Builder")
 
-        self.main_widget = QtImport.QSplitter(self)
+        self.main_widget = qt_import.QSplitter(self)
         self.setCentralWidget(self.main_widget)
 
         self.statusbar = self.statusBar()
         self.gui_editor_window = GUIEditorWindow(self.main_widget)
         self.toolbox_window = ToolboxWidget(self.main_widget)
-        self.log_window = LogViewBrick.LogViewBrick(None)
+        self.log_window = log_view_brick.LogViewBrick(None)
         self.log_window.setWindowTitle("Log window")
-        sw = QtImport.QApplication.desktop().screen().width()
-        sh = QtImport.QApplication.desktop().screen().height()
-        self.log_window.resize(QtImport.QSize(sw * 0.8, sh * 0.2))
+        sw = qt_import.QApplication.desktop().screen().width()
+        sh = qt_import.QApplication.desktop().screen().height()
+        self.log_window.resize(qt_import.QSize(sw * 0.8, sh * 0.2))
         self.property_editor_window = PropertyEditorWindow(None)
         self.gui_preview_window = GUIPreviewWindow(None)
         self.configuration = self.gui_editor_window.configuration
@@ -1260,21 +1269,21 @@ class GUIBuilder(QtImport.QMainWindow):
         file_new_action = self.create_action(
             "&New...",
             self.new_clicked,
-            QtImport.QKeySequence.New,
+            qt_import.QKeySequence.New,
             icon="NewDocument",
             tip="Create new GUI",
         )
         file_open_action = self.create_action(
             "&Open...",
             self.open_clicked,
-            QtImport.QKeySequence.Open,
+            qt_import.QKeySequence.Open,
             icon="OpenDoc2",
             tip="Open an existing GUI file",
         )
         file_save_action = self.create_action(
             "&Save",
             self.save_clicked,
-            QtImport.QKeySequence.Save,
+            qt_import.QKeySequence.Save,
             icon="Save",
             tip="Save the gui file",
         )
@@ -1381,9 +1390,9 @@ class GUIBuilder(QtImport.QMainWindow):
     ):
         """Creates menu action"""
 
-        action = QtImport.QAction(text, self)
+        action = qt_import.QAction(text, self)
         if icon is not None:
-            action.setIcon(Icons.load_icon(icon))
+            action.setIcon(icons.load_icon(icon))
         if shortcut is not None:
             action.setShortcut(shortcut)
         if tip is not None:
@@ -1391,7 +1400,7 @@ class GUIBuilder(QtImport.QMainWindow):
             action.setStatusTip(tip)
         if slot is not None:
             getattr(action, signal).connect(slot)
-            # self.connect(action, QtImport.QtCore.SIGNAL(signal), slot)
+            # self.connect(action, qt_import.QtCore.SIGNAL(signal), slot)
         if checkable:
             action.setCheckable(True)
 
@@ -1423,7 +1432,7 @@ class GUIBuilder(QtImport.QMainWindow):
         """Open gui file"""
 
         filename = str(
-            QtImport.QFileDialog.getOpenFileName(
+            qt_import.QFileDialog.getOpenFileName(
                 self,
                 "Open file",
                 os.environ["HOME"],
@@ -1437,8 +1446,8 @@ class GUIBuilder(QtImport.QMainWindow):
                 gui_file = open(filename)
             except BaseException:
                 logging.getLogger().exception("Cannot open file %s", filename)
-                QtImport.QMessageBox.warning(
-                    self, "Error", "Could not open file %s !" % filename, QtImport.QMessageBox.Ok
+                qt_import.QMessageBox.warning(
+                    self, "Error", "Could not open file %s !" % filename, qt_import.QMessageBox.Ok
                 )
             else:
                 try:
@@ -1449,13 +1458,13 @@ class GUIBuilder(QtImport.QMainWindow):
                         logging.getLogger().exception(
                             "Cannot read configuration from file %s", filename
                         )
-                        QtImport.QMessageBox.warning(
+                        qt_import.QMessageBox.warning(
                             self,
                             "Error",
                             "\
                            Could not read configuration\nfrom file %s"
                             % filename,
-                            QtImport.QMessageBox.Ok,
+                            qt_import.QMessageBox.Ok,
                         )
                     else:
                         self.filename = filename
@@ -1468,7 +1477,7 @@ class GUIBuilder(QtImport.QMainWindow):
     def save_clicked(self):
         """Saves gui file"""
 
-        QtImport.QApplication.setOverrideCursor(QtImport.QCursor(QtImport.Qt.WaitCursor))
+        qt_import.QApplication.setOverrideCursor(qt_import.QCursor(qt_import.Qt.WaitCursor))
 
         if self.filename is not None:
             if os.path.exists(self.filename):
@@ -1477,26 +1486,26 @@ class GUIBuilder(QtImport.QMainWindow):
                 should_create_startup_script = True
             if self.configuration.save(self.filename):
                 self.setWindowTitle("GUI Builder - %s" % self.filename)
-                QtImport.QApplication.restoreOverrideCursor()
-                QtImport.QMessageBox.information(
+                qt_import.QApplication.restoreOverrideCursor()
+                qt_import.QMessageBox.information(
                     self,
                     "Success",
                     "Configuration have been saved "
                     + "successfully to\n%s" % self.filename,
-                    QtImport.QMessageBox.Ok,
+                    qt_import.QMessageBox.Ok,
                 )
 
                 if should_create_startup_script:
                     if (
-                        QtImport.QMessageBox.question(
+                        qt_import.QMessageBox.question(
                             self,
                             "Launch script",
                             "Do you want to create a startup script "
                             + "for the new GUI ?",
-                            QtImport.QMessageBox.Yes,
-                            QtImport.QMessageBox.No,
+                            qt_import.QMessageBox.Yes,
+                            qt_import.QMessageBox.No,
                         )
-                        == QtImport.QMessageBox.Yes
+                        == qt_import.QMessageBox.Yes
                     ):
                         try:
                             hwr_server = (
@@ -1512,16 +1521,16 @@ class GUIBuilder(QtImport.QMainWindow):
                             ).pid
                 return True
             else:
-                QtImport.QApplication.restoreOverrideCursor()
-                QtImport.QMessageBox.warning(
+                qt_import.QApplication.restoreOverrideCursor()
+                qt_import.QMessageBox.warning(
                     self,
                     "Error",
                     "Could not save configuration to file %s !" % self.filename,
-                    QtImport.QMessageBox.Ok,
+                    qt_import.QMessageBox.Ok,
                 )
                 return False
         else:
-            QtImport.QApplication.restoreOverrideCursor()
+            qt_import.QApplication.restoreOverrideCursor()
             self.save_as_clicked()
 
     def save_as_clicked(self):
@@ -1529,12 +1538,12 @@ class GUIBuilder(QtImport.QMainWindow):
 
         filename = self.filename
         name_filters = ["JSON (*.json)", "YAML (*.yml)", "PICKLE (*.gui)"]
-        dialog = QtImport.QFileDialog()
-        dialog.setFilter(dialog.filter() | QtImport.QDir.Hidden)
-        dialog.setAcceptMode(QtImport.QFileDialog.AcceptSave)
+        dialog = qt_import.QFileDialog()
+        dialog.setFilter(dialog.filter() | qt_import.QDir.Hidden)
+        dialog.setAcceptMode(qt_import.QFileDialog.AcceptSave)
         dialog.setNameFilters(name_filters)
 
-        if dialog.exec_() == QtImport.QDialog.Accepted:
+        if dialog.exec_() == qt_import.QDialog.Accepted:
             self.filename = str(dialog.selectedFiles()[0])
             if not (
                 self.filename.endswith(".json")
@@ -1554,14 +1563,14 @@ class GUIBuilder(QtImport.QMainWindow):
             or self.gui_editor_window.connection_editor_window.has_changed
         ):
             if (
-                QtImport.QMessageBox.warning(
+                qt_import.QMessageBox.warning(
                     self,
                     "Please confirm",
                     "Are you sure you want to quit ?\n" + "Your changes will be lost.",
-                    QtImport.QMessageBox.Yes,
-                    QtImport.QMessageBox.No,
+                    qt_import.QMessageBox.Yes,
+                    qt_import.QMessageBox.No,
                 )
-                == QtImport.QMessageBox.No
+                == qt_import.QMessageBox.No
             ):
                 return
         exit(0)
@@ -1605,15 +1614,15 @@ class GUIBuilder(QtImport.QMainWindow):
 
         if self.gui_editor_window.configuration.has_changed or self.filename is None:
             if (
-                QtImport.QMessageBox.warning(
+                qt_import.QMessageBox.warning(
                     self,
                     "GUI file not saved yet",
                     "Before starting the GUI, the file needs to "
                     + "be saved.\nContinue ?",
-                    QtImport.QMessageBox.Yes,
-                    QtImport.QMessageBox.No,
+                    qt_import.QMessageBox.Yes,
+                    qt_import.QMessageBox.No,
                 )
-                == QtImport.QMessageBox.No
+                == qt_import.QMessageBox.No
             ):
                 return
 
@@ -1642,7 +1651,7 @@ class GUIBuilder(QtImport.QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QtImport.QApplication([])
+    app = qt_import.QApplication([])
     mainwin = GUIBuilder()
     app.setMainWidget(mainwin)
     mainwin.show()

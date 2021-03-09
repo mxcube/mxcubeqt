@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 from mxcubeqt.widgets.reference_image_widget import ReferenceImageWidget
 from mxcubeqt.widgets.char_type_widget import CharTypeWidget
@@ -35,10 +35,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class CharParametersWidget(QtImport.QWidget):
+class CharParametersWidget(qt_import.QWidget):
     def __init__(self, parent=None, name="char_parameter_widget"):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -55,52 +55,52 @@ class CharParametersWidget(QtImport.QWidget):
         self.add_dc_cb = None
 
         # Graphic elements ----------------------------------------------------
-        main_widget = QtImport.QWidget(self)
-        rone_widget = QtImport.QWidget(main_widget)
+        main_widget = qt_import.QWidget(self)
+        rone_widget = qt_import.QWidget(main_widget)
         self.reference_img_widget = ReferenceImageWidget(rone_widget)
         self.acq_widget = self.reference_img_widget.acq_widget
         self.path_widget = self.reference_img_widget.path_widget
-        self.position_widget = QtImport.load_ui_file("snapshot_widget_layout.ui")
+        self.position_widget = qt_import.load_ui_file("snapshot_widget_layout.ui")
         self.position_widget.setMinimumSize(450, 340)
 
-        rtwo_widget = QtImport.QWidget(main_widget)
+        rtwo_widget = qt_import.QWidget(main_widget)
         self.char_type_widget = CharTypeWidget(rtwo_widget)
         self.routine_dc_widget = self.char_type_widget.routine_dc_page
         self.sad_widget = self.char_type_widget.sad_page
         self.rad_dmg_char_widget = self.char_type_widget.rad_damage_page
         self.opt_parameters_widget = OptimisationParametersWidgetLayout(self)
 
-        rtree_widget = QtImport.QWidget(main_widget)
-        self.rad_dmg_widget = QtImport.load_ui_file(
+        rtree_widget = qt_import.QWidget(main_widget)
+        self.rad_dmg_widget = qt_import.load_ui_file(
             "radiation_damage_model_widget_layout.ui"
         )
-        self.vertical_dimension_widget = QtImport.load_ui_file(
+        self.vertical_dimension_widget = qt_import.load_ui_file(
             "vertical_crystal_dimension_widget_layout.ui"
         )
 
         # Layout --------------------------------------------------------------
-        rone_widget_layout = QtImport.QHBoxLayout(rone_widget)
+        rone_widget_layout = qt_import.QHBoxLayout(rone_widget)
         rone_widget_layout.addWidget(self.reference_img_widget)
         rone_widget_layout.addWidget(self.position_widget)
         # rone_widget_layout.addStretch(0)
         rone_widget_layout.setSpacing(2)
         rone_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        rtwo_widget_layout = QtImport.QHBoxLayout(rtwo_widget)
+        rtwo_widget_layout = qt_import.QHBoxLayout(rtwo_widget)
         rtwo_widget_layout.addWidget(self.char_type_widget)
         rtwo_widget_layout.addWidget(self.opt_parameters_widget)
         rtwo_widget_layout.addStretch(0)
         rtwo_widget_layout.setSpacing(2)
         rtwo_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        rtree_widget_layout = QtImport.QHBoxLayout(rtree_widget)
+        rtree_widget_layout = qt_import.QHBoxLayout(rtree_widget)
         rtree_widget_layout.addWidget(self.rad_dmg_widget)
         rtree_widget_layout.addWidget(self.vertical_dimension_widget)
         rtree_widget_layout.addStretch(10)
         rtree_widget_layout.setSpacing(2)
         rtree_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_widget_vlayout = QtImport.QVBoxLayout(main_widget)
+        _main_widget_vlayout = qt_import.QVBoxLayout(main_widget)
         _main_widget_vlayout.addWidget(rone_widget)
         _main_widget_vlayout.addWidget(rtwo_widget)
         _main_widget_vlayout.addWidget(rtree_widget)
@@ -108,7 +108,7 @@ class CharParametersWidget(QtImport.QWidget):
         _main_widget_vlayout.setSpacing(2)
         _main_widget_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_hlayout = QtImport.QHBoxLayout(self)
+        _main_hlayout = qt_import.QHBoxLayout(self)
         _main_hlayout.addWidget(main_widget)
         _main_hlayout.setSpacing(0)
         _main_hlayout.addStretch(0)
@@ -130,14 +130,14 @@ class CharParametersWidget(QtImport.QWidget):
             "min_dose",
             self.routine_dc_widget.dose_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "min_time",
             self.routine_dc_widget.time_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
@@ -163,7 +163,7 @@ class CharParametersWidget(QtImport.QWidget):
             "sad_res",
             self.sad_widget.sad_resolution_ledit,
             float,
-            QtImport.QDoubleValidator(0.5, 20, 3, self),
+            qt_import.QDoubleValidator(0.5, 20, 3, self),
         )
 
         self._char_params_mib.bind_value_update(
@@ -178,14 +178,14 @@ class CharParametersWidget(QtImport.QWidget):
             "burn_osc_start",
             self.rad_dmg_char_widget.burn_osc_start_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "burn_osc_interval",
             self.rad_dmg_char_widget.burn_osc_interval_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
@@ -206,28 +206,28 @@ class CharParametersWidget(QtImport.QWidget):
             "aimed_resolution",
             self.opt_parameters_widget.opt_param_widget.maximum_res_ledit,
             float,
-            QtImport.QDoubleValidator(0.01, 1000, 2, self),
+            qt_import.QDoubleValidator(0.01, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "aimed_multiplicity",
             self.opt_parameters_widget.opt_param_widget.aimed_mult_ledit,
             float,
-            QtImport.QDoubleValidator(0.01, 1000, 2, self),
+            qt_import.QDoubleValidator(0.01, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "aimed_i_sigma",
             self.opt_parameters_widget.opt_param_widget.i_over_sigma_ledit,
             float,
-            QtImport.QDoubleValidator(0.01, 1000, 2, self),
+            qt_import.QDoubleValidator(0.01, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "aimed_completness",
             self.opt_parameters_widget.opt_param_widget.aimed_comp_ledit,
             float,
-            QtImport.QDoubleValidator(0.01, 1000, 2, self),
+            qt_import.QDoubleValidator(0.01, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
@@ -248,14 +248,14 @@ class CharParametersWidget(QtImport.QWidget):
             "permitted_phi_start",
             self.opt_parameters_widget.opt_param_widget.phi_start_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "permitted_phi_end",
             self.opt_parameters_widget.opt_param_widget.phi_end_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
@@ -269,49 +269,49 @@ class CharParametersWidget(QtImport.QWidget):
             "rad_suscept",
             self.rad_dmg_widget.sensetivity_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "beta",
             self.rad_dmg_widget.beta_over_gray_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "gamma",
             self.rad_dmg_widget.gamma_over_gray_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "max_crystal_vdim",
             self.vertical_dimension_widget.max_vdim_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "min_crystal_vdim",
             self.vertical_dimension_widget.min_vdim_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "min_crystal_vphi",
             self.vertical_dimension_widget.min_vphi_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         self._char_params_mib.bind_value_update(
             "max_crystal_vphi",
             self.vertical_dimension_widget.max_vphi_ledit,
             float,
-            QtImport.QDoubleValidator(0.0, 1000, 2, self),
+            qt_import.QDoubleValidator(0.0, 1000, 2, self),
         )
 
         # self._char_params_mib.bind_value_update('space_group',
@@ -460,10 +460,10 @@ class CharParametersWidget(QtImport.QWidget):
             image = image.scaled(
                 400,
                 400 * ration,
-                QtImport.Qt.KeepAspectRatio,
-                QtImport.Qt.SmoothTransformation,
+                qt_import.Qt.KeepAspectRatio,
+                qt_import.Qt.SmoothTransformation,
             )
-            self.position_widget.svideo.setPixmap(QtImport.QPixmap(image))
+            self.position_widget.svideo.setPixmap(qt_import.QPixmap(image))
 
         self.toggle_permitted_range(self._char_params.use_permitted_rotation)
         self.enable_opt_parameters_widget(self._char_params.determine_rad_params)

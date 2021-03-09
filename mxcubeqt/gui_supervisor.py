@@ -32,12 +32,12 @@ except ImportError:
     import yaml
 
 from mxcubeqt import configuration, gui_builder
-from mxcubeqt.utils import gui_display, Icons, Colors, QtImport
-from mxcubeqt.BaseComponents import BaseWidget, NullBrick
+from mxcubeqt.utils import gui_display, icons, colors, qt_import
+from mxcubeqt.base_components import BaseWidget, NullBrick
 
 from mxcubecore import HardwareRepository as HWR
 
-LOAD_GUI_EVENT = QtImport.QEvent.MaxUser
+LOAD_GUI_EVENT = qt_import.QEvent.MaxUser
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -57,13 +57,13 @@ def get_splash_screen():
     global SPLASH_SCREEN
     return SPLASH_SCREEN
 
-class SplashScreen(QtImport.QSplashScreen):
+class SplashScreen(qt_import.QSplashScreen):
     """Splash screen when mxcube is loading"""
 
     def __init__(self, pixmap):
         """Builds a splash screen with a image and a progressbar"""
 
-        QtImport.QSplashScreen.__init__(self, pixmap)
+        qt_import.QSplashScreen.__init__(self, pixmap)
 
         self._message = ""
         self.gui_name = None
@@ -73,13 +73,13 @@ class SplashScreen(QtImport.QSplashScreen):
         self.right_x = 390
         self.pxsize = 11
 
-        self.progress_bar = QtImport.QProgressBar(self)
+        self.progress_bar = qt_import.QProgressBar(self)
 
-        new_palette = QtImport.QPalette()
-        new_palette.setColor(QtImport.QPalette.Highlight, Colors.DARK_GREEN)
+        new_palette = qt_import.QPalette()
+        new_palette.setColor(qt_import.QPalette.Highlight, colors.DARK_GREEN)
         self.progress_bar.setPalette(new_palette)
 
-        _vlayout = QtImport.QVBoxLayout(self)
+        _vlayout = qt_import.QVBoxLayout(self)
         _vlayout.addWidget(self.progress_bar)
 
         self.repaint()
@@ -111,13 +111,13 @@ class SplashScreen(QtImport.QSplashScreen):
         bot_y = self.top_y + painter.fontMetrics().height()
 
         painter.font().setPixelSize(self.pxsize)
-        painter.setPen(QtImport.QPen(QtImport.Qt.black))
+        painter.setPen(qt_import.QPen(qt_import.Qt.black))
         painter.drawText(
-            QtImport.QRect(
-                QtImport.QPoint(self.top_x, self.top_y),
-                QtImport.QPoint(self.right_x, bot_y)
+            qt_import.QRect(
+                qt_import.QPoint(self.top_x, self.top_y),
+                qt_import.QPoint(self.right_x, bot_y)
             ),
-            QtImport.Qt.AlignLeft | QtImport.Qt.AlignTop,
+            qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
             "Starting MXCuBE. Please wait...",
         )
         painter.font().setPixelSize(self.pxsize * 2.5)
@@ -126,25 +126,25 @@ class SplashScreen(QtImport.QSplashScreen):
         top_y = bot_y
         bot_y += 2 + painter.fontMetrics().height()
         painter.drawText(
-            QtImport.QRect(
-                QtImport.QPoint(self.top_x, top_y),
-                QtImport.QPoint(self.right_x, bot_y)
+            qt_import.QRect(
+                qt_import.QPoint(self.top_x, top_y),
+                qt_import.QPoint(self.right_x, bot_y)
             ),
-            QtImport.Qt.AlignLeft | QtImport.Qt.AlignBottom,
+            qt_import.Qt.AlignLeft | qt_import.Qt.AlignBottom,
             self._message,
         )
         self.progress_bar.setGeometry(10, self.top_y + 50, self.right_x, 20)
 
-class GUISupervisor(QtImport.QWidget):
+class GUISupervisor(qt_import.QWidget):
     """GUI supervisor"""
 
-    brickChangedSignal = QtImport.pyqtSignal(str, str, str, tuple, bool)
-    tabChangedSignal = QtImport.pyqtSignal(str, int)
+    brickChangedSignal = qt_import.pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = qt_import.pyqtSignal(str, int)
 
     def __init__(self, design_mode=False, show_maximized=False, no_border=False):
         """Main mxcube gui widget"""
 
-        QtImport.QWidget.__init__(self)
+        qt_import.QWidget.__init__(self)
 
         self.framework = None
         self.gui_config_file = None
@@ -158,7 +158,7 @@ class GUISupervisor(QtImport.QWidget):
         self.no_border = no_border
         self.windows = []
 
-        self.splash_screen = SplashScreen(Icons.load_pixmap("splash"))
+        self.splash_screen = SplashScreen(icons.load_pixmap("splash"))
 
         set_splash_screen(self.splash_screen)
         self.splash_screen.show()
@@ -174,11 +174,11 @@ class GUISupervisor(QtImport.QWidget):
         """Loads gui"""
         self.configuration = configuration.Configuration()
         self.gui_config_file = gui_config_file
-        load_from_dict = gui_config_file.endswith(".json") or gui_config_file.endswith(
-            ".yml"
-        )
 
         if self.gui_config_file:
+            load_from_dict = gui_config_file.endswith(".json") or gui_config_file.endswith(
+                ".yml"
+            )
             if hasattr(self, "splash_screen"):
                 self.splash_screen.set_gui_name(
                     os.path.splitext(os.path.basename(gui_config_file))[0]
@@ -197,11 +197,11 @@ class GUISupervisor(QtImport.QWidget):
                     logging.getLogger().exception(
                         "Cannot open file %s", gui_config_file
                     )
-                    QtImport.QMessageBox.warning(
+                    qt_import.QMessageBox.warning(
                         self,
                         "Error",
                         "Could not open file %s !" % gui_config_file,
-                        QtImport.QMessageBox.Ok,
+                        qt_import.QMessageBox.Ok,
                     )
                 else:
                     # find mnemonics to speed up loading
@@ -276,8 +276,8 @@ class GUISupervisor(QtImport.QWidget):
                         config = configuration.Configuration(raw_config)
                     except BaseException:
                         logging.getLogger("GUI").exception(failed_msg)
-                        QtImport.QMessageBox.warning(
-                            self, "Error", failed_msg, QtImport.QMessageBox.Ok
+                        qt_import.QMessageBox.warning(
+                            self, "Error", failed_msg, qt_import.QMessageBox.Ok
                         )
                     else:
                         self.configuration = config
@@ -305,7 +305,7 @@ class GUISupervisor(QtImport.QWidget):
                     if self.launch_in_design_mode:
                         self.framework = gui_builder.GUIBuilder()
 
-                        QtImport.QApplication.setActiveWindow(self.framework)
+                        qt_import.QApplication.setActiveWindow(self.framework)
 
                         self.framework.filename = gui_config_file
                         self.framework.configuration = config
@@ -331,7 +331,7 @@ class GUISupervisor(QtImport.QWidget):
 
         self.framework = gui_builder.GUIBuilder()
 
-        QtImport.QApplication.setActiveWindow(self.framework)
+        qt_import.QApplication.setActiveWindow(self.framework)
         self.framework.show()
         self.framework.new_clicked(self.gui_config_file)
 
@@ -376,12 +376,12 @@ class GUISupervisor(QtImport.QWidget):
         if len(self.windows) > 0:
             main_window = self.windows[0]
             main_window.configuration = config
-            QtImport.QApplication.setActiveWindow(main_window)
+            qt_import.QApplication.setActiveWindow(main_window)
             if self.no_border:
                 main_window.move(0, 0)
-                width = QtImport.QApplication.desktop().width()
-                height = QtImport.QApplication.desktop().height()
-                main_window.resize(QtImport.QSize(width, height))
+                width = qt_import.QApplication.desktop().width()
+                height = qt_import.QApplication.desktop().height()
+                main_window.resize(qt_import.QSize(width, height))
 
             # make connections
             widgets_dict = dict(
@@ -392,7 +392,7 @@ class GUISupervisor(QtImport.QWidget):
                         or None,
                         w,
                     )
-                    for w in QtImport.QApplication.allWidgets()
+                    for w in qt_import.QApplication.allWidgets()
                 ]
             )
 
@@ -466,8 +466,8 @@ class GUISupervisor(QtImport.QWidget):
 
         self.hardware_repository.close()
 
-        QtImport.QApplication.sendPostedEvents()
-        QtImport.QApplication.processEvents()
+        qt_import.QApplication.sendPostedEvents()
+        qt_import.QApplication.processEvents()
 
         self.save_size()
 
@@ -520,15 +520,15 @@ class GUISupervisor(QtImport.QWidget):
                     % str(self.hardware_repository.server_address).split(":")[0]
                 )
                 if (
-                    QtImport.QMessageBox.warning(
+                    qt_import.QMessageBox.warning(
                         self,
                         "Cannot connect to Hardware Repository",
                         message,
-                        QtImport.QMessageBox.Retry
-                        | QtImport.QMessageBox.Cancel
-                        | QtImport.QMessageBox.NoButton,
+                        qt_import.QMessageBox.Retry
+                        | qt_import.QMessageBox.Cancel
+                        | qt_import.QMessageBox.NoButton,
                     )
-                    == QtImport.QMessageBox.Cancel
+                    == qt_import.QMessageBox.Cancel
                 ):
                     logging.getLogger().warning(
                         "Gave up trying to " + "connect to Hardware Repository server."
@@ -550,7 +550,7 @@ class GUISupervisor(QtImport.QWidget):
             del self.splash_screen
         except BaseException:
             logging.getLogger().exception("exception while loading GUI file")
-            QtImport.QApplication.exit()
+            qt_import.QApplication.exit()
 
     def customEvent(self, event):
         """Custom event"""

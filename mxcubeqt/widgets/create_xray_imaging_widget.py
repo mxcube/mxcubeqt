@@ -19,7 +19,7 @@
 
 import copy
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
@@ -41,7 +41,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
     def __init__(self, parent=None, name=None, fl=0):
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(fl), "XrayImaging"
+            self, parent, name, qt_import.Qt.WindowFlags(fl), "XrayImaging"
         )
 
         if not name:
@@ -78,7 +78,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
         )
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._xray_imaging_parameters_widget)
         _main_vlayout.addWidget(self._data_path_widget)

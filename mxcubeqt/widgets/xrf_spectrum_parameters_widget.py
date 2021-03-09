@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.mca_spectrum_widget import McaSpectrumWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
@@ -31,9 +31,9 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class XRFSpectrumParametersWidget(QtImport.QWidget):
+class XRFSpectrumParametersWidget(qt_import.QWidget):
     def __init__(self, parent=None, name="xrf_spectrum_parameters_widget"):
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         if name is not None:
             self.setObjectName(name)
@@ -44,18 +44,18 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        _top_widget = QtImport.QWidget(self)
-        _parameters_widget = QtImport.QWidget(_top_widget)
+        _top_widget = qt_import.QWidget(self)
+        _parameters_widget = qt_import.QWidget(_top_widget)
         self.data_path_widget = DataPathWidget(_parameters_widget)
-        self.other_parameters_gbox = QtImport.QGroupBox(
+        self.other_parameters_gbox = qt_import.QGroupBox(
             "Other parameters", _parameters_widget
         )
-        self.count_time_label = QtImport.QLabel(
+        self.count_time_label = qt_import.QLabel(
             "Count time:", self.other_parameters_gbox
         )
-        self.count_time_ledit = QtImport.QLineEdit(self.other_parameters_gbox)
+        self.count_time_ledit = qt_import.QLineEdit(self.other_parameters_gbox)
         self.count_time_ledit.setFixedWidth(50)
-        self.adjust_transmission_cbox = QtImport.QCheckBox(
+        self.adjust_transmission_cbox = qt_import.QCheckBox(
             "Adjust transmission", self.other_parameters_gbox
         )
         self.adjust_transmission_cbox.hide()
@@ -63,7 +63,7 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         self.snapshot_widget = SnapshotWidget(self)
 
         # Layout -------------------------------------------------------------
-        _other_parameters_gbox_hlayout = QtImport.QHBoxLayout(
+        _other_parameters_gbox_hlayout = qt_import.QHBoxLayout(
             self.other_parameters_gbox
         )
         _other_parameters_gbox_hlayout.addWidget(self.count_time_label)
@@ -73,21 +73,21 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         _other_parameters_gbox_hlayout.setSpacing(2)
         _other_parameters_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _parameters_widget_layout = QtImport.QVBoxLayout(_parameters_widget)
+        _parameters_widget_layout = qt_import.QVBoxLayout(_parameters_widget)
         _parameters_widget_layout.addWidget(self.data_path_widget)
         _parameters_widget_layout.addWidget(self.other_parameters_gbox)
         _parameters_widget_layout.addStretch(0)
         _parameters_widget_layout.setSpacing(2)
         _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _top_widget_layout = QtImport.QHBoxLayout(_top_widget)
+        _top_widget_layout = qt_import.QHBoxLayout(_top_widget)
         _top_widget_layout.addWidget(_parameters_widget)
         _top_widget_layout.addWidget(self.snapshot_widget)
         _top_widget_layout.setSpacing(2)
         _top_widget_layout.addStretch(0)
         _top_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(_top_widget)
         _main_vlayout.addWidget(self.mca_spectrum_widget)
         _main_vlayout.setSpacing(2)
@@ -95,10 +95,10 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
 
         # SizePolicies -------------------------------------------------------
         self.mca_spectrum_widget.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         _top_widget.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Fixed
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed
         )
 
         # Qt signal/slot connections ------------------------------------------

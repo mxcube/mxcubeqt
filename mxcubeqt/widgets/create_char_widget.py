@@ -20,7 +20,7 @@
 import copy
 import logging
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
@@ -71,18 +71,18 @@ class CreateCharWidget(CreateTaskBase):
             self, data_model=self._path_template, layout="vertical"
         )
 
-        self._vertical_dimension_widget = QtImport.load_ui_file(
+        self._vertical_dimension_widget = qt_import.load_ui_file(
             "vertical_crystal_dimension_widget_layout.ui"
         )
 
-        self._char_widget = QtImport.load_ui_file(
+        self._char_widget = qt_import.load_ui_file(
             "characterise_simple_widget_vertical_layout.ui"
         )
 
         self._comments_widget = CommentsWidget(self)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
@@ -131,28 +131,28 @@ class CreateCharWidget(CreateTaskBase):
                 "max_crystal_vdim",
                 self._vertical_dimension_widget.max_vdim_ledit,
                 float,
-                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+                qt_import.QDoubleValidator(0.0, 1000, 2, self),
             )
 
             self._char_params_mib.bind_value_update(
                 "min_crystal_vdim",
                 self._vertical_dimension_widget.min_vdim_ledit,
                 float,
-                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+                qt_import.QDoubleValidator(0.0, 1000, 2, self),
             )
 
             self._char_params_mib.bind_value_update(
                 "min_crystal_vphi",
                 self._vertical_dimension_widget.min_vphi_ledit,
                 float,
-                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+                qt_import.QDoubleValidator(0.0, 1000, 2, self),
             )
 
             self._char_params_mib.bind_value_update(
                 "max_crystal_vphi",
                 self._vertical_dimension_widget.max_vphi_ledit,
                 float,
-                QtImport.QDoubleValidator(0.0, 1000, 2, self),
+                qt_import.QDoubleValidator(0.0, 1000, 2, self),
             )
 
         self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)

@@ -6,9 +6,9 @@
 * If it is necessary to create a new brick then use starting template and add necessary graphical elements:
 
 ```
-   import QtImport
+   import qt_import
 
-   from gui.BaseComponents import BaseWidget
+   from gui.base_components import BaseWidget
 
    __category__ = "General"
 
@@ -37,12 +37,12 @@
            self.defineSlot("test_brick_slot", ())
 
            # Graphic elements ----------------------------------------------------
-           self.test_ledit = QtImport.QLineEdit("Test linedit", self)
-           self.test_button = QtImport.QPushButton("Test button", self)
-           self.test_combo = QtImport.QComboBox(self)
+           self.test_ledit = qt_import.QLineEdit("Test linedit", self)
+           self.test_button = qt_import.QPushButton("Test button", self)
+           self.test_combo = qt_import.QComboBox(self)
 
            # Layout --------------------------------------------------------------
-           _main_vlayout = QtImport.QVBoxLayout(self)
+           _main_vlayout = qt_import.QVBoxLayout(self)
            _main_vlayout.addWidget(self.test_ledit)
            _main_vlayout.addWidget(self.test_button)
            _main_vlayout.addWidget(self.test_combo)
@@ -149,13 +149,13 @@ It is recommended to use widgets to compose a brick. A widget in the MXCuBE cont
 In this example `dc_tree_widget.py` is used in  `TreeBrick`.
 
 ```
-   class DataCollectTree(QtImport.QWidget):
+   class DataCollectTree(qt_import.QWidget):
          def __init__(self, parent = None, name = "data_collect",
                       selection_changed = None):
              """
              Descript. :
              """
-             QtImport.QWidget.__init__(self, parent)
+             qt_import.QWidget.__init__(self, parent)
              self.setObjectName(name)
 ```
 
@@ -167,7 +167,7 @@ In this example `dc_tree_widget.py` is used in  `TreeBrick`.
    self.dc_tree_widget = DataCollectTree(self)
   
    # ...
-   main_layout = QtImport.QVBoxLayout(self)
+   main_layout = qt_import.QVBoxLayout(self)
    # ...
    main_layout.addWidget(self.dc_tree_widget)
    main_layout.setSpacing(0)
@@ -182,11 +182,11 @@ Qt Designer is a powefull tool that allows to create layout for widgets and bric
 
 ![alt text](images/qt_designer.png "Qt Designer")
 
-2. Intiate ui file with `QtImport.load_ui_file()` function and then use the generated object to get access to the components created on it:
+2. Intiate ui file with `qt_import.load_ui_file()` function and then use the generated object to get access to the components created on it:
 
 ```   
    # ...
-   self.sample_changer_widget = QtImport.load_ui_file(
+   self.sample_changer_widget = qt_import.load_ui_file(
         "sample_changer_widget_layout.ui")
 
    # ...
@@ -217,13 +217,13 @@ In the 'emitter' brick:
 * Emit the signal when needed
 
 ```
-import QtImport
-from gui.BaseComponents import BaseWidget
+import qt_import
+from gui.base_components import BaseWidget
 
 __category__ = "General"
 
 # signal definition
-signal_with_list = QtImport.pyqtSignal(list)
+signal_with_list = qt_import.pyqtSignal(list)
 
 class EmitterBrick(BaseWidget):
 
@@ -243,8 +243,8 @@ In the 'receiver' brick:
 * Then, create the code of the slot as it was a simple member function
 
 ```
-import QtImport
-from gui.BaseComponents import BaseWidget
+import qt_import
+from gui.base_components import BaseWidget
 
 __category__ = "General"
 

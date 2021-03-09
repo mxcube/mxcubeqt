@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 from mxcubecore.HardwareObjects import queue_model_objects
 
@@ -31,10 +31,10 @@ __license__ = "LGPLv3+"
 MAD_ENERGY_COMBO_NAMES = {"ip": 0, "pk": 1, "rm1": 2, "rm2": 3}
 
 
-class AcquisitionWidget(QtImport.QWidget):
+class AcquisitionWidget(qt_import.QWidget):
 
-    acqParametersChangedSignal = QtImport.pyqtSignal(list)
-    madEnergySelectedSignal = QtImport.pyqtSignal(str, float, bool)
+    acqParametersChangedSignal = qt_import.pyqtSignal(list)
+    madEnergySelectedSignal = qt_import.pyqtSignal(str, float, bool)
 
     def __init__(
         self,
@@ -46,7 +46,7 @@ class AcquisitionWidget(QtImport.QWidget):
         layout="horizontal",
     ):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
@@ -82,17 +82,17 @@ class AcquisitionWidget(QtImport.QWidget):
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         if layout == "horizontal":
-            self.acq_widget_layout = QtImport.load_ui_file(
+            self.acq_widget_layout = qt_import.load_ui_file(
                 "acquisition_widget_horizontal_layout.ui"
             )
             self.use_osc_start(False)
         else:
-            self.acq_widget_layout = QtImport.load_ui_file(
+            self.acq_widget_layout = qt_import.load_ui_file(
                 "acquisition_widget_vertical_layout.ui"
             )
 
         # Layout --------------------------------------------------------------
-        __main_vlayout = QtImport.QVBoxLayout(self)
+        __main_vlayout = qt_import.QVBoxLayout(self)
         __main_vlayout.addWidget(self.acq_widget_layout)
         __main_vlayout.setSpacing(0)
         __main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -141,11 +141,11 @@ class AcquisitionWidget(QtImport.QWidget):
             self.kappa_phi_ledit_changed
         )
 
-        if self.acq_widget_layout.findChild(QtImport.QLineEdit, "overlap_ledit"):
+        if self.acq_widget_layout.findChild(qt_import.QLineEdit, "overlap_ledit"):
             self.acq_widget_layout.overlap_ledit.textChanged.connect(
                 self.overlap_changed
             )
-        if self.acq_widget_layout.findChild(QtImport.QCheckBox, "max_osc_range_cbx"):
+        if self.acq_widget_layout.findChild(qt_import.QCheckBox, "max_osc_range_cbx"):
             self.acq_widget_layout.max_osc_range_cbx.toggled.connect(
                 self.max_osc_range_toggled
             )
@@ -158,37 +158,37 @@ class AcquisitionWidget(QtImport.QWidget):
             ["ip: -", "pk: -", "rm1: -", "rm2: -"]
         )
 
-        self.osc_start_validator = QtImport.QDoubleValidator(
+        self.osc_start_validator = qt_import.QDoubleValidator(
             -10000, 10000, 4, self.acq_widget_layout.osc_start_ledit
         )
-        self.osc_range_per_frame_validator = QtImport.QDoubleValidator(
+        self.osc_range_per_frame_validator = qt_import.QDoubleValidator(
             0, 10000, 4, self.acq_widget_layout.osc_range_ledit
         )
-        self.osc_total_range_validator = QtImport.QDoubleValidator(
+        self.osc_total_range_validator = qt_import.QDoubleValidator(
             0, 10000, 4, self.acq_widget_layout.osc_total_range_ledit
         )
-        self.kappa_validator = QtImport.QDoubleValidator(
+        self.kappa_validator = qt_import.QDoubleValidator(
             -0.01, 360, 4, self.acq_widget_layout.kappa_ledit
         )
-        self.kappa_phi_validator = QtImport.QDoubleValidator(
+        self.kappa_phi_validator = qt_import.QDoubleValidator(
             -360, 360, 4, self.acq_widget_layout.kappa_phi_ledit
         )
-        self.energy_validator = QtImport.QDoubleValidator(
+        self.energy_validator = qt_import.QDoubleValidator(
             4, 25, 5, self.acq_widget_layout.energy_ledit
         )
-        self.resolution_validator = QtImport.QDoubleValidator(
+        self.resolution_validator = qt_import.QDoubleValidator(
             0, 15, 3, self.acq_widget_layout.resolution_ledit
         )
-        self.transmission_validator = QtImport.QDoubleValidator(
+        self.transmission_validator = qt_import.QDoubleValidator(
             0, 100, 3, self.acq_widget_layout.transmission_ledit
         )
-        self.exp_time_validator = QtImport.QDoubleValidator(
+        self.exp_time_validator = qt_import.QDoubleValidator(
             0.0001, 10000, 7, self.acq_widget_layout.exp_time_ledit
         )
-        self.first_img_validator = QtImport.QIntValidator(
+        self.first_img_validator = qt_import.QIntValidator(
             0, 99999, self.acq_widget_layout.first_image_ledit
         )
-        self.num_img_validator = QtImport.QIntValidator(
+        self.num_img_validator = qt_import.QIntValidator(
             1, 9999999, self.acq_widget_layout.num_images_ledit
         )
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
@@ -445,16 +445,16 @@ class AcquisitionWidget(QtImport.QWidget):
         )
 
         num_passes = self.acq_widget_layout.findChild(
-            QtImport.QLineEdit, "num_passes_ledit"
+            qt_import.QLineEdit, "num_passes_ledit"
         )
 
         if num_passes:
             self._acquisition_mib.bind_value_update(
-                "num_passes", num_passes, int, QtImport.QIntValidator(1, 1000, self)
+                "num_passes", num_passes, int, qt_import.QIntValidator(1, 1000, self)
             )
 
         overlap_ledit = self.acq_widget_layout.findChild(
-            QtImport.QLineEdit, "overlap_ledit"
+            qt_import.QLineEdit, "overlap_ledit"
         )
 
         if overlap_ledit:
@@ -462,7 +462,7 @@ class AcquisitionWidget(QtImport.QWidget):
                 "overlap",
                 overlap_ledit,
                 float,
-                QtImport.QDoubleValidator(-1000, 1000, 2, self),
+                qt_import.QDoubleValidator(-1000, 1000, 2, self),
             )
 
         self._acquisition_mib.bind_value_update(
@@ -503,7 +503,7 @@ class AcquisitionWidget(QtImport.QWidget):
 
         if HWR.beamline.disable_num_passes:
             num_passes = self.acq_widget_layout.findChild(
-                QtImport.QLineEdit, "num_passes_ledit"
+                qt_import.QLineEdit, "num_passes_ledit"
             )
             if num_passes:
                 num_passes.setDisabled(True)

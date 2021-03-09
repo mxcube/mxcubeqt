@@ -19,7 +19,7 @@
 
 import os
 
-from mxcubeqt.utils import Icons, QtImport
+from mxcubeqt.utils import icons, qt_import
 from mxcubeqt.widgets.matplot_widget import PlotWidget
 
 from mxcubecore import HardwareRepository as HWR
@@ -28,10 +28,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class XrayImagingResultsWidget(QtImport.QWidget):
+class XrayImagingResultsWidget(qt_import.QWidget):
     def __init__(self, parent=None, name=None, fl=0, xray_imaging_params=None):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if name is not None:
             self.setObjectName(name)
@@ -49,59 +49,59 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        results_gbox = QtImport.QGroupBox("Results", self)
+        results_gbox = qt_import.QGroupBox("Results", self)
         
-        self.graphics_view_widget = QtImport.QWidget(results_gbox)
-        self.results_widget = QtImport.load_ui_file(
+        self.graphics_view_widget = qt_import.QWidget(results_gbox)
+        self.results_widget = qt_import.load_ui_file(
             "xray_imaging_results_widget_layout.ui"
         )
-        tools_widget = QtImport.QGroupBox(self) 
-        button_widget = QtImport.QWidget(self)
-        self.start_centering_button = QtImport.QPushButton(
-            Icons.load_icon("VCRPlay2"), "3 Click", tools_widget
+        tools_widget = qt_import.QGroupBox(self) 
+        button_widget = qt_import.QWidget(self)
+        self.start_centering_button = qt_import.QPushButton(
+            icons.load_icon("VCRPlay2"), "3 Click", tools_widget
         )
-        self.start_n_centering_button = QtImport.QPushButton(
-            Icons.load_icon("VCRPlay"), "n Click", tools_widget
+        self.start_n_centering_button = qt_import.QPushButton(
+            icons.load_icon("VCRPlay"), "n Click", tools_widget
         )
-        self.accept_centering_button = QtImport.QPushButton(
-            Icons.load_icon("ThumbUp"), "Save", tools_widget
+        self.accept_centering_button = qt_import.QPushButton(
+            icons.load_icon("ThumbUp"), "Save", tools_widget
         )
         self.histogram_plot = PlotWidget(self)
 
-        self.popup_menu = QtImport.QMenu(self)
+        self.popup_menu = qt_import.QMenu(self)
         self.popup_menu.menuAction().setIconVisibleInMenu(True)
 
         self.popup_menu.addAction(
-            Icons.load_icon("VCRPlay2"),
+            icons.load_icon("VCRPlay2"),
             "Start 3-click centering",
             start_centering_clicked,
         )
         self.popup_menu.addAction(
-            Icons.load_icon("VCRPlay"),
+            icons.load_icon("VCRPlay"),
             "Start n-click centering",
             start_n_centering_clicked,
         )
         self.popup_menu.addAction(
-            Icons.load_icon("ThumbUp"),
+            icons.load_icon("ThumbUp"),
             "Create centering point",
             self.accept_centering_clicked,
         )
 
         self.popup_menu.addSeparator()
         self.measure_distance_action = self.popup_menu.addAction(
-            Icons.load_icon("measure_distance"),
+            icons.load_icon("measure_distance"),
             "Distance and histogram",
             measure_distance_clicked,
         )
 
         # Layout --------------------------------------------------------------
-        self._graphics_view_widget_vlayout = QtImport.QVBoxLayout(
+        self._graphics_view_widget_vlayout = qt_import.QVBoxLayout(
             self.graphics_view_widget
         )
         self._graphics_view_widget_vlayout.setSpacing(0)
         self._graphics_view_widget_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        __button_widget_hlayout = QtImport.QHBoxLayout(button_widget)
+        __button_widget_hlayout = qt_import.QHBoxLayout(button_widget)
         __button_widget_hlayout.addWidget(self.start_centering_button)
         __button_widget_hlayout.addWidget(self.start_n_centering_button)
         __button_widget_hlayout.addWidget(self.accept_centering_button)
@@ -109,7 +109,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         __button_widget_hlayout.setSpacing(2)
         __button_widget_hlayout.setContentsMargins(2, 2, 2, 2)
 
-        __tools_widget_vlayout = QtImport.QVBoxLayout(tools_widget)
+        __tools_widget_vlayout = qt_import.QVBoxLayout(tools_widget)
         __tools_widget_vlayout.addWidget(button_widget)
         __tools_widget_vlayout.addWidget(self.results_widget)
         __tools_widget_vlayout.addWidget(self.histogram_plot)
@@ -117,7 +117,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         __tools_widget_vlayout.setSpacing(2)
         __tools_widget_vlayout.setContentsMargins(2, 2, 2, 2)
 
-        __main_hlayout = QtImport.QHBoxLayout(self)
+        __main_hlayout = qt_import.QHBoxLayout(self)
         __main_hlayout.addWidget(self.graphics_view_widget)
         __main_hlayout.addWidget(tools_widget)
         __main_hlayout.setSpacing(0)
@@ -176,14 +176,14 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.accept_centering_button.clicked.connect(accept_centering_clicked)
 
         # Other ---------------------------------------------------------------
-        self.results_widget.first_image_button.setIcon(Icons.load_icon("VCRRewind"))
-        self.results_widget.prev_image_button.setIcon(Icons.load_icon("VCRPlay4"))
-        self.results_widget.next_image_button.setIcon(Icons.load_icon("VCRPlay2"))
+        self.results_widget.first_image_button.setIcon(icons.load_icon("VCRRewind"))
+        self.results_widget.prev_image_button.setIcon(icons.load_icon("VCRPlay4"))
+        self.results_widget.next_image_button.setIcon(icons.load_icon("VCRPlay2"))
         self.results_widget.last_image_button.setIcon(
-            Icons.load_icon("VCRFastForward2")
+            icons.load_icon("VCRFastForward2")
         )
-        self.results_widget.play_button.setIcon(Icons.load_icon("VCRPlay"))
-        self.results_widget.stop_button.setIcon(Icons.load_icon("Stop2"))
+        self.results_widget.play_button.setIcon(icons.load_icon("VCRPlay"))
+        self.results_widget.stop_button.setIcon(icons.load_icon("Stop2"))
 
         self.start_centering_button.setFixedSize(70, 50)
         self.start_n_centering_button.setFixedSize(70, 50)
@@ -217,7 +217,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         )
 
     def contextMenuEvent(self, event):
-        self.popup_menu.popup(QtImport.QCursor.pos())
+        self.popup_menu.popup(qt_import.QCursor.pos())
 
     def populate_widget(self, item):
         data_model = item.get_model()
@@ -274,7 +274,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.refresh_gui()
 
     def data_browse_button_clicked(self):
-        file_dialog = QtImport.QFileDialog(self)
+        file_dialog = qt_import.QFileDialog(self)
        
         try:
             base_image_dir = os.path.dirname(str(self.results_widget.data_path_ledit.text()))
@@ -296,7 +296,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
             self.results_widget.config_path_ledit.setText(config_path)
 
     def ff_browse_button_clicked(self):
-        file_dialog = QtImport.QFileDialog(self)
+        file_dialog = qt_import.QFileDialog(self)
         base_image_dir = os.environ["HOME"]
 
         selected_filename = str(
@@ -305,7 +305,7 @@ class XrayImagingResultsWidget(QtImport.QWidget):
         self.results_widget.ff_path_ledit.setText(selected_filename)
 
     def config_browse_button_clicked(self):
-        file_dialog = QtImport.QFileDialog(self)
+        file_dialog = qt_import.QFileDialog(self)
         base_image_dir = os.environ["HOME"]
 
         selected_filename = str(

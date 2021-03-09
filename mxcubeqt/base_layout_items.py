@@ -19,7 +19,7 @@
 
 """Module contains classes defining graphical objects in MXCuBE"""
 
-from mxcubeqt.utils import property_bag, QtImport
+from mxcubeqt.utils import property_bag, qt_import
 
 DEFAULT_MARGIN = 2
 DEFAULT_SPACING = 2
@@ -275,10 +275,10 @@ class SplitterCfg(ContainerCfg):
 
         self.properties.add_property("sizes", "string", "[]", hidden=True)
         for key in [
-            QtImport.Qt.Key_F9,
-            QtImport.Qt.Key_F10,
-            QtImport.Qt.Key_F11,
-            QtImport.Qt.Key_F12,
+            qt_import.Qt.Key_F9,
+            qt_import.Qt.Key_F10,
+            qt_import.Qt.Key_F11,
+            qt_import.Qt.Key_F12,
         ]:
             self.properties.add_property("sizes_%d" % key, "string", "[]", hidden=True)
 

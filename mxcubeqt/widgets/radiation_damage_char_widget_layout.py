@@ -18,18 +18,18 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class RadiationDamageWidgetLayout(QtImport.QWidget):
+class RadiationDamageWidgetLayout(qt_import.QWidget):
 
     def __init__(self, parent=None, name=None, flags=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(flags))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("RadiationDamageWidgetLayout")
@@ -39,21 +39,21 @@ class RadiationDamageWidgetLayout(QtImport.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.rad_damage_cbx = QtImport.QCheckBox(self)
-        _label_widget = QtImport.QWidget(self)
-        self.burn_osc_start_label = QtImport.QLabel(_label_widget)
-        self.burn_osc_start_ledit = QtImport.QLineEdit(_label_widget)
+        self.rad_damage_cbx = qt_import.QCheckBox(self)
+        _label_widget = qt_import.QWidget(self)
+        self.burn_osc_start_label = qt_import.QLabel(_label_widget)
+        self.burn_osc_start_ledit = qt_import.QLineEdit(_label_widget)
         self.burn_osc_start_ledit.setMinimumSize(50, 0)
         self.burn_osc_start_ledit.setMaximumSize(50, 32767)
 
-        _value_widget = QtImport.QWidget(self)
-        self.burn_osc_interval_label = QtImport.QLabel(_value_widget)
-        self.burn_osc_interval_ledit = QtImport.QLineEdit(_value_widget)
+        _value_widget = qt_import.QWidget(self)
+        self.burn_osc_interval_label = qt_import.QLabel(_value_widget)
+        self.burn_osc_interval_ledit = qt_import.QLineEdit(_value_widget)
         self.burn_osc_interval_ledit.setMinimumSize(50, 0)
         self.burn_osc_interval_ledit.setMaximumSize(50, 32767)
 
         # Layout --------------------------------------------------------------
-        _label_widget_hlayout = QtImport.QHBoxLayout(self)
+        _label_widget_hlayout = qt_import.QHBoxLayout(self)
         _label_widget_hlayout.addWidget(self.burn_osc_start_label)
         _label_widget_hlayout.addWidget(self.burn_osc_start_ledit)
         _label_widget_hlayout.addStretch(0)
@@ -61,7 +61,7 @@ class RadiationDamageWidgetLayout(QtImport.QWidget):
         _label_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         _label_widget.setLayout(_label_widget_hlayout)
 
-        _value_hlayout = QtImport.QHBoxLayout(self)
+        _value_hlayout = qt_import.QHBoxLayout(self)
         _value_hlayout.addWidget(self.burn_osc_interval_label)
         _value_hlayout.addWidget(self.burn_osc_interval_ledit)
         _value_hlayout.addStretch(0)
@@ -69,7 +69,7 @@ class RadiationDamageWidgetLayout(QtImport.QWidget):
         _value_hlayout.setContentsMargins(0, 0, 0, 0)
         _value_widget.setLayout(_value_hlayout)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.rad_damage_cbx)
         _main_vlayout.addWidget(_label_widget)
         _main_vlayout.addWidget(_value_widget)
@@ -96,4 +96,4 @@ class RadiationDamageWidgetLayout(QtImport.QWidget):
         )
 
     def __tr(self, s, c=None):
-        return QtImport.QApplication.translate("RadiationDamageWidgetLayout", s, c)
+        return qt_import.QApplication.translate("RadiationDamageWidgetLayout", s, c)

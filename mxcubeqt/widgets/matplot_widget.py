@@ -22,9 +22,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
-if QtImport.qt_variant == "PyQt5":
+if qt_import.qt_variant == "PyQt5":
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 else:
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -34,23 +34,23 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class TwoAxisPlotWidget(QtImport.QWidget):
+class TwoAxisPlotWidget(qt_import.QWidget):
     def __init__(self, parent, realtime_plot=False):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self._realtime_plot = realtime_plot
         self._two_axis_figure_canvas = MplCanvas(self)
         self._two_axis_figure_canvas.set_real_time(realtime_plot)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._two_axis_figure_canvas)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         self.setMaximumSize(2000, 2000)
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
         self.clearcurves = self.clear
@@ -173,7 +173,7 @@ class MplCanvas(FigureCanvas):
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(
-            self, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            self, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         FigureCanvas.updateGeometry(self)
 
@@ -335,20 +335,20 @@ class MplCanvas(FigureCanvas):
         return self.mouse_position
 
 
-class PolarScaterWidget(QtImport.QWidget):
+class PolarScaterWidget(qt_import.QWidget):
     def __init__(self, parent=None):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self._polar_scater = PolarScater(self)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._polar_scater)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
     def draw_multiwedge_scater(self, sw_list):
@@ -368,7 +368,7 @@ class PolarScater(FigureCanvas):
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(
-            self, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            self, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         FigureCanvas.updateGeometry(self)
 
@@ -412,16 +412,16 @@ class PolarScater(FigureCanvas):
         self.fig.canvas.draw_idle()
 
 
-class PlotWidget(QtImport.QWidget):
+class PlotWidget(qt_import.QWidget):
 
-    mouseMovedSignal = QtImport.pyqtSignal(float, float)
-    mouseClickedSignal = QtImport.pyqtSignal(float, float)
-    mouseDoubleClickedSignal = QtImport.pyqtSignal(float, float)
-    mouseLeftSignal = QtImport.pyqtSignal()
+    mouseMovedSignal = qt_import.pyqtSignal(float, float)
+    mouseClickedSignal = qt_import.pyqtSignal(float, float)
+    mouseDoubleClickedSignal = qt_import.pyqtSignal(float, float)
+    mouseLeftSignal = qt_import.pyqtSignal()
 
     def __init__(self, parent=None):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.im = None
         self.mpl_canvas = MplCanvas(self)
@@ -431,14 +431,14 @@ class PlotWidget(QtImport.QWidget):
         self.selection_span = None
         self.mouse_clicked = None
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.mpl_canvas)
         # _main_vlayout.addWidget(self.ntb)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
         # self.mpl_canvas.axes.grid(True)
@@ -480,15 +480,15 @@ class PlotWidget(QtImport.QWidget):
             (x_start, x_end) = self.mpl_canvas.axes.get_xlim()
             delta = abs((x_end - x_start) / 50.0)
             if abs(self.selection_xrange[0] - mouse_event.xdata) < delta:
-                QtImport.QApplication.setOverrideCursor(
-                    QtImport.QCursor(QtImport.Qt.SizeHorCursor)
+                qt_import.QApplication.setOverrideCursor(
+                    qt_import.QCursor(qt_import.Qt.SizeHorCursor)
                 )
                 if self.mouse_clicked:
                     self.selection_xrange[0] = mouse_event.xdata
                     do_update = True
             elif abs(self.selection_xrange[1] - mouse_event.xdata) < delta:
-                QtImport.QApplication.setOverrideCursor(
-                    QtImport.QCursor(QtImport.Qt.SizeHorCursor)
+                qt_import.QApplication.setOverrideCursor(
+                    qt_import.QCursor(qt_import.Qt.SizeHorCursor)
                 )
                 if self.mouse_clicked:
                     self.selection_xrange[1] = mouse_event.xdata

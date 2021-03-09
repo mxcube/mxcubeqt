@@ -21,7 +21,7 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
@@ -41,7 +41,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
 
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(fl), "GphlWorkflow"
+            self, parent, name, qt_import.Qt.WindowFlags(fl), "GphlWorkflow"
         )
 
         if not name:
@@ -56,10 +56,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def _initialize_graphics(self):
         # Graphic elements ----------------------------------------------------
-        self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
+        self._workflow_type_widget = qt_import.QGroupBox("Workflow type", self)
 
-        self._workflow_cbox = QtImport.QComboBox(self._workflow_type_widget)
-        self._gphl_acq_widget = QtImport.QGroupBox("Acquisition", self)
+        self._workflow_cbox = qt_import.QComboBox(self._workflow_type_widget)
+        self._gphl_acq_widget = qt_import.QGroupBox("Acquisition", self)
         self._gphl_acq_param_widget = GphlAcquisitionWidget(
             self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
@@ -78,12 +78,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
-        _workflow_type_vlayout = QtImport.QVBoxLayout(self._workflow_type_widget)
+        _workflow_type_vlayout = qt_import.QVBoxLayout(self._workflow_type_widget)
         _workflow_type_vlayout.addWidget(self._workflow_cbox)
-        _gphl_acq_vlayout = QtImport.QVBoxLayout(self._gphl_acq_widget)
+        _gphl_acq_vlayout = qt_import.QVBoxLayout(self._gphl_acq_widget)
         _gphl_acq_vlayout.addWidget(self._gphl_acq_param_widget)
         _gphl_acq_vlayout.addWidget(self._gphl_diffractcal_widget)
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._workflow_type_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._gphl_acq_widget)
@@ -208,7 +208,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         workflow_hwobj = HWR.beamline.gphl_workflow
         if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:
             # We will be setting up the connection now - time to connect to quit
-            QtImport.QApplication.instance().aboutToQuit.connect(
+            qt_import.QApplication.instance().aboutToQuit.connect(
                 workflow_hwobj.shutdown
             )
 

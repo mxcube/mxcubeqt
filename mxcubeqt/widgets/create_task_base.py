@@ -22,7 +22,7 @@ import abc
 import logging
 from copy import deepcopy
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubecore.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
@@ -35,7 +35,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class CreateTaskBase(QtImport.QWidget):
+class CreateTaskBase(qt_import.QWidget):
     """
     Base class for widgets that are used to create tasks.
     Contains methods for handling the PathTemplate,
@@ -50,11 +50,11 @@ class CreateTaskBase(QtImport.QWidget):
     the objects PathTemplate and AcquisitionParameters.
     """
 
-    acqParametersConflictSignal = QtImport.pyqtSignal(bool)
-    pathTempleConflictSignal = QtImport.pyqtSignal(bool)
+    acqParametersConflictSignal = qt_import.pyqtSignal(bool)
+    pathTempleConflictSignal = qt_import.pyqtSignal(bool)
 
     def __init__(self, parent, name, fl, task_node_name="Unamed task-node"):
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
         self.setObjectName(name)
 
         self._tree_brick = None
@@ -117,12 +117,12 @@ class CreateTaskBase(QtImport.QWidget):
             self._acq_widget.acq_widget_layout.energy_label.setEnabled(state)
             self._acq_widget.acq_widget_layout.energy_ledit.setEnabled(state)
             if self._acq_widget.acq_widget_layout.findChild(
-                QtImport.QCheckBox, "mad_cbox"
+                qt_import.QCheckBox, "mad_cbox"
             ):
                 self._acq_widget.acq_widget_layout.mad_cbox.setEnabled(state)
                 self._acq_widget.acq_widget_layout.energies_combo.setEnabled(state)
             if self._acq_widget.acq_widget_layout.findChild(
-                QtImport.QLabel, "first_image_label"
+                qt_import.QLabel, "first_image_label"
             ):
                 self._acq_widget.acq_widget_layout.first_image_label.setEnabled(state)
                 self._acq_widget.acq_widget_layout.first_image_ledit.setEnabled(state)
@@ -505,7 +505,7 @@ class CreateTaskBase(QtImport.QWidget):
         set_omega = True
         if self._acq_widget:
             if self._acq_widget.acq_widget_layout.findChild(
-                QtImport.QCheckBox, "max_osc_range_cbx"
+                qt_import.QCheckBox, "max_osc_range_cbx"
             ):
                 if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
                     set_omega = False
@@ -936,7 +936,7 @@ class CreateTaskBase(QtImport.QWidget):
                     num_images = 0
 
             if self._acq_widget.acq_widget_layout.findChild(
-                QtImport.QCheckBox, "max_osc_range_cbx"
+                qt_import.QCheckBox, "max_osc_range_cbx"
             ):
                 if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
                     set_max_range = True

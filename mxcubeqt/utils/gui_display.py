@@ -27,8 +27,8 @@ import webbrowser
 import collections
 from functools import partial
 
-from mxcubeqt.utils import Icons, Colors, property_editor, QtImport
-from mxcubeqt.BaseComponents import BaseWidget
+from mxcubeqt.utils import icons, colors, property_editor, qt_import
+from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.base_layout_items import BrickCfg, SpacerCfg, WindowCfg, ContainerCfg, TabCfg
 
 from mxcubecore import HardwareRepository as HWR
@@ -38,28 +38,28 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __status__ = "Production"
 
-class CustomLabel(QtImport.QLabel):
+class CustomLabel(qt_import.QLabel):
     """Label"""
 
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QLabel.__init__(self, args[0])
-        self.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed)
+        qt_import.QLabel.__init__(self, args[0])
+        self.setSizePolicy(qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed)
 
 
-class CustomMenuBar(QtImport.QMenuBar):
+class CustomMenuBar(qt_import.QMenuBar):
     """MenuBar displayed on the top of the window"""
 
-    viewToolBarSignal = QtImport.pyqtSignal(bool)
-    saveConfigSignal = QtImport.pyqtSignal()
+    viewToolBarSignal = qt_import.pyqtSignal(bool)
+    saveConfigSignal = qt_import.pyqtSignal()
 
     def __init__(self, parent):
         """Parent *must* be the window
            It contains a centralWidget in its viewport
         """
 
-        QtImport.QMenuBar.__init__(self)
+        qt_import.QMenuBar.__init__(self)
 
         # Internal values -----------------------------------------------------
         self.parent = parent
@@ -124,7 +124,7 @@ class CustomMenuBar(QtImport.QMenuBar):
 
         # Layout --------------------------------------------------------------
         self.setSizePolicy(
-            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed
+            qt_import.QSizePolicy.MinimumExpanding, qt_import.QSizePolicy.Fixed
         )
 
         # Qt signal/slot connections ------------------------------------------
@@ -132,12 +132,12 @@ class CustomMenuBar(QtImport.QMenuBar):
 
         # Other ---------------------------------------------------------------
         self.menu_items = [self.file_menu, self.view_menu, self.help_menu]
-        # self.setwindowIcon(Icons.load_icon("desktop_icon"))
-        for widget in QtImport.QApplication.allWidgets():
+        # self.setwindowIcon(icons.load_icon("desktop_icon"))
+        for widget in qt_import.QApplication.allWidgets():
             if isinstance(widget, BaseWidget):
                 self.bricks_properties_editor.add_brick(widget.objectName(), widget)
         self.bricks_properties_editor.bricks_listwidget.sortItems(
-            QtImport.Qt.AscendingOrder
+            qt_import.Qt.AscendingOrder
         )
 
     def insert_menu(self, new_menu_item, position):
@@ -174,11 +174,11 @@ class CustomMenuBar(QtImport.QMenuBar):
             # restore colour if master/client/etc
             self.original_style = self.styleSheet()
         if self.expert_mode_action.isChecked():
-            res = QtImport.QInputDialog.getText(
+            res = qt_import.QInputDialog.getText(
                 self,
                 "Switch to expert mode",
                 "Please enter the password:",
-                QtImport.QLineEdit.Password,
+                qt_import.QLineEdit.Password,
             )
             if res[1]:
                 if str(res[0]) == self.expert_pwd:
@@ -186,11 +186,11 @@ class CustomMenuBar(QtImport.QMenuBar):
                     self.expert_mode_action.setChecked(True)
                 else:
                     self.expert_mode_action.setChecked(False)
-                    QtImport.QMessageBox.critical(
+                    qt_import.QMessageBox.critical(
                         self,
                         "Switch to expert mode",
                         "Wrong password!",
-                        QtImport.QMessageBox.Ok,
+                        qt_import.QMessageBox.Ok,
                     )
             else:
                 self.expert_mode_action.setChecked(False)
@@ -214,7 +214,7 @@ class CustomMenuBar(QtImport.QMenuBar):
             #                    True)
             self.parent.enableExpertModeSignal.emit(True)
             # go through all bricks and execute the method
-            for widget in QtImport.QApplication.allWidgets():
+            for widget in qt_import.QApplication.allWidgets():
                 if hasattr(widget, "set_expert_mode"):
                     widget.set_expert_mode(True)
                 if isinstance(widget, BaseWidget):
@@ -229,7 +229,7 @@ class CustomMenuBar(QtImport.QMenuBar):
             # switch to user mode
             self.parent.enableExpertModeSignal.emit(False)
             # go through all bricks and execute the method
-            for widget in QtImport.QApplication.allWidgets():
+            for widget in qt_import.QApplication.allWidgets():
                 try:
                     if hasattr(widget, "set_expert_mode"):
                         # if isinstance(widget, BaseWidget):
@@ -268,7 +268,7 @@ class CustomMenuBar(QtImport.QMenuBar):
     def about_clicked(self):
         """Display dialog with info about mxcube"""
 
-        QtImport.QMessageBox.about(
+        qt_import.QMessageBox.about(
             self,
             "About MXCuBE",
             """<b>MXCuBE v %s </b>
@@ -277,8 +277,8 @@ class CustomMenuBar(QtImport.QMenuBar):
             % (
                 "2x",
                 platform.python_version(),
-                QtImport.qt_version_no,
-                QtImport.pyqt_version_no,
+                qt_import.qt_version_no,
+                qt_import.pyqt_version_no,
                 platform.system(),
             ),
         )
@@ -294,13 +294,13 @@ class CustomMenuBar(QtImport.QMenuBar):
               <b>Ctrl + +/-</b> : zoom in/out<br><br>
               <b>Mouse wheel +/-</b> : rotate sample
            """
-        QtImport.QMessageBox.about(self, "Available shortcuts", shortcuts_text)
+        qt_import.QMessageBox.about(self, "Available shortcuts", shortcuts_text)
 
     def quit_clicked(self):
         """Exit mxcube"""
 
         if self.execution_mode:
-            QtImport.QApplication.quit()
+            qt_import.QApplication.quit()
 
     def info_for_developers_clicked(self):
         """Opens webpage with documentation"""
@@ -345,17 +345,17 @@ class CustomMenuBar(QtImport.QMenuBar):
     def view_max_clicked(self):
         """Show maximized"""
 
-        QtImport.QApplication.activeWindow().showMaximized()
+        qt_import.QApplication.activeWindow().showMaximized()
 
     def view_normal_clicked(self):
         """Show normal window"""
 
-        QtImport.QApplication.activeWindow().showNormal()
+        qt_import.QApplication.activeWindow().showNormal()
 
     def view_min_clicked(self):
         """Show minimized window"""
 
-        QtImport.QApplication.activeWindow().showMinimized()
+        qt_import.QApplication.activeWindow().showMinimized()
 
     def append_windows_links(self, windows_list):
         """If there are more than one window then appends names
@@ -376,7 +376,7 @@ class CustomMenuBar(QtImport.QMenuBar):
         self.preview_windows[window_caption].activateWindow()
 
 
-class CustomToolBar(QtImport.QToolBar):
+class CustomToolBar(qt_import.QToolBar):
     """Custom toolbar"""
 
     def __init__(self, parent):
@@ -384,25 +384,25 @@ class CustomToolBar(QtImport.QToolBar):
            It contains a centralWidget in its viewport
         """
 
-        QtImport.QToolBar.__init__(self)
+        qt_import.QToolBar.__init__(self)
 
         self.setSizePolicy(
-            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.Fixed
+            qt_import.QSizePolicy.MinimumExpanding, qt_import.QSizePolicy.Fixed
         )
 
 
-class CustomGroupBox(QtImport.QGroupBox):
+class CustomGroupBox(qt_import.QGroupBox):
     def __init__(self, *args, **kwargs):
-        QtImport.QGroupBox.__init__(self, args[0])
+        qt_import.QGroupBox.__init__(self, args[0])
         self.setObjectName(args[1])
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
         if kwargs["layout"] == "horizontal":
-            __group_box_layout = QtImport.QHBoxLayout(self)
+            __group_box_layout = qt_import.QHBoxLayout(self)
         else:
-            __group_box_layout = QtImport.QVBoxLayout(self)
+            __group_box_layout = qt_import.QVBoxLayout(self)
         __group_box_layout.setSpacing(0)
         __group_box_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -413,12 +413,12 @@ class CustomGroupBox(QtImport.QGroupBox):
             if hasattr(child, "setVisible"):
                 child.setVisible(state)
 
-class Spacer(QtImport.QFrame):
+class Spacer(qt_import.QFrame):
     """Spacer widget"""
 
     def __init__(self, *args, **kwargs):
         """init"""
-        QtImport.QFrame.__init__(self, args[0])
+        qt_import.QFrame.__init__(self, args[0])
         self.setObjectName(args[1])
 
         self.orientation = kwargs.get("orientation", "horizontal")
@@ -427,9 +427,9 @@ class Spacer(QtImport.QFrame):
         self.setFixedSize(-1)
 
         if self.orientation == "horizontal":
-            self.main_layout = QtImport.QHBoxLayout(self)
+            self.main_layout = qt_import.QHBoxLayout(self)
         else:
-            self.main_layout = QtImport.QVBoxLayout(self)
+            self.main_layout = qt_import.QVBoxLayout(self)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -439,13 +439,13 @@ class Spacer(QtImport.QFrame):
         if fixed_size >= 0:
             hor_size_policy = (
                 self.orientation == "horizontal"
-                and QtImport.QSizePolicy.Fixed
-                or QtImport.QSizePolicy.MinimumExpanding
+                and qt_import.QSizePolicy.Fixed
+                or qt_import.QSizePolicy.MinimumExpanding
             )
             ver_size_policy = (
-                hor_size_policy == QtImport.QSizePolicy.Fixed
-                and QtImport.QSizePolicy.MinimumExpanding
-                or QtImport.QSizePolicy.Fixed
+                hor_size_policy == qt_import.QSizePolicy.Fixed
+                and qt_import.QSizePolicy.MinimumExpanding
+                or qt_import.QSizePolicy.Fixed
             )
 
             if self.orientation == "horizontal":
@@ -455,25 +455,25 @@ class Spacer(QtImport.QFrame):
         else:
             hor_size_policy = (
                 self.orientation == "horizontal"
-                and QtImport.QSizePolicy.Expanding
-                or QtImport.QSizePolicy.MinimumExpanding
+                and qt_import.QSizePolicy.Expanding
+                or qt_import.QSizePolicy.MinimumExpanding
             )
             ver_size_policy = (
-                hor_size_policy == QtImport.QSizePolicy.Expanding
-                and QtImport.QSizePolicy.MinimumExpanding
-                or QtImport.QSizePolicy.Expanding
+                hor_size_policy == qt_import.QSizePolicy.Expanding
+                and qt_import.QSizePolicy.MinimumExpanding
+                or qt_import.QSizePolicy.Expanding
             )
         self.setSizePolicy(hor_size_policy, ver_size_policy)
 
     def paintEvent(self, event):
         """Paints the widgets"""
 
-        QtImport.QFrame.paintEvent(self, event)
+        qt_import.QFrame.paintEvent(self, event)
 
         if self.execution_mode:
             return
-        painter = QtImport.QPainter(self)
-        painter.setPen(QtImport.QPen(QtImport.Qt.black, 3))
+        painter = qt_import.QPainter(self)
+        painter.setPen(qt_import.QPen(qt_import.Qt.black, 3))
 
         if self.orientation == "horizontal":
             height = self.height() / 2
@@ -490,10 +490,10 @@ class Spacer(QtImport.QFrame):
             painter.drawLine(width, self.height(), width - 5, self.height() - 5)
             painter.drawLine(width, self.height(), width + 5, self.height() - 5)
 
-class CustomFrame(QtImport.QFrame):
+class CustomFrame(qt_import.QFrame):
     def __init__(self, *args, **kwargs):
         """init"""
-        QtImport.QFrame.__init__(self, args[0])
+        qt_import.QFrame.__init__(self, args[0])
 
         self.setObjectName(args[1])
         self.pinned = True
@@ -503,22 +503,22 @@ class CustomFrame(QtImport.QFrame):
         execution_mode = kwargs.get("execution_mode", False)
 
         if not execution_mode:
-            self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
+            self.setFrameStyle(qt_import.QFrame.Box | qt_import.QFrame.Plain)
 
         if kwargs.get("layout") == "vertical":
-            __frame_layout = QtImport.QVBoxLayout(self)
+            __frame_layout = qt_import.QVBoxLayout(self)
         else:
-            __frame_layout = QtImport.QHBoxLayout(self)
+            __frame_layout = qt_import.QHBoxLayout(self)
 
-        self.open_in_dialog_button = QtImport.QPushButton(
-            Icons.load_icon("UnLock"), ""
+        self.open_in_dialog_button = qt_import.QPushButton(
+            icons.load_icon("UnLock"), ""
         )
         self.open_in_dialog_button.setFixedWidth(30)
         # self.open_in_dialog_button.setObjectName("pin")
         self.open_in_dialog_button.setVisible(False)
 
-        self.dialog = QtImport.QDialog(self.parent())
-        self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
+        self.dialog = qt_import.QDialog(self.parent())
+        self.dialog_layout = qt_import.QVBoxLayout(self.dialog)
 
         __frame_layout.addWidget(self.open_in_dialog_button)
         __frame_layout.setSpacing(0)
@@ -529,54 +529,54 @@ class CustomFrame(QtImport.QFrame):
     def show_in_dialog_toggled(self):
         if self.pinned:
             self.pinned = False
-            self.open_in_dialog_button.setIcon(Icons.load_icon("Lock"))
+            self.open_in_dialog_button.setIcon(icons.load_icon("Lock"))
             self.origin_index = self.origin_parent.layout().indexOf(self)
             self.origin_parent.layout().removeWidget(self)
             self.dialog_layout.addWidget(self)
             self.dialog.show()
         else:
             self.pinned = True
-            self.open_in_dialog_button.setIcon(Icons.load_icon("UnLock"))
+            self.open_in_dialog_button.setIcon(icons.load_icon("UnLock"))
             self.dialog_layout.removeWidget(self)
             self.origin_parent.layout().insertWidget(self.origin_index, self)
             self.dialog.close()
 
     def set_background_color(self, color):
-        Colors.set_widget_color(self, color, QtImport.QPalette.Background)
+        colors.set_widget_color(self, color, qt_import.QPalette.Background)
 
     def set_expert_mode(self, expert_mode):
         self.open_in_dialog_button.setVisible(expert_mode)
 
-class CustomSplitter(QtImport.QSplitter):
+class CustomSplitter(qt_import.QSplitter):
 
     def __init__(self, *args, **kwargs):
         """init"""
-        QtImport.QFrame.__init__(self, args[0])
+        qt_import.QFrame.__init__(self, args[0])
 
         self.setObjectName(args[1])
         self.origin_parent = self.parent()
         execution_mode = kwargs.get("execution_mode", False)
 
         if not execution_mode:
-            self.setFrameStyle(QtImport.QFrame.Box | QtImport.QFrame.Plain)
+            self.setFrameStyle(qt_import.QFrame.Box | qt_import.QFrame.Plain)
 
         if kwargs.get("layout") == "vertical":
-            self.setOrientation(QtImport.Qt.Vertical)
-            __frame_layout = QtImport.QVBoxLayout(self)
+            self.setOrientation(qt_import.Qt.Vertical)
+            __frame_layout = qt_import.QVBoxLayout(self)
         else:
-            self.setOrientation(QtImport.Qt.Horizontal)
-            __frame_layout = QtImport.QHBoxLayout(self)
+            self.setOrientation(qt_import.Qt.Horizontal)
+            __frame_layout = qt_import.QHBoxLayout(self)
 
-class CustomTabWidget(QtImport.QTabWidget):
+class CustomTabWidget(qt_import.QTabWidget):
     """Tab widget"""
 
     # notebookPageChangedSignal = pyqtSignal(str)
-    tabChangedSignal = QtImport.pyqtSignal(int, object)
+    tabChangedSignal = qt_import.pyqtSignal(int, object)
 
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QTabWidget.__init__(self, args[0])
+        qt_import.QTabWidget.__init__(self, args[0])
         self.setObjectName(args[1])
         self.open_in_dialog_button = None
         self.close_tab_button = None
@@ -585,12 +585,12 @@ class CustomTabWidget(QtImport.QTabWidget):
         # self.tab_widgets = []
         self.count_changed = {}
         self.setSizePolicy(
-            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         self.currentChanged.connect(self._page_changed)
 
-        self.dialog = QtImport.QDialog(self.parent())
-        self.dialog_layout = QtImport.QVBoxLayout(self.dialog)
+        self.dialog = qt_import.QDialog(self.parent())
+        self.dialog_layout = qt_import.QVBoxLayout(self.dialog)
 
     def _page_changed(self, index):
         """Page changed event"""
@@ -647,7 +647,7 @@ class CustomTabWidget(QtImport.QTabWidget):
                         self.insertTab(
                             page["index"],
                             page["widget"],
-                            Icons.load_icon(icon),
+                            icons.load_icon(icon),
                             label,
                         )
                     else:
@@ -847,7 +847,7 @@ def get_vertical_groupbox(*args, **kwargs):
     kwargs["layout"] = "vertical"
     return CustomGroupBox(*args, **kwargs)
 
-class WindowDisplayWidget(QtImport.QScrollArea):
+class WindowDisplayWidget(qt_import.QScrollArea):
     """Main widget"""
 
     items = {
@@ -864,18 +864,18 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         "vsplitter": get_vertical_splitter,
     }
 
-    brickChangedSignal = QtImport.pyqtSignal(str, str, str, tuple, bool)
-    tabChangedSignal = QtImport.pyqtSignal(str, int)
-    enableExpertModeSignal = QtImport.pyqtSignal(bool)
-    windowClosedSignal = QtImport.pyqtSignal()
-    isShownSignal = QtImport.pyqtSignal()
-    isHiddenSignal = QtImport.pyqtSignal()
-    itemClickedSignal = QtImport.pyqtSignal(str)
+    brickChangedSignal = qt_import.pyqtSignal(str, str, str, tuple, bool)
+    tabChangedSignal = qt_import.pyqtSignal(str, int)
+    enableExpertModeSignal = qt_import.pyqtSignal(bool)
+    windowClosedSignal = qt_import.pyqtSignal()
+    isShownSignal = qt_import.pyqtSignal()
+    isHiddenSignal = qt_import.pyqtSignal()
+    itemClickedSignal = qt_import.pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         """__init__ of WindowDisplayWidget"""
 
-        QtImport.QScrollArea.__init__(self, args[0])
+        qt_import.QScrollArea.__init__(self, args[0])
 
         self.additional_windows = {}
         self.__put_back_colors = None
@@ -887,9 +887,9 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self.setWindowTitle("GUI preview")
         self.progress_dialog_base_label = ""
 
-        self.central_widget = QtImport.QWidget(self.widget())
+        self.central_widget = qt_import.QWidget(self.widget())
         # self.central_widget.setObjectName("deee")
-        self.central_widget_layout = QtImport.QVBoxLayout(self.central_widget)
+        self.central_widget_layout = qt_import.QVBoxLayout(self.central_widget)
         self.central_widget_layout.setSpacing(0)
         self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.central_widget.show()
@@ -898,33 +898,33 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._toolbar.hide()
         self._menubar = CustomMenuBar(self)
         self._menubar.hide()
-        self._statusbar = QtImport.QStatusBar(self)
+        self._statusbar = qt_import.QStatusBar(self)
         self._statusbar.hide()
 
-        self._keep_open_checkbox = QtImport.QCheckBox("Keep window open")
+        self._keep_open_checkbox = qt_import.QCheckBox("Keep window open")
         self._keep_open_checkbox.hide() 
 
-        self._statusbar_user_label = QtImport.QLabel("-")
-        self._statusbar_state_label = QtImport.QLabel(" <b>State: -</b>")
-        self._statusbar_diffractometer_label = QtImport.QLabel(
+        self._statusbar_user_label = qt_import.QLabel("-")
+        self._statusbar_state_label = qt_import.QLabel(" <b>State: -</b>")
+        self._statusbar_diffractometer_label = qt_import.QLabel(
             " <b>Diffractometer: -</b>"
         )
-        self._statusbar_sc_label = QtImport.QLabel(" <b>Sample changer: -</b>")
-        self._statusbar_last_collect_label = QtImport.QLabel(" <b>Last collect: -</b>")
-        self._progress_bar = QtImport.QProgressBar()
+        self._statusbar_sc_label = qt_import.QLabel(" <b>Sample changer: -</b>")
+        self._statusbar_last_collect_label = qt_import.QLabel(" <b>Last collect: -</b>")
+        self._progress_bar = qt_import.QProgressBar()
         # TODO make it via property
         self._progress_bar.setEnabled(False)
         self._progress_bar.setVisible(False)
 
-        self._file_system_status_label = QtImport.QLabel("File system")
-        self._edna_status_label = QtImport.QLabel("EDNA")
-        self._ispyb_status_label = QtImport.QLabel("ISPyB")
+        self._file_system_status_label = qt_import.QLabel("File system")
+        self._edna_status_label = qt_import.QLabel("EDNA")
+        self._ispyb_status_label = qt_import.QLabel("ISPyB")
 
-        self._warning_box = QtImport.QMessageBox(
-             QtImport.QMessageBox.Question,
+        self._warning_box = qt_import.QMessageBox(
+             qt_import.QMessageBox.Question,
              "Warning",
              "-",
-             QtImport.QMessageBox.Ok
+             qt_import.QMessageBox.Ok
         )
         self._warning_box.setModal(True)
 
@@ -939,14 +939,14 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._statusbar.addPermanentWidget(self._edna_status_label)
         self._statusbar.addPermanentWidget(self._ispyb_status_label)
 
-        self._progress_dialog = QtImport.QProgressDialog(self)
+        self._progress_dialog = qt_import.QProgressDialog(self)
         self._progress_dialog.setWindowFlags(
-            QtImport.Qt.Window
-            | QtImport.Qt.WindowTitleHint
-            | QtImport.Qt.CustomizeWindowHint
+            qt_import.Qt.Window
+            | qt_import.Qt.WindowTitleHint
+            | qt_import.Qt.CustomizeWindowHint
         )
-        new_palette = QtImport.QPalette()
-        new_palette.setColor(QtImport.QPalette.Highlight, Colors.DARK_GREEN)
+        new_palette = qt_import.QPalette()
+        new_palette.setColor(qt_import.QPalette.Highlight, colors.DARK_GREEN)
         self._progress_dialog.setPalette(new_palette)
 
         self._progress_dialog.setWindowTitle("Please wait...")
@@ -958,7 +958,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         # _statusbar_hlayout.setSpacing(2)
         # _statusbar_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._menubar)
         _main_vlayout.addWidget(self._keep_open_checkbox)
         _main_vlayout.addWidget(self._toolbar)
@@ -969,8 +969,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         self._menubar.viewToolBarSignal.connect(self.view_toolbar_toggled)
 
-        self.setWindowFlags(self.windowFlags() | QtImport.Qt.WindowMaximizeButtonHint)
-        self.setWindowIcon(Icons.load_icon("desktop_icon"))
+        self.setWindowFlags(self.windowFlags() | qt_import.Qt.WindowMaximizeButtonHint)
+        self.setWindowIcon(icons.load_icon("desktop_icon"))
 
         self._menubar.saveConfigSignal.connect(self.save_config_requested)
 
@@ -1057,13 +1057,13 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             info_state = info_state.lower()
 
         if info_state in ("ready", "success") or info_message.lower() == "ready":
-            Colors.set_widget_color(selected_label, Colors.LIGHT_GREEN)
+            colors.set_widget_color(selected_label, colors.LIGHT_GREEN)
         elif info_state == "action_req":
-            Colors.set_widget_color(selected_label, Colors.LIGHT_ORANGE)
+            colors.set_widget_color(selected_label, colors.LIGHT_ORANGE)
         elif info_state == "error" or "alarm" in info_message.lower():
-            Colors.set_widget_color(selected_label, Colors.LIGHT_RED)
+            colors.set_widget_color(selected_label, colors.LIGHT_RED)
         else:
-            Colors.set_widget_color(selected_label, Colors.LIGHT_YELLOW)
+            colors.set_widget_color(selected_label, colors.LIGHT_YELLOW)
 
     def init_progress_bar(self, progress_type, number_of_steps):
         self._progress_bar.setEnabled(True)
@@ -1078,8 +1078,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         self._progress_bar.setEnabled(False)
 
     def open_progress_dialog(self, msg, max_steps):
-        QtImport.QApplication.setOverrideCursor(
-            QtImport.QCursor(QtImport.Qt.BusyCursor)
+        qt_import.QApplication.setOverrideCursor(
+            qt_import.QCursor(qt_import.Qt.BusyCursor)
         )
         self.progress_dialog_base_label = msg
         self._progress_dialog.setWindowTitle(msg)
@@ -1093,15 +1093,15 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             self._progress_dialog.setLabelText(msg)
 
     def close_progress_dialog(self):
-        QtImport.QApplication.setOverrideCursor(
-            QtImport.QCursor(QtImport.Qt.ArrowCursor)
+        qt_import.QApplication.setOverrideCursor(
+            qt_import.QCursor(qt_import.Qt.ArrowCursor)
         )
         self._progress_dialog.close()
 
     def show(self, *args):
         """Show"""
 
-        ret = QtImport.QWidget.show(self)
+        ret = qt_import.QWidget.show(self)
         self.isShownSignal.emit()
         # self.emit(SIGNAL("isShown"), ())
         return ret
@@ -1109,26 +1109,26 @@ class WindowDisplayWidget(QtImport.QScrollArea):
     def closeEvent(self, event):
         event.accept()
         if self.close_on_exit:
-            QtImport.QApplication.exit(0)
+            qt_import.QApplication.exit(0)
 
     def hide(self, *args):
         """Hide"""
         if not self._keep_open_checkbox.isChecked():
-            ret = QtImport.QWidget.hide(self)
+            ret = qt_import.QWidget.hide(self)
             self.isHiddenSignal.emit()
             # self.emit(SIGNAL("isHidden"), ())
             return ret
 
     def set_caption(self, caption):
         """Set caption"""
-        ret = QtImport.QWidget.setWindowTitle(self, caption)
+        ret = qt_import.QWidget.setWindowTitle(self, caption)
         self.base_caption = caption
         return ret
 
     def update_instance_caption(self, instance_caption):
         """Update caption if instance mode (master,slave) changed"""
 
-        QtImport.QWidget.setWindowTitle(self, self.base_caption + instance_caption)
+        qt_import.QWidget.setWindowTitle(self, self.base_caption + instance_caption)
 
     def exitExpertMode(self, *args):
         """Exit expert mode"""
@@ -1154,8 +1154,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
             )
             if item_type in ("vbox", "hbox", "vgroupbox", "hgroupbox", "hsplitter", "vsplitter"):
                 if item_cfg["properties"]["color"] is not None:
-                    qtcolor = QtImport.QColor(item_cfg["properties"]["color"])
-                    Colors.set_widget_color(new_item, qtcolor)
+                    qtcolor = qt_import.QColor(item_cfg["properties"]["color"])
+                    colors.set_widget_color(new_item, qtcolor)
 
                 if item_type.endswith("groupbox"):
                     new_item.setTitle(item_cfg["properties"]["label"])
@@ -1173,17 +1173,17 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     )
                 elif hasattr(new_item.layout(), "setMargins"):
                     new_item.layout().setMargin(item_cfg["properties"]["margin"])
-                frame_style = QtImport.QFrame.NoFrame
+                frame_style = qt_import.QFrame.NoFrame
                 if item_cfg["properties"]["frameshape"] != "default":
                     frame_style = getattr(
-                        QtImport.QFrame, item_cfg["properties"]["frameshape"]
+                        qt_import.QFrame, item_cfg["properties"]["frameshape"]
                     )
                 if item_cfg["properties"]["shadowstyle"] != "default":
                     frame_style = frame_style | getattr(
-                        QtImport.QFrame,
+                        qt_import.QFrame,
                         item_cfg["properties"]["shadowstyle"].capitalize(),
                     )
-                if frame_style != QtImport.QFrame.NoFrame:
+                if frame_style != qt_import.QFrame.NoFrame:
                     try:
                         new_item.setFrameStyle(frame_style)
                     except BaseException:
@@ -1196,24 +1196,24 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 if item_cfg["properties"]["fixedheight"] > -1:
                     new_item.setFixedHeight(item_cfg["properties"]["fixedheight"])
             elif item_type == "icon":
-                img = QtImport.QPixmap()
+                img = qt_import.QPixmap()
                 if img.load(item_cfg["properties"]["filename"]):
                     new_item.setPixmap(img)
             elif item_type == "label":
                 new_item.setText(item_cfg["properties"]["text"])
             elif item_type == "tab":
                 item_cfg.widget = new_item
-                button_widget = QtImport.QWidget(new_item)
+                button_widget = qt_import.QWidget(new_item)
 
-                new_item.open_in_dialog_button = QtImport.QToolButton(button_widget)
-                new_item.open_in_dialog_button.setIcon(Icons.load_icon("Frames2"))
+                new_item.open_in_dialog_button = qt_import.QToolButton(button_widget)
+                new_item.open_in_dialog_button.setIcon(icons.load_icon("Frames2"))
                 new_item.open_in_dialog_button.setFixedSize(22, 22)
 
-                new_item.close_tab_button = QtImport.QToolButton(button_widget)
-                new_item.close_tab_button.setIcon(Icons.load_icon("delete_small"))
+                new_item.close_tab_button = qt_import.QToolButton(button_widget)
+                new_item.close_tab_button.setIcon(icons.load_icon("delete_small"))
                 new_item.close_tab_button.setFixedSize(22, 22)
 
-                __button_widget_vlayout = QtImport.QHBoxLayout(button_widget)
+                __button_widget_vlayout = qt_import.QHBoxLayout(button_widget)
                 __button_widget_vlayout.addWidget(new_item.open_in_dialog_button)
                 __button_widget_vlayout.addWidget(new_item.close_tab_button)
                 __button_widget_vlayout.setSpacing(2)
@@ -1232,7 +1232,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 def open_in_dialog():
                     if new_item.pinned:
                         new_item.pinned = False
-                        new_item.open_in_dialog_button.setIcon(Icons.load_icon("Lock"))
+                        new_item.open_in_dialog_button.setIcon(icons.load_icon("Lock"))
                         current_widget = new_item.currentWidget()
                         new_item.removeTab(new_item.currentIndex())
                         new_item.dialog_layout.addWidget(current_widget)
@@ -1240,7 +1240,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     else:
                         new_item.pinned = True
                         new_item.open_in_dialog_button.setIcon(
-                            Icons.load_icon("UnLock")
+                            icons.load_icon("UnLock")
                         )
                         # self.dialog_layout.removeWidget(self)
                         # self.origin_parent.layout().insertWidget(self.origin_index, self)
@@ -1320,7 +1320,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     self.preview_items.append(new_item)
                     if alignment_flags is not None:
                         layout.addWidget(
-                            new_item, stretch, QtImport.Qt.Alignment(alignment_flags)
+                            new_item, stretch, qt_import.Qt.Alignment(alignment_flags)
                         )
                     else:
                         layout.addWidget(new_item, stretch)
@@ -1340,8 +1340,8 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         if self.current_window is not None and self.current_window != window_id:
             # remove all bricks and destroy all other items
             self.central_widget.close()
-            self.central_widget = QtImport.QWidget(self.viewport())
-            self.central_widget_layout = QtImport.QVBoxLayout(self.central_widget)
+            self.central_widget = qt_import.QWidget(self.viewport())
+            self.central_widget_layout = qt_import.QVBoxLayout(self.central_widget)
             self.central_widget.show()
 
         self.current_window = window_id
@@ -1406,7 +1406,7 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     new_item, child["properties"]["label"], child["properties"]["icon"]
                 )
                 new_tab.item_cfg = child
-            elif isinstance(parent_item, QtImport.QSplitter):
+            elif isinstance(parent_item, qt_import.QSplitter):
                 parent_item.addWidget(new_item)
             else:
                 parent_item.layout().addWidget(new_item)
@@ -1448,19 +1448,19 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                     return
 
     def select_widget(self, widget):
-        """Colors selected widget"""
+        """colors selected widget"""
 
         if isinstance(self.__put_back_colors, collections.Callable):
             self.__put_back_colors()
-        original_color = widget.palette().color(QtImport.QPalette.Window)
-        selected_color = QtImport.QColor(150, 150, 200)
-        Colors.set_widget_color(widget, selected_color, QtImport.QPalette.Background)
+        original_color = widget.palette().color(qt_import.QPalette.Window)
+        selected_color = qt_import.QColor(150, 150, 200)
+        colors.set_widget_color(widget, selected_color, qt_import.QPalette.Background)
 
         def put_back_colors(wref=weakref.ref(widget), bkgd_color=original_color):
             widget = wref()
             if widget is not None:
-                Colors.set_widget_color(
-                    widget, bkgd_color, QtImport.QPalette.Background
+                colors.set_widget_color(
+                    widget, bkgd_color, qt_import.QPalette.Background
                 )
 
         self.__put_back_colors = put_back_colors
@@ -1470,13 +1470,13 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         if widget is not None and event is not None:
             if (
-                event.type() == QtImport.QEvent.MouseButtonRelease
-                and event.button() == QtImport.Qt.LeftButton
+                event.type() == qt_import.QEvent.MouseButtonRelease
+                and event.button() == qt_import.Qt.LeftButton
             ):
                 self.itemClickedSignal.emit(widget.objectName())
                 return True
 
-        return QtImport.QScrollArea.eventFilter(self, widget, event)
+        return qt_import.QScrollArea.eventFilter(self, widget, event)
 
     def getAlignmentFlags(self, alignment_directives_string):
         """Returns alignment flags"""
@@ -1490,28 +1490,28 @@ class WindowDisplayWidget(QtImport.QScrollArea):
         if "none" in alignment_directives:
             return alignment_flags
         if "hcenter" in alignment_directives:
-            return QtImport.Qt.AlignHCenter
+            return qt_import.Qt.AlignHCenter
         if "vcenter" in alignment_directives:
-            return QtImport.Qt.AlignVCenter
+            return qt_import.Qt.AlignVCenter
         if "top" in alignment_directives:
-            alignment_flags = QtImport.Qt.AlignTop
+            alignment_flags = qt_import.Qt.AlignTop
         if "bottom" in alignment_directives:
-            alignment_flags = QtImport.Qt.AlignBottom
+            alignment_flags = qt_import.Qt.AlignBottom
         if "center" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtImport.Qt.AlignCenter
+                alignment_flags = qt_import.Qt.AlignCenter
             else:
-                alignment_flags = alignment_flags | QtImport.Qt.AlignHCenter
+                alignment_flags = alignment_flags | qt_import.Qt.AlignHCenter
         if "left" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtImport.Qt.AlignLeft | QtImport.Qt.AlignVCenter
+                alignment_flags = qt_import.Qt.AlignLeft | qt_import.Qt.AlignVCenter
             else:
-                alignment_flags = alignment_flags | QtImport.Qt.AlignLeft
+                alignment_flags = alignment_flags | qt_import.Qt.AlignLeft
         if "right" in alignment_directives:
             if alignment_flags == 0:
-                alignment_flags = QtImport.Qt.AlignRight | QtImport.Qt.AlignVCenter
+                alignment_flags = qt_import.Qt.AlignRight | qt_import.Qt.AlignVCenter
             else:
-                alignment_flags = alignment_flags | QtImport.Qt.AlignRight
+                alignment_flags = alignment_flags | qt_import.Qt.AlignRight
         return alignment_flags
 
     def getSizePolicy(self, hsizepolicy, vsizepolicy):
@@ -1519,13 +1519,13 @@ class WindowDisplayWidget(QtImport.QScrollArea):
 
         def _get_size_policy_flag(policy_flag):
             if policy_flag == "expanding":
-                return QtImport.QSizePolicy.Expanding
+                return qt_import.QSizePolicy.Expanding
             elif policy_flag == "fixed":
-                return QtImport.QSizePolicy.Fixed
+                return qt_import.QSizePolicy.Fixed
             else:
-                return QtImport.QSizePolicy.Preferred
+                return qt_import.QSizePolicy.Preferred
 
-        return QtImport.QSizePolicy(
+        return qt_import.QSizePolicy(
             _get_size_policy_flag(hsizepolicy), _get_size_policy_flag(vsizepolicy)
         )
 
@@ -1540,23 +1540,23 @@ class WindowDisplayWidget(QtImport.QScrollArea):
                 widget.setFont(font)
 
 
-class BricksPropertiesEditor(QtImport.QWidget):
+class BricksPropertiesEditor(qt_import.QWidget):
 
-    propertyEditedSignal = QtImport.pyqtSignal()
+    propertyEditedSignal = qt_import.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         """init"""
 
-        QtImport.QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
 
         self.bricks_dict = {}
         self.selected_brick = None
         self.property_edited = False
 
-        self.bricks_listwidget = QtImport.QListWidget()
+        self.bricks_listwidget = qt_import.QListWidget()
         self.properties_table = property_editor.ConfigurationTable(self)
 
-        _main_vlayout = QtImport.QHBoxLayout(self)
+        _main_vlayout = qt_import.QHBoxLayout(self)
         _main_vlayout.addWidget(self.bricks_listwidget)
         _main_vlayout.addWidget(self.properties_table)
         # _main_vlayout.setSpacing(2)
@@ -1570,7 +1570,7 @@ class BricksPropertiesEditor(QtImport.QWidget):
         # self.property_changed)
 
         self.bricks_listwidget.setSizePolicy(
-            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.MinimumExpanding
+            qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.MinimumExpanding
         )
         # self.properties_table.setSizePolicy(QSizePolicy.Expanding,
         #                                    QSizePolicy.MinimumExpanding)

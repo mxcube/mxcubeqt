@@ -21,7 +21,7 @@ import sys
 import logging
 import traceback
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 _handler = None
 
@@ -62,7 +62,7 @@ class __Handler:
 
     def excepthook(self, type, value, tb):
         if type == KeyboardInterrupt:
-            QtImport.getQApp().quit()
+            qt_import.getQApp().quit()
             return
         try:
             exception = traceback.format_exception(type, value, tb)

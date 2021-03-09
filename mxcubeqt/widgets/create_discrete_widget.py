@@ -19,7 +19,7 @@
 
 import copy
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
@@ -43,7 +43,7 @@ class CreateDiscreteWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
 
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(fl), "Standard"
+            self, parent, name, qt_import.Qt.WindowFlags(fl), "Standard"
         )
 
         if not name:
@@ -76,7 +76,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._comments_widget.setHidden(True)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)

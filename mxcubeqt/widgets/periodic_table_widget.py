@@ -28,20 +28,20 @@ except BaseException:
     except BaseException:
         pass
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class PeriodicTableWidget(QtImport.QWidget):
+class PeriodicTableWidget(qt_import.QWidget):
 
-    elementEdgeSelectedSignal = QtImport.pyqtSignal(str, str)
+    elementEdgeSelectedSignal = qt_import.pyqtSignal(str, str)
 
     def __init__(self, parent=None, name=None, fl=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
         self.selected_element = None
@@ -55,15 +55,15 @@ class PeriodicTableWidget(QtImport.QWidget):
         if PYMCA_IMPORTED:
             self.periodic_table = CustomPeriodicTable(self)
         else:
-            self.periodic_elements_combo = QtImport.QComboBox(self)
+            self.periodic_elements_combo = qt_import.QComboBox(self)
             self.periodic_elements_combo.setFixedWidth(100)
 
-        self.edge_widget = QtImport.QWidget(self)
-        edge_label = QtImport.QLabel("Edge:", self.edge_widget)
-        self.edge_combo = QtImport.QComboBox(self.edge_widget)
+        self.edge_widget = qt_import.QWidget(self)
+        edge_label = qt_import.QLabel("Edge:", self.edge_widget)
+        self.edge_combo = qt_import.QComboBox(self.edge_widget)
 
         # Layout --------------------------------------------------------------
-        _edge_hlayout = QtImport.QHBoxLayout(self.edge_widget)
+        _edge_hlayout = qt_import.QHBoxLayout(self.edge_widget)
         if not PYMCA_IMPORTED:
             _edge_hlayout.addWidget(self.periodic_elements_combo)
         _edge_hlayout.addWidget(edge_label)
@@ -72,9 +72,9 @@ class PeriodicTableWidget(QtImport.QWidget):
         _edge_hlayout.setSpacing(2)
         _edge_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         if PYMCA_IMPORTED:
-            _main_vlayout.addWidget(self.periodic_table, QtImport.Qt.AlignHCenter)
+            _main_vlayout.addWidget(self.periodic_table, qt_import.Qt.AlignHCenter)
         _main_vlayout.addWidget(self.edge_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
@@ -137,7 +137,7 @@ if PYMCA_IMPORTED:
 
     class CustomPeriodicTable(QPeriodicTable.QPeriodicTable):
 
-        edgeSelectedSignal = QtImport.pyqtSignal(str, str)
+        edgeSelectedSignal = qt_import.pyqtSignal(str, str)
 
         def __init__(self, *args):
             QPeriodicTable.QPeriodicTable.__init__(self, *args)
@@ -146,12 +146,12 @@ if PYMCA_IMPORTED:
             if PYMCA_IMPORTED == 5:
                 self.sigElementClicked.connect(self.table_element_clicked)
             else:
-                QtImport.QObject.connect(
-                    self, QtImport.SIGNAL("elementClicked"), self.table_element_clicked
+                qt_import.QObject.connect(
+                    self, qt_import.SIGNAL("elementClicked"), self.table_element_clicked
                 )
             for b in self.eltButton:
-                self.eltButton[b].colors[0] = QtImport.QColor(QtImport.Qt.green)
-                self.eltButton[b].colors[1] = QtImport.QColor(QtImport.Qt.darkGreen)
+                self.eltButton[b].colors[0] = qt_import.QColor(qt_import.Qt.green)
+                self.eltButton[b].colors[1] = qt_import.QColor(qt_import.Qt.darkGreen)
                 self.eltButton[b].setEnabled(False)
             for el in QPeriodicTable.Elements:
                 symbol = el[0]

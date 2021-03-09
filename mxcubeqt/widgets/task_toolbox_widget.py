@@ -20,7 +20,7 @@
 import logging
 import importlib
 
-from mxcubeqt.utils import Icons, queue_item, QtImport
+from mxcubeqt.utils import icons, queue_item, qt_import
 from mxcubeqt.widgets.create_discrete_widget import CreateDiscreteWidget
 from mxcubeqt.widgets.create_helical_widget import CreateHelicalWidget
 from mxcubeqt.widgets.create_char_widget import CreateCharWidget
@@ -41,10 +41,10 @@ __license__ = "LGPLv3+"
 __category__ = "Task"
 
 
-class TaskToolBoxWidget(QtImport.QWidget):
+class TaskToolBoxWidget(qt_import.QWidget):
     def __init__(self, parent=None, name="task_toolbox"):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
         self.setObjectName = name
 
         # Internal variables --------------------------------------------------
@@ -57,10 +57,10 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.create_task_widgets = {}
 
         # Graphic elements ----------------------------------------------------
-        self.method_label = QtImport.QLabel("Collection method", self)
-        self.method_label.setAlignment(QtImport.Qt.AlignCenter)
+        self.method_label = qt_import.QLabel("Collection method", self)
+        self.method_label.setAlignment(qt_import.Qt.AlignCenter)
 
-        self.tool_box = QtImport.QToolBox(self)
+        self.tool_box = qt_import.QToolBox(self)
         self.tool_box.setObjectName("tool_box")
         # self.tool_box.setFixedWidth(600)
 
@@ -90,30 +90,30 @@ class TaskToolBoxWidget(QtImport.QWidget):
         self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
         self.tool_box.addItem(self.still_scan_page, "Still")
 
-        self.button_box = QtImport.QWidget(self)
-        self.create_task_button = QtImport.QPushButton(
+        self.button_box = qt_import.QWidget(self)
+        self.create_task_button = qt_import.QPushButton(
             "  Add to queue", self.button_box
         )
-        self.create_task_button.setIcon(Icons.load_icon("add_row.png"))
+        self.create_task_button.setIcon(icons.load_icon("add_row.png"))
         msg = "Add the collection method to the selected sample"
         self.create_task_button.setToolTip(msg)
         self.create_task_button.setEnabled(False)
 
-        self.collect_now_button = QtImport.QPushButton("Collect Now", self.button_box)
-        self.collect_now_button.setIcon(Icons.load_icon("VCRPlay2.png"))
+        self.collect_now_button = qt_import.QPushButton("Collect Now", self.button_box)
+        self.collect_now_button.setIcon(icons.load_icon("VCRPlay2.png"))
         self.collect_now_button.setToolTip(
             "Add the collection method to the queue and execute it"
         )
 
         # Layout --------------------------------------------------------------
-        _button_box_hlayout = QtImport.QHBoxLayout(self.button_box)
+        _button_box_hlayout = qt_import.QHBoxLayout(self.button_box)
         _button_box_hlayout.addWidget(self.collect_now_button)
         _button_box_hlayout.addStretch(0)
         _button_box_hlayout.addWidget(self.create_task_button)
         _button_box_hlayout.setSpacing(0)
         _button_box_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.method_label)
         _main_vlayout.addWidget(self.tool_box)
         _main_vlayout.addWidget(self.button_box)
@@ -468,11 +468,11 @@ class TaskToolBoxWidget(QtImport.QWidget):
             conf_msg = "One or several not mounted samples are selected.\n" +\
                        "Before collecting sample(s) will be mounted. Continue?"
             if (
-                QtImport.QMessageBox.warning(
+                qt_import.QMessageBox.warning(
                       None, "Question", conf_msg,
-                      QtImport.QMessageBox.Ok, QtImport.QMessageBox.No
+                      qt_import.QMessageBox.Ok, qt_import.QMessageBox.No
                 )
-                == QtImport.QMessageBox.No
+                == qt_import.QMessageBox.No
             ):
                 return
 

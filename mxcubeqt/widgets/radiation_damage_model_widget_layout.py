@@ -17,17 +17,17 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubeqt.utils import Colors, QtImport
+from mxcubeqt.utils import colors, qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class RadiationDamageModelWidgetLayout(QtImport.QWidget):
+class RadiationDamageModelWidgetLayout(qt_import.QWidget):
     def __init__(self, parent=None, name=None, fl=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if not name:
             self.setObjectName("RadiationDamageModelWidgetLayout")
@@ -37,12 +37,12 @@ class RadiationDamageModelWidgetLayout(QtImport.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.rad_damage_widget = QtImport.load_ui_file(
+        self.rad_damage_widget = qt_import.load_ui_file(
             "radiation_damage_model_widget_layout.ui"
         )
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.rad_damage_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -52,8 +52,8 @@ class RadiationDamageModelWidgetLayout(QtImport.QWidget):
 
         # Other ---------------------------------------------------------------
         self.languageChange()
-        self.setAttribute(QtImport.Qt.WA_WState_Polished)
-        Colors.set_widget_color(self, Colors.GROUP_BOX_GRAY)
+        self.setAttribute(qt_import.Qt.WA_WState_Polished)
+        colors.set_widget_color(self, colors.GROUP_BOX_GRAY)
 
     def languageChange(self):
         self.setWindowTitle(self.__tr("RadiationDamageModelWidget"))
@@ -71,9 +71,9 @@ class RadiationDamageModelWidgetLayout(QtImport.QWidget):
         self.rad_damage_widget.sensetivity_label.setText(self.__tr("Sensetivity:"))
 
     def __tr(self, s, c=None):
-        return QtImport.QApplication.translate("RadiationDamageModelWidgetLayout", s, c)
+        return qt_import.QApplication.translate("RadiationDamageModelWidgetLayout", s, c)
 
     def __trUtf8(self, s, c=None):
-        return QtImport.QApplication.translate(
-            "RadiationDamageModelWidgetLayout", s, c, QtImport.QApplication.UnicodeUTF8
+        return qt_import.QApplication.translate(
+            "RadiationDamageModelWidgetLayout", s, c, qt_import.QApplication.UnicodeUTF8
         )

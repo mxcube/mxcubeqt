@@ -82,7 +82,7 @@ echo " GUI_FILE:    $GUI_FILE"
 echo "######################################################################"
 
 # Running the application
-$MXCUBE_ROOT/bin/mxcube --hardwareRepository=$XML_PATH \
+$MXCUBE_ROOT/scripts/mxcube_app.py --hardwareRepository=$XML_PATH \
 			--bricksDir=$MXCUBE_BRICKS_PATH \
 			--logFile=$MXCUBE_LOG_PATH/$APP_NAME-$USER.log \
 			$GUI_FILE $* > $MXCUBE_LOG_PATH/$APP_NAME-$USER.out 2> $MXCUBE_LOGS_PATH/$APP_NAME-$USER.err

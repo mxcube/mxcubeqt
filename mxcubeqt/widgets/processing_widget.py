@@ -19,7 +19,7 @@
 
 from os.path import expanduser
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
 from mxcubecore.HardwareObjects import (
@@ -32,13 +32,13 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class ProcessingWidget(QtImport.QWidget):
+class ProcessingWidget(qt_import.QWidget):
 
-    enableProcessingSignal = QtImport.pyqtSignal(bool, bool)
+    enableProcessingSignal = qt_import.pyqtSignal(bool, bool)
 
     def __init__(self, parent=None, name=None, fl=0, data_model=None):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
         if name is not None:
             self.setObjectName(name)
 
@@ -49,11 +49,11 @@ class ProcessingWidget(QtImport.QWidget):
 
         self._model_mib = DataModelInputBinder(self._model)
 
-        self.processing_widget = QtImport.load_ui_file(
+        self.processing_widget = qt_import.load_ui_file(
             "processing_widget_vertical_layout.ui"
         )
 
-        self.main_layout = QtImport.QVBoxLayout(self)
+        self.main_layout = qt_import.QVBoxLayout(self)
         self.main_layout.addWidget(self.processing_widget)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -145,7 +145,7 @@ class ProcessingWidget(QtImport.QWidget):
         )
 
     def _browse_clicked(self):
-        file_dialog = QtImport.QFileDialog(self)
+        file_dialog = qt_import.QFileDialog(self)
 
         pdb_filename = str(
             file_dialog.getOpenFileName(

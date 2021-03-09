@@ -19,7 +19,7 @@
 
 import logging
 
-from mxcubeqt.utils import queue_item, QtImport
+from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
@@ -40,7 +40,7 @@ class CreateAdvancedWidget(CreateTaskBase):
 
     def __init__(self, parent=None, name=None, fl=0):
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(fl), "Advanced"
+            self, parent, name, qt_import.Qt.WindowFlags(fl), "Advanced"
         )
 
         if not name:
@@ -57,7 +57,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._advanced_methods_widget = QtImport.load_ui_file(
+        self._advanced_methods_widget = qt_import.load_ui_file(
             "advanced_methods_layout.ui"
         )
         self._acq_widget = AcquisitionWidget(
@@ -79,7 +79,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._comments_widget = CommentsWidget(self)
 
         # Layout --------------------------------------------------------------
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._advanced_methods_widget)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
@@ -363,7 +363,7 @@ class CreateAdvancedWidget(CreateTaskBase):
                     "%.6f" % exp_time
                 ) 
 
-            grid_treewidget_item = QtImport.QTreeWidgetItem(
+            grid_treewidget_item = qt_import.QTreeWidgetItem(
                 self._advanced_methods_widget.grid_treewidget, info_str_list
             )
             self._grid_map[shape] = grid_treewidget_item
@@ -548,7 +548,7 @@ class CreateAdvancedWidget(CreateTaskBase):
     def overlay_change_color(self):
         """Changes the default color (blue) of overlay
         """
-        color = QtImport.QColorDialog.getColor()
+        color = qt_import.QColorDialog.getColor()
         grid = self.get_selected_shapes()[0]
 
         if color.isValid() and grid:

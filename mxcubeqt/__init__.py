@@ -38,7 +38,7 @@ import gevent.monkey
 gevent.monkey.patch_all(thread=False)
 
 from mxcubecore import HardwareRepository as HWR
-from mxcubeqt.utils import gui_log_handler, error_handler, QtImport
+from mxcubeqt.utils import gui_log_handler, error_handler, qt_import
 from mxcubeqt.gui_supervisor import (
     GUISupervisor,
     LOAD_GUI_EVENT,
@@ -78,9 +78,10 @@ SPLASH_SCREEN = None
 
 LOGGING_NAME = ""
 
-mxcube_root = os.path.dirname(__file__)
-sys.path.insert(0, mxcube_root)
+MXCUBEQT_ROOT = os.path.dirname(__file__)
+#sys.path.insert(0, MXCUBEQT_ROOT)
 
+MOCKUP_CONFIG_PATH = os.path.join(MXCUBEQT_ROOT, "example_config.yml")
 
 def get_splash():
     return get_splash_screen()
@@ -150,7 +151,7 @@ def set_log_file(filename):
 def do_gevent():
     """Can't call gevent.run inside inner event loops (message boxes...)"""
 
-    if QtImport.QEventLoop():
+    if qt_import.QEventLoop():
         try:
             gevent.wait(timeout=0.01)
         except AssertionError:
@@ -160,20 +161,19 @@ def do_gevent():
         pass
 
 
-class MyCustomEvent(QtImport.QEvent):
+class MyCustomEvent(qt_import.QEvent):
     """Custom event"""
 
     def __init__(self, event_type, data):
         """init"""
 
-        QtImport.QEvent.__init__(self, event_type)
+        qt_import.QEvent.__init__(self, event_type)
         self.data = data
 
 
-def create_app(gui_config_file=None):
+def create_app(gui_config_path=None, core_config_path=None):
     """Main run method"""
 
-    default_configuration_path = "localhost:hwr"
     # path to user's home dir. (works on Win2K, XP, Unix, Mac...)
     parser = OptionParser(usage="usage: %prog <GUI definition file> [options]")
     parser.add_option(
@@ -218,14 +218,15 @@ def create_app(gui_config_file=None):
     )
     parser.add_option(
         "",
-        "--hardwareRepository",
+        "--coreConfigPath",
         action="store",
         type="string",
-        help="Hardware Repository Server host:port (default"
-        + " to %s) (you can also use " % default_configuration_path
-        + "HARDWARE_REPOSITORY_SERVER the environment variable)",
-        metavar="HOST:PORT",
-        dest="hardwareRepositoryServer",
+        help="Path to the directory containing mxcubecore "
+        + "configuration files. "
+        + "Alternatively MXCUBE_CORE_CONFIG_PATH env variable"
+        + "can be used",
+        metavar="directory",
+        dest="coreConfigPath",
         default="",
     )
     parser.add_option(
@@ -294,6 +295,14 @@ def create_app(gui_config_file=None):
         dest="version",
         help="Shows version",
     )
+    parser.add_option(
+        "",
+        "--mockupMode",
+        action="store_true",
+        default=False,
+        dest="mockupMode",
+        help="Runs MXCuBE with mockup configuration",
+    )
 
 
     parser.add_option("", "--pyqt4", action="store_true", default=None)
@@ -305,6 +314,8 @@ def create_app(gui_config_file=None):
     log_file = start_log(opts.logFile, opts.logLevel)
 
     # get config from arguments
+    if not gui_config_path and opts.mockupMode: 
+        gui_config_path = MOCKUP_CONFIG_PATH
     log_template = opts.logTemplate
     hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
@@ -319,13 +330,12 @@ def create_app(gui_config_file=None):
 
     app_style = opts.appStyle
 
-    if opts.hardwareRepositoryServer:
-        configuration_path = opts.hardwareRepositoryServer
-    else:
-        # try to set Hardware Repository server from environment
-        configuration_path = os.environ.get("HARDWARE_REPOSITORY_SERVER")
-        if configuration_path is None:
-            configuration_path = default_configuration_path
+    if not core_config_path:
+        if opts.coreConfigPath:
+            core_config_path = opts.coreConfigPath
+        else:
+            # try to set Hardware Repository server from environment
+            core_config_path = os.environ.get("MXCUBE_CORE_CONFIG_PATH")
 
     # add bricks directories and hardware objects directories from environment
     try:
@@ -355,7 +365,7 @@ def create_app(gui_config_file=None):
     ]
     hwobj_directories = [_directory for _directory in hwobj_directories if _directory]
 
-    main_application = QtImport.QApplication([])
+    main_application = qt_import.QApplication([])
     if app_style:
         main_application.setStyle(app_style)
 
@@ -378,11 +388,11 @@ def create_app(gui_config_file=None):
         )
         > 1
     ):
-        QtImport.QMessageBox.warning(
+        qt_import.QMessageBox.warning(
             None,
             "Warning",
             "Another instance of MXCuBE is running.\n",
-            QtImport.QMessageBox.Ok,
+            qt_import.QMessageBox.Ok,
         )
         # sys.exit(1)
 
@@ -390,7 +400,7 @@ def create_app(gui_config_file=None):
     if hwobj_directories:
         # Must be done before init_hardware_repository
         HWR.add_hardware_objects_dirs(hwobj_directories)
-    HWR.init_hardware_repository(configuration_path)
+    HWR.init_hardware_repository(core_config_path)
     HWR.set_user_file_directory(user_file_dir)
     if custom_bricks_directories:
         add_custom_bricks_dirs(custom_bricks_directories)
@@ -465,7 +475,7 @@ def create_app(gui_config_file=None):
     # log startup details
     # logging.getLogger().info("\n\n\n\n")
     HWR_LOGGER.info("Starting to load gui...")
-    HWR_LOGGER.info("GUI file: %s" % (gui_config_file or "unnamed"))
+    HWR_LOGGER.info("GUI file: %s" % (gui_config_path or "unnamed"))
     if len(log_file) > 0:
         HWR_LOGGER.info("Log file: %s" % log_file)
     HWR_LOGGER.info("User file directory: %s" % user_file_dir)
@@ -476,14 +486,14 @@ def create_app(gui_config_file=None):
     HWR_LOGGER.info(
         "    - Qt %s - %s %s"
         % (
-            "%d.%d.%d" % tuple(QtImport.qt_version_no),
-            QtImport.qt_variant,
-            "%d.%d.%d" % tuple(QtImport.pyqt_version_no),
+            "%d.%d.%d" % tuple(qt_import.qt_version_no),
+            qt_import.qt_variant,
+            "%d.%d.%d" % tuple(qt_import.pyqt_version_no),
         )
     )
-    if QtImport.mpl_imported:
+    if qt_import.mpl_imported:
         HWR_LOGGER.info(
-            "    - Matplotlib %s" % "%d.%d.%d" % tuple(QtImport.mpl_version_no)
+            "    - Matplotlib %s" % "%d.%d.%d" % tuple(qt_import.mpl_version_no)
         )
     else:
         HWR_LOGGER.info("    - Matplotlib not available")
@@ -491,7 +501,7 @@ def create_app(gui_config_file=None):
         "------------------------------------------------------------------------------"
     )
 
-    QtImport.QApplication.setDesktopSettingsAware(False)
+    qt_import.QApplication.setDesktopSettingsAware(False)
 
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = GUISupervisor(
@@ -503,25 +513,25 @@ def create_app(gui_config_file=None):
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(
-        supervisor, MyCustomEvent(LOAD_GUI_EVENT, gui_config_file)
+        supervisor, MyCustomEvent(LOAD_GUI_EVENT, gui_config_path)
     )
 
     # redirect errors to logger
     error_handler.enable_std_err_redirection()
 
-    gevent_timer = QtImport.QTimer()
+    gevent_timer = qt_import.QTimer()
     gevent_timer.timeout.connect(do_gevent)
     gevent_timer.start(0)
 
     palette = main_application.palette()
-    palette.setColor(QtImport.QPalette.ToolTipBase, QtImport.QColor(255, 241, 204))
-    palette.setColor(QtImport.QPalette.ToolTipText, QtImport.Qt.black)
+    palette.setColor(qt_import.QPalette.ToolTipBase, qt_import.QColor(255, 241, 204))
+    palette.setColor(qt_import.QPalette.ToolTipText, qt_import.Qt.black)
     main_application.setPalette(palette)
 
     main_application.setOrganizationName("MXCuBE")
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
-    # app.setWindowIcon(QtImport.QIcon("images/icon.png"))
+    # app.setWindowIcon(qt_import.QIcon("images/icon.png"))
 
     main_application.exec_()
 

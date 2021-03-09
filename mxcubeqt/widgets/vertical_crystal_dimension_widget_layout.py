@@ -18,128 +18,128 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class VerticalCrystalDimensionWidgetLayout(QtImport.QWidget):
+class VerticalCrystalDimensionWidgetLayout(qt_import.QWidget):
     def __init__(self, parent=None, name=None, fl=0):
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(fl))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(fl))
 
         if not name:
             self.setObjectName("VerticalCrystalDimensionWidgetLayout")
 
         return
 
-        VerticalCrystalDimensionWidgetLayoutLayout = QtImport.QVBoxLayout(
+        VerticalCrystalDimensionWidgetLayoutLayout = qt_import.QVBoxLayout(
             self, 0, 6, "VerticalCrystalDimensionWidgetLayoutLayout"
         )
 
-        self.gbox = QtImport.QGroupBox(self, "gbox")
+        self.gbox = qt_import.QGroupBox(self, "gbox")
         self.gbox.setSizePolicy(
-            QtImport.QSizePolicy.MinimumExpanding, QtImport.QSizePolicy.MinimumExpanding
+            qt_import.QSizePolicy.MinimumExpanding, qt_import.QSizePolicy.MinimumExpanding
         )
         self.gbox.setChecked(0)
-        self.gbox.setColumnLayout(0, QtImport.Qt.Vertical)
+        self.gbox.setColumnLayout(0, qt_import.Qt.Vertical)
         self.gbox.layout().setSpacing(6)
         self.gbox.layout().setMargin(11)
-        gboxLayout = QtImport.QHBoxLayout(self.gbox.layout())
-        gboxLayout.setAlignment(QtImport.Qt.AlignTop)
+        gboxLayout = qt_import.QHBoxLayout(self.gbox.layout())
+        gboxLayout.setAlignment(qt_import.Qt.AlignTop)
 
-        main_layout = QtImport.QVBoxLayout(None, 0, 15, "main_layout")
+        main_layout = qt_import.QVBoxLayout(None, 0, 15, "main_layout")
 
-        space_group_layout = QtImport.QHBoxLayout(None, 0, 6, "space_group_layout")
+        space_group_layout = qt_import.QHBoxLayout(None, 0, 6, "space_group_layout")
 
-        space_group_ledit_layout = QtImport.QHBoxLayout(None, 0, 6, "space_group_ledit_layout")
+        space_group_ledit_layout = qt_import.QHBoxLayout(None, 0, 6, "space_group_ledit_layout")
 
-        self.space_group_label = QtImport.QLabel(self.gbox, "space_group_label")
+        self.space_group_label = qt_import.QLabel(self.gbox, "space_group_label")
         space_group_ledit_layout.addWidget(self.space_group_label)
 
-        self.space_group_ledit = QtImport.QComboBox(0, self.gbox, "space_group_ledit")
-        self.space_group_ledit.setMinimumSize(QtImport.QSize(100, 0))
-        self.space_group_ledit.setMaximumSize(QtImport.QSize(100, 32767))
+        self.space_group_ledit = qt_import.QComboBox(0, self.gbox, "space_group_ledit")
+        self.space_group_ledit.setMinimumSize(qt_import.QSize(100, 0))
+        self.space_group_ledit.setMaximumSize(qt_import.QSize(100, 32767))
         space_group_ledit_layout.addWidget(self.space_group_ledit)
         space_group_layout.addLayout(space_group_ledit_layout)
-        space_group_hspacer = QtImport.QSpacerItem(
-            1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
+        space_group_hspacer = qt_import.QSpacerItem(
+            1, 20, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum
         )
         space_group_layout.addItem(space_group_hspacer)
         main_layout.addLayout(space_group_layout)
 
-        vdim_layout = QtImport.QVBoxLayout(None, 0, 2, "vdim_layout")
+        vdim_layout = qt_import.QVBoxLayout(None, 0, 2, "vdim_layout")
 
-        vdim_heading_layout = QtImport.QHBoxLayout(None, 0, 6, "vdim_heading_layout")
+        vdim_heading_layout = qt_import.QHBoxLayout(None, 0, 6, "vdim_heading_layout")
 
-        self.dimension_label = QtImport.QLabel(self.gbox, "dimension_label")
+        self.dimension_label = qt_import.QLabel(self.gbox, "dimension_label")
         vdim_heading_layout.addWidget(self.dimension_label)
-        vdim_heading_spacer = QtImport.QSpacerItem(
-            1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
+        vdim_heading_spacer = qt_import.QSpacerItem(
+            1, 20, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum
         )
         vdim_heading_layout.addItem(vdim_heading_spacer)
         vdim_layout.addLayout(vdim_heading_layout)
 
-        vdim_control_layout = QtImport.QHBoxLayout(None, 0, 0, "vdim_control_layout")
+        vdim_control_layout = qt_import.QHBoxLayout(None, 0, 0, "vdim_control_layout")
 
-        vdim_ledit_hlayout = QtImport.QHBoxLayout(None, 0, 20, "vdim_ledit_hlayout")
+        vdim_ledit_hlayout = qt_import.QHBoxLayout(None, 0, 20, "vdim_ledit_hlayout")
 
-        col_one_vdim_ledit_hlayout = QtImport.QHBoxLayout(
+        col_one_vdim_ledit_hlayout = qt_import.QHBoxLayout(
             None, 0, 6, "col_one_vdim_ledit_hlayout"
         )
 
-        vlayout_min_vdim_label = QtImport.QVBoxLayout(None, 0, 6, "vlayout_min_vdim_label")
+        vlayout_min_vdim_label = qt_import.QVBoxLayout(None, 0, 6, "vlayout_min_vdim_label")
 
-        self.min_vdim_label = QtImport.QLabel(self.gbox, "min_vdim_label")
+        self.min_vdim_label = qt_import.QLabel(self.gbox, "min_vdim_label")
         vlayout_min_vdim_label.addWidget(self.min_vdim_label)
 
-        self.vdim_min_phi_label = QtImport.QLabel(self.gbox, "vdim_min_phi_label")
+        self.vdim_min_phi_label = qt_import.QLabel(self.gbox, "vdim_min_phi_label")
         vlayout_min_vdim_label.addWidget(self.vdim_min_phi_label)
         col_one_vdim_ledit_hlayout.addLayout(vlayout_min_vdim_label)
 
-        vlayout_min_vdim_ledit = QtImport.QVBoxLayout(None, 0, 6, "vlayout_min_vdim_ledit")
+        vlayout_min_vdim_ledit = qt_import.QVBoxLayout(None, 0, 6, "vlayout_min_vdim_ledit")
 
-        self.min_vdim_ledit = QtImport.QLineEdit(self.gbox, "min_vdim_ledit")
-        self.min_vdim_ledit.setMinimumSize(QtImport.QSize(50, 0))
-        self.min_vdim_ledit.setMaximumSize(QtImport.QSize(50, 32767))
+        self.min_vdim_ledit = qt_import.QLineEdit(self.gbox, "min_vdim_ledit")
+        self.min_vdim_ledit.setMinimumSize(qt_import.QSize(50, 0))
+        self.min_vdim_ledit.setMaximumSize(qt_import.QSize(50, 32767))
         vlayout_min_vdim_ledit.addWidget(self.min_vdim_ledit)
 
-        self.min_vphi_ledit = QtImport.QLineEdit(self.gbox, "min_vphi_ledit")
-        self.min_vphi_ledit.setMinimumSize(QtImport.QSize(50, 0))
-        self.min_vphi_ledit.setMaximumSize(QtImport.QSize(50, 32767))
+        self.min_vphi_ledit = qt_import.QLineEdit(self.gbox, "min_vphi_ledit")
+        self.min_vphi_ledit.setMinimumSize(qt_import.QSize(50, 0))
+        self.min_vphi_ledit.setMaximumSize(qt_import.QSize(50, 32767))
         vlayout_min_vdim_ledit.addWidget(self.min_vphi_ledit)
         col_one_vdim_ledit_hlayout.addLayout(vlayout_min_vdim_ledit)
         vdim_ledit_hlayout.addLayout(col_one_vdim_ledit_hlayout)
 
-        col_two_vdim_ledit_hlayout = QtImport.QHBoxLayout(
+        col_two_vdim_ledit_hlayout = qt_import.QHBoxLayout(
             None, 0, 6, "col_two_vdim_ledit_hlayout"
         )
 
-        vlayout_two_vdim_hlayout = QtImport.QVBoxLayout(None, 0, 6, "vlayout_two_vdim_hlayout")
+        vlayout_two_vdim_hlayout = qt_import.QVBoxLayout(None, 0, 6, "vlayout_two_vdim_hlayout")
 
-        self.max_vdim_label = QtImport.QLabel(self.gbox, "max_vdim_label")
+        self.max_vdim_label = qt_import.QLabel(self.gbox, "max_vdim_label")
         vlayout_two_vdim_hlayout.addWidget(self.max_vdim_label)
 
-        self.max_vphi_label = QtImport.QLabel(self.gbox, "max_vphi_label")
+        self.max_vphi_label = qt_import.QLabel(self.gbox, "max_vphi_label")
         vlayout_two_vdim_hlayout.addWidget(self.max_vphi_label)
         col_two_vdim_ledit_hlayout.addLayout(vlayout_two_vdim_hlayout)
 
-        vlayout_max_vdim_ledit = QtImport.QVBoxLayout(None, 0, 6, "vlayout_max_vdim_ledit")
+        vlayout_max_vdim_ledit = qt_import.QVBoxLayout(None, 0, 6, "vlayout_max_vdim_ledit")
 
-        self.max_vdim_ledit = QtImport.QLineEdit(self.gbox, "max_vdim_ledit")
-        self.max_vdim_ledit.setMinimumSize(QtImport.QSize(50, 0))
-        self.max_vdim_ledit.setMaximumSize(QtImport.QSize(50, 32767))
+        self.max_vdim_ledit = qt_import.QLineEdit(self.gbox, "max_vdim_ledit")
+        self.max_vdim_ledit.setMinimumSize(qt_import.QSize(50, 0))
+        self.max_vdim_ledit.setMaximumSize(qt_import.QSize(50, 32767))
         vlayout_max_vdim_ledit.addWidget(self.max_vdim_ledit)
 
-        self.max_vphi_ledit = QtImport.QLineEdit(self.gbox, "max_vphi_ledit")
-        self.max_vphi_ledit.setMinimumSize(QtImport.QSize(50, 0))
-        self.max_vphi_ledit.setMaximumSize(QtImport.QSize(50, 32767))
+        self.max_vphi_ledit = qt_import.QLineEdit(self.gbox, "max_vphi_ledit")
+        self.max_vphi_ledit.setMinimumSize(qt_import.QSize(50, 0))
+        self.max_vphi_ledit.setMaximumSize(qt_import.QSize(50, 32767))
         vlayout_max_vdim_ledit.addWidget(self.max_vphi_ledit)
         col_two_vdim_ledit_hlayout.addLayout(vlayout_max_vdim_ledit)
         vdim_ledit_hlayout.addLayout(col_two_vdim_ledit_hlayout)
         vdim_control_layout.addLayout(vdim_ledit_hlayout)
-        vspacer = QtImport.QSpacerItem(1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum)
+        vspacer = qt_import.QSpacerItem(1, 20, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum)
         vdim_control_layout.addItem(vspacer)
         vdim_layout.addLayout(vdim_control_layout)
         main_layout.addLayout(vdim_layout)
@@ -148,7 +148,7 @@ class VerticalCrystalDimensionWidgetLayout(QtImport.QWidget):
 
         self.languageChange()
 
-        self.resize(QtImport.QSize(307, 163).expandedTo(self.minimumSizeHint()))
+        self.resize(qt_import.QSize(307, 163).expandedTo(self.minimumSizeHint()))
 
     def languageChange(self):
         self.setCaption(self.__tr("VerticalCrystalDimensionWidget"))
@@ -165,9 +165,9 @@ class VerticalCrystalDimensionWidgetLayout(QtImport.QWidget):
         )
 
     def __tr(self, s, c=None):
-        return QtImport.QApplication.translate("VerticalCrystalDimensionWidgetLayout", s, c)
+        return qt_import.QApplication.translate("VerticalCrystalDimensionWidgetLayout", s, c)
 
     def __trUtf8(self, s, c=None):
-        return QtImport.QApplication.translate(
-            "VerticalCrystalDimensionWidgetLayout", s, c, QtImport.QApplication.UnicodeUTF8
+        return qt_import.QApplication.translate(
+            "VerticalCrystalDimensionWidgetLayout", s, c, qt_import.QApplication.UnicodeUTF8
         )

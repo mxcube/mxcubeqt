@@ -20,7 +20,7 @@
 import numpy as np
 import pyqtgraph as pg
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -29,15 +29,15 @@ __license__ = "LGPLv3+"
 #pg.setConfigOption('background', 'w')
 
 
-class PlotWidget(QtImport.QWidget):
+class PlotWidget(qt_import.QWidget):
 
-    mouseMovedSignal = QtImport.pyqtSignal(float, float)
-    mouseClickedSignal = QtImport.pyqtSignal(float, float)
-    mouseDoubleClickedSignal = QtImport.pyqtSignal(float, float)
-    mouseLeftSignal = QtImport.pyqtSignal()
+    mouseMovedSignal = qt_import.pyqtSignal(float, float)
+    mouseClickedSignal = qt_import.pyqtSignal(float, float)
+    mouseDoubleClickedSignal = qt_import.pyqtSignal(float, float)
+    mouseLeftSignal = qt_import.pyqtSignal()
 
     def __init__(self, parent=None):
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
 
         self.view_box = CustomViewBox()
         self.plot_widget = pg.PlotWidget(viewBox=self.view_box)
@@ -50,7 +50,7 @@ class PlotWidget(QtImport.QWidget):
         self.plot_widget.showGrid(x=True, y=True)
         self.curves_dict = {}
 
-        self.vlayout = QtImport.QVBoxLayout(self)
+        self.vlayout = qt_import.QVBoxLayout(self)
         self.vlayout.addWidget(self.plot_widget)
         self.vlayout.addWidget(self.image_view)
 
@@ -136,11 +136,11 @@ class CustomViewBox(pg.ViewBox):
 
     ## reimplement right-click to zoom out
     #def mouseClickEvent(self, ev):
-    #    if ev.button() == QtImport.Qt.RightButton:
+    #    if ev.button() == qt_import.Qt.RightButton:
     #        self.autoRange()
 
     def mouseDragEvent(self, ev):
-        if ev.button() == QtImport.Qt.RightButton:
+        if ev.button() == qt_import.Qt.RightButton:
             ev.ignore()
         else:
             pg.ViewBox.mouseDragEvent(self, ev)

@@ -18,16 +18,16 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class RoutineDCWidgetLayout(QtImport.QWidget):
+class RoutineDCWidgetLayout(qt_import.QWidget):
     def __init__(self, parent=None, name=None, flags=0):
 
-        QtImport.QWidget.__init__(self, parent, QtImport.Qt.WindowFlags(flags))
+        qt_import.QWidget.__init__(self, parent, qt_import.Qt.WindowFlags(flags))
 
         if not name:
             self.setObjectName("RoutineDCWidgetLayout")
@@ -37,23 +37,23 @@ class RoutineDCWidgetLayout(QtImport.QWidget):
         # Internal variables --------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        self.min_dose_radio = QtImport.QRadioButton(self)
-        self.min_time_radio = QtImport.QRadioButton(self)
-        self.dose_time_bgroup = QtImport.QButtonGroup(self)
+        self.min_dose_radio = qt_import.QRadioButton(self)
+        self.min_time_radio = qt_import.QRadioButton(self)
+        self.dose_time_bgroup = qt_import.QButtonGroup(self)
         self.dose_time_bgroup.addButton(self.min_dose_radio)
         self.dose_time_bgroup.addButton(self.min_time_radio)
-        self.dose_limit_cbx = QtImport.QCheckBox(self)
-        self.time_limit_cbx = QtImport.QCheckBox(self)
-        self.dose_ledit = QtImport.QLineEdit(self)
+        self.dose_limit_cbx = qt_import.QCheckBox(self)
+        self.time_limit_cbx = qt_import.QCheckBox(self)
+        self.dose_ledit = qt_import.QLineEdit(self)
         self.dose_ledit.setMinimumSize(50, 0)
         self.dose_ledit.setMaximumSize(50, 32767)
-        self.time_ledit = QtImport.QLineEdit(self)
+        self.time_ledit = qt_import.QLineEdit(self)
         self.time_ledit.setMinimumSize(50, 0)
         self.time_ledit.setMaximumSize(50, 32767)
-        self.radiation_damage_cbx = QtImport.QCheckBox(self)
+        self.radiation_damage_cbx = qt_import.QCheckBox(self)
 
         # Layout --------------------------------------------------------------
-        _main_gridlayout = QtImport.QGridLayout(self)
+        _main_gridlayout = qt_import.QGridLayout(self)
         _main_gridlayout.addWidget(self.min_dose_radio, 0, 0)  # , 2, 1)
         _main_gridlayout.addWidget(self.min_time_radio, 1, 0)
         _main_gridlayout.addWidget(self.dose_limit_cbx, 0, 1)
@@ -82,4 +82,4 @@ class RoutineDCWidgetLayout(QtImport.QWidget):
         self.radiation_damage_cbx.setText(self.__tr("Account for radiation damage"))
 
     def __tr(self, s, c=None):
-        return QtImport.QApplication.translate("RoutineDCWidgetLayout", s, c)
+        return qt_import.QApplication.translate("RoutineDCWidgetLayout", s, c)

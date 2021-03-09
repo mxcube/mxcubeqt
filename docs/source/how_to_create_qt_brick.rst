@@ -8,9 +8,9 @@ How to create GUI brick in Qt version
 
 .. code-block:: python
 
-   import QtImport
+   import qt_import
 
-   from gui.BaseComponents import BaseWidget
+   from gui.base_components import BaseWidget
 
    __category__ = "General"
 
@@ -39,12 +39,12 @@ How to create GUI brick in Qt version
            self.defineSlot("test_brick_slot", ())
 
            # Graphic elements ----------------------------------------------------
-           self.test_ledit = QtImport.QLineEdit("Test linedit", self)
-           self.test_button = QtImport.QPushButton("Test button", self)
-           self.test_combo = QtImport.QComboBox(self)
+           self.test_ledit = qt_import.QLineEdit("Test linedit", self)
+           self.test_button = qt_import.QPushButton("Test button", self)
+           self.test_combo = qt_import.QComboBox(self)
 
            # Layout --------------------------------------------------------------
-           _main_vlayout = QtImport.QVBoxLayout(self)
+           _main_vlayout = qt_import.QVBoxLayout(self)
            _main_vlayout.addWidget(self.test_ledit)
            _main_vlayout.addWidget(self.test_button)
            _main_vlayout.addWidget(self.test_combo)
@@ -171,13 +171,13 @@ It is recommended to use widgets to compose a brick. A widget in the MXCuBE cont
 In this example ``dc_tree_widget.py`` is used in  ``TreeBrick``.
 
 .. code-block:: python
-   class DataCollectTree(QtImport.QWidget):
+   class DataCollectTree(qt_import.QWidget):
          def __init__(self, parent = None, name = "data_collect",
                       selection_changed = None):
              """
              Descript. :
              """
-             QtImport.QWidget.__init__(self, parent)
+             qt_import.QWidget.__init__(self, parent)
              self.setObjectName(name)
 
 
@@ -191,7 +191,7 @@ In this example ``dc_tree_widget.py`` is used in  ``TreeBrick``.
    self.dc_tree_widget = DataCollectTree(self)
   
    # ...
-   main_layout = QtImport.QVBoxLayout(self)
+   main_layout = qt_import.QVBoxLayout(self)
    # ...
    main_layout.addWidget(self.dc_tree_widget)
    main_layout.setSpacing(0)
@@ -213,7 +213,7 @@ Qt designer is a powefull tool that allows to create layout for widgets and bric
 .. code-block:: python
 
    # ...
-   self.sample_changer_widget = QtImport.load_ui_file(
+   self.sample_changer_widget = qt_import.load_ui_file(
         "sample_changer_widget_layout.ui")
 
    # ...

@@ -19,7 +19,7 @@
 
 import logging
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
@@ -32,10 +32,10 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class DCParametersWidget(QtImport.QWidget):
+class DCParametersWidget(qt_import.QWidget):
     def __init__(self, parent=None, name="parameter_widget"):
 
-        QtImport.QWidget.__init__(self, parent)
+        qt_import.QWidget.__init__(self, parent)
         if name is not None:
             self.setObjectName(name)
 
@@ -51,13 +51,13 @@ class DCParametersWidget(QtImport.QWidget):
         self._acquisition_mib = None
 
         # Graphic elements ----------------------------------------------------
-        _dc_parameters_widget = QtImport.QWidget(self)
+        _dc_parameters_widget = qt_import.QWidget(self)
         self._data_path_widget = DataPathWidget(_dc_parameters_widget)
         self._acq_widget = AcquisitionWidget(_dc_parameters_widget, layout="horizontal")
         self._processing_widget = ProcessingWidget(_dc_parameters_widget)
 
         # Layout --------------------------------------------------------------
-        _dc_parameters_widget_layout = QtImport.QVBoxLayout(_dc_parameters_widget)
+        _dc_parameters_widget_layout = qt_import.QVBoxLayout(_dc_parameters_widget)
         _dc_parameters_widget_layout.addWidget(self._data_path_widget)
         _dc_parameters_widget_layout.addWidget(self._acq_widget)
         _dc_parameters_widget_layout.addWidget(self._processing_widget)
@@ -65,7 +65,7 @@ class DCParametersWidget(QtImport.QWidget):
         _dc_parameters_widget_layout.setSpacing(2)
         _dc_parameters_widget_layout.addStretch(10)
 
-        _main_hlayout = QtImport.QHBoxLayout(self)
+        _main_hlayout = qt_import.QHBoxLayout(self)
         _main_hlayout.addWidget(_dc_parameters_widget)
         _main_hlayout.setContentsMargins(0, 0, 0, 0)
         _main_hlayout.setSpacing(2)

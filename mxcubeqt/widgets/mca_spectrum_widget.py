@@ -46,10 +46,10 @@ import os
 import logging
 import numpy as np
 
-from mxcubeqt.utils import QtImport
+from mxcubeqt.utils import qt_import
 pymca_imported = False
 try:
-    if QtImport.qt_variant == "PyQt5":
+    if qt_import.qt_variant == "PyQt5":
         from PyMca5.PyMca import McaAdvancedFit
         from PyMca5.PyMca import ConfigDict
     else:
@@ -62,7 +62,7 @@ except BaseException:
 if not pymca_imported:
     from mxcubeqt.widgets.matplot_widget import TwoAxisPlotWidget
 
-from mxcubeqt.BaseComponents import BaseWidget
+from mxcubeqt.base_components import BaseWidget
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -81,7 +81,7 @@ class McaSpectrumWidget(BaseWidget):
         else:
             self.mcafit_widget = TwoAxisPlotWidget(self)
 
-        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.mcafit_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
