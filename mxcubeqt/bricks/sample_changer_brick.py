@@ -1263,7 +1263,7 @@ class SampleChangerBrick(BaseWidget):
     def changeSample(self, sample_number):
         basket_index = HWR.beamline.sample_changer.getSelectedComponent().get_index()
         basket_number = basket_index + 1
-        address = Container.Pin.getSampleAddress(basket_number, sample_number)
+        address = Container.Pin.get_sample_address(basket_number, sample_number)
         HWR.beamline.sample_changer.select(address, wait=False)
 
     def user_select_this_sample(self, basket_index, vial_index):

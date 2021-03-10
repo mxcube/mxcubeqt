@@ -227,7 +227,7 @@ class ConfigurationTable(qt_import.QTableWidget):
         if col == 1 and row >= 0:
             self.item(row, 2).setEnabled(1)
 
-        return qt_import.QTable.beginEdit(self, row, col, replace)
+        return qt_import.QTableWidget.beginEdit(self, row, col, replace)
 
     def endEdit(self, row, col, accept, replace):
         if col == 1 and row >= 0:
@@ -265,7 +265,7 @@ class ConfigurationTable(qt_import.QTableWidget):
                     # self.emit(QtCore.SIGNAL('propertyChanged'),
                     # (prop_name, old_value, prop.get_user_value(), ))
 
-        return qt_import.QTable.endEdit(self, row, col, accept, replace)
+        return qt_import.QTableWidget.endEdit(self, row, col, accept, replace)
 
 
 class ValidationTableItem(qt_import.QWidget):
@@ -404,7 +404,7 @@ class ColorTableItem(qt_import.QWidget):
                 try:
                     self.qtcolor = qt_import.QColor(color)
                 except BaseException:
-                    self.qtcolor = qt_import.QtColor(qt_import.Qt.green)
+                    self.qtcolor = qt_import.QColor(qt_import.Qt.green)
                     self.color = self.qtcolor.rgb()
                 else:
                     self.color = self.qtcolor.rgb()

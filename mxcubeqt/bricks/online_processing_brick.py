@@ -71,9 +71,7 @@ class OnlineProcessingBrick(BaseWidget):
     def populate_widget(self, item):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = item.get_model().reference_image_collection
-            self.osc_results_widget.populate_widget(
-                item, item.get_model().line_collection
-            )
+            self.osc_results_widget.populate_widget(item)
         else:
             data_collection = item.get_model()
             self.osc_results_widget.populate_widget(item)

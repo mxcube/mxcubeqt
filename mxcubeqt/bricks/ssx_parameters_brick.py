@@ -17,12 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from gui.base_components import BaseWidget
-from gui.utils import html_template, qt_import
-from gui.widgets.dc_parameters_widget import DCParametersWidget
-from gui.widgets.image_tracking_widget import ImageTrackingWidget
-from gui.widgets.advanced_results_widget import AdvancedResultsWidget
-from gui.widgets.snapshot_widget import SnapshotWidget
+from mxcubeqt.base_components import BaseWidget
+from mxcubeqt.utils import html_template, qt_import
+from mxcubeqt.widgets.dc_parameters_widget import DCParametersWidget
+from mxcubeqt.widgets.image_tracking_widget import ImageTrackingWidget
+from mxcubeqt.widgets.advanced_results_widget import AdvancedResultsWidget
+from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
 from mxcubecore import HardwareRepository as HWR
 

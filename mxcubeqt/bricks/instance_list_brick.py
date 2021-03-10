@@ -17,9 +17,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from mxcubecore.HardwareObjects import InstanceServer
-from mxcubeqt.base_components import BaseWidget
-from mxcubeqt.utils import colors, icons, qt_import
+
+
 import os
 import sys
 import smtplib
@@ -32,6 +31,9 @@ if sys.version_info[0] == 3:
 else:
     from email import Utils as utils
 
+from mxcubeqt.base_components import BaseWidget
+from mxcubeqt.utils import colors, icons, qt_import
+from mxcubecore.HardwareObjects import QtInstanceServer
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -922,7 +924,7 @@ class InstanceListBrick(BaseWidget):
         if self.give_control_msgbox is not None:
             if self.timeout_left in (30, 20, 10):
                 self.instance_server_hwobj.sendChatMessage(
-                    InstanceServer.ChatInstanceMessage.PRIORITY_LOW,
+                    QtInstanceServer.ChatInstanceMessage.PRIORITY_LOW,
                     "%s will have control in %d seconds..."
                     % (self.give_control_msgbox.nickname, self.timeout_left),
                 )
@@ -958,7 +960,7 @@ class InstanceListBrick(BaseWidget):
                         self.instance_server_hwobj.giveControl(client_id)
                     else:
                         self.instance_server_hwobj.sendChatMessage(
-                            InstanceServer.ChatInstanceMessage.PRIORITY_HIGH,
+                            QtInstanceServer.ChatInstanceMessage.PRIORITY_HIGH,
                             "Control denied for %s!" % client_print,
                         )
                     self.give_control_msgbox = None

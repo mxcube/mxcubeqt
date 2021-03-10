@@ -99,9 +99,7 @@ class AdvancedBrick(BaseWidget):
             self.line_parameters_widget.populate_widget(
                 item, item.get_model().line_collection
             )
-            self.line_results_widget.populate_widget(
-                item, item.get_model().line_collection
-            )
+            self.line_results_widget.populate_widget(item)
         else:
             self._data_collection = item.get_model()
             self.parameters_widget.populate_widget(item, self._data_collection)

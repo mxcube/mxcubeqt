@@ -817,8 +817,8 @@ class BaseWidget(connectable.Connectable, qt_import.QFrame):
                 uid = (
                     sender,
                     pysignal
-                    and qt_import.QtCore.SIGNAL(signal)
-                    or qt_import.QtCore.SIGNAL(signal),
+                    and qt_import.pyqtSignal(signal)
+                    or qt_import.pyqtSignal(signal),
                     hash(slot),
                 )
                 signal_slot_filter = self._signal_slot_filters[uid]
@@ -866,25 +866,6 @@ class BaseWidget(connectable.Connectable, qt_import.QFrame):
     def restart(self):
         self.stop()
         self.run()
-
-    def load_ui_file(self, filename):
-        for path in [mxcubeqt.get_base_bricks_path()] + mxcubeqt.get_custom_bricks_dirs():
-            if os.path.exists(os.path.join(path, filename)):
-                return qt_import.QWidgetFactory.create(os.path.join(path, filename))
-
-    def create_gui_from_ui(self, ui_filename):
-        widget = self.loadUIFile(ui_filename)
-        if widget is not None:
-            children = self.children() or []
-            for child in children:
-                self.removeChild(child)
-
-            layout = qt_import.QGridLayout(self, 1, 1)
-            widget.reparent(self)
-            widget.show()
-            layout.addWidget(widget, 0, 0)
-            self.setLayout(layout)
-            return widget
 
     def set_persistent_property_bag(self, persistent_property_bag):
         if id(persistent_property_bag) != id(self.property_bag):

@@ -19,7 +19,7 @@
 
 from mxcubeqt.utils import icons, qt_import
 from mxcubeqt.base_components import BaseWidget
-from mxcubeqt.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
+from mxcubeqt.bricks.motor_spinbox_brick import MotorSpinboxBrick
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -100,7 +100,7 @@ class MultipleMotorsBrick(BaseWidget):
             for index, hwobj_name in enumerate(hwobj_names_list):
                 temp_motor_hwobj = self.get_hardware_object(hwobj_name)
                 if temp_motor_hwobj is not None:
-                    temp_motor_widget = MotorSpinBoxBrick(self)
+                    temp_motor_widget = MotorSpinboxBrick(self)
                     temp_motor_widget.set_motor(temp_motor_hwobj, hwobj_name)
                     temp_motor_widget.move_left_button.setVisible(
                         self["showMoveButtons"]

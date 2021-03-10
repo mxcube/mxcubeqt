@@ -23,7 +23,7 @@ import time
 from mxcubeqt.utils import icons, qt_import
 from mxcubeqt.base_components import BaseWidget
 
-from mxcubecore.HardwareObjects import InstanceServer
+from mxcubecore.HardwareObjects import QtInstanceServer
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -141,7 +141,7 @@ class ChatBrick(BaseWidget):
         color = ChatBrick.PRIORITY_COLORS[priority]
         msg_prefix = ""
         msg_suffix = ""
-        if priority == InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL:
+        if priority == QtInstanceServer.ChatInstanceMessage.PRIORITY_NORMAL:
             if user_id is None:
                 header = ""
             else:
@@ -187,14 +187,14 @@ class ChatBrick(BaseWidget):
             "%s has joined the conversation."
             % self.instance_server_hwobj.idPrettyPrint(client_id)
         )
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
+        self.message_arrived(QtInstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
     def wants_control(self, client_id):
         msg = "%s wants to have control!" % self.instance_server_hwobj.idPrettyPrint(
             client_id
         )
         self.message_arrived(
-            InstanceServer.ChatInstanceMessage.PRIORITY_HIGH, None, msg
+            QtInstanceServer.ChatInstanceMessage.PRIORITY_HIGH, None, msg
         )
 
     def server_initialized(self, started, server_id=None):
@@ -208,7 +208,7 @@ class ChatBrick(BaseWidget):
             "%s has left the conversation..."
             % self.instance_server_hwobj.idPrettyPrint(client_id)
         )
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
+        self.message_arrived(QtInstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
     def client_initialized(
         self, connected, server_id=None, my_nickname=None, quiet=False
@@ -220,7 +220,7 @@ class ChatBrick(BaseWidget):
                 server_print,
             )
             self.message_arrived(
-                InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg
+                QtInstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg
             )
             self.nickname = my_nickname
 
@@ -233,14 +233,14 @@ class ChatBrick(BaseWidget):
             new_client_print = self.instance_server_hwobj.idPrettyPrint(new_client_id)
             msg = "%s has changed to %s." % (old_client_print, new_client_print)
             self.message_arrived(
-                InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg
+                QtInstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg
             )
 
     def send_current_message(self):
         txt = str(self.message_ledit.text())
         if len(txt):
             self.instance_server_hwobj.sendChatMessage(
-                InstanceServer.ChatInstanceMessage.PRIORITY_NORMAL, txt
+                QtInstanceServer.ChatInstanceMessage.PRIORITY_NORMAL, txt
             )
             self.message_ledit.setText("")
 
@@ -334,17 +334,17 @@ class ChatBrick(BaseWidget):
     def have_control(self, have_control, gui_only=False):
         if not gui_only:
             if have_control:
-                p = InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
+                p = QtInstanceServer.ChatInstanceMessage.PRIORITY_HIGH
                 msg = "I've gained control!"
             else:
-                p = InstanceServer.ChatInstanceMessage.PRIORITY_HIGH
+                p = QtInstanceServer.ChatInstanceMessage.PRIORITY_HIGH
                 msg = "I've lost control..."
             self.message_arrived(p, None, msg)
 
     def pass_control(self, has_control_id):
         has_control_print = self.instance_server_hwobj.idPrettyPrint(has_control_id)
         msg = "%s has control." % has_control_print
-        self.message_arrived(InstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
+        self.message_arrived(QtInstanceServer.ChatInstanceMessage.PRIORITY_LOW, None, msg)
 
     def tabSelected(self, tab_name):
         if tab_name == self["myTabLabel"]:
