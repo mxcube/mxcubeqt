@@ -21,8 +21,7 @@ before_script:
 
 script:
   - cd test
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_wait 20 python -m pytest; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_wait 20 python3 -m pytest; fi
+  - pytest
   - cd ..
   - pylint -E mxcubeqt/*py --extension-pkg-whitelist=PyQt5,PyQt4
   - travis_wait 20 pylint -E mxcubeqt/utils --extension-pkg-whitelist=PyQt5,PyQt4
