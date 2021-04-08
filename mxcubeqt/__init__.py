@@ -218,6 +218,19 @@ def create_app(gui_config_path=None, core_config_path=None):
     )
     parser.add_option(
         "",
+        "--guiConfigPath",
+        action="store",
+        type="string",
+        help="Path to the mxcube gui configuration file "
+        + "Alternatively MXCUBE_GUI_CONFIG_PATH env variable"
+        + "can be used",
+        metavar="directory",
+        dest="coreConfigPath",
+        default="",
+    )
+
+    parser.add_option(
+        "",
         "--coreConfigPath",
         action="store",
         type="string",
@@ -225,8 +238,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         + "configuration files. "
         + "Alternatively MXCUBE_CORE_CONFIG_PATH env variable"
         + "can be used",
-        metavar="directory",
-        dest="coreConfigPath",
+        dest="guiConfigPath",
         default="",
     )
     parser.add_option(
@@ -312,10 +324,6 @@ def create_app(gui_config_path=None, core_config_path=None):
     (opts, args) = parser.parse_args()
 
     log_file = start_log(opts.logFile, opts.logLevel)
-
-    # get config from arguments
-    if not gui_config_path and opts.mockupMode: 
-        gui_config_path = MOCKUP_CONFIG_PATH
     log_template = opts.logTemplate
     hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
@@ -330,12 +338,21 @@ def create_app(gui_config_path=None, core_config_path=None):
 
     app_style = opts.appStyle
 
+    if not gui_config_path:
+        if opts.guiConfigPath:
+            gui_config_path = opts.guiConfigPath
+        elif opts.mockupMode:
+            gui_config_path = MOCKUP_CONFIG_PATH
+        else:
+            gui_config_path = os.environ.get("MXCUBE_GUI_CONFIG_PATH")
+
     if not core_config_path:
         if opts.coreConfigPath:
             core_config_path = opts.coreConfigPath
         else:
             # try to set Hardware Repository server from environment
             core_config_path = os.environ.get("MXCUBE_CORE_CONFIG_PATH")
+
 
     # add bricks directories and hardware objects directories from environment
     try:

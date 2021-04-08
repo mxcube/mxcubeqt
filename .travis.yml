@@ -8,9 +8,10 @@ python:
 env:
   - PYTHONPATH=$PYTHONPATH:$(pwd) HARDWARE_REPOSITORY_SERVER=$(pwd)/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/configuration/mockup 
 
+services: xvfb
+
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev python-pyqt5; fi
-  - 
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest-xvfb PyYAML pylint; fi
   - git clone https://github.com/mxcube/mxcubecore
@@ -20,9 +21,9 @@ before_script:
   - "export DISPLAY=:99.0"
 
 script:
-  - cd test
-  - pytest
-  - cd ..
+#  - cd test
+#- pytest
+#- cd ..
   - pylint -E mxcubeqt/*py --extension-pkg-whitelist=PyQt5,PyQt4
   - travis_wait 20 pylint -E mxcubeqt/utils --extension-pkg-whitelist=PyQt5,PyQt4
   - travis_wait 20 pylint -E mxcubeqt/bricks --extension-pkg-whitelist=PyQt5,PyQt4
