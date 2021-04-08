@@ -6,7 +6,7 @@ python:
   - "3.8"
 
 env:
-  - PYTHONPATH=$PYTHONPATH:$(pwd) HARDWARE_REPOSITORY_SERVER=$(pwd)/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/configuration/mockup 
+  - PYTHONPATH=$PYTHONPATH:$(pwd)/mxcubecore MXCUBE_CORE_CONFIG=$(pwd)/mxcubecore/mxcubecore/configuration/mockup/qt:$(pwd)/mxcubecore/mxcubecore/configuration/mockup 
 
 services: xvfb
 
@@ -15,7 +15,6 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest-xvfb PyYAML pylint; fi
   - git clone https://github.com/mxcube/mxcubecore
-  - ln -s mxcubecore HardwareRepository 
 
 before_script:
   - "export DISPLAY=:99.0"
