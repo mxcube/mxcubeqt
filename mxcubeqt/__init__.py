@@ -130,8 +130,9 @@ def set_logging_name(name, logging_formatter=""):
     logging_formatter.replace(" ", "")
     if logging_formatter == "":
         logging_formatter = LOG_FORMATTER
-    _formatter = logging.Formatter(logging_formatter)
-    HWR_LOG_HANDLER.setFormatter(LOG_FORMATTER)
+    #print('logging_formatter', logging_formatter)
+    #_formatter = logging.Formatter(logging_formatter)
+    HWR_LOG_HANDLER.setFormatter(logging_formatter)
     LOGIN_NAME = name
 
 
@@ -171,7 +172,7 @@ class MyCustomEvent(qt_import.QEvent):
         self.data = data
 
 
-def create_app(gui_config_path=None, core_config_path=None):
+def create_app(gui_config_file=None, core_config_path=None):
     """Main run method"""
 
     # path to user's home dir. (works on Win2K, XP, Unix, Mac...)
@@ -314,8 +315,8 @@ def create_app(gui_config_path=None, core_config_path=None):
     log_file = start_log(opts.logFile, opts.logLevel)
 
     # get config from arguments
-    if not gui_config_path and opts.mockupMode: 
-        gui_config_path = MOCKUP_CONFIG_PATH
+    if not gui_config_file and opts.mockupMode: 
+        gui_config_file = MOCKUP_CONFIG_PATH
     log_template = opts.logTemplate
     hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
@@ -475,7 +476,7 @@ def create_app(gui_config_path=None, core_config_path=None):
     # log startup details
     # logging.getLogger().info("\n\n\n\n")
     HWR_LOGGER.info("Starting to load gui...")
-    HWR_LOGGER.info("GUI file: %s" % (gui_config_path or "unnamed"))
+    HWR_LOGGER.info("GUI file: %s" % (gui_config_file or "unnamed"))
     if len(log_file) > 0:
         HWR_LOGGER.info("Log file: %s" % log_file)
     HWR_LOGGER.info("User file directory: %s" % user_file_dir)
@@ -513,7 +514,7 @@ def create_app(gui_config_path=None, core_config_path=None):
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(
-        supervisor, MyCustomEvent(LOAD_GUI_EVENT, gui_config_path)
+        supervisor, MyCustomEvent(LOAD_GUI_EVENT, gui_config_file)
     )
 
     # redirect errors to logger
