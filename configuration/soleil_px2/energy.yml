@@ -1,9 +1,23 @@
 - children:
-  - brick: {class: MachineInfoBrick, name: machine_info_brick0}
+  - brick: {class: EnergyBrick, name: energy_brick0}
     children: []
     connections: []
-    name: machine_info_brick0
+    name: energy_brick0
     properties:
+    - {comment: '', default_value: '##.####', format_string: '%2.4f', format_string_length: 7,
+      hidden: false, name: angFormatString, old_value: null, type: formatString, value: '##.####'}
+    - choices: [keV, Ang]
+      comment: ''
+      default_value: keV
+      hidden: false
+      name: defaultMode
+      old_value: null
+      type: combo
+      value: keV
+    - {comment: '', default_value: 0, hidden: false, name: displayStatus, old_value: 0,
+      type: boolean, value: 1}
+    - {comment: '', default_value: 0, hidden: false, name: doBeamAlignment, old_value: 0,
+      type: boolean, value: 1}
     - {comment: Set fixed height in pixels, default_value: -1, hidden: false, name: fixedHeight,
       old_value: null, type: integer, value: -1}
     - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
@@ -15,12 +29,12 @@
     - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: null,
       type: boolean, value: 0}
     - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
-      name: instanceAllowAlways, old_value: 0, type: boolean, value: 1}
+      name: instanceAllowAlways, old_value: null, type: boolean, value: 0}
     - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
-      name: instanceAllowConnected, old_value: 0, type: boolean, value: 1}
-    - {comment: Maximal number of plot points, default_value: 100, hidden: false,
-      name: maxPlotPoints, old_value: null, type: integer, value: 100}
-    type: machine_info_brick
+      name: instanceAllowConnected, old_value: null, type: boolean, value: 0}
+    - {comment: '', default_value: '##.####', format_string: '%2.4f', format_string_length: 7,
+      hidden: false, name: kevFormatString, old_value: null, type: formatString, value: '##.####'}
+    type: energy_brick
   connections: []
   name: window0
   properties:
