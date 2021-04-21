@@ -20,7 +20,7 @@
 import logging
 
 from mxcubeqt.utils import icons, qt_import
-from mxcubeqt.bricks import MotorSpinBoxBrick
+from mxcubeqt.bricks.motor_spinbox_brick import MotorSpinboxBrick
 
 """
 Controls both the light on/off (light_actuator) and intensity (motor)
@@ -38,11 +38,10 @@ STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
 )
 
 
-class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
+class LightControlBrick(MotorSpinboxBrick):
     def __init__(self, *args):
 
-        MotorSpinBoxBrick.MotorSpinBoxBrick.__init__(self, *args)
-
+        MotorSpinboxBrick.__init__(self, *args)
         self.light_actuator_hwo = None
         self.light_saved_pos = None
 
@@ -136,7 +135,7 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
-            MotorSpinBoxBrick.MotorSpinBoxBrick.property_changed(
+            MotorSpinboxBrick.property_changed(
                 self, property_name, old_value, new_value
             )
             if self.motor_hwobj is not None:
@@ -147,6 +146,6 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
                 else:
                     self["delta"] = 1.0
         else:
-            MotorSpinBoxBrick.MotorSpinBoxBrick.property_changed(
+            MotorSpinboxBrick.property_changed(
                 self, property_name, old_value, new_value
             )
