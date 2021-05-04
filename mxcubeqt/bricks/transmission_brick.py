@@ -108,10 +108,6 @@ class TransmissionBrick(BaseWidget):
 
     def _state_changed(self, state):
         """Updates new value QLineEdit based on the state"""
-        if HWR.beamline.transmission.is_ready():
-            self.connected()
-        else:
-            self.disconnected()
         self._update_ledit_color(colors.COLOR_STATES[state])
 
     def _value_changed(self, new_value):
