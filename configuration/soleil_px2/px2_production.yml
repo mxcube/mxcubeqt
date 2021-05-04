@@ -2936,7 +2936,7 @@
                 value: !!python/unicode '/singleton_objects/queue-model'}
               - {comment: '', defaultValue: !!python/unicode '/redis', hidden: false,
                 name: redis_client, oldValue: !!python/unicode '/redis', type: string,
-                value: !!python/unicode ''}
+                value: !!python/unicode '/redis_false'}
               - {comment: '', defaultValue: !!python/unicode 'Sample changer', hidden: false,
                 name: scOneName, oldValue: !!python/unicode 'Sample changer', type: string,
                 value: !!python/unicode 'Sample changer'}

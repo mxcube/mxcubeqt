@@ -2762,7 +2762,7 @@
               - {comment: '', default_value: /queue-model, hidden: false, name: queue_model,
                 old_value: /queue-model, type: string, value: /singleton_objects/queue-model}
               - {comment: '', default_value: '', hidden: false, name: redis_client,
-                old_value: '', type: string, value: /singleton_objects/redis}
+                old_value: '', type: string, value: /singleton_objects/redis_false}
               - {comment: '', default_value: Sample changer, hidden: false, name: scOneName,
                 old_value: Sample changer, type: string, value: Cats}
               - {comment: '', default_value: Plate, hidden: false, name: scTwoName,

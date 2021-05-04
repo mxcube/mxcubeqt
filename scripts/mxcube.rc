@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-curdir=$(pwd)
+MXCUBE_BASE=$1
+MXCUBE_BASE=$(realpath $MXCUBE_BASE)
+export APP_NAME=mxcube
 export INSTITUTE=SOLEIL
-export MXCUBE_BASE=$(cd $(dirname $0); cd ../../; echo $(pwd))
-cd ${curdir}
-echo MXCUBE_BASE $MXCUBE_BASE
 export MXCUBE_ROOT=$MXCUBE_BASE/mxcube
 export MXCUBE_QT=$MXCUBE_ROOT/mxcubeqt
-export MXCUBE_CORE=$MXCUBE_BASE/mxcubecore
+export MXCUBE_CORE=$MXCUBE_BASE/mxcubecore/mxcubecore
 export MXCUBE_XML_PATH=$MXCUBE_CORE/configuration
 export MXCUBE_GUI_PATH=$MXCUBE_ROOT/configuration
 export MXCUBE_LOG_PATH=$MXCUBE_BASE/log
 export MXCUBE_BRICKS_PATH=$MXCUBE_QT/bricks
 export MXCUBE_HWOBJS_PATH=$MXCUBE_CORE/HardwareObjects
+export SOLEIL_HWOBJS=$MXCUBE_HWOBJS_PATH/SOLEIL
+export PX2_HWOBJS=$SOLEIL_HWOBJS/PX2
 export MXCUBE_DEFAULT_GUI_FILE=$MXCUBE_QT/example_config.yml
 export MXCUBE_DEFAULT_XML_PATH=$MXCUBE_XML_PATH/mockup:$MXCUBE_XML_PATH/mockup/qt
-export PYTHONPATH=$MXCUBE_BASE:$MXCUBE_QT:$MXCUBE_CORE/$MXCUBE_CORE/SOLEIL/:$MXCUBE_CORE/SOLEIL/PX2:$PYTHONPATH
-export XML_PATH=$MXCUBE_CORE/configuration/soleil_px2/
+export PYTHONPATH=$MXCUBE_ROOT:$MXCUBE_QT:$MXCUBE_BASE/mxcubecore:$MXCUBE_CORE:$SOLEIL_HWOBJS:$PX2_HWOBJS:$PYTHONPATH
+export XML_PATH=$MXCUBE_CORE/configuration/soleil_px2
+
+
