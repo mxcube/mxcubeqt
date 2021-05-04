@@ -29,6 +29,7 @@ __category__ = "General"
 
 
 class EnergyBrick(BaseWidget):
+    
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -50,9 +51,9 @@ class EnergyBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.group_box = qt_import.QGroupBox("Energy", self)
-        energy_label = qt_import.QLabel("Current:", self.group_box)
-        energy_label.setFixedWidth(75)
-        wavelength_label = qt_import.QLabel("Wavelength: ", self.group_box)
+        current_label = qt_import.QLabel("Current:", self.group_box)
+        current_label.setFixedWidth(75)
+        
         self.energy_ledit = qt_import.QLineEdit(self.group_box)
         self.energy_ledit.setReadOnly(True)
         self.wavelength_ledit = qt_import.QLineEdit(self.group_box)
@@ -87,9 +88,8 @@ class EnergyBrick(BaseWidget):
         _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _group_box_gridlayout = qt_import.QGridLayout(self.group_box)
-        _group_box_gridlayout.addWidget(energy_label, 0, 0)
+        _group_box_gridlayout.addWidget(current_label, 0, 0, 2, 1)
         _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1)
-        _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
         _group_box_gridlayout.addWidget(self.wavelength_ledit, 1, 1)
         _group_box_gridlayout.addWidget(self.status_label, 2, 0)
         _group_box_gridlayout.addWidget(self.status_ledit, 2, 1)
@@ -173,15 +173,15 @@ class EnergyBrick(BaseWidget):
     def energy_changed(self, energy_value):
         energy_value_str = self["kevFormatString"] % energy_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
-
-    def wavelength_changed(self, wavelength_value):
+        wavelength_value = HWR.beamline.energy._calculate_wavelength(energy_value)
         wavelength_value_str = self["angFormatString"] % wavelength_value
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def state_changed(self, state):
-        self.setEnabled(HWR.beamline.energy.is_ready())
+        is_ready = HWR.beamline.energy.is_ready()
+        self.stop_button.setEnabled(not is_ready)
         BaseWidget.set_status_info("status", "", "")
-
+        
     def status_info_changed(self, status_info):
         self.status_ledit.setText(status_info)
 
@@ -235,4 +235,5 @@ class EnergyBrick(BaseWidget):
         self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)
 
     def stop_clicked(self):
-        print("stoped clicked")
+        HWR.beamline.resolution.stop()
+        
