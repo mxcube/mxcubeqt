@@ -73,13 +73,11 @@ class LightControlBrick(MotorSpinboxBrick):
             qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Minimum
         )
 
-    # Light off pressed: switch off lamp and set out the wago
-
+    # Light off pressed: switch off lamp and extract the light holder (if any)
     def light_button_off_clicked(self):
-        if self.motor_hwobj is not None and hasattr(self.motor_hwobj, "move_in"):
-            self.motor_hwobj.move_in()
+        if self.motor_hwobj is not None and hasattr(self.motor_hwobj, "move_out"):
+            self.motor_hwobj.move_out()
             return
-        # self.lightOffButton.setDown(True)
         if self.light_actuator_hwo is not None:
             if self.light_actuator_hwo.get_state() != STATE_OUT:
                 if self.motor_hwobj is not None:
@@ -102,10 +100,12 @@ class LightControlBrick(MotorSpinboxBrick):
             else:
                 self.light_off_button.setDown(True)
 
-    # Light on pressed: set in the wago and set lamp to previous position
+    # Light on pressed: set in the light holder (if any) and set lamp to previous position
     def light_button_on_clicked(self):
-        if self.motor_hwobj is not None and hasattr(self.motor_hwobj, "move_out"):
-            self.motor_hwobj.move_out()
+        print('LightControlBrick light_button_on_clicked')
+        if self.motor_hwobj is not None and hasattr(self.motor_hwobj, "move_in"):
+            self.motor_hwobj.move_in()
+            print('in self.motor_hwobj.move_in()')
             return
         if self.light_actuator_hwo is not None:
             if self.light_actuator_hwo.get_state() != STATE_IN:
@@ -116,9 +116,8 @@ class LightControlBrick(MotorSpinboxBrick):
             else:
                 self.light_on_button.setDown(True)
 
-    # Wago light events
     def light_state_changed(self, state):
-        # print "LightControlBrick.wagoLightStateChanged",state
+        print('LightControlBrick light_state_changed')
         if state == STATE_IN:
             self.light_on_button.setDown(True)
             self.light_off_button.setDown(False)
