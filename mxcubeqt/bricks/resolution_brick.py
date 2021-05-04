@@ -37,7 +37,7 @@ class ResolutionBrick(BaseWidget):
         colors.LIGHT_YELLOW,
         colors.LIGHT_YELLOW,
         colors.LIGHT_YELLOW,
-        qt_import.QColor(255, 165, 0),
+        colors.LIGHT_ORANGE,
         colors.LIGHT_RED,
     )
 
@@ -157,10 +157,14 @@ class ResolutionBrick(BaseWidget):
             self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
         if HWR.beamline.resolution is not None:
             self.connect(
-                HWR.beamline.resolution, "deviceReady", self.resolution_ready
+                HWR.beamline.resolution,
+                "deviceReady", 
+                self.resolution_ready
             )
             self.connect(
-                HWR.beamline.resolution, "deviceNotReady", self.resolution_not_ready
+                HWR.beamline.resolution, 
+                "deviceNotReady", 
+                self.resolution_not_ready
             )
             self.connect(
                 HWR.beamline.resolution,
@@ -269,50 +273,24 @@ class ResolutionBrick(BaseWidget):
         Door interlock is optional, because not all sites might have it
         """
         groupbox_title = ""
-        detector_distance = HWR.beamline.detector.distance
-        if detector_distance is None:
-            detector_distance_ready = False
-        elif detector_distance_ready is None:
-            detector_distance_ready = detector_distance.is_ready()
-        if detector_distance_ready:
-            self.get_detector_distance_limits()
-            curr_detector_distance = detector_distance.get_value()
-            self.detector_distance_changed(curr_detector_distance)
-            self.detector_distance_state_changed(detector_distance.get_state())
-            if self.units_combobox.currentText() == "mm":
-                groupbox_title = "Detector distance"
-                self.new_value_validator.setRange(
-                    self.detector_distance_limits[0],
-                    self.detector_distance_limits[1],
-                    2,
-                )
+        tool_tip = ""
+        limits = [None, None]
+        self.resolution_value_changed(HWR.beamline.resolution.get_value())
+        self.detector_distance_changed(HWR.beamline.detector.distance.get_value())
+        unit = self.units_combobox.currentText()
+        if unit == "mm":
+            groupbox_title = "Detector distance"
+            limits = HWR.beamline.detector.distance.get_limits()
+            self.detector_distance_limits = limits
         else:
-            self.detector_distance_state_changed(None)
-
-         
-
-        if HWR.beamline.resolution is None:
-            resolution_ready = False
-        elif resolution_ready is None:
-            resolution_ready = HWR.beamline.resolution.is_ready()
-        if resolution_ready:
-            self.get_resolution_limits()
-            curr_resolution = HWR.beamline.resolution.get_value()
-            self.resolution_value_changed(curr_resolution)
-            self.resolution_state_changed(HWR.beamline.resolution.get_state())
-            if self.units_combobox.currentText() != "mm":
-                groupbox_title = "Resolution"
-                self.new_value_validator.setRange(
-                    self.resolution_limits[0], self.resolution_limits[1], 3
-                )
-        else:
-            self.resolution_state_changed(None)
-
-        self.setEnabled(self.door_interlocked)
-        if not self.door_interlocked:
-            groupbox_title += " (door is unlocked)"
+            groupbox_title = "Resolution"
+            limits = HWR.beamline.resolution.get_limits()
+            self.resolution_limits = limits
+            
+        self.new_value_validator.setRange(limits[0], limits[1], 7)
         self.group_box.setTitle(groupbox_title)
-        self.create_tool_tip()
+        tool_tip = "%s limits %.3f: %.3f %s" % (groupbox_title, limits[0], limits[1], unit)
+        self.new_value_ledit.setToolTip(tool_tip)
  
     def resolution_ready(self):
         self.update_gui(resolution_ready=True)
@@ -373,7 +351,7 @@ class ResolutionBrick(BaseWidget):
 
     def resolution_value_changed(self, value):
         if value:
-            resolution_str = self["angFormatString"] % float(value)
+            resolution_str = self["angFormatString"] % value
             self.resolution_ledit.setText("%s %s" % (resolution_str, u"\u212B"))
 
     def detector_distance_changed(self, value):
@@ -382,10 +360,12 @@ class ResolutionBrick(BaseWidget):
             self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
+        if type(state) != int:
+            state = state.value
         detector_distance = HWR.beamline.detector.distance
         if detector_distance is not None:
             if state:
-                color = ResolutionBrick.STATE_COLORS[state.value]
+                color = ResolutionBrick.STATE_COLORS[state]
             else:
                 color = colors.LIGHT_RED
 
@@ -403,7 +383,7 @@ class ResolutionBrick(BaseWidget):
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
-
+                    self.new_value_ledit.setEnabled(True)
                 colors.set_widget_color(self.new_value_ledit, color)
 
     def detector_distance_state_changed(self, state):
@@ -432,7 +412,7 @@ class ResolutionBrick(BaseWidget):
                 self.stop_button.setEnabled(True)
             else:
                 self.stop_button.setEnabled(False)
-
+                self.new_value_ledit.setEnabled(True)
             colors.set_widget_color(self.new_value_ledit, color)
 
     def stop_clicked(self):
