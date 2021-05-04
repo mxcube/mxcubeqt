@@ -55,8 +55,8 @@ class MotorPredefPosBrick(BaseWidget):
 
         # Internal values -----------------------------------------------------
 
-        self.positions = None
-
+        self.position_values = None
+        self.position_names = None
         # Properties ----------------------------------------------------------
         self.add_property("label", "string", "")
         self.add_property("mnemonic", "string", "")
@@ -134,7 +134,7 @@ class MotorPredefPosBrick(BaseWidget):
                     colors.LIGHT_GRAY,
                     qt_import.QPalette.Button,
                     )
-
+        self.predefined_position_changed(self.motor_hwobj.get_value(), offset=0)
         #self.setToolTip(state=state)
 
     def property_changed(self, property_name, old_value, new_value):
@@ -204,12 +204,14 @@ class MotorPredefPosBrick(BaseWidget):
         self.positions_combo.clear()
         if self.motor_hwobj is not None:
             if positions is None:
-                positions = [e.value for e in self.motor_hwobj.VALUES]
-        for p in positions:
+                position_values = [e.value for e in self.motor_hwobj.VALUES]
+                position_names = [e.name for e in self.motor_hwobj.VALUES]
+        for p in position_values:
             if p != 'UNKNOWN':
                 self.positions_combo.addItem(str(p))
 
-        self.positions = positions
+        self.position_values = position_values
+        self.position_names = position_names
         if self.motor_hwobj is not None:
             if self.motor_hwobj.is_ready():
                 self.predefined_position_changed(
@@ -218,14 +220,14 @@ class MotorPredefPosBrick(BaseWidget):
 
     def position_selected(self, index):
         if index >= 0:
-            self.motor_hwobj.set_value(int(self.positions[index]))
+            self.motor_hwobj.set_value(self.motor_hwobj.VALUES[self.position_names[index]])
         self.positions_combo.setCurrentIndex(-1)
-        self.next_position_button.setEnabled(index < (len(self.positions) - 1))
+        self.next_position_button.setEnabled(index < (len(self.position_values) - 1))
         self.previous_position_button.setEnabled(index >= 0)
 
-    def predefined_position_changed(self, position_name, offset):
-        if self.positions:
-            for index, item in enumerate(self.positions):
+    def predefined_position_changed(self, position_name, offset=None):
+        if self.position_values:
+            for index, item in enumerate(self.position_values):
                 if position_name == item:
                     self.positions_combo.setCurrentIndex(index)
 
