@@ -5,4 +5,4 @@ color: white
 fa-icon: users 
 ---
 
-# Next virtual MXCuBE meeting organized by EMBL Hamburg, May 2021
+# Next MXCuBE meeting organized by Elletra, Autumn 2021
