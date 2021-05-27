@@ -10,7 +10,7 @@ env:
 services: xvfb
 
 install:
-  - then travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest-xvfb PyYAML pylint; fi
+  - travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest-xvfb PyYAML pylint
   - git clone https://github.com/mxcube/mxcubecore
 
 before_script:
