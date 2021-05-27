@@ -20,10 +20,7 @@ before_script:
   - "export DISPLAY=:99.0"
 
 script:
-#  - cd test
-#- pytest
-#- cd ..
-  - pylint -E mxcubeqt/*py --extension-pkg-whitelist=PyQt5,PyQt4
-  - travis_wait 20 pylint -E mxcubeqt/utils --extension-pkg-whitelist=PyQt5,PyQt4
-  - travis_wait 20 pylint -E mxcubeqt/bricks --extension-pkg-whitelist=PyQt5,PyQt4
-  - travis_wait 20 pylint -E mxcubeqt/widgets --extension-pkg-whitelist=PyQt5,PyQt4   
+  - cd test
+  - pytest
+  - cd ..
+  - pylint mxcubeqt --extension-pkg-whitelist=PyQt5,PyQt4
