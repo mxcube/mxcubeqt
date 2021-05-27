@@ -1,7 +1,6 @@
 language: python
 
 python:
-  - "2.7"
   - "3.7"
   - "3.8"
 
@@ -11,9 +10,7 @@ env:
 services: xvfb
 
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install mesa-common-dev python-pyqt5; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then travis_retry python -m pip install -r requirements_python2.txt PyVirtualDisplay==0.2.5 pytest-xvfb PyYAML pylint==2.8.2; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3'* ]]; then travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest-xvfb PyYAML pylint; fi
+  - then travis_retry pip3 install -r requirements_python3.txt PyQt5 pytest-xvfb PyYAML pylint; fi
   - git clone https://github.com/mxcube/mxcubecore
 
 before_script:
