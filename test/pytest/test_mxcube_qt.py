@@ -3,10 +3,10 @@ import sys
 import os
 import gevent
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../.."))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../../.."))
 MXCUBE_GUI_FILE = os.path.join(
         ROOT_DIR,
-        "mxcube/mxcubeqt/example_config.yml"
+        "mxcubeqt/mxcubeqt/example_config.yml"
         )
 MXCUBE_CORE_CONFIG_PATH = "%s:%s" % (
         os.path.join(
