@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from mxcubeqt import create_app
 
 def run():
