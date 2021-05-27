@@ -80,17 +80,14 @@ class GraphicsToolsBrick(BaseWidget):
             "Centring point with 3 clicks",
             self.create_point_click_clicked,
         )
-        temp_action.setShortcut("Ctrl+1")
         temp_action = _create_menu.addAction(
             icons.load_icon("ThumbUp"),
             "Centring point on current position",
             self.create_point_current_clicked,
         )
-        temp_action.setShortcut("Ctrl+2")
         temp_action = _create_menu.addAction(
             icons.load_icon("Line.png"), "Helical line", self.create_line_clicked
         )
-        temp_action.setShortcut("Ctrl+3")
         temp_action = _create_menu.addAction(
             icons.load_icon("Line.png"),
             "Automatic helical line",
@@ -99,7 +96,6 @@ class GraphicsToolsBrick(BaseWidget):
         temp_action = _create_menu.addAction(
             icons.load_icon("Grid"), "Grid", self.create_grid_clicked
         )
-        temp_action.setShortcut("Ctrl+G")
 
         _measure_menu = self.tools_menu.addMenu("Measure")
         self.measure_distance_action = _measure_menu.addAction(
@@ -137,15 +133,12 @@ class GraphicsToolsBrick(BaseWidget):
         temp_action = self.tools_menu.addAction(
             "Select all centring points", self.select_all_points_clicked
         )
-        temp_action.setShortcut("Ctrl+A")
         temp_action = self.tools_menu.addAction(
             "Deselect all items", self.deselect_all_items_clicked
         )
-        temp_action.setShortcut("Ctrl+D")
         temp_action = self.tools_menu.addAction(
             icons.load_icon("Delete"), "Clear all items", self.clear_all_items_clicked
         )
-        temp_action.setShortcut("Ctrl+X")
 
         self.tools_menu.addSeparator()
 
