@@ -23,4 +23,4 @@ script:
   - cd test
   - pytest
   - cd ..
-  - pylint mxcubeqt --extension-pkg-whitelist=PyQt5,PyQt4
+  - travis wait 30 pylint mxcubeqt -E --extension-pkg-whitelist=PyQt5,PyQt4
