@@ -20,7 +20,5 @@ before_script:
   - "export DISPLAY=:99.0"
 
 script:
-  - cd test
-  - python -m pytest
-  - cd ..
+  - python -m pytest test
   - pylint mxcubeqt -E --extension-pkg-whitelist=PyQt5,PyQt4
