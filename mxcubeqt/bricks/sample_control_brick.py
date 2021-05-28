@@ -110,18 +110,18 @@ class SampleControlBrick(BaseWidget):
         self.auto_center_button.clicked.connect(auto_center_clicked)
 
         # Other ---------------------------------------------------------------
-        self.centre_button.setToolTip("3 click centring (Ctrl+1)")
+        self.centre_button.setToolTip("3 click centring")
         self.accept_button.setToolTip(
             "Accept 3 click centring or "
-            "create a point\nbased on current position (Ctrl+2)"
+            "create a point\nbased on current position"
         )
         self.reject_button.setToolTip("Reject centring")
         self.create_line_button.setToolTip(
-            "Create helical line between \n" + "two points (Ctrl+L)"
+            "Create helical line between two points"
         )
-        self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+G)")
-        self.select_all_button.setToolTip("Select all centring points (Ctrl+A)")
-        self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
+        self.draw_grid_button.setToolTip("Create grid with drag and drop")
+        self.select_all_button.setToolTip("Select all centring points")
+        self.clear_all_button.setToolTip("Clear all items")
         # self.instanceSynchronize("")
 
         self.connect(HWR.beamline.sample_view, "centringStarted", self.centring_started)

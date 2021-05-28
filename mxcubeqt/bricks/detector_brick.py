@@ -27,25 +27,27 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 
+STATES = {
+    "unknown": colors.LIGHT_GRAY,
+    "OK": colors.LIGHT_BLUE,
+    "BAD": colors.LIGHT_RED,
+}
+    
+DETECTOR_STATES = {
+    "busy": colors.LIGHT_GREEN,
+    "error": colors.LIGHT_RED,
+    "initializing": colors.LIGHT_YELLOW,
+    "calibrating": colors.LIGHT_YELLOW,
+    "configuring": colors.LIGHT_YELLOW,
+    "slave": colors.LIGHT_RED,
+    "exposing": colors.LIGHT_GREEN,
+    "ready": colors.LIGHT_BLUE,
+    "uninitialized": colors.LIGHT_GRAY,
+}
 
 class DetectorBrick(BaseWidget):
 
-    STATES = {
-        "unknown": colors.LIGHT_GRAY,
-        "OK": colors.LIGHT_BLUE,
-        "BAD": colors.LIGHT_RED,
-    }
-    DETECTOR_STATES = {
-        "busy": colors.LIGHT_GREEN,
-        "error": colors.LIGHT_RED,
-        "initializing": colors.LIGHT_YELLOW,
-        "calibrating": colors.LIGHT_YELLOW,
-        "configuring": colors.LIGHT_YELLOW,
-        "slave": colors.LIGHT_RED,
-        "exposing": colors.LIGHT_GREEN,
-        "ready": colors.LIGHT_BLUE,
-        "uninitialized": colors.LIGHT_GRAY,
-    }
+
 
     def __init__(self, *args):
 
@@ -86,15 +88,15 @@ class DetectorBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
         colors.set_widget_color(
-            self.status_label, DetectorStatusBrick.DETECTOR_STATES["uninitialized"]
+            self.status_label, DETECTOR_STATES["uninitialized"]
         )
         colors.set_widget_color(
-            self.temperature_label, DetectorStatusBrick.STATES["unknown"]
+            self.temperature_label, STATES["unknown"]
         )
         colors.set_widget_color(
-            self.humidity_label, DetectorStatusBrick.STATES["unknown"]
+            self.humidity_label, STATES["unknown"]
         )
-        colors.set_widget_color(self.frame_rate_label, DetectorStatusBrick.STATES["OK"])
+        colors.set_widget_color(self.frame_rate_label, STATES["OK"])
 
         self.status_label.setMinimumHeight(20)
         self.status_label.setAlignment(qt_import.Qt.AlignCenter)
@@ -116,7 +118,7 @@ class DetectorBrick(BaseWidget):
             self.status_label.setText("<b>%s</b>" % status.title())
             colors.set_widget_color(
                 self.status_label,
-                DetectorStatusBrick.DETECTOR_STATES.get(status, colors.LIGHT_GRAY),
+                DETECTOR_STATES.get(status, colors.LIGHT_GRAY),
             )
             self.setToolTip(status_message)
 
@@ -126,11 +128,11 @@ class DetectorBrick(BaseWidget):
             self.temperature_label.setText("   Temperature : %0.1f%s" % (value, unit))
         if status_ok:
             colors.set_widget_color(
-                self.temperature_label, DetectorStatusBrick.STATES["OK"]
+                self.temperature_label, STATES["OK"]
             )
         else:
             colors.set_widget_color(
-                self.temperature_label, DetectorStatusBrick.STATES["BAD"]
+                self.temperature_label, STATES["BAD"]
             )
 
     def humidity_changed(self, value, status_ok):
@@ -140,11 +142,11 @@ class DetectorBrick(BaseWidget):
             )
         if status_ok:
             colors.set_widget_color(
-                self.humidity_label, DetectorStatusBrick.STATES["OK"]
+                self.humidity_label, STATES["OK"]
             )
         else:
             colors.set_widget_color(
-                self.humidity_label, DetectorStatusBrick.STATES["BAD"]
+                self.humidity_label, STATES["BAD"]
             )
 
     def frame_rate_changed(self, value):

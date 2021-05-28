@@ -18,9 +18,8 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import logging
 
-from mxcubeqt.utils import icons, colors, qt_import
+from mxcubeqt.utils import colors, icons, qt_import
 from mxcubeqt.base_components import BaseWidget
 
 
@@ -258,7 +257,7 @@ class DuoStateBrick(BaseWidget):
             else:
                 self.buttons_widget.show()
         elif property_name == "icons":
-            w = self.fontMetrics().width("Set out")
+            #w = self.fontMetrics().width("Set out")
             icons_list = new_value.split()
             try:
                 self.set_in_button.setIcon(icons.load_icon(icons_list[0]))
@@ -280,9 +279,8 @@ class DuoStateBrick(BaseWidget):
         #        self.stateChanged(self.wrapper_hwobj.get_state())
 
         elif property_name == "setin":
-            icons = self["icons"]
             # w=self.fontMetrics().width("Set out")
-            icons_list = icons.split()
+            icons_list = self["icons"]
             try:
                 i = icons_list[0]
             except IndexError:
@@ -293,9 +291,8 @@ class DuoStateBrick(BaseWidget):
             self.set_in_button.setText(self["setin"])
 
         elif property_name == "setout":
-            icons = self["icons"]
             # w=self.fontMetrics().width("Set out")
-            icons_list = icons.split()
+            icons_list = self["icons"].split()
             try:
                 i = icons_list[1]
             except IndexError:

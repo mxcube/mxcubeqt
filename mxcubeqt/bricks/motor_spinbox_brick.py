@@ -347,7 +347,7 @@ class MotorSpinboxBrick(BaseWidget):
     def update_history(self, pos):
         pos = str(pos)
         if pos not in self.position_history:
-            if len(self.position_history) == MotorSpinBoxBrick.MAX_HISTORY:
+            if len(self.position_history) == MotorSpinboxBrick.MAX_HISTORY:
                 del self.position_history[-1]
             self.position_history.insert(0, pos)
 

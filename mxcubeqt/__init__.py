@@ -174,8 +174,7 @@ class MyCustomEvent(qt_import.QEvent):
 def create_app(gui_config_path=None, core_config_path=None):
     """Main run method"""
 
-    # path to user's home dir. (works on Win2K, XP, Unix, Mac...)
-    parser = OptionParser(usage="usage: %prog <GUI definition file> [options]")
+    parser = OptionParser(usage="usage: %prog <gui definition file> <core configuration paths> [options]")
     parser.add_option(
         "",
         "--logFile",
@@ -218,6 +217,19 @@ def create_app(gui_config_path=None, core_config_path=None):
     )
     parser.add_option(
         "",
+        "--guiConfigPath",
+        action="store",
+        type="string",
+        help="Path to the mxcube gui configuration file "
+        + "Alternatively MXCUBE_GUI_CONFIG_PATH env variable"
+        + "can be used",
+        metavar="directory",
+        dest="coreConfigPath",
+        default="",
+    )
+
+    parser.add_option(
+        "",
         "--coreConfigPath",
         action="store",
         type="string",
@@ -225,8 +237,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         + "configuration files. "
         + "Alternatively MXCUBE_CORE_CONFIG_PATH env variable"
         + "can be used",
-        metavar="directory",
-        dest="coreConfigPath",
+        dest="guiConfigPath",
         default="",
     )
     parser.add_option(
@@ -248,7 +259,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         action="store_true",
         dest="designMode",
         default=False,
-        help="start GUI in Design mode",
+        help="Start mxcube in design mode",
     )
     parser.add_option(
         "-m",
@@ -256,7 +267,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         action="store_true",
         dest="showMaximized",
         default=False,
-        help="maximize main window",
+        help="Maximize main window",
     )
     parser.add_option(
         "",
@@ -264,7 +275,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         action="store_true",
         dest="noBorder",
         default=False,
-        help="does not show borders on main window",
+        help="Does not show borders on main window",
     )
     parser.add_option(
         "",
@@ -303,19 +314,31 @@ def create_app(gui_config_path=None, core_config_path=None):
         dest="mockupMode",
         help="Runs MXCuBE with mockup configuration",
     )
-
-
-    parser.add_option("", "--pyqt4", action="store_true", default=None)
-    parser.add_option("", "--pyqt5", action="store_true", default=None)
-    parser.add_option("", "--pyside", action="store_true", default=None)
+    parser.add_option(
+        "",
+        "--pyqt4",
+        action="store_true",
+        default=None,
+        help="Force to use PyQt4"
+    )
+    parser.add_option(
+        "",
+        "--pyqt5",
+        action="store_true",
+        default=None,
+        help="Force to use PyQt5"
+    )
+    parser.add_option(
+        "",
+        "--pyside",
+        action="store_true",
+        default=None,
+        help="Force to use PySide"
+    )
 
     (opts, args) = parser.parse_args()
 
     log_file = start_log(opts.logFile, opts.logLevel)
-
-    # get config from arguments
-    if not gui_config_path and opts.mockupMode: 
-        gui_config_path = MOCKUP_CONFIG_PATH
     log_template = opts.logTemplate
     hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
     custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
@@ -330,12 +353,21 @@ def create_app(gui_config_path=None, core_config_path=None):
 
     app_style = opts.appStyle
 
+    if not gui_config_path:
+        if opts.guiConfigPath:
+            gui_config_path = opts.guiConfigPath
+        elif opts.mockupMode:
+            gui_config_path = MOCKUP_CONFIG_PATH
+        else:
+            gui_config_path = os.environ.get("MXCUBE_GUI_CONFIG_PATH")
+
     if not core_config_path:
         if opts.coreConfigPath:
             core_config_path = opts.coreConfigPath
         else:
             # try to set Hardware Repository server from environment
             core_config_path = os.environ.get("MXCUBE_CORE_CONFIG_PATH")
+
 
     # add bricks directories and hardware objects directories from environment
     try:
@@ -470,11 +502,10 @@ def create_app(gui_config_path=None, core_config_path=None):
     HWR_LOGGER.info(
         "=============================================================================="
     )
-    HWR_LOGGER.info("Starting MXCuBE Qt")
-
-    # log startup details
-    # logging.getLogger().info("\n\n\n\n")
-    HWR_LOGGER.info("Starting to load gui...")
+    if opts.designMode:
+        HWR_LOGGER.info("Starting MXCuBE Qt in designer mode...")
+    else:
+        HWR_LOGGER.info("Starting MXCuBE Qt...")
     HWR_LOGGER.info("GUI file: %s" % (gui_config_path or "unnamed"))
     if len(log_file) > 0:
         HWR_LOGGER.info("Log file: %s" % log_file)
