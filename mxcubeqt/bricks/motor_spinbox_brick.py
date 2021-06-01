@@ -450,7 +450,8 @@ class MotorSpinboxBrick(BaseWidget):
         else:
             # restore last position from motor
             self.position_changed(self.motor_hwobj.get_value())
-            self.state_changed(self.motor_hwobj.get_state())
+            # NBNB hte following line causes infinite loop in mock mode
+            # self.state_changed(self.motor_hwobj.get_state())
             
     def set_tool_tip(self, name=None, state=None, limits=None):
         states = (

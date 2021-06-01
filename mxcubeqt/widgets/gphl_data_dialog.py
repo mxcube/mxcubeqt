@@ -106,7 +106,7 @@ class GphlDataDialog(qt_import.QDialog):
         qt_import.QVBoxLayout(self)
         main_layout = self.layout()
         main_layout.setSpacing(10)
-        main_layout.setMargin(6)
+        main_layout.setContentsMargins(6, 6, 6, 6)
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
