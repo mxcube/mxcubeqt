@@ -251,7 +251,7 @@ class EsrfCenteringBrick(BaseWidget):
         Used to give feedback to user: update plot's data
         """
         # use sample_centring module
-        sample_centring.
+        #sample_centring.
         # from multipointcenter
         # p[0] * numpy.sin(x + p[1]) + p[2]
         amplitude = parameter_dict['r']

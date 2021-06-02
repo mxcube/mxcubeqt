@@ -454,6 +454,9 @@ class PlotWidget(qt_import.QWidget):
         )
         # self.setFixedSize(1000, 700)
 
+    def set_plot_type(self, plot_type):
+        return
+
     def button_pressed(self, mouse_event):
         dbl_click = False
         if hasattr(mouse_event, "dblclick"):

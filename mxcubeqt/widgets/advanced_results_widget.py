@@ -55,10 +55,10 @@ class AdvancedResultsWidget(qt_import.QWidget):
 
         if HWR.beamline.online_processing is not None:
             HWR.beamline.online_processing.connect(
-               "processingStarted", self.processing_started
+               "procedureStarted", self.processing_started
             )
             HWR.beamline.online_processing.connect(
-               "processingResultsUpdate", self.update_processing_results
+               "resultsUpdated", self.update_processing_results
             )
         else:
             self.setEnabled(False)
@@ -71,9 +71,15 @@ class AdvancedResultsWidget(qt_import.QWidget):
             self.hit_map_widget.set_results(processing_results["raw"], processing_results["aligned"])
             self.hit_map_widget.update_results(True)
 
-    def processing_started(self, data_collection, results_raw, results_aligned):
-        #self.hit_map_widget.set_associated_data_collection(data_collection)
-        self.hit_map_widget.set_results(results_raw, results_aligned)
-
+    def processing_started(self, data_model):
+        print(111)
+        print(data_model)
+        self.hit_map_widget.set_associated_data_collection(
+            data_model["data_collection_model"]
+        )
+        self.hit_map_widget.set_results(
+            data_model["raw_results"],
+            data_model["aligned_results"]
+        )
     def update_processing_results(self, last_results):
         self.hit_map_widget.update_results(last_results)

@@ -338,7 +338,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Run processing after collection</string>
+           <string>Run offline processing</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -360,7 +360,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Run Dozor</string>
+           <string>Run online processing</string>
           </property>
           <property name="checked">
            <bool>false</bool>

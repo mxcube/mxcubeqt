@@ -15,8 +15,3 @@
 * Ro remove a connection, select established connection and press **Remove connection**.
 
 ![alt text](images/qt_signals_slots.png "Qt Signals and Slots")
-
-### Other information
-
-* [How to create Hardware Object](how_to_create_hwobj.md)
-* [How to create GUI brick](how_to_create_qt_brick.md)

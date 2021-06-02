@@ -274,10 +274,3 @@ _**warning**_ : The number of variables emited via signal should much the number
    * [Qt Examples And Tutorials](https://doc.qt.io/qt-5/qtexamplesandtutorials.html)
    * [Qt for Python, Qt Project page](https://wiki.qt.io/Qt_for_Python)
    * [PyQt Project page](https://www.riverbankcomputing.com/static/Docs/PyQt5/)
-   
-### Other information
-
-* [How to create GUI brick](how_to_create_qt_brick.md)
-* [How to define Qt GUI](how_to_define_qt_gui.md)
-* [How to create Hardware Object](how_to_create_hwobj.md)
-

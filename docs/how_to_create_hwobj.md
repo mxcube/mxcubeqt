@@ -74,8 +74,3 @@ class TestHardwareObject(HardwareObject)
         pass
 ```
 **INFO** : Device type defined in xml should match the class type in the hwobj.
-
-### Other information
-
-* [How_to_create_qt_brick]()
-* [How_to_define_qt_gui]()
