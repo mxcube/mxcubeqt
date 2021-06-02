@@ -31,6 +31,7 @@ from logging.handlers import TimedRotatingFileHandler
 import tempfile
 import platform
 from optparse import OptionParser
+from pkg_resources import resource_filename, resource_string
 
 import gevent
 import gevent.monkey
@@ -81,7 +82,16 @@ LOGGING_NAME = ""
 MXCUBEQT_ROOT = os.path.dirname(__file__)
 #sys.path.insert(0, MXCUBEQT_ROOT)
 
-MOCKUP_CONFIG_PATH = os.path.join(MXCUBEQT_ROOT, "example_config.yml")
+#MOCKUP_CONFIG_PATH = os.path.join(MXCUBEQT_ROOT, "example_config.yml")
+MOCKUP_CONFIG_PATH = resource_filename('mxcubeqt', 'example_config.yml')
+
+path = []
+for p in ['configuration/mockup', 'configuration/mockup/qt']:
+    path.append(resource_filename('mxcubecore', p))
+
+MOCKUP_CORE_CONFIG_PATH = ":".join(path)
+print(MOCKUP_CORE_CONFIG_PATH)
+
 
 def get_splash():
     return get_splash_screen()
@@ -364,6 +374,8 @@ def create_app(gui_config_path=None, core_config_path=None):
     if not core_config_path:
         if opts.coreConfigPath:
             core_config_path = opts.coreConfigPath
+        elif opts.mockupMode:
+            core_config_path = MOCKUP_CORE_CONFIG_PATH
         else:
             # try to set Hardware Repository server from environment
             core_config_path = os.environ.get("MXCUBE_CORE_CONFIG_PATH")
