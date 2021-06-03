@@ -60,6 +60,32 @@ class LineEdit(qt_import.QLineEdit):
     def get_value(self):
         return ConvertUtils.text_type(self.text())
 
+    def input_field_changed(self):
+        """UI update function triggered by field value changes"""
+        valid = self.is_valid()
+        if valid:
+            colors.set_widget_color(
+                self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base
+            )
+            if self.update_function is not None:
+                self.update_function(self.parent())
+        else:
+            colors.set_widget_color(
+                self, colors.LINE_EDIT_ERROR, qt_import.QPalette.Base
+            )
+        #
+        self.parent().parametersValidSignal.emit(valid)
+
+
+    def is_valid(self):
+        if self.validator():
+            return (
+                self.validator.validate(self.text(), 0)[0]
+                == qt_import.QValidator.Acceptable
+            )
+        else:
+            return True
+
 
 class FloatString(LineEdit):
     """LineEdit widget with validators and formatting for floating point numbers"""
@@ -82,23 +108,7 @@ class FloatString(LineEdit):
             self.validator.setTop(val)
         self.update_function = options.get("update_function")
 
-        self.textChanged.connect(self.input_field_changed)
-
-    def input_field_changed(self, input_field_text):
-        """UI update function triggered by field value changes"""
-        if self.update_function is not None:
-            self.update_function(self.parent())
-        if (
-            self.validator.validate(input_field_text, 0)[0]
-            == qt_import.QValidator.Acceptable
-        ):
-            colors.set_widget_color(
-                self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base
-            )
-        else:
-            colors.set_widget_color(
-                self, colors.LINE_EDIT_ERROR, qt_import.QPalette.Base
-            )
+        self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value):
         self.setText(self.formatstr % value)
@@ -132,7 +142,7 @@ class TextEdit(qt_import.QTextEdit):
 
 
 class Combo(qt_import.QComboBox):
-    """STandard ComboBox (pulldown) widget"""
+    """Standard ComboBox (pulldown) widget"""
 
     def __init__(self, parent, options):
         qt_import.QComboBox.__init__(self, parent)
@@ -339,6 +349,7 @@ class CheckBox(qt_import.QCheckBox):
 # Mapping of type fields to Classes
 WIDGET_CLASSES = {
     "combo": Combo,
+    "dblcombo": Combo,
     "spinbox": IntSpinBox,
     "text": LineEdit,
     "floatstring": FloatString,
@@ -356,6 +367,7 @@ def make_widget(parent, options):
 
 class FieldsWidget(qt_import.QWidget):
     """Collection-of-widgets widget for parameter query"""
+    parametersValidSignal = qt_import.pyqtSignal(bool)
 
     def __init__(self, fields, parent=None):
         qt_import.QWidget.__init__(self, parent)
@@ -368,10 +380,18 @@ class FieldsWidget(qt_import.QWidget):
 
         current_row = 0
         col_incr = 0
-        pad = ""
+        # pad1: width of empty separating columns
+        pad1 = " " * 4
+        # Extra padding in front of columns 2, 3, ...
+        # to offset space for boolean widgets
+        pad2 = ""
         for field in fields:
             # should not happen but lets just skip them
-            if field["type"] != "message" and "uiLabel" not in field:
+            if (
+                field["type"] != "message"
+                and "uiLabel" not in field
+                and not field["type"].startswith("dbl")
+            ):
                 continue
 
             # hack until the 'real' xml gets implemented server side
@@ -396,28 +416,45 @@ class FieldsWidget(qt_import.QWidget):
                         qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed
                     )
                 self.field_widgets.append(widget)
+                col = col_incr
                 if field["type"] == "boolean":
                     self.layout().addWidget(
-                        widget, current_row, 0 + col_incr, 1, 2, qt_import.Qt.AlignLeft
+                        widget, current_row, col, 1, 2, qt_import.Qt.AlignLeft
+                    )
+                elif field["type"].startswith("dbl"):
+                    # Double width widget, no label
+                    self.layout().addWidget(
+                        widget, current_row, col, 1, 2, qt_import.Qt.AlignLeft
                     )
                 else:
+                    pad = pad2 if col_incr else ""
                     label = qt_import.QLabel(pad + field["uiLabel"], self)
                     self.layout().addWidget(
-                        label, current_row, 0 + col_incr, qt_import.Qt.AlignLeft
+                        label, current_row, col, qt_import.Qt.AlignLeft
                     )
                     self.layout().addWidget(
-                        widget, current_row, 1 + col_incr, qt_import.Qt.AlignLeft
+                        widget, current_row, 1 + col, qt_import.Qt.AlignLeft
+                    )
+                    # Add empty column, for separation purposes
+
+                    hspacer = qt_import.QSpacerItem(
+                        10,
+                        20,
+                        qt_import.QSizePolicy.MinimumExpanding,
+                        qt_import.QSizePolicy.Minimum
+                    )
+                    # empty = qt_import.QLabel(pad1, self)
+                    self.layout().addItem(
+                        hspacer, current_row, col + 2, qt_import.Qt.AlignLeft
                     )
 
             current_row += 1
             if field.pop("NEW_COLUMN", False):
-                # Increment column
-                col_incr += 2
                 current_row = 0
-                pad = " " * 5
-        self.update()
+                # Increment column
+                col_incr += 3
 
-    def set_values(self, values):
+    def set_values(self, **values):
         """Set values for all fields from values dictionary"""
         for field in self.field_widgets:
             if field.get_name() in values:
@@ -427,10 +464,11 @@ class FieldsWidget(qt_import.QWidget):
         """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
 
-    def update(self):
-        """Call update functions"""
-        for field in self.field_widgets:
-            if hasattr(field, 'update_function'):
-                update_function = field.update_function
-                if update_function:
-                    update_function(self)
+    def invalid_fields(self):
+        invalids = []
+
+        for widget in self.field_widgets:
+            if isinstance(widget, LineEdit):
+                if not widget.is_valid():
+                    invalids.append(widget.get_name())
+        return invalids

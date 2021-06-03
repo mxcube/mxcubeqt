@@ -880,13 +880,34 @@ class DataCollectTree(qt_import.QWidget):
 
                 if len(checked_items):
                     self.confirm_dialog.set_items(checked_items)
-                    self.confirm_dialog.show()
+                    # Replaced so that you skip confirmation dialog for specific cases
+                    # You do not want confirmation for GPhL workflow
+                    # even on beamlines where the [Collect Now] butotn is disabled
+                    # Code by Gleb Bourenkov
+                    # self.confirm_dialog.show()
+                    show = False
+                    for item in checked_items:
+                        if isinstance(item, queue_item.SampleQueueItem):
+                            if not item.mounted_style:
+                                show = True
+                        elif not isinstance(item, queue_item.GphlWorkflowQueueItem):
+                            if not isinstance(
+                                    item, queue_item.DataCollectionGroupQueueItem
+                            ):
+                                show = True
+                    if show:
+                       self.confirm_dialog.show()
+                    else:
+                       self.confirm_dialog.continue_button_click()
                 else:
-                    message = "No data collections selected, please select one" + \
-                              " or more data collections"
+                    message = (
+                        "No data collections selected, please select one"
+                        " or more data collections"
+                    )
 
-                    qt_import.QMessageBox.information(self, "Data collection",
-                                                     message, "OK")
+                    qt_import.QMessageBox.information(
+                        self, "Data collection", message, "OK"
+                    )
 
     def enable_sample_changer_widget(self, state):
         """Enables sample changer widget"""
@@ -933,8 +954,9 @@ class DataCollectTree(qt_import.QWidget):
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
                 collection_par_list.append(item.get_model().as_dict())
         """
-        invalid_parameters = HWR.beamline.\
-            check_collection_parameters(collection_par_list)
+        invalid_parameters = HWR.beamline.check_collection_parameters(
+            collection_par_list
+        )
         if len(invalid_parameters) > 0:
             msg = "Collection parameter "
             for item in invalid_parameters:
@@ -1167,8 +1189,9 @@ class DataCollectTree(qt_import.QWidget):
                 if not parent.isSelected() or (not parent.deletable):
                     self.tree_brick.show_sample_centring_tab()
 
-                    HWR.beamline.queue_model.del_child(parent.get_model(),
-                                                     item.get_model())
+                    HWR.beamline.queue_model.del_child(
+                        parent.get_model(), item.get_model()
+                    )
                     qe = item.get_queue_entry()
                     parent.get_queue_entry().dequeue(qe)
                     parent.takeChild(parent.indexOfChild(item))
@@ -1606,13 +1629,18 @@ class DataCollectTree(qt_import.QWidget):
 
     def load_queue_from_file(self):
         """Loads queue from file"""
-        filename = str(qt_import.QFileDialog.getOpenFileName(self,
-                                                            "Open file", os.environ["HOME"],
-                                                            "Item file (*.dat)", "Choose queue file to open"))
+        filename = str(
+            qt_import.QFileDialog.getOpenFileName(
+                self,
+                "Open file", os.environ["HOME"],
+                "Item file (*.dat)", "Choose queue file to open"
+            )
+        )
         if len(filename) > 0:
             self.sample_tree_widget.clear()
-            loaded_model = HWR.beamline.queue_model.load_queue(filename,
-                                                             HWR.beamline.sample_view.get_snapshot())
+            loaded_model = HWR.beamline.queue_model.load_queue(
+                filename, HWR.beamline.sample_view.get_snapshot()
+            )
             return loaded_model
 
     def save_history_queue(self):
