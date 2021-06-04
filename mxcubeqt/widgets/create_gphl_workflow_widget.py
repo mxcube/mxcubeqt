@@ -156,7 +156,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
 
         (data_directory, proc_directory) = self.get_default_directory()
-        self._path_template = HWR.beamline.beamline_setup.get_default_path_template()
+        self._path_template = HWR.beamline.get_default_path_template()
         self._path_template.directory = data_directory
         self._path_template.process_directory = proc_directory
         self._path_template.base_prefix = self.get_default_prefix()
