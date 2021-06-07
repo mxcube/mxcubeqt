@@ -104,23 +104,23 @@ class ShutterBrick(BaseWidget):
         if property_name == "hwobj_shutter":
             if self.shutter_hwobj is not None:
                 self.disconnect(
-                    self.shutter_hwobj, "shutterStateChanged", self.state_changed
+                    self.shutter_hwobj, "valueChanged", self.value_changed
                 )
             else:
                 self.shutter_hwobj = self.get_hardware_object(new_value)
                 self.connect(
-                    self.shutter_hwobj, "shutterStateChanged", self.state_changed
+                    self.shutter_hwobj, "valueChanged", self.value_changed
                 )
                 self.shutter_hwobj.force_emit_signals()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
-    def state_changed(self, shutter_state):
+    def value_changed(self, value):
         """Based on the shutter state enables/disables open and close buttons"""
-        self.state_label.setText(str(shutter_state.name.capitalize()))
-        if shutter_state in ("UNKOWN", "AUTOMATIC", "DISABLED"):
+        self.state_label.setText(str(value.name.capitalize()))
+        if value in ("UNKOWN", "AUTOMATIC", "DISABLED"):
             colors.set_widget_color(self.state_label, colors.LIGHT_GRAY)
-        elif shutter_state in ("FAULT", "ERROR"):
+        elif value in ("FAULT", "ERROR"):
             colors.set_widget_color(self.state_label, colors.LIGHT_RED)
         else:
             colors.set_widget_color(self.state_label, colors.LIGHT_GREEN)
