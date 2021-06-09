@@ -181,7 +181,7 @@ class CreateTaskBase(qt_import.QWidget):
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
         # ISPyB
-        if tab_index is 0 and HWR.beamline.session.proposal_code:
+        if tab_index == 0 and HWR.beamline.session.proposal_code:
             self.update_selection()
 
     def set_osc_start(self, new_value):

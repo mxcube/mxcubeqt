@@ -246,18 +246,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._path_template = model.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
-        # elif isinstance(tree_item, queue_item.BasketQueueItem):
-        #     print ('@~@~ 4')
-        #     self.setDisabled(False)
-
         elif isinstance(tree_item, queue_item.SampleQueueItem):
-            # # Reset directory to default (and folder edt field to empty)
+            # # Reset directory to default (and folder edit field to empty)
             # (data_directory, proc_directory) = self.get_default_directory()
             # self._path_template.directory = data_directory
             # self._path_template.process_directory = proc_directory
 
             if not model.has_lims_data() and not HWR.beamline.session.get_group_name():
-                # When noprefix is set, verride prefix setting;
+                # When noprefix is set, override prefix setting;
                 # globally we cannot set location as name, apparently, but here we can
                 self._path_template.base_prefix = (
                     model.get_name() or HWR.beamline.session.get_proposal()

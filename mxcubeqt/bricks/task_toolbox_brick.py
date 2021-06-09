@@ -126,7 +126,7 @@ class TaskToolboxBrick(BaseWidget):
         handles LIMS login, ie ProposalBrick.
         The session_id is '' if no session could be retrieved.
         """
-        if session_id is "":
+        if session_id == "":
             self.logged_in(True)
 
     @qt_import.pyqtSlot(bool)

@@ -23,9 +23,7 @@ __version__ = '0.0.1'
 
 import os
 import sys
-import types
 import fcntl
-import string
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import tempfile
@@ -35,9 +33,18 @@ from optparse import OptionParser
 import gevent
 import gevent.monkey
 
-gevent.monkey.patch_all(thread=False)
+# NB this must be done *before* the gevent monkeypatching
+# The original socket is needed later for running py4j
+import socket as original_socket
+del sys.modules["socket"]
+del sys.modules["_socket"]
 
 from mxcubecore import HardwareRepository as HWR
+HWR.original_socket = original_socket
+del original_socket
+
+gevent.monkey.patch_all(thread=False)
+
 from mxcubeqt.utils import gui_log_handler, error_handler, qt_import
 from mxcubeqt.gui_supervisor import (
     GUISupervisor,

@@ -84,7 +84,7 @@ class GphlSetupWidget(qt_import.QWidget):
         _parameters_widget = self._parameters_widget = qt_import.QWidget(self)
         qt_import.QGridLayout(_parameters_widget)
         _parameters_widget.layout().setColumnStretch(2, 1)
-        _parameters_widget.layout().setMargin(0)
+        # _parameters_widget.layout().setMargin(0)
         _parameters_widget.layout().setSpacing(0)
         # _parameters_widget.layout().setContentsMargins(0, 0, 0, 0)
 
@@ -290,7 +290,7 @@ class GphlRuntimeWidget(qt_import.QWidget):
         _parameters_widget = self._parameters_widget = qt_import.QWidget(self)
         qt_import.QGridLayout(_parameters_widget)
         _parameters_widget.layout().setColumnStretch(2, 1)
-        _parameters_widget.layout().setMargin(0)
+        # _parameters_widget.layout().setMargin(0)
         _parameters_widget.layout().setSpacing(0)
         # _parameters_widget.layout().setContentsMargins(0, 0, 0, 0)
 

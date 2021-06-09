@@ -158,13 +158,13 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
 
     def update_num_images(self, index=None, num_images=None):
         if index is not None:
-            if index is 0:
+            if index == 0:
                 self._acquisition_parameters.num_images = 1
                 self._path_template.num_files = 1
-            elif index is 1:
+            elif index == 1:
                 self._acquisition_parameters.num_images = 2
                 self._path_template.num_files = 2
-            elif index is 2:
+            elif index == 2:
                 self._acquisition_parameters.num_images = 4
                 self._path_template.num_files = 4
 
@@ -172,11 +172,11 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             if self.acq_widget_layout.num_images_cbox.count() > 3:
                 self.acq_widget_layout.num_images_cbox.removeItem(4)
 
-            if num_images is 1:
+            if num_images == 1:
                 self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
-            elif num_images is 2:
+            elif num_images == 2:
                 self.acq_widget_layout.num_images_cbox.setCurrentIndex(1)
-            elif num_images is 4:
+            elif num_images == 4:
                 self.acq_widget_layout.num_images_cbox.setCurrentIndex(2)
             else:
                 self.acq_widget_layout.num_images_cbox.addItem(str(num_images))
