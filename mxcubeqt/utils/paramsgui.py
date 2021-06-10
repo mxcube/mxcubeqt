@@ -78,13 +78,7 @@ class LineEdit(qt_import.QLineEdit):
 
 
     def is_valid(self):
-        if self.validator():
-            return (
-                self.validator.validate(self.text(), 0)[0]
-                == qt_import.QValidator.Acceptable
-            )
-        else:
-            return True
+        return True
 
 
 class FloatString(LineEdit):
@@ -112,6 +106,15 @@ class FloatString(LineEdit):
 
     def set_value(self, value):
         self.setText(self.formatstr % value)
+
+    def is_valid(self):
+        if self.validator:
+            return (
+                self.validator.validate(self.text(), 0)[0]
+                == qt_import.QValidator.Acceptable
+            )
+        else:
+            return True
 
 
 class TextEdit(qt_import.QTextEdit):
