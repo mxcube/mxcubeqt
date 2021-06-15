@@ -71,11 +71,12 @@ class SSXSequenceWidget(qt_import.QWidget):
         self.chan_table.cellChanged.connect(
              self.chan_table_cell_changed)
 
-        if HWR.beamline.ssx_setup is not None:
-            self.chan_seq_graphics_view = HWR.beamline.ssx_setup.get_graphics_view()
-            _channels_gbox_vlayout.addWidget(self.chan_seq_graphics_view, 0, 1, 2, 1)
-            self.init_view()
-            HWR.beamline.ssx_setup.connect("valueChanged", self.metadata_values_changed)
+        if hasattr(HWR.beamline, "ssx_setup"):
+            if HWR.beamline.ssx_setup is not None:
+                self.chan_seq_graphics_view = HWR.beamline.ssx_setup.get_graphics_view()
+                _channels_gbox_vlayout.addWidget(self.chan_seq_graphics_view, 0, 1, 2, 1)
+                self.init_view()
+                HWR.beamline.ssx_setup.connect("valueChanged", self.metadata_values_changed)
         _channels_gbox.setCheckable(True)
         _channels_gbox.setChecked(False)
 
