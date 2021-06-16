@@ -10,26 +10,25 @@ MXCuBE application is in fact 2 things :
 This MXCuBE Framework is used to design and execute graphic user interfaces for beamline applications.
 In order to achieve this, different types of files take part on the process:
 
-* GUI files:
-    * Files created when MXCuBE is executed in editor mode.
-    * Different extensions types are allowed (`.gui`, `.yml`, `.json` ): the first one is not recommended, as it is not read-friendly and complicated to edit through a text editor.
-    * This files describe the bricks that take part of the GUI, their layout and position on the application, the connections between them and their properties (like for example, the hardware object they are binded to)
-    * By default, created in the `mxcube.git/bin` folder
+- GUI files:
 
-* Brick .py code files:
-    * Describe the layout and behaviour of the brick, including its interaction with an eventual hardware object
-    * They can be linked to a `<brick_design>.ui` file, created with QtCreator tool: a fast, easy and visual way to set brick's components and layout. Stored in `mxcube.git/gui/ui_files`.
-    * Stored in `mxcube.git/gui/bricks` folder  (subfolders admitted).
-    
-* Hardware Object .py code files:
-    * Hardware objects define interface to actual beamline components.
-    * They instantiate the Hardware Object with the help of the configuration file (see below)
-    * Stored in `mxcube.git/HardwareRepository/HardwareObjects/` folder (subfolders admitted).
+  - Files created when MXCuBE is executed in editor mode.
+  - Different extensions types are allowed (`.gui`, `.yml`, `.json` ): the first one is not recommended, as it is not read-friendly and complicated to edit through a text editor.
+  - This files describe the bricks that take part of the GUI, their layout and position on the application, the connections between them and their properties (like for example, the hardware object they are binded to)
 
-* XML files:
-    * Files that are used to configure the hardware object
-    * Stored in `mxcube.git/HardwareRepository/configuration/<beamline_line>` folder (subfolders admitted).
+- Brick .py code files:
+  - Describe the layout and behaviour of the brick, including its interaction with an eventual hardware object
+  - They can be linked to a `<brick_design>.ui` file, created with QtCreator tool: a fast, easy and visual way to set brick's components and layout. Stored in `mxcube.git/mxcubeqt/ui_files`.
+  - Stored in `mxcube.git/mxcubeqt/bricks` folder (subfolders admitted).
+- Hardware Object .py code files:
 
+  - Hardware objects define interface to actual beamline components.
+  - They instantiate the Hardware Object with the help of the configuration file (see below)
+  - Stored in `mxcube.git/mxcubecore/HardwareObjects/` folder (subfolders admitted).
+
+- XML files:
+  - Files that are used to configure the hardware object
+  - Stored in `mxcube.git/mxcubecore/configuration/<beamline_line>` folder (subfolders admitted).
 
 ## MXCuBE in action
 
@@ -43,7 +42,6 @@ Please note the squares of different colors that highlight the links between the
 
 ![alt text](images/mxcube_architecture_example.png "mxcube explained")
 
-
 ### Parsing the beamline_config.yml file
 
 The application launches and as first step, it parses the HARDWARE_REPOSITORY_SERVER (env variable, can be defined as an argument when executing application) folder looking for a file `named beamline_config.yml` file and creating and initializing the hardware objects described in it.
@@ -52,6 +50,7 @@ This file is basically a list of pairs "device: device_description_xml_file_name
 The goal is to make available these beamline components to any hardware object or any brick in order to interact with it.
 
 Here's an example of `beamline_config.yml` with three component on it:
+
 - beam : hardware object linked to the beam (size, position, changes...)
 - sample_view : hardware object to interact with microscope's/camera's images (create graphic items, measure sizes, highlight regions, move beam mark...)
 - diffractometer : hardware object used to control the motors on top of which the sample is set.
@@ -80,11 +79,10 @@ This HWR.beamline object is a singleton:
 
 `""" Beamline class serving as singleton container for links to top-level HardwareObjects """`
 
-
 Please notice the warnings on the comments on the beamline configuration file concerning the order of creation/loading of the hardware objects.
 If connection between hardware object is needed, then issues can arise.
 
-```    
+```
     # NB - the order is *NOT* arbitrary, as signal connections are set
     # on one object that require the other to be already loaded.
 ```
@@ -92,6 +90,7 @@ If connection between hardware object is needed, then issues can arise.
 During this initialization the framework parses the xml files referenced in `beamline_config.yml` file (and the 'nested' hardware objects, if any) and creates class members (on the child class of HardwareObject) from xml tags : in the example, the yellow and blue squares highlight this.
 
 xml file with :
+
 ```
 <?xml version="1.0" encoding="utf-8"?>
     <device class="ESRF.BlissTurret">
@@ -148,16 +147,17 @@ for motor_name in self.centring_motors_list:
 ### Creating the GUI
 
 Then the application parses the GUI file and for each of the detected bricks executes its corresponding code.
-In the initialization of each Brick, the `property_changed(self, property_name, old_value, new_value)` function is executed with all the values of `property_name` and with `new_value` to the values entered by user when executing the GUI Builder.  See more on 'property_changed' in the "How to : create a brick" section.
+In the initialization of each Brick, the `property_changed(self, property_name, old_value, new_value)` function is executed with all the values of `property_name` and with `new_value` to the values entered by user when executing the GUI Builder. See more on 'property_changed' in the "How to : create a brick" section.
 
 The goal of this function is to ensure that all the properties set by user for the brick are taken into account.
-By convention the `mnemonic` property is used to set the xml file where the configuration of a hardware object can be found.  The `get_hardware_objec(hwro_name)` function allows to recover that object and start interacting with the real device through it.
+By convention the `mnemonic` property is used to set the xml file where the configuration of a hardware object can be found. The `get_hardware_objec(hwro_name)` function allows to recover that object and start interacting with the real device through it.
 
 ## How to : create hardware object
 
 [How to create Hardware Object](how_to_create_hwobj.md)
 
 ## How to : create GUI brick
+
 [How to create GUI brick](how_to_create_qt_brick.md)
 
 ## How to : signals and slots between bricks and hardware objects
@@ -170,6 +170,7 @@ Besides, signal can send data of any type.
 As a convention, this kind of signals (see [Create GUI brick](how_to_create_qt_brick.md) for signal/slots between bricks) are asked to be written in **camelCase**.
 
 Example:
+
 ```
 ...
 class MultiplePositions(Equipment):
@@ -219,6 +220,4 @@ class MultiplePositionsBrick(BaseWidget):
 ## Annexe : Class Diagrams
 
 ![alt text](images/hardware_repository_class_diagram.png "Hardware Repository Class Diagram")
-
-
 ![alt text](images/gui_class_diagram.png "GUI Class Diagram")

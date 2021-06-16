@@ -1161,17 +1161,17 @@
                   hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                   value: 0}
                 - {comment: '', default_value: 1, hidden: false, name: showAdvancedTask,
-                  old_value: 1, type: boolean, value: 0}
+                  old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showCharTask,
                   old_value: 1, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: showCollectNowButton,
-                  old_value: 0, type: boolean, value: 0}
-                - {comment: '', default_value: 1, hidden: false, name: showDiscreetTask,
                   old_value: 0, type: boolean, value: 1}
+                - {comment: '', default_value: 1, hidden: false, name: showDiscreetTask,
+                  old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showHelicalTask,
                   old_value: 1, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: showStillScanTask,
-                  old_value: 0, type: boolean, value: 1}
+                  old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: useCompression,
                   old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: useOscStartCbox,
@@ -2885,7 +2885,7 @@
       name: online_processing_brick
       properties:
       - {comment: Set fixed height in pixels, default_value: -1, hidden: false, name: fixedHeight,
-        old_value: -1, type: integer, value: -1}
+        old_value: 300, type: integer, value: 200}
       - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
         old_value: -1, type: integer, value: -1}
       - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',

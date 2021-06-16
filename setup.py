@@ -36,7 +36,7 @@ setup(
     # author_email='mxcube@mxcube.org',
     description='Qt front-end version for MXCuBE',
     long_description='Front-end version for MXCuBE based on Qt framework',
-    url='http://github.com/mxcube/mxcube',
+    url='http://github.com/mxcube/mxcubeqt',
     packages=find_packages(),
     package_dir={},
     include_package_data=True,

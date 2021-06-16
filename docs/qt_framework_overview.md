@@ -1,10 +1,10 @@
 ## Qt based GUI
 
-Initaly MXCuBE was written in Qt3 and later adopted and migrated to the Qt4/5/PySide platform. 
+Initaly MXCuBE was written in Qt3 and later adopted and migrated to the Qt4/5/PySide platform.
 
 ###Best Practices
 
-To format code [PEP-8](http://www.python.org/dev/peps/pep-0008/) is used in general. 
+To format code [PEP-8](http://www.python.org/dev/peps/pep-0008/) is used in general.
 However, Qt diverges from PEP-8 and uses camel case notation. This can be seen in the diagrams
 that contain Qt derived objects. New code should as much as possible confirm to PEP-8.
 
@@ -34,6 +34,5 @@ group and data collection would be abbreviated dcg and dc.
 
 ### Tutorials
 
-* [Create Hardware Object](how_to_create_hwobj.md)
-* [Create GUI brick](how_to_create_qt_brick.md)
-* :doc:`how_to_define_gui`
+- [Create Hardware Object](how_to_create_hwobj.md)
+- [Create GUI brick](how_to_create_qt_brick.md)
