@@ -348,10 +348,6 @@ def create_app(gui_config_path=None, core_config_path=None):
 
     (opts, args) = parser.parse_args()
 
-    log_file = start_log(opts.logFile, opts.logLevel)
-    log_template = opts.logTemplate
-    hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
-    custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
     if opts.version:
         from mxcubeqt import __version__
         print(__version__)

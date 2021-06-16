@@ -256,9 +256,9 @@ class HitMapWidget(qt_import.QWidget):
         y_axis_range = [0, 1]
 
         if self.__plot_type == "1D":
-            x_array = np.linspace(0, acq_parameters.num_images, acq_parameters.num_images, dtype=int)
-            y_array = np.zeros(acq_parameters.num_images)
-            #y_array = np.zeros(1)
+            #x_array = np.linspace(0, acq_parameters.num_images, acq_parameters.num_images, dtype=int)
+            #y_array = np.zeros(acq_parameters.num_images)
+            y_array = np.zeros(1)
 
             self._hit_map_plot.clear()
 
@@ -266,7 +266,7 @@ class HitMapWidget(qt_import.QWidget):
                 self._hit_map_plot.add_curve(
                     result_type["key"],
                     y_array,
-                    x_array,
+                    x_array=None,
                     linestyle="None",
                     label=result_type["descr"],
                     color=result_type["color"],
