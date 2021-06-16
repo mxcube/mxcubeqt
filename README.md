@@ -23,14 +23,14 @@ Latest information about the MXCuBE project can be found in the
 
 ## Information for developers
 
-* [How to install and run Qt version](https://github.com/mxcube/mxcube/tree/master/docs/how_to_run_mxcube_qt.md)
-* [Contributing guidelines](https://github.com/mxcube/mxcube/blob/master/CONTRIBUTING.md)
+* [How to install and run Qt version](https://github.com/mxcube/mxcubeqt/tree/master/docs/how_to_run_mxcube_qt.md)
+* [Contributing guidelines](https://github.com/mxcube/mxcubeqt/blob/master/CONTRIBUTING.md)
 
 ## Information for users
 
-* [User manual](https://github.com/mxcube/mxcube/blob/master/docs/manual/MXCuBE2_1_manual_march2015-v2.pdf).
-* [Feature overview](https://github.com/mxcube/mxcube/blob/master/docs/source/feature_overview.rst)
-* [Overview of Graphical user interface](https://github.com/mxcube/mxcube/blob/master/docs/source/gui_overview.rst)
+* [User manual](https://github.com/mxcube/mxcubeqt/blob/master/docs/manual/MXCuBE2_1_manual_march2015-v2.pdf).
+* [Feature overview](https://github.com/mxcube/mxcubeqt/blob/master/docs/source/feature_overview.rst)
+* [Overview of Graphical user interface](https://github.com/mxcube/mxcubeqt/blob/master/docs/source/gui_overview.rst)
 * If you cite MXCuBE, please use the reference:
 
 ```
