@@ -29,7 +29,7 @@ Write necessary hardware object:
 - Then class must inherit from the base HardwareObject class:
 - Most common types are: Equipment, AbstractActuator and Procedure
 - The initialization of the class is done in two different functions:
-  - def **init**(self)
+  - def __init__(self)
     call parent class constructor
     define all internal values and give a default value
   - def init(self):

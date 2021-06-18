@@ -1,7 +1,7 @@
 ## How to create GUI brick in Qt version
 
 - MXCuBE is based on building bricks that are linked together with GUI designer.
-- Before creating and submiting a new brick to the git repository, please inspect [mxcubeqt/bricks](https://github.com/mxcubeqt/mxcuebqt/tree/master/bricks) directory if there is a brick that might fit to your needs.
+- Before creating and submiting a new brick to the git repository, please inspect [mxcubeqt/bricks](https://github.com/mxcube/mxcubeqt/tree/master/mxcubeqt/bricks) directory if there is a brick that might fit to your needs.
 - The main idea is to keep a commot graphical layout among many software users and try to keep optimal set of bricks.
 - If it is necessary to create a new brick then use starting template and add necessary graphical elements:
 

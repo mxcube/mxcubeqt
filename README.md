@@ -1,7 +1,5 @@
 # MXCuBE
 
-[![Build Status](https://travis-ci.org/mxcube/mxcube.svg?branch=master)](https://travis-ci.org/mxcube/mxcube)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ace26bd8ba8d41ce80afa50b8b51e04c)](https://www.codacy.com/app/IvarsKarpics/mxcube?utm_source=github.com&utm_medium=referral&utm_content=mxcube/mxcube&utm_campaign=Badge_Grade)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 MXCuBE stands for Macromolecular Xtallography Customized Beamline Environment.
