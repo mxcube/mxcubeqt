@@ -348,19 +348,16 @@ def create_app(gui_config_path=None, core_config_path=None):
 
     (opts, args) = parser.parse_args()
 
-    log_file = start_log(opts.logFile, opts.logLevel)
-    log_template = opts.logTemplate
-    hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
-    custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
     if opts.version:
         from mxcubeqt import __version__
         print(__version__)
         exit(0)
-    if opts.userFileDir:
-        user_file_dir = opts.userFileDir
-    else:
-        user_file_dir = os.path.join(os.environ["HOME"], ".mxcube")
 
+    log_file = start_log(opts.logFile, opts.logLevel)
+    log_template = opts.logTemplate
+    hwobj_directories = opts.hardwareObjectsDirs.split(os.path.pathsep)
+    custom_bricks_directories = opts.bricksDirs.split(os.path.pathsep)
+    user_file_dir = opts.userFileDir or os.path.join(os.environ["HOME"], ".mxcube")
     app_style = opts.appStyle
 
     if not gui_config_path:

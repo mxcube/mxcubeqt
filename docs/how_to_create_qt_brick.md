@@ -1,9 +1,9 @@
 ## How to create GUI brick in Qt version
 
-* MXCuBE is based on building bricks that are linked together with GUI designer.
-* Before creating and submiting a new brick to the git repository, please inspect [gui/bricks](https://github.com/mxcube/gui/tree/master/bricks)  directory if there is a brick that might fit to your needs.
-* The main idea is to keep a commot graphical layout among many software users and try to keep optimal set of bricks.
-* If it is necessary to create a new brick then use starting template and add necessary graphical elements:
+- MXCuBE is based on building bricks that are linked together with GUI designer.
+- Before creating and submiting a new brick to the git repository, please inspect [mxcubeqt/bricks](https://github.com/mxcube/mxcubeqt/tree/master/mxcubeqt/bricks) directory if there is a brick that might fit to your needs.
+- The main idea is to keep a commot graphical layout among many software users and try to keep optimal set of bricks.
+- If it is necessary to create a new brick then use starting template and add necessary graphical elements:
 
 ```
    import qt_import
@@ -18,13 +18,13 @@
            BaseWidget.__init__(self)
 
            # Hardware objects ----------------------------------------------------
-           self.test_hwobj = None       
+           self.test_hwobj = None
 
            # Internal variables --------------------------------------------------
            self.test_internal_variable = None
 
-           # Properties ---------------------------------------------------------- 
-           self.add_property('mnemonic', 'string', '')  
+           # Properties ----------------------------------------------------------
+           self.add_property('mnemonic', 'string', '')
            self.add_property('booleanProperty', 'boolean', False)
            self.add_property('stringProperty', 'string', 'initString')
            self.add_property('integerPropery', 'integer', 0)
@@ -55,17 +55,17 @@
            self.test_ledit.textChanged.connect(self.test_ledit_text_changed)
            self.test_button.pressed.connect(self.test_button_pressed)
            self.test_combo.activated.connect(self.test_combo_activated)
- 
+
            # Other ---------------------------------------------------------------
 
 ```
 
 ### Pogramming guidelines
 
-* Follow [Best practices](qt_framework_overview.md) when programming in Qt.
-* `Hardware objects` defines used hardware objects. Use syntax `self.***_hwobj`.
-* `Internal variables` defines internal variables (booleans, strings, integers, lists etc). Use reasonable variable names (for example: self.energy_limits_list clearly defines that variable is a list that contains energy limits) and assign None or a default value.
-* In `Properties` section properties of the brick are defined. With GUI designer these properties are defined. They are stored in the gui file and preserved when MXCuBE is closed. Method `property_changed` is executed at the startup and can be used to read these properties.
+- Follow [Best practices](qt_framework_overview.md) when programming in Qt.
+- `Hardware objects` defines used hardware objects. Use syntax `self.***_hwobj`.
+- `Internal variables` defines internal variables (booleans, strings, integers, lists etc). Use reasonable variable names (for example: self.energy_limits_list clearly defines that variable is a list that contains energy limits) and assign None or a default value.
+- In `Properties` section properties of the brick are defined. With GUI designer these properties are defined. They are stored in the gui file and preserved when MXCuBE is closed. Method `property_changed` is executed at the startup and can be used to read these properties.
 
 ```
    def property_changed(self, property_name, old_values, new_value):
@@ -100,13 +100,13 @@
                 # If hwobj is not initialized then the brick is disabled
                 self.setEnabled(False)
         elif property_name == "booleanProperty":
-  
+
             # Do something with a boolean value
             pass
         elif property_name == "stringProperty":
 
             # Do something with a string value
-            pass 
+            pass
         elif property_name == "integerPropery":
 
             # Do something with an integer value
@@ -119,11 +119,11 @@
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
 ```
-   
-* `Graphical elements` section is used to define all graphical elements.
-* `Layout` defines brick layout. All Qt widgets are grouped within the brick based on `QHBoxLayout`, `QVBoxLayout` and `QGridLayout`. Use `addWidget` to add widget to the layout, `setSpacing` to set spacing between the qt widget, `setContentsMargins` to set the contents margins.
-* `SizePolicies` define size policy (fixed size, expanding etc) of a widget.
-* `Qt signal/slot connections` define signals/slots used within a brick. Here basic interations between basic Qt widgets are defined. Many Qt widgets have their own built in signals already implemented. For example, a QPushButton has (among others), a `clicked()` signal that can be connected to other widget/object's function to execute an action whenever it is emited. Example:
+
+- `Graphical elements` section is used to define all graphical elements.
+- `Layout` defines brick layout. All Qt widgets are grouped within the brick based on `QHBoxLayout`, `QVBoxLayout` and `QGridLayout`. Use `addWidget` to add widget to the layout, `setSpacing` to set spacing between the qt widget, `setContentsMargins` to set the contents margins.
+- `SizePolicies` define size policy (fixed size, expanding etc) of a widget.
+- `Qt signal/slot connections` define signals/slots used within a brick. Here basic interations between basic Qt widgets are defined. Many Qt widgets have their own built in signals already implemented. For example, a QPushButton has (among others), a `clicked()` signal that can be connected to other widget/object's function to execute an action whenever it is emited. Example:
 
 ```
    self.test_ledit.textChanged.connect(self.test_ledit_text_changed)
@@ -140,13 +140,13 @@
        pass
 ```
 
-* `Other`. It is recommended to add all other code here. It is recommended to just define (not write additional code) GUI element in `Graphical elements` and then all necessary code define in `Other` section.
+- `Other`. It is recommended to add all other code here. It is recommended to just define (not write additional code) GUI element in `Graphical elements` and then all necessary code define in `Other` section.
 
 ### Bricks based on widgets
 
 It is recommended to use widgets to compose a brick. A widget in the MXCuBE context is a basic graphical element that has a defined function. Widgets are not bricks and can not be used as a stand alone brick via GUI designer. All widget are located in [widgets directory] (https://github.com/mxcube/mxcube/tree/master/gui/widgets)
 
-In this example `dc_tree_widget.py` is used in  `TreeBrick`.
+In this example `dc_tree_widget.py` is used in `TreeBrick`.
 
 ```
    class DataCollectTree(qt_import.QWidget):
@@ -165,7 +165,7 @@ In this example `dc_tree_widget.py` is used in  `TreeBrick`.
    # ...
 
    self.dc_tree_widget = DataCollectTree(self)
-  
+
    # ...
    main_layout = qt_import.QVBoxLayout(self)
    # ...
@@ -173,10 +173,10 @@ In this example `dc_tree_widget.py` is used in  `TreeBrick`.
    main_layout.setSpacing(0)
    main_layout.setContentsMargins(0, 0, 0, 0)
 ```
-   
+
 ### Bricks and widgets build by Qt Designer
 
-Qt Designer is a powefull tool that allows to create layout for widgets and bricks. When many graphical elements are used then the layout management becomes difficult and it is easy to get lost. With Qt Designer a layout is designed and stored in ui file (see [ui files directory](https://github.com/mxcube/mxcube/tree/master/gui/ui_files>). This ui file is initialized and used via widget or Brick.
+Qt Designer is a powefull tool that allows to create layout for widgets and bricks. When many graphical elements are used then the layout management becomes difficult and it is easy to get lost. With Qt Designer a layout is designed and stored in ui file (see [ui files directory](https://github.com/mxcube/mxcubeqt/tree/master/mxcubeqt/ui_files>). This ui file is initialized and used via widget or Brick.
 
 1. Use Qt designer to create layout and save ui file:
 
@@ -184,7 +184,7 @@ Qt Designer is a powefull tool that allows to create layout for widgets and bric
 
 2. Intiate ui file with `qt_import.load_ui_file()` function and then use the generated object to get access to the components created on it:
 
-```   
+```
    # ...
    self.sample_changer_widget = qt_import.load_ui_file(
         "sample_changer_widget_layout.ui")
@@ -205,16 +205,16 @@ In this case ui file is used in the brick. If it was used in the widget then rem
 
 ### Signals and slots between bricks
 
-* Use `Signals` and `Slots` to define interface and interactions between bricks. The only way how two separate bricks can communicate is via this signal and slot mechanism.
-* Following [Qt's signal and slots system](https://doc.qt.io/qt-5/signalsandslots.html) implemented for PyQt in [PyQt Support for Signals and Slots](https://www.riverbankcomputing.com/static/Docs/PyQt5/signals_slots.html), any Qt object can send signals that can be connected to any object slots (simple member functions) to create interaction between them: when a signal is **emited** then the slot will execute.
+- Use `Signals` and `Slots` to define interface and interactions between bricks. The only way how two separate bricks can communicate is via this signal and slot mechanism.
+- Following [Qt's signal and slots system](https://doc.qt.io/qt-5/signalsandslots.html) implemented for PyQt in [PyQt Support for Signals and Slots](https://www.riverbankcomputing.com/static/Docs/PyQt5/signals_slots.html), any Qt object can send signals that can be connected to any object slots (simple member functions) to create interaction between them: when a signal is **emited** then the slot will execute.
 
 For custom widgets, like user defined Bricks, custom signals can be created and then emitted.
 
 In the 'emitter' brick:
 
-* First, declare the signal as a class static member
-* Then, through the `define_signal` function, define it in the `__init__()` function 
-* Emit the signal when needed
+- First, declare the signal as a class static member
+- Then, through the `define_signal` function, define it in the `__init__()` function
+- Emit the signal when needed
 
 ```
 import qt_import
@@ -239,8 +239,8 @@ class EmitterBrick(BaseWidget):
 
 In the 'receiver' brick:
 
-* Define the slot through the `define_signal` function in the `__init__()` function 
-* Then, create the code of the slot as it was a simple member function
+- Define the slot through the `define_signal` function in the `__init__()` function
+- Then, create the code of the slot as it was a simple member function
 
 ```
 import qt_import
@@ -265,19 +265,11 @@ Finally, in the GUI builder define the signal/slot connection between EmitterBri
 
 Example with TestBrick1.py (signal emitter) and TestBrick2.py signal receiver.
 
-
 _**warning**_ : The number of variables emited via signal should much the number of variables received by a slot.
 
 ### See also
 
-   * [Qt Home Page](https://www.qt.io/)
-   * [Qt Examples And Tutorials](https://doc.qt.io/qt-5/qtexamplesandtutorials.html)
-   * [Qt for Python, Qt Project page](https://wiki.qt.io/Qt_for_Python)
-   * [PyQt Project page](https://www.riverbankcomputing.com/static/Docs/PyQt5/)
-   
-### Other information
-
-* [How to create GUI brick](how_to_create_qt_brick.md)
-* [How to define Qt GUI](how_to_define_qt_gui.md)
-* [How to create Hardware Object](how_to_create_hwobj.md)
-
+- [Qt Home Page](https://www.qt.io/)
+- [Qt Examples And Tutorials](https://doc.qt.io/qt-5/qtexamplesandtutorials.html)
+- [Qt for Python, Qt Project page](https://wiki.qt.io/Qt_for_Python)
+- [PyQt Project page](https://www.riverbankcomputing.com/static/Docs/PyQt5/)
