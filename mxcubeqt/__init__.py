@@ -79,11 +79,11 @@ SPLASH_SCREEN = None
 
 LOGGING_NAME = ""
 
-MXCUBEQT_ROOT = os.path.dirname(__file__)
+#MXCUBEQT_ROOT = os.path.dirname(__file__)
 #sys.path.insert(0, MXCUBEQT_ROOT)
 
 #MOCKUP_CONFIG_PATH = os.path.join(MXCUBEQT_ROOT, "example_config.yml")
-MOCKUP_CONFIG_PATH = resource_filename('mxcubeqt', 'example_config.yml')
+MOCKUP_CONFIG_PATH = resource_filename('mxcubeqt', 'configuration/mockup.yml')
 
 path = []
 for p in ['configuration/mockup', 'configuration/mockup/qt']:
@@ -376,7 +376,6 @@ def create_app(gui_config_path=None, core_config_path=None):
         else:
             # try to set Hardware Repository server from environment
             core_config_path = os.environ.get("MXCUBE_CORE_CONFIG_PATH")
-
 
     # add bricks directories and hardware objects directories from environment
     try:
