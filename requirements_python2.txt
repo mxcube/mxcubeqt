@@ -1,12 +1,2 @@
-PyDispatcher
-gevent
-suds
-jsonpickle
-numpy
-scipy
-matplotlib
-pymca
-enum34
-lxml
-ruamel.yaml
+mxcubecore
 pyqtgraph

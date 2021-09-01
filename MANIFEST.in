@@ -1,0 +1,4 @@
+#https://packaging.python.org/guides/using-manifest-in/
+recursive-include mxcubeqt/configuration *.yml
+recursive-include mxcubeqt/ui_files *.ui
+recursive-include mxcubeqt/icons *.png
