@@ -24,7 +24,6 @@ from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
-from mxcubeqt.widgets.comments_widget import CommentsWidget
 
 from mxcubecore.HardwareObjects import (
     queue_model_objects,
@@ -72,21 +71,16 @@ class CreateDiscreteWidget(CreateTaskBase):
             self, data_model=self._processing_parameters
         )
 
-        self._comments_widget = CommentsWidget(self)
-        self._comments_widget.setHidden(True)
-
         # Layout --------------------------------------------------------------
         _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._processing_widget)
-        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
@@ -186,7 +180,7 @@ class CreateDiscreteWidget(CreateTaskBase):
             cpos = queue_model_objects.CentredPosition()
             cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
 
-        tasks.extend(self.create_dc(sample, cpos=cpos))
+        tasks.extend(self.create_dc(sample, cpos=cpos, comments=comments))
         self._path_template.run_number += 1
 
         return tasks
@@ -201,6 +195,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         sc=None,
         cpos=None,
         inverse_beam=False,
+        comments=None
     ):
         tasks = []
 
@@ -224,6 +219,9 @@ class CreateDiscreteWidget(CreateTaskBase):
         if inverse_beam:
             acq.acquisition_parameters.inverse_beam = False
 
+        if comments:
+            acq.acquisition_parameters.comments = comments
+
         acq.acquisition_parameters.centred_position = cpos
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
@@ -244,3 +242,23 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks.append(data_collection)
 
         return tasks
+
+    def execute_task(self, sample):
+        # All this should be in queue_entry level
+        group_data = {
+            "sessionId": api.session.session_id,
+            "experimentType": "OSC",
+        }
+        gid = HWR.beamline.lims._store_data_collection_group(group_data)
+        sample.lims_group_id = gid
+
+        task_list = self._create_task(sample, None)
+        task_list[0].lims_group_id = gid
+
+        param_list = queue_model_objects.to_collect_dict(
+            task_list[0], HWR.beamline.session, sample, None
+        )
+
+        HWR.beamline.collect.collect(
+            queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list
+        )

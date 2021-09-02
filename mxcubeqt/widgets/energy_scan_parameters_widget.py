@@ -24,7 +24,6 @@ from mxcubeqt.widgets.pyqtgraph_widget import PlotWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
 from mxcubecore.HardwareObjects import queue_model_objects
-
 from mxcubecore import HardwareRepository as HWR
 
 
@@ -44,52 +43,38 @@ class EnergyScanParametersWidget(qt_import.QWidget):
         self._tree_view_item = None
 
         # Graphic elements ----------------------------------------------------
-        _top_widget = qt_import.QWidget(self)
-        _parameters_widget = qt_import.QWidget(_top_widget)
-        self.periodic_table_widget = PeriodicTableWidget(_parameters_widget)
-        self.data_path_widget = DataPathWidget(_parameters_widget)
+        self.periodic_table_widget = PeriodicTableWidget(self)
+        self.data_path_widget = DataPathWidget(self)
         self.data_path_widget.data_path_layout.file_name_label.setText("")
         self.data_path_widget.data_path_layout.file_name_value_label.hide()
         self.snapshot_widget = SnapshotWidget(self)
 
-        self.scan_plot_widget = PlotWidget(self)
-        self.chooch_plot_widget = PlotWidget(self)
+        self.scan_online_plot_widget = PlotWidget(self)
+        self.scan_online_plot_widget.set_plot_type("1D")
+        self.scan_result_plot_widget = PlotWidget(self)
+        self.scan_result_plot_widget.set_plot_type("1D")
 
         # Layout -------------------------------------------------------------
-        _parameters_widget_layout = qt_import.QVBoxLayout()
-        _parameters_widget_layout.addWidget(self.periodic_table_widget)
-        _parameters_widget_layout.addWidget(self.data_path_widget)
-        _parameters_widget_layout.addStretch(0)
-        _parameters_widget_layout.setSpacing(2)
-        _parameters_widget_layout.setContentsMargins(0, 0, 0, 0)
-        _parameters_widget.setLayout(_parameters_widget_layout)
-
-        _top_widget_hlayout = qt_import.QHBoxLayout(self)
-        _top_widget_hlayout.addWidget(_parameters_widget)
-        _top_widget_hlayout.addWidget(self.snapshot_widget)
-        _top_widget_hlayout.addStretch(0)
-        _top_widget_hlayout.setSpacing(2)
-        _top_widget_hlayout.setContentsMargins(0, 0, 0, 0)
-        _top_widget.setLayout(_top_widget_hlayout)
-
-        _main_vlayout = qt_import.QVBoxLayout(self)
-        _main_vlayout.addWidget(_top_widget)
-        _main_vlayout.addWidget(self.scan_plot_widget)
-        #_main_vlayout.addWidget(self.scan_result_plot_widget)
-        _main_vlayout.addWidget(self.chooch_plot_widget)
-        _main_vlayout.setSpacing(5)
-        _main_vlayout.setContentsMargins(2, 2, 2, 2)
-        # _main_vlayout.addStretch(0)
-
-        self.setLayout(_main_vlayout)
+        _main_gridlayout = qt_import.QGridLayout(self)
+        _main_gridlayout.addWidget(self.periodic_table_widget, 0, 0)
+        _main_gridlayout.addWidget(self.snapshot_widget, 0, 1)
+        _main_gridlayout.addWidget(self.data_path_widget, 1, 0, 1, 2)
+        _main_gridlayout.addWidget(self.scan_online_plot_widget, 2, 0, 1, 2)
+        _main_gridlayout.addWidget(self.scan_result_plot_widget, 3, 0, 1, 2)
+        _main_gridlayout.setSpacing(5)
+        _main_gridlayout.setContentsMargins(2, 2, 2, 2)
+        _main_gridlayout.setColumnStretch(2, 1)
 
         # SizePolicies --------------------------------------------------------
-        self.scan_plot_widget.setSizePolicy(
-            qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Expanding
-        )
-        self.chooch_plot_widget.setSizePolicy(
-            qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Expanding
-        )
+        self.periodic_table_widget.setFixedSize(600, 400)
+        #self.scan_online_plot_widget.setSizePolicy(
+        #    qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed
+        #)
+        #self.scan_result_plot_widget.setSizePolicy(
+        #    qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed
+        #)
+        #self.scan_online_plot_widget.setFixedHeight(300)
+        #self.scan_result_plot_widget.setFixedHeight(300)
 
         # Qt signal/slot connections ------------------------------------------
         # qt.QObject.connect(self.periodic_table_widget, qt.PYSIGNAL('edgeSelected'),
@@ -104,18 +89,18 @@ class EnergyScanParametersWidget(qt_import.QWidget):
         )
 
         # Other ---------------------------------------------------------------
-        self.scan_plot_widget.hide()
-        #self.scan_result_plot_widget.hide()
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
         if HWR.beamline.energy_scan is not None:
             HWR.beamline.energy_scan.connect(
                 "energyScanStarted", self.energy_scan_started
             )
-            HWR.beamline.energy_scan.connect(
-                "scanNewPoint", self.energy_scan_new_point
-            )
+            HWR.beamline.energy_scan.connect("scanNewPoint", self.energy_scan_new_point)
             HWR.beamline.energy_scan.connect("choochFinished", self.chooch_finished)
+
+        self.scan_online_plot_widget.one_dim_plot.setLabel('left', "Counts")
+        self.scan_online_plot_widget.one_dim_plot.setLabel('bottom', "Energy", "keV")
+        self.scan_result_plot_widget.one_dim_plot.setLabel('bottom', "Energy", "keV")
 
     def _prefix_ledit_change(self, new_value):
         self.energy_scan_model.set_name(str(new_value))
@@ -126,6 +111,10 @@ class EnergyScanParametersWidget(qt_import.QWidget):
             self.energy_scan_model.set_number(int(new_value))
             self._tree_view_item.setText(0, self.energy_scan_model.get_name())
 
+    def tab_changed(self):
+        if self._tree_view_item:
+            self.populate_widget(self._tree_view_item)
+
     def populate_widget(self, item):
         self._tree_view_item = item
         self.energy_scan_model = item.get_model()
@@ -134,29 +123,25 @@ class EnergyScanParametersWidget(qt_import.QWidget):
 
         self.data_path_widget.setDisabled(executed or is_running)
         self.periodic_table_widget.setDisabled(executed or is_running)
-        # self.scan_plot_widget.setEnabled()
-        # self.scan_plot_widget.setEnabled(not executed)
+        # self.scan_online_plot_widget.setEnabled()
+        # self.scan_online_plot_widget.setEnabled(not executed)
         # self.chooch_plot_widget.setEnabled(not executed)
 
-        width = self.data_path_widget.width() + self.snapshot_widget.width()
-        self.scan_plot_widget.setFixedWidth(width)
+        #width = self.data_path_widget.width() + self.snapshot_widget.width()
+        #self.scan_online_plot_widget.setFixedWidth(width)
         #self.scan_result_plot_widget.setFixedWidth(width)
-        self.chooch_plot_widget.setFixedWidth(width)
-
-        self.chooch_plot_widget.clear()
+        #self.chooch_plot_widget.setFixedWidth(width)
         title = "Element: %s, Edge: %s" % (
             self.energy_scan_model.element_symbol,
             self.energy_scan_model.edge,
         )
 
         if executed:
-            self.scan_plot_widget.hide()
-            #self.scan_result_plot_widget.show()
-
+            self.scan_online_plot_widget.clear()
+            self.scan_online_plot_widget.clear()
             result = self.energy_scan_model.get_scan_result()
-            #self.scan_result_plot_widget.plot_energy_scan_curve(result.data, title)
-
-            self.chooch_plot_widget.plot_energy_scan_results(
+            self.scan_online_plot_widget.plot_energy_scan_results(result.data, title)
+            self.scan_result_plot_widget.plot_chooch_results(
                 result.pk,
                 result.fppPeak,
                 result.fpPeak,
@@ -169,27 +154,34 @@ class EnergyScanParametersWidget(qt_import.QWidget):
                 result.chooch_graph_y2,
                 result.title,
             )
-        self.data_path_widget.update_data_model(self.energy_scan_model.path_template)
+        
+        self.data_path_widget.update_data_model(
+            self.energy_scan_model.path_template
+        )
         self.periodic_table_widget.set_current_element_edge(
-            self.energy_scan_model.element_symbol, self.energy_scan_model.edge
+            self.energy_scan_model.element_symbol,
+            self.energy_scan_model.edge
         )
 
         image = self.energy_scan_model.centred_position.snapshot_image
-        self.snapshot_widget.display_snapshot(image, width=400)
+        self.snapshot_widget.display_snapshot(image, width=500)
 
     def element_clicked(self, symbol, energy):
         self.energy_scan_model.element_symbol = symbol
         self.energy_scan_model.edge = energy
 
     def energy_scan_started(self, scan_info):
-        self.scan_plot_widget.clear()
-        self.chooch_plot_widget.clear()
-        self.scan_plot_widget.start_new_scan(scan_info)
+        self.scan_online_plot_widget.clear()
+        self.scan_result_plot_widget.clear()
+        #self.scan_online_plot_widget.start_new_scan(scan_info)
+        self.scan_online_plot_widget.add_energy_scan_plot(scan_info)
+        #self.scan_online_plot_widget.one_dim_plot.setTitle(scan_info["title"])
+        #self.scan_online_plot_widget.add_curve("energyscan")
         self.data_path_widget.setEnabled(False)
         self.periodic_table_widget.setEnabled(False)
 
     def energy_scan_new_point(self, x, y):
-        self.scan_plot_widget.add_new_plot_value(x, y)
+        self.scan_online_plot_widget.add_energy_scan_plot_point(x, y)
 
     def chooch_finished(
         self,
@@ -205,7 +197,7 @@ class EnergyScanParametersWidget(qt_import.QWidget):
         chooch_graph_y2,
         title,
     ):
-        self.chooch_plot_widget.plot_energy_scan_results(
+        self.scan_result_plot_widget.plot_chooch_results(
             pk,
             fppPeak,
             fpPeak,
@@ -218,4 +210,3 @@ class EnergyScanParametersWidget(qt_import.QWidget):
             chooch_graph_y2,
             title,
         )
-        self.scan_plot_widget.plot_finished()

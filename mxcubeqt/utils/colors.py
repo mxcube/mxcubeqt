@@ -81,6 +81,9 @@ def set_widget_color(widget, color, color_role=None):
     widget.setAutoFillBackground(True)
     widget.setPalette(widget_palette)
 
+def set_widget_color_by_state(widget, state, color_role=None):
+    color = COLOR_STATES.get(state, LIGHT_GREEN)
+    set_widget_color(widget, color, color_role)
 
 def get_random_color(alpha=255):
     return QColor(randint(0, 255), randint(0, 255), randint(0, 255), alpha)

@@ -86,27 +86,20 @@ class DoorInterlockBrick(BaseWidget):
 
         self.connect(
             HWR.beamline.hutch_interlock,
-            "doorInterlockStateChanged",
-            self.state_changed
+            "valueChanged",
+            self.value_changed
         )
         
     def unlock_doors(self):
         self.unlock_door_button.setEnabled(False)
-        HWR.beamline.hutch_interlock.unlock_door_interlock()
+        HWR.beamline.hutch_interlock.unlock()
 
     def updateLabel(self, label):
         self.main_groupbox.setTitle(label)
 
-    def state_changed(self, state, state_label=None):
-        try:
-            color = self.STATES[state]
-        except KeyError:
-            state = "unknown"
-            color = self.STATES[state]
+    def value_changed(self, value):
+        is_locked = value.value.lower().startswith("locked")
+        color = colors.LIGHT_GREEN if is_locked else colors.LIGHT_GRAY
         colors.set_widget_color(self.state_label, color)
-        if state_label is not None:
-            self.state_label.setText("<b>%s</b>" % state_label)
-        else:
-            self.state_label.setText("<b>%s</b>" % state)
-
-        self.unlock_door_button.setEnabled(state == "locked_active")
+        self.state_label.setText(value.value.title())
+        self.unlock_door_button.setEnabled(is_locked)

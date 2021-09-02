@@ -28,25 +28,6 @@ __category__ = "Motor"
 
 class MotorPredefPosBrick(BaseWidget):
 
-    STATE_COLORS = (
-        colors.LIGHT_YELLOW,  # INITIALIZING
-        colors.LIGHT_GREEN,  # ON
-        colors.DARK_GRAY,  # OFF
-        colors.LIGHT_GREEN,  # READY
-        colors.LIGHT_YELLOW,  # BUSY
-        colors.LIGHT_YELLOW,  # MOVING
-        colors.LIGHT_GREEN,  # STANDBY
-        colors.DARK_GRAY,  # DISABLED
-        colors.DARK_GRAY,  # UNKNOWN
-        colors.LIGHT_RED,  # ALARM
-        colors.LIGHT_RED,  # FAULT
-        colors.LIGHT_RED,  # INVALID
-        colors.DARK_GRAY,  # OFFLINE
-        colors.LIGHT_RED,  # LOWLIMIT
-        colors.LIGHT_RED,  # HIGHLIMIT
-        colors.DARK_GRAY,
-    )  # NOTINITIALIZED
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -149,37 +130,32 @@ class MotorPredefPosBrick(BaseWidget):
                     self.motor_hwobj, "stateChanged", self.motor_state_changed
                 )
                 self.disconnect(
-                    self.motor_hwobj, "newPredefinedPositions", self.fill_positions
-                )
-                self.disconnect(
                     self.motor_hwobj,
-                    "predefinedPositionChanged",
+                    "valueChanged",
                     self.predefined_position_changed,
                 )
 
             self.motor_hwobj = self.get_hardware_object(new_value)
 
             if self.motor_hwobj is not None:
-                self.connect(
-                    self.motor_hwobj, "newPredefinedPositions", self.fill_positions
-                )
+                self.fill_positions()
                 self.connect(self.motor_hwobj, "stateChanged", self.motor_state_changed)
                 self.connect(
                     self.motor_hwobj,
-                    "predefinedPositionChanged",
+                    "valueChanged",
                     self.predefined_position_changed,
                 )
-                self.fill_positions()
-                if self.motor_hwobj.is_ready():
-                    self.predefined_position_changed(
-                        self.motor_hwobj.get_value(), 0
-                    )
+
+                #if self.motor_hwobj.is_ready():
+                #    self.predefined_position_changed(
+                #        self.motor_hwobj.get_value()
+                #    )
                 if self["label"] == "":
                     lbl = self.motor_hwobj.user_name
                     self.label.setText("<i>" + lbl + ":</i>")
                 colors.set_widget_color(
                     self.positions_combo,
-                    MotorPredefPosBrick.STATE_COLORS[0],
+                    colors.LIGHT_YELLOW,
                     qt_import.QPalette.Button,
                 )
                 self.motor_state_changed(self.motor_hwobj.get_state())
@@ -201,33 +177,26 @@ class MotorPredefPosBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def fill_positions(self, positions=None):
+        self.positions = []
         self.positions_combo.clear()
-        if self.motor_hwobj is not None:
-            if positions is None:
-                positions = [e.value for e in self.motor_hwobj.VALUES]
-        for p in positions:
-            if p != 'UNKNOWN':
-                self.positions_combo.addItem(str(p))
-
-        self.positions = positions
-        if self.motor_hwobj is not None:
-            if self.motor_hwobj.is_ready():
-                self.predefined_position_changed(
-                    self.motor_hwobj.get_value(), 0
-                )
+        for pos in self.motor_hwobj.VALUES:
+            if pos.value != "UNKNOWN":
+                self.positions.append(pos)
+                self.positions_combo.addItem(str(pos.value))
+        self.predefined_position_changed(self.motor_hwobj.get_value())
 
     def position_selected(self, index):
         if index >= 0:
-            self.motor_hwobj.set_value(int(self.positions[index]))
-        self.positions_combo.setCurrentIndex(-1)
+            self.motor_hwobj.set_value(self.positions[index])
         self.next_position_button.setEnabled(index < (len(self.positions) - 1))
         self.previous_position_button.setEnabled(index >= 0)
 
-    def predefined_position_changed(self, position_name, offset):
+    def predefined_position_changed(self, position_enum):
         if self.positions:
             for index, item in enumerate(self.positions):
-                if position_name == item:
+                if position_enum.value == item.value:
                     self.positions_combo.setCurrentIndex(index)
+                    return
 
     def select_previous_position(self):
         self.position_selected(self.positions_combo.currentIndex() - 1)

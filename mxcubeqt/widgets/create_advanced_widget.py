@@ -188,7 +188,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._comments_widget.setHidden(True)
 
     def enable_widgets(self, state):
-        return
         self._acq_widget.setEnabled(state)
         self._data_path_widget.setEnabled(state)
 
@@ -266,7 +265,7 @@ class CreateAdvancedWidget(CreateTaskBase):
         ):
 
             if isinstance(tree_item, queue_item.XrayCenteringQueueItem):
-                data_collection = tree_item.get_model().reference_image_collection
+                data_collection = tree_item.get_model().mesh_dc
             else:
                 data_collection = tree_item.get_model()
 

@@ -254,6 +254,7 @@ class GUISupervisor(qt_import.QWidget):
                     )
                     failed_msg += "Starting in designer mode with clean GUI."
 
+                    raw_config = None
                     try:
                         if gui_config_file.endswith(".json"):
                             raw_config = json.load(gui_file)

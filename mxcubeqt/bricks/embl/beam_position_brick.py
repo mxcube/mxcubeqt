@@ -25,7 +25,7 @@
 
 from mxcubeqt.utils import icons, qt_import
 from mxcubeqt.base_components import BaseWidget
-from mxcubeqt.bricks.MotorSpinBoxBrick import MotorSpinBoxBrick
+from mxcubeqt.bricks.motor_spinbox_brick import MotorSpinboxBrick
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -51,8 +51,6 @@ class BeamPositionBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        self.beam_focusing_hwobj = None
-        self.beamline_test_hwobj = None
         self.unf_hor_motor = None
         self.unf_ver_motor = None
         self.double_hor_motor = None
@@ -62,8 +60,6 @@ class BeamPositionBrick(BaseWidget):
         self.is_beam_location_phase = False
 
         # Properties ----------------------------------------------------------
-        self.add_property("hwobj_beam_focusing", "string", "")
-        self.add_property("hwobj_beamline_test", "string", "/beamline-test")
         self.add_property("hwobj_motors_list", "string", "")
         self.add_property("icon_list", "string", "")
         self.add_property("defaultSteps", "string", "")
@@ -80,10 +76,10 @@ class BeamPositionBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_group_box = qt_import.QGroupBox(self)
-        self.unf_hor_motor_brick = MotorSpinBoxBrick(self.main_group_box)
-        self.unf_ver_motor_brick = MotorSpinBoxBrick(self.main_group_box)
-        self.double_hor_motor_brick = MotorSpinBoxBrick(self.main_group_box)
-        self.double_ver_motor_brick = MotorSpinBoxBrick(self.main_group_box)
+        self.unf_hor_motor_brick = MotorSpinboxBrick(self.main_group_box)
+        self.unf_ver_motor_brick = MotorSpinboxBrick(self.main_group_box)
+        self.double_hor_motor_brick = MotorSpinboxBrick(self.main_group_box)
+        self.double_ver_motor_brick = MotorSpinboxBrick(self.main_group_box)
         self.motor_widget_list = (
             self.unf_hor_motor_brick,
             self.unf_ver_motor_brick,
@@ -139,6 +135,14 @@ class BeamPositionBrick(BaseWidget):
         self.connect(
             HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
+        if HWR.beamline.beam.definer is not None:
+            self.connect(
+                    HWR.beamline.beam.definer,
+                    "focusingModeChanged",
+                    self.focus_mode_changed,
+                    )
+            mode, beam_size = HWR.beamline.beam.definer.get_active_focus_mode()
+            self.focus_mode_changed(mode, beam_size)
 
         self.update_gui()
 
@@ -222,28 +226,6 @@ class BeamPositionBrick(BaseWidget):
                     temp_motor_widget.step_changed(None)
                     temp_motor_hwobj.force_emit_signals()
                     temp_motor_widget.update_gui()
-        elif property_name == "hwobj_beam_focusing":
-            if self.beam_focusing_hwobj is not None:
-                self.disconnect(
-                    self.beam_focusing_hwobj,
-                    "focusingModeChanged",
-                    self.focus_mode_changed,
-                )
-            self.beam_focusing_hwobj = self.get_hardware_object(
-                new_value, optional=True
-            )
-            if self.beam_focusing_hwobj is not None:
-                self.connect(
-                    self.beam_focusing_hwobj,
-                    "focusingModeChanged",
-                    self.focus_mode_changed,
-                )
-                mode, beam_size = self.beam_focusing_hwobj.get_active_focus_mode()
-                self.focus_mode_changed(mode, beam_size)
-        elif property_name == "hwobj_beamline_test":
-            self.beamline_test_hwobj = self.get_hardware_object(
-                new_value, optional=True
-            )
         elif property_name == "enableCenterBeam":
             self.center_beam_button.setVisible(new_value)
         elif property_name == "enableMeasureFlux":
@@ -318,7 +300,7 @@ class BeamPositionBrick(BaseWidget):
             )
             == qt_import.QMessageBox.Ok
         ):
-            self.beamline_test_hwobj.center_beam()
+            HWR.beamline.beam_centering.center_beam()
 
     def phase_changed(self, phase):
         """
@@ -348,4 +330,4 @@ class BeamPositionBrick(BaseWidget):
             )
             == qt_import.QMessageBox.Ok
         ):
-            self.beamline_test_hwobj.measure_flux()
+            HWR.beamline.flux.measure_flux()

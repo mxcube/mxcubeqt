@@ -75,7 +75,9 @@ class CreateTaskBase(qt_import.QWidget):
 
         self._in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
         
-        HWR.beamline.energy.connect("valueChanged", self.set_energy)
+        HWR.beamline.energy.connect(
+            "valueChanged", self.set_energy
+        )
         HWR.beamline.energy.connect(
             "limitsChanged", self.set_energy_limits
         )
@@ -108,7 +110,7 @@ class CreateTaskBase(qt_import.QWidget):
                 "valueChanged", self.set_kappa
             )
         if hasattr(HWR.beamline.diffractometer, 'kappa_phi'):
-            HWR.beamline.diffractometer.kappa.connect(
+            HWR.beamline.diffractometer.kappa_phi.connect(
                 "valueChanged", self.set_kappa_phi
             )
 
@@ -629,7 +631,7 @@ class CreateTaskBase(qt_import.QWidget):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a task. When a task_node is selected.
-    def create_task(self, sample, shape):
+    def create_task(self, sample, shape, comments):
         (tasks, sc) = ([], None)
 
         dm = HWR.beamline.diffractometer
@@ -655,7 +657,7 @@ class CreateTaskBase(qt_import.QWidget):
         fully_automatic = not dm.user_confirms_centring
 
         free_pin_mode = sample.free_pin_mode
-        temp_tasks = self._create_task(sample, shape)
+        temp_tasks = self._create_task(sample, shape, comments)
 
         if len(temp_tasks) == 0:
             return
@@ -736,7 +738,7 @@ class CreateTaskBase(qt_import.QWidget):
         return tasks
 
     @abc.abstractmethod
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
         pass
 
     def _create_path_template(self, sample, path_template):

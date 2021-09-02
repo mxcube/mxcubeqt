@@ -29,7 +29,8 @@ from mxcubeqt.widgets.create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from mxcubeqt.widgets.create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from mxcubeqt.widgets.create_advanced_widget import CreateAdvancedWidget
 from mxcubeqt.widgets.create_xray_imaging_widget import CreateXrayImagingWidget
-from mxcubeqt.widgets.create_still_scan_widget import CreateStillScanWidget
+from mxcubeqt.widgets.create_ssx_widget import CreateSsxWidget
+from mxcubeqt.widgets.comments_widget import CommentsWidget
 
 from mxcubecore.HardwareObjects import queue_model_objects
 
@@ -77,7 +78,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             self.gphl_workflow_page = None
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
         self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
-        self.still_scan_page = CreateStillScanWidget(self.tool_box, "still_scan")
+        self.ssx_page = CreateSsxWidget(self.tool_box, "ssx")
 
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
@@ -88,7 +89,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             self.tool_box.addItem(self.gphl_workflow_page, "GPhL Workflows")
         self.tool_box.addItem(self.advanced_page, "Advanced")
         self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
-        self.tool_box.addItem(self.still_scan_page, "Still")
+        self.tool_box.addItem(self.ssx_page, "SSX")
 
         self.button_box = qt_import.QWidget(self)
         self.create_task_button = qt_import.QPushButton(
@@ -104,6 +105,8 @@ class TaskToolBoxWidget(qt_import.QWidget):
         self.collect_now_button.setToolTip(
             "Add the collection method to the queue and execute it"
         )
+        self.comments_widget = CommentsWidget(self)
+        self.comments_widget.setFixedHeight(100)
 
         # Layout --------------------------------------------------------------
         _button_box_hlayout = qt_import.QHBoxLayout(self.button_box)
@@ -116,6 +119,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.method_label)
         _main_vlayout.addWidget(self.tool_box)
+        _main_vlayout.addWidget(self.comments_widget)
         _main_vlayout.addWidget(self.button_box)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -263,7 +267,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
                     if self.tool_box.currentWidget() == self.advanced_page:
                         self.create_task_button.setEnabled(True)
                 elif data_collection.is_still():
-                    if self.tool_box.currentWidget() == self.still_scan_page:
+                    if self.tool_box.currentWidget() == self.ssx_page:
                         self.create_task_button.setEnabled(True)
                 elif self.tool_box.currentWidget() == self.discrete_page:
                     self.create_task_button.setEnabled(True)
@@ -311,7 +315,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
                 elif data_model.is_mesh():
                     self.tool_box.setCurrentWidget(self.advanced_page)
                 elif data_model.is_still():
-                    self.tool_box.setCurrentWidget(self.still_scan_page)
+                    self.tool_box.setCurrentWidget(self.ssx_page)
                 else:
                     self.tool_box.setCurrentWidget(self.discrete_page)
             elif isinstance(items[0], queue_item.CharacterisationQueueItem):
@@ -415,7 +419,8 @@ class TaskToolBoxWidget(qt_import.QWidget):
         # Selected item is a task group
         if isinstance(task_node, queue_model_objects.TaskGroup):
             sample = task_node.get_parent()
-            task_list = self.tool_box.currentWidget().create_task(sample, shape)
+            comment = self.comments_widget.get_comment_text()
+            task_list = self.tool_box.currentWidget().create_task(sample, shape, comment)
 
             for child_task_node in task_list:
                 HWR.beamline.queue_model.add_child(task_node, child_task_node)

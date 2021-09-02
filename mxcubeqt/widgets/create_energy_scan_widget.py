@@ -137,30 +137,6 @@ class CreateEnergyScanWidget(CreateTaskBase):
         self._path_template.suffix = "raw"
         self._path_template.compression = False
 
-    def init_data_path_model(self):
-        # Initialize the path_template of the widget to default
-        # values read from the beamline setup
-        if self._data_path_widget:
-            if hasattr(HWR.beamline.session, 'get_secondary_image_directory'):
-                self._data_path_widget.set_base_image_directory(
-                    HWR.beamline.session.get_secondary_image_directory()
-                )
-            self._data_path_widget.set_base_process_directory(
-                HWR.beamline.session.get_base_process_directory()
-            )
-
-            (data_directory, proc_directory) = self.get_default_directory()
-            self._path_template = HWR.beamline.get_default_path_template()
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix()
-            self._path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
-                  self._path_template
-            )
-            self._path_template.compression = self._enable_compression
-        else:
-            self._path_template = queue_model_objects.PathTemplate()
-
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         escan_model = tree_item.get_model()

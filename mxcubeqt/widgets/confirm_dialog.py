@@ -49,6 +49,9 @@ class ConfirmDialog(qt_import.QDialog):
         # Graphic elements ----------------------------------------------------
         self.conf_dialog_layout = qt_import.load_ui_file("confirmation_dialog_layout.ui")
 
+        continue_shortcut = qt_import.QShortcut(qt_import.QKeySequence("C"), self.conf_dialog_layout.continue_button)
+        continue_shortcut.activated.connect(self.continue_shortcut_pressed)
+
         # Layout --------------------------------------------------------------
         _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.conf_dialog_layout)
@@ -155,11 +158,11 @@ class ConfirmDialog(qt_import.QDialog):
                     self.conf_dialog_layout.take_snapshots_combo.count() - 1
                 )
             elif isinstance(item, queue_item.XrayCenteringQueueItem):
-                acq_parameters = item_model.reference_image_collection.acquisitions[
+                acq_parameters = item_model.mesh_dc.acquisitions[
                     0
                 ].acquisition_parameters
             elif isinstance(item, queue_item.XrayImagingQueueItem):
-                acq_parameters = item_model.acquisition.acquisition_parameters
+                acq_parameters = item_model.acquisitions[0].acquisition_parameters
 
             path_template = item_model.get_path_template()
 
@@ -218,8 +221,12 @@ class ConfirmDialog(qt_import.QDialog):
                         file_treewidgee_item = qt_import.QTreeWidgetItem(
                             self.conf_dialog_layout.file_treewidget, file_str_list
                         )
-                        file_treewidgee_item.setTextColor(1, qt_import.Qt.red)
-                        file_treewidgee_item.setTextColor(2, qt_import.Qt.red)
+                        if hasattr(file_treewidgee_item, "setTextcolor"):
+                            file_treewidgee_item.setTextcolor(1, qt_import.Qt.red)
+                            file_treewidgee_item.setTextcolor(2, qt_import.Qt.red)
+                        else:
+                            file_treewidgee_item.setForeground(1, qt_import.QBrush(qt_import.Qt.red))
+                            file_treewidgee_item.setForeground(2, qt_import.QBrush(qt_import.Qt.red))
                         file_exists = True
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)
@@ -246,6 +253,9 @@ class ConfirmDialog(qt_import.QDialog):
             + " image(s)."
         )
 
+    def continue_shortcut_pressed(self):
+        self.continue_button_click()
+
     def continue_button_click(self):
         for item in self.checked_items:
             item_model = item.get_model()
@@ -258,7 +268,7 @@ class ConfirmDialog(qt_import.QDialog):
                     0
                 ].acquisition_parameters
             elif isinstance(item_model, queue_model_objects.XrayCentering):
-                acq_parameters = item_model.reference_image_collection.acquisitions[
+                acq_parameters = item_model.mesh_dc.acquisitions[
                     0
                 ].acquisition_parameters
             elif isinstance(item_model, queue_model_objects.TaskGroup):

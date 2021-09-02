@@ -27,11 +27,11 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class AdvancedResultsWidget(qt_import.QWidget):
+class OnlineProcessingResultsWidget(qt_import.QWidget):
 
     def __init__(self, parent=None):
         qt_import.QWidget.__init__(self, parent)
-        self.setObjectName("advanced_results_widget")
+        self.setObjectName("online_processing_results_widget")
 
         # Hardware objects ----------------------------------------------------
 
@@ -68,7 +68,10 @@ class AdvancedResultsWidget(qt_import.QWidget):
         self.hit_map_widget.set_associated_data_collection(data_collection)
         if data_collection.is_executed():
             processing_results = data_collection.get_online_processing_results()
-            self.hit_map_widget.set_results(processing_results["raw"], processing_results["aligned"])
+            self.hit_map_widget.set_results(
+                    processing_results["raw"],
+                    processing_results["aligned"]
+            )
             self.hit_map_widget.update_results(True)
 
     def processing_started(self, data_collection, results_raw, results_aligned):

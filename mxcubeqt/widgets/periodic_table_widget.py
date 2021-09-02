@@ -26,7 +26,7 @@ except BaseException:
         from PyMca import QPeriodicTable
         PYMCA_IMPORTED = 4
     except BaseException:
-        pass
+        print("Unable to import PyMca")
 
 from mxcubeqt.utils import qt_import
 
@@ -158,11 +158,17 @@ if PYMCA_IMPORTED:
                 self.elements_dict[symbol] = el
 
         def elementEnter(self, symbol, z=None, name=None):
+            if isinstance(symbol, tuple) and len(symbol) > 0:
+                symbol = symbol[0]
+
             b = self.eltButton[symbol]
             if b.isEnabled():
                 b.setCurrent(True)
 
         def elementLeave(self, symbol):
+            if isinstance(symbol, tuple) and len(symbol) > 0:
+                symbol = symbol[0]
+
             b = self.eltButton[symbol]
             if b.isEnabled():
                 b.setCurrent(False)

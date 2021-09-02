@@ -21,7 +21,6 @@ from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import html_template, qt_import
 from mxcubeqt.widgets.dc_parameters_widget import DCParametersWidget
 from mxcubeqt.widgets.image_tracking_widget import ImageTrackingWidget
-from mxcubeqt.widgets.advanced_results_widget import AdvancedResultsWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
 from mxcubecore import HardwareRepository as HWR
@@ -52,15 +51,11 @@ class DataCollectionParametersBrick(BaseWidget):
         self.parameters_widget = DCParametersWidget(self, "parameters_widget")
         self.results_static_view = qt_import.QTextBrowser(self.tool_box)
         self.image_tracking_widget = ImageTrackingWidget(self.tool_box)
-        self.advance_results_widget = AdvancedResultsWidget(self.tool_box)
         self.snapshot_widget = SnapshotWidget(self)
 
         self.tool_box.addItem(self.parameters_widget, "Parameters")
         self.tool_box.addItem(self.image_tracking_widget, "Results - ADXV control")
         self.tool_box.addItem(self.results_static_view, "Results - Summary")
-        self.tool_box.addItem(
-            self.advance_results_widget, "Results - Parallel processing"
-        )
 
         # Layout --------------------------------------------------------------
         _main_vlayout = qt_import.QHBoxLayout(self)
@@ -83,11 +78,6 @@ class DataCollectionParametersBrick(BaseWidget):
 
         data_collection = item.get_model()
 
-        # if data_collection.is_helical():
-        #    self.advance_results_widget.show()
-        # else:
-        #    self.advance_results_widget.hide()
-
         self.snapshot_widget.display_snapshot(
             data_collection.acquisitions[
                 0
@@ -104,7 +94,6 @@ class DataCollectionParametersBrick(BaseWidget):
             self.parameters_widget.setEnabled(True)
 
         self.parameters_widget.populate_widget(item)
-        self.advance_results_widget.populate_widget(item)
 
     def populate_results(self, data_collection):
         if data_collection.html_report[-4:] == "html":

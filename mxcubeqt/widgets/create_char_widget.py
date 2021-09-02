@@ -25,7 +25,6 @@ from mxcubeqt.utils.widget_utils import DataModelInputBinder
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget_simple import AcquisitionWidgetSimple
-from mxcubeqt.widgets.comments_widget import CommentsWidget
 
 from mxcubecore.HardwareObjects import (
     queue_model_objects,
@@ -79,7 +78,6 @@ class CreateCharWidget(CreateTaskBase):
             "characterise_simple_widget_vertical_layout.ui"
         )
 
-        self._comments_widget = CommentsWidget(self)
 
         # Layout --------------------------------------------------------------
         _main_vlayout = qt_import.QVBoxLayout(self)
@@ -87,13 +85,11 @@ class CreateCharWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(self._char_widget)
         _main_vlayout.addWidget(self._vertical_dimension_widget)
-        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.setSpacing(6)
         _main_vlayout.addStretch(0)
 
         # SizePolicies --------------------------------------------------------
-        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.pathTemplateChangedSignal.connect(
@@ -295,6 +291,9 @@ class CreateCharWidget(CreateTaskBase):
         # this is achived by setting overap to -89
         acq.acquisition_parameters.overlap = -89
         acq.acquisition_parameters.centred_position = cpos
+
+        if comments:
+            acq.acquisition_parameters.comments = comments
 
         dc.acquisitions[0] = acq
         dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.EDNA_REF

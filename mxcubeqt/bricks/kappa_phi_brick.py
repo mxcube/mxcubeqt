@@ -30,15 +30,6 @@ __category__ = "Motor"
 
 class KappaPhiBrick(BaseWidget):
 
-    STATE_COLORS = (
-        colors.LIGHT_RED,
-        colors.DARK_GRAY,
-        colors.LIGHT_GREEN,
-        colors.LIGHT_YELLOW,
-        colors.LIGHT_YELLOW,
-        colors.LIGHT_YELLOW,
-    )
-
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 
@@ -98,7 +89,7 @@ class KappaPhiBrick(BaseWidget):
 
         self.step_cbox.activated.connect(self.go_to_step)
         self.step_cbox.activated.connect(self.step_changed)
-        self.step_cbox.textChanged.connect(self.step_edited)
+        self.step_cbox.editTextChanged.connect(self.step_edited)
 
         self.close_button.clicked.connect(self.close_clicked)
         self.stop_button.clicked.connect(self.stop_clicked)
@@ -186,40 +177,22 @@ class KappaPhiBrick(BaseWidget):
         self.kappaphi_dspinbox.blockSignals(False)
 
     def diffractometer_state_changed(self, state):
-        if HWR.beamline.diffractometer.in_plate_mode():
-            self.setDisabled(True)
-            return
+        self.setDisabled(HWR.beamline.diffractometer.in_plate_mode())
+        self.kappa_dspinbox.setEnabled(HWR.beamline.diffractometer.is_ready())
+        self.kappaphi_dspinbox.setEnabled(HWR.beamline.diffractometer.is_ready())
+        self.close_button.setEnabled(HWR.beamline.diffractometer.is_ready())
+        self.stop_button.setEnabled(not HWR.beamline.diffractometer.is_ready())
 
-        if state == "Ready":
-            self.kappa_dspinbox.setEnabled(True)
-            self.kappaphi_dspinbox.setEnabled(True)
-            self.close_button.setEnabled(True)
-            self.stop_button.setEnabled(False)
-            colors.set_widget_color(
-                self.kappa_dspinbox.lineEdit(),
-                colors.LIGHT_GREEN,
-                qt_import.QPalette.Base,
-            )
-            colors.set_widget_color(
-                self.kappaphi_dspinbox.lineEdit(),
-                colors.LIGHT_GREEN,
-                qt_import.QPalette.Base,
-            )
-        else:
-            self.kappa_dspinbox.setEnabled(False)
-            self.kappaphi_dspinbox.setEnabled(False)
-            self.close_button.setEnabled(False)
-            self.stop_button.setEnabled(True)
-            colors.set_widget_color(
-                self.kappa_dspinbox.lineEdit(),
-                colors.LIGHT_YELLOW,
-                qt_import.QPalette.Base,
-            )
-            colors.set_widget_color(
-                self.kappaphi_dspinbox.lineEdit(),
-                colors.LIGHT_YELLOW,
-                qt_import.QPalette.Base,
-            )
+        colors.set_widget_color_by_state(
+            self.kappa_dspinbox.lineEdit(),
+            state,
+            qt_import.QPalette.Base,
+        )
+        colors.set_widget_color_by_state(
+            self.kappaphi_dspinbox.lineEdit(),
+            state,    
+            qt_import.QPalette.Base,
+        )
 
     def go_to_step(self, step_index):
         step = str(self.step_cbox.currentText())

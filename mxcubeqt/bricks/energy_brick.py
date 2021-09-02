@@ -123,7 +123,7 @@ class EnergyBrick(BaseWidget):
         self.status_ledit.setEnabled(False)
 
         self.set_new_value_limits()
-        self.connect(HWR.beamline.energy, "valueChanged", self.energy_changed)
+        self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
         self.connect(HWR.beamline.energy, "stateChanged", self.state_changed)
         self.connect(
             HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
@@ -170,11 +170,10 @@ class EnergyBrick(BaseWidget):
                 self.beam_align_cbox.isChecked()
             )
 
-    def energy_changed(self, energy_value):
+    def energy_changed(self, energy_value, wavelength_value):
         energy_value_str = self["kevFormatString"] % energy_value
         self.energy_ledit.setText("%s keV" % energy_value_str)
 
-    def wavelength_changed(self, wavelength_value):
         wavelength_value_str = self["angFormatString"] % wavelength_value
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
@@ -235,4 +234,4 @@ class EnergyBrick(BaseWidget):
         self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)
 
     def stop_clicked(self):
-        print("stoped clicked")
+        HWR.beamline.energy.stop()

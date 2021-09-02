@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""AcquisitionStillWidget is customized for ssx type acquisitions"""
+"""AcquisitionSsxlWidget is customized for ssx type acquisitions"""
 
 from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
@@ -31,7 +31,7 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class AcquisitionStillWidget(qt_import.QWidget):
+class AcquisitionSsxWidget(qt_import.QWidget):
 
     acqParametersChangedSignal = qt_import.pyqtSignal(list)
 
@@ -84,7 +84,7 @@ class AcquisitionStillWidget(qt_import.QWidget):
         self._acquisition_mib = DataModelInputBinder(self._acquisition_parameters)
 
         self.acq_widget_layout = qt_import.load_ui_file(
-            "acquisition_widget_vertical_still_layout.ui"
+            "acquisition_widget_vertical_ssx_layout.ui"
         )
         # Layout --------------------------------------------------------------
         __main_vlayout = qt_import.QVBoxLayout(self)

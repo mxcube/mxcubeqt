@@ -87,7 +87,6 @@ class DataCollectTree(qt_import.QWidget):
         self.item_history_list = []
         self.close_kappa = False
         self.show_sc_during_mount = True
-        self.show_sc_during_mount = True
 
         # Signals ------------------------------------------------------------
 
@@ -148,6 +147,9 @@ class DataCollectTree(qt_import.QWidget):
         self.plate_navigator_cbox = qt_import.QCheckBox("Plate navigator", self)
         self.plate_navigator_widget = PlateNavigatorWidget(self)
         self.plate_navigator_widget.hide()
+
+        continue_shortcut = qt_import.QShortcut(qt_import.QKeySequence("C"), self.continue_button)
+        continue_shortcut.activated.connect(self.continue_shortcut_pressed)
 
         # Layout --------------------------------------------------------------
         button_widget_grid_layout = qt_import.QGridLayout(self.button_widget)
@@ -887,6 +889,9 @@ class DataCollectTree(qt_import.QWidget):
 
                     qt_import.QMessageBox.information(self, "Data collection",
                                                      message, "OK")
+
+    def continue_shortcut_pressed(self):
+        self.continue_button_click()
 
     def enable_sample_changer_widget(self, state):
         """Enables sample changer widget"""

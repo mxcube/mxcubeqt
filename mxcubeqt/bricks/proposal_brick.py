@@ -80,15 +80,12 @@ class ProposalBrick(BaseWidget):
         self.secondary_proposals = []
 
         # Properties ----------------------------------------------------------
-        self.add_property("instanceServer", "string", "")
-        self.add_property("localLogin", "string", "")
         self.add_property("titlePrefix", "string", "")
         self.add_property("autoSessionUsers", "string", "")
         self.add_property("codes", "string", "fx ifx ih im ix ls mx opid")
         self.add_property("secondaryProposals", "string", "")
         self.add_property("icons", "string", "")
         self.add_property("serverStartDelay", "integer", 500)
-        self.add_property("dbConnection", "string")
 
         # Signals ------------------------------------------------------------
         self.define_signal("sessionSelected", ())

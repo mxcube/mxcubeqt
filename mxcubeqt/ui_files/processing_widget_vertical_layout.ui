@@ -333,12 +333,12 @@
          <widget class="QCheckBox" name="run_offline_processing_cbox">
           <property name="maximumSize">
            <size>
-            <width>450</width>
+            <width>4500</width>
             <height>16777215</height>
            </size>
           </property>
           <property name="text">
-           <string>Run processing after collection</string>
+           <string>Run offline processing</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -355,12 +355,12 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>250</width>
+            <width>2500</width>
             <height>16777215</height>
            </size>
           </property>
           <property name="text">
-           <string>Run Dozor</string>
+           <string>Run online processing</string>
           </property>
           <property name="checked">
            <bool>false</bool>

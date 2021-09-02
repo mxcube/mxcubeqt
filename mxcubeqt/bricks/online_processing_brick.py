@@ -18,9 +18,11 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import queue_item, qt_import
+from mxcubeqt.utils import qt_import, queue_item
 from mxcubeqt.base_components import BaseWidget
-from mxcubeqt.widgets.advanced_results_widget import AdvancedResultsWidget
+from mxcubeqt.widgets.hit_map_widget import HitMapWidget
+
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -45,16 +47,11 @@ class OnlineProcessingBrick(BaseWidget):
         self.define_slot("populate_widget", ({}))
 
         # Graphic elements ----------------------------------------------------
-        self.tab_widget = qt_import.QTabWidget(self)
-        self.osc_results_widget = AdvancedResultsWidget(self.tab_widget)
-        self.mesh_results_widget = AdvancedResultsWidget(self.tab_widget)
-
-        self.tab_widget.addTab(self.osc_results_widget, "Osc")
-        self.tab_widget.addTab(self.mesh_results_widget, "Mesh")
+        self.hit_map_widget = HitMapWidget(self)
 
         # Layout --------------------------------------------------------------
         _main_vlayout = qt_import.QHBoxLayout(self)
-        _main_vlayout.addWidget(self.tab_widget)
+        _main_vlayout.addWidget(self.hit_map_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
@@ -63,29 +60,32 @@ class OnlineProcessingBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.osc_results_widget.hit_map_widget._hit_map_tools_widget.setHidden(True)
-        self.osc_results_widget.hit_map_widget._summary_gbox.setHidden(True)
-        self.mesh_results_widget.hit_map_widget._hit_map_tools_widget.setHidden(True)
-        self.mesh_results_widget.hit_map_widget._summary_gbox.setHidden(True)
+
+        if HWR.beamline.online_processing is not None:
+            HWR.beamline.online_processing.connect(
+               "processingStarted", self.processing_started
+            )
+            HWR.beamline.online_processing.connect(
+               "processingResultsUpdate", self.update_processing_results
+            )
+        else:
+            self.setEnabled(False)
 
     def populate_widget(self, item):
+        data_collection = item.get_model()
         if isinstance(item, queue_item.XrayCenteringQueueItem):
-            data_collection = item.get_model().reference_image_collection
-            self.osc_results_widget.populate_widget(item)
-        else:
-            data_collection = item.get_model()
-            self.osc_results_widget.populate_widget(item)
-            self.mesh_results_widget.populate_widget(item)
+            data_collection = data_collection.mesh_dc
+        self.hit_map_widget.set_data_collection(data_collection)
+        if data_collection.is_executed():
+            processing_results = data_collection.get_online_processing_results()
+            self.hit_map_widget.set_results(
+                    processing_results["raw"],
+                    processing_results["aligned"]
+            )
+            self.hit_map_widget.update_results(True)
 
-    def run(self):
-        self.osc_results_widget.hit_map_widget.set_plot_type("1D")
-        self.mesh_results_widget.hit_map_widget.set_plot_type("2D")
-        if self["fixedWidth"] > 0:
-            #self.results_widget._hit_map_gbox.setFixedWidth(self["fixedWidth"] - 2)
-            self.osc_results_widget.hit_map_widget._hit_map_plot.setFixedWidth(self["fixedWidth"] - 4)
-            self.mesh_results_widget.hit_map_widget._hit_map_plot.setFixedWidth(self["fixedWidth"] - 4)
-        if self["fixedHeight"] > 0:
-            self.osc_results_widget.hit_map_widget._hit_map_gbox.setFixedHeight(self["fixedHeight"] - 2)
-            self.osc_results_widget.hit_map_widget._hit_map_plot.setFixedHeight(self["fixedHeight"] - 40)
-            self.mesh_results_widget.hit_map_widget._hit_map_gbox.setFixedHeight(self["fixedHeight"] - 2)
-            self.mesh_results_widget.hit_map_widget._hit_map_plot.setFixedHeight(self["fixedHeight"] - 40)
+    def processing_started(self, data_collection, results_raw, results_aligned):
+        self.hit_map_widget.set_results(results_raw, results_aligned)
+
+    def update_processing_results(self, last_results):
+        self.hit_map_widget.update_results(last_results)

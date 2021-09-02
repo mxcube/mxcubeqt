@@ -21,11 +21,7 @@ import numpy as np
 from copy import deepcopy
 
 from mxcubeqt.utils import qt_import
-try:
-   from widgets.pyqtgraph_widget import PlotWidget
-except:
-   from mxcubeqt.widgets.matplot_widget import PlotWidget
-
+from widgets.pyqtgraph_widget import PlotWidget
 from mxcubecore import HardwareRepository as HWR
 
 
@@ -35,7 +31,7 @@ __license__ = "LGPLv3+"
 
 class HitMapWidget(qt_import.QWidget):
 
-    def __init__(self, parent=None, show_aligned_results=False):
+    def __init__(self, parent=None):
 
         qt_import.QWidget.__init__(self, parent)
 
@@ -48,30 +44,32 @@ class HitMapWidget(qt_import.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        self.__plot_type = "1D"
         self.__result_types = []
         self.__results_raw = None
         self.__results_aligned = None
         self.__first_result = True
-        self.__associated_grid = None
-        self.__associated_data_collection = None
+        self.__grid = None
+        #self.__is_mesh_scan = False
+        self.__data_collection = None
         self.__selected_col = 0
         self.__selected_row = 0
         self.__score_key = None
         self.__max_value = 0
         self.__filter_min_value = 0
         self.__best_pos_list = None
-        self.__hit_map_max_size = []
         self.__hitmap_clicked = False
         self.__enable_continues_image_display = False
         #self.__tooltip_text = None
         self.selected_image_serial = None
 
         # Graphic elements ----------------------------------------------------
-        self._hit_map_gbox = qt_import.QGroupBox("Hit map", self)
-        self._hit_map_plot = PlotWidget(self._hit_map_gbox)
+        self._hit_map_gbox = qt_import.QGroupBox("Online processing results", self)
+        hit_maps_widget = qt_import.QWidget(self._hit_map_gbox)
+        self._osc_hit_map_plot = PlotWidget(hit_maps_widget)
+        self._osc_hit_map_plot.set_plot_type("1D")
+        self._grid_hit_map_plot = PlotWidget(hit_maps_widget)
+        self._grid_hit_map_plot.set_plot_type("2D")
         self._hit_map_popup_menu = qt_import.QMenu(self._hit_map_gbox)
-        
 
         hit_map_info_widget = qt_import.QWidget(self._hit_map_gbox)
         score_type_label = qt_import.QLabel("Result: ", hit_map_info_widget)
@@ -95,12 +93,14 @@ class HitMapWidget(qt_import.QWidget):
             "Create centring points", self._hit_map_tools_widget
         )
 
+        """
         self._summary_gbox = qt_import.QGroupBox("Summary", self)
         self._summary_textbrowser = qt_import.QTextBrowser(self._summary_gbox)
         self._best_pos_gbox = qt_import.QGroupBox("Best positions", self)
         self._best_pos_table = qt_import.QTableWidget(self._best_pos_gbox)
         self._best_pos_popup_menu = qt_import.QMenu(self._hit_map_gbox)
         self._best_pos_gbox.setHidden(True)
+        """
 
         # Layout --------------------------------------------------------------
         _hit_map_info_hlayout = qt_import.QHBoxLayout(hit_map_info_widget)
@@ -122,13 +122,18 @@ class HitMapWidget(qt_import.QWidget):
         _hit_map_tools_hlayout.setSpacing(2)
         _hit_map_tools_hlayout.setContentsMargins(0, 0, 0, 0)
 
+        _hit_maps_hlayout = qt_import.QHBoxLayout(hit_maps_widget)
+        _hit_maps_hlayout.addWidget(self._osc_hit_map_plot)
+        _hit_maps_hlayout.addWidget(self._grid_hit_map_plot)
+
         _hit_map_gbox_vlayout = qt_import.QVBoxLayout(self._hit_map_gbox)
-        _hit_map_gbox_vlayout.addWidget(self._hit_map_plot)
+        _hit_map_gbox_vlayout.addWidget(hit_maps_widget)
         _hit_map_gbox_vlayout.addWidget(hit_map_info_widget)
         _hit_map_gbox_vlayout.addWidget(self._hit_map_tools_widget)
         _hit_map_gbox_vlayout.setSpacing(2)
         _hit_map_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
 
+        """
         _summary_gbox_vlayout = qt_import.QVBoxLayout(self._summary_gbox)
         _summary_gbox_vlayout.addWidget(self._summary_textbrowser)
         _summary_gbox_vlayout.setSpacing(2)
@@ -138,19 +143,16 @@ class HitMapWidget(qt_import.QWidget):
         _best_postition_gbox_vlayout.addWidget(self._best_pos_table)
         _best_postition_gbox_vlayout.setSpacing(2)
         _best_postition_gbox_vlayout.setContentsMargins(0, 0, 0, 0)
+        """
 
         _main_hlayout = qt_import.QVBoxLayout(self)
         _main_hlayout.addWidget(self._hit_map_gbox)
-        _main_hlayout.addWidget(self._summary_gbox)
-        _main_hlayout.addWidget(self._best_pos_gbox)
+        #_main_hlayout.addWidget(self._summary_gbox)
+        #_main_hlayout.addWidget(self._best_pos_gbox)
         _main_hlayout.setSpacing(2)
         _main_hlayout.setContentsMargins(2, 2, 2, 2)
 
         # SizePolicies --------------------------------------------------------
-        #self._image_info_label.setAlignment(qt_import.Qt.AlignLeft)
-        #self._image_info_label.setSizePolicy(
-        #    qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Fixed
-        #)
 
         # Qt signals and slots ------------------------------------------------
         image_display_cbox.stateChanged.connect(self.enable_image_display_state_changed)
@@ -160,19 +162,19 @@ class HitMapWidget(qt_import.QWidget):
             self.relaunch_processing_clicked
         )
         self._create_points_button.clicked.connect(self.create_points_clicked)
-        self._hit_map_plot.mouseMovedSignal.connect(self.mouse_moved)
-        self._hit_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
-        self._hit_map_plot.mouseDoubleClickedSignal.connect(
+        self._osc_hit_map_plot.mouseMovedSignal.connect(self.mouse_moved)
+        self._osc_hit_map_plot.mouseClickedSignal.connect(self.mouse_clicked)
+        self._osc_hit_map_plot.mouseDoubleClickedSignal.connect(
             self.move_to_position_clicked
         )
-        self._hit_map_plot.mouseLeftSignal.connect(self.mouse_left_plot)
+        self._osc_hit_map_plot.mouseLeftSignal.connect(self.mouse_left_plot)
         self._autoscale_button.clicked.connect(self.autoscale_pressed)
 
         # Other ---------------------------------------------------------------
         #self.__tooltip_text = (
         #    "Double click to move to the position. " + "Right click to open menu."
         #)
-        #self._hit_map_plot.setToolTip(self.__tooltip_text)
+        #self._osc_hit_map_plot.setToolTip(self.__tooltip_text)
         self._hit_map_popup_menu.addSeparator()
         self._hit_map_popup_menu.addAction(
             "Move to position", self.move_to_position_clicked
@@ -195,7 +197,7 @@ class HitMapWidget(qt_import.QWidget):
         )
         self._hit_map_popup_menu.addSeparator()
 
-        #self._hit_map_plot.contextMenuEvent = self.open_hit_map_popup_menu
+        #self._osc_hit_map_plot.contextMenuEvent = self.open_hit_map_popup_menu
 
         if HWR.beamline.online_processing is not None:
             self.__result_types = HWR.beamline.online_processing.get_result_types()
@@ -203,6 +205,8 @@ class HitMapWidget(qt_import.QWidget):
             self._score_type_cbox.addItem(result["descr"])
         self._score_type_cbox.setMaximumWidth(200)
         self.__score_key = "spots_resolution"
+
+        self._relaunch_processing_button.setVisible(False)
 
         self._threshold_slider.setRange(0, 100)
         self._threshold_slider.setTickInterval(5)
@@ -212,6 +216,7 @@ class HitMapWidget(qt_import.QWidget):
         #font = self._best_pos_table.font()
         #font.setPointSize(8)
         #self._best_pos_table.setFont(font)
+        """
         self._best_pos_table.setEditTriggers(qt_import.QAbstractItemView.NoEditTriggers)
         self._best_pos_table.setColumnCount(9)
         self._best_pos_table.setAlternatingRowColors(True)
@@ -236,67 +241,43 @@ class HitMapWidget(qt_import.QWidget):
         self._best_pos_table.contextMenuEvent = self.open_best_pos_popup_menu
 
         screen_shape = qt_import.QDesktopWidget().screenGeometry()
-        self.__hit_map_max_size = (screen_shape.width() / 2, screen_shape.height() / 2)
+        """
 
-    def set_plot_type(self, plot_type):
-        self.__plot_type = plot_type
-        self._hit_map_plot.set_plot_type(plot_type)
-        self._hit_map_gbox.setTitle("%s hit map" % plot_type)
-
-    def set_associated_data_collection(self, data_collection):
+    def set_data_collection(self, data_collection):
         self.clean_result()
 
-        self.__associated_data_collection = data_collection
-        self.__associated_grid = self.__associated_data_collection.grid
-        acq_parameters = self.__associated_data_collection.acquisitions[
+        self.__data_collection = data_collection
+        self.__grid = self.__data_collection.grid
+        num_images = self.__data_collection.acquisitions[
             0
-        ].acquisition_parameters
+        ].acquisition_parameters.num_images
         self.__first_result = True
-        x_axis_range = [0, acq_parameters.num_images]
-        y_axis_range = [0, 1]
 
-        if self.__plot_type == "1D":
-            #x_array = np.linspace(0, acq_parameters.num_images, acq_parameters.num_images, dtype=int)
-            #y_array = np.zeros(acq_parameters.num_images)
-            y_array = np.zeros(1)
-
-            self._hit_map_plot.clear()
-
-            for result_type in self.__result_types:
-                self._hit_map_plot.add_curve(
-                    result_type["key"],
-                    y_array,
-                    x_array=None,
-                    linestyle="None",
-                    label=result_type["descr"],
-                    color=result_type["color"],
-                    marker="s",
-                )
-
-            self._hit_map_plot.hide_all_curves()
-            self._hit_map_plot.show_curve(self.__score_key)
-        elif self.__associated_grid is not None:
-            (num_col, num_row) = self.__associated_grid.get_col_row_num()
-            x_axis_range = [0, num_col]
-            y_axis_range = [0, num_row]
-
-            self._summary_textbrowser.append("<b>Mesh parameters</b>")
-            grid_params = self.__associated_grid.get_properties()
-
-            empty_array = np.zeros(acq_parameters.num_images).reshape(
-                grid_params["steps_x"], grid_params["steps_y"]
+        y_array = np.zeros(num_images)
+        for result_type in self.__result_types:
+            self._osc_hit_map_plot.add_curve(
+                result_type["key"],
+                y_array,
+                x_array=None,
+                color=result_type["color"],
             )
 
-            self._hit_map_plot.plot_result(empty_array)
+        self._osc_hit_map_plot.hide_all_curves()
+        self._osc_hit_map_plot.show_curve(self.__score_key)
+        self._osc_hit_map_plot.autoscale_axes()
 
-        self._hit_map_plot.set_x_axis_limits(x_axis_range)
-        self._hit_map_plot.set_y_axis_limits(y_axis_range)
-
-        self.refresh()
-        #self._hit_map_plot.autoscale_axes()
-
+        if self.__grid:
+            (num_col, num_row) = self.__grid.get_col_row_num()
+            #self._summary_textbrowser.append("<b>Mesh parameters</b>")
+            grid_params = self.__grid.get_properties()
+            empty_array = np.zeros(num_images).reshape(
+                grid_params["steps_x"],
+                grid_params["steps_y"]
+            )
+            self._grid_hit_map_plot.plot_result(empty_array)
+        
     def main_gbox_toggled(self, toggle):
-        self._hit_map_plot.setHidden(not toggle)
+        self._osc_hit_map_plot.setHidden(not toggle)
         self._hit_map_tools_widget.setHidden(not toggle)
 
     def open_hit_map_popup_menu(self, context_event):
@@ -311,68 +292,50 @@ class HitMapWidget(qt_import.QWidget):
     def score_type_changed(self, index):
         self.__score_key = self.__result_types[index]["key"]
 
-        if self.__plot_type == "1D":
-            self._hit_map_plot.hide_all_curves()
-            self._hit_map_plot.show_curve(self.__score_key)
-            self.refresh()
-        elif self.__associated_grid:
-            self._hit_map_plot.update_plot(self.__results_aligned[self.__score_key])
-            self.__associated_grid.set_score(self.__results_raw[self.__score_key])
+        self._osc_hit_map_plot.hide_all_curves()
+        self._osc_hit_map_plot.show_curve(self.__score_key)
+        self._osc_hit_map_plot.autoscale_axes()
+        self.adjust_y_labels()
 
-        self._hit_map_plot.autoscale_axes()
+        if self.__grid:
+            self._grid_hit_map_plot.plot_result(
+                self.__results_aligned[self.__score_key]
+            )
+            self.__grid.set_score(
+                self.__results_raw[self.__score_key]
+            )
 
-    def refresh(self):
-        return
+        
+    def adjust_y_labels(self):
+        labels = []
+        positions = np.linspace(0, self.__results_raw[self.__score_key].max(), 5)
 
-        if self.__results_raw:
-            if self.__plot_type == "1D":
-                #self._hit_map_plot.adjust_axes(self.__score_key)
-                            
-                """
-                labels = []
-                positions = np.linspace(
-                    0, self.__results_raw[self.__score_key].max(), 5
-                    )
-
-                if self.__score_key == "spots_resolution":
-                    labels.append("inf")
-                    for item in positions[1:]:
-                        labels.append("%.2f" % (1.0 / item))
+        if self.__score_key == "spots_resolution":
+            labels.append("inf")
+            for item in positions[1:]:
+                if item == 0:
+                   labels.append("0")
                 else:
-                    for item in positions:
-                        labels.append("%d" % item)
+                   labels.append("%.2f" % (1.0 / item))
+        else:
+            for item in positions:
+                labels.append("%.2f" % item)
 
-                self._hit_map_plot.set_yticks(positions)
-                self._hit_map_plot.set_ytick_labels(labels)
-                """
-                self._hit_map_plot.autoscale_axes()
-            #elif self.__associated_grid:
-            #    self._hit_map_plot.plot_result(
-            #        self.__results_aligned[self.__score_key]
-            #    )
-
+        self._osc_hit_map_plot.set_yticks(list(zip(positions, labels)))
+        
     def filter_min_slider_changed(self, value):
-        # self.__associated_grid.set_min_score(self._threshold_slider.value() / 100.0)
+        # self.__grid.set_min_score(self._threshold_slider.value() / 100.0)
         filter_min_value = self.__results_raw[self.__score_key].max() * value / 100.0
-        self.__results_aligned[self.__score_key] = deepcopy(
-            self.__results_raw[self.__score_key]
-        )
-        self.__results_aligned[self.__score_key][
-            self.__results_raw[self.__score_key] < filter_min_value
-        ] = 0
-        self._hit_map_plot.update_plot(
-            self.__results_aligned[self.__score_key]
-        )
+        result = deepcopy(self.__results_aligned[self.__score_key])
+        
+        self.__results_aligned[self.__score_key][result < filter_min_value] = 0
+        self._grid_hit_map_plot.plot_result(result)
 
     def mouse_moved(self, pos_x, pos_y):
         do_update = False
 
-        if self.__plot_type == "1D":
-            if abs(pos_x - self.__selected_col) > 1:
-                self.__selected_col = pos_x
-                do_update = True 
-        elif self.__associated_grid is not None: 
-            (num_col, num_row) = self.__associated_grid.get_col_row_num()
+        if self.__grid: 
+            (num_col, num_row) = self.__grid.get_col_row_num()
             pos_y = num_row - pos_y
 
             if abs(int(pos_x) - int(self.__selected_col)):
@@ -380,6 +343,14 @@ class HitMapWidget(qt_import.QWidget):
                 do_update = True
             if abs(int(pos_y) - int(self.__selected_row)):
                 self.__selected_row = pos_y
+                do_update = True
+        else:
+            if pos_x < 0:
+                pos_x = 0
+            elif pos_x > len(self.__results_raw[self.__score_key])- 1:
+                pos_x = len(self.__results_raw[self.__score_key]) - 1
+            if abs(pos_x - self.__selected_col) > 1:
+                self.__selected_col = pos_x
                 do_update = True
 
         if do_update and self.__results_raw is not None:
@@ -392,7 +363,7 @@ class HitMapWidget(qt_import.QWidget):
         self.__hitmap_clicked = True
 
     def update_image_info(self):
-        if self.__associated_data_collection:
+        if self.__data_collection:
             msg = ""
             image, line, self.selected_image_serial, image_path = (
                 self.get_image_parameters_from_coord()
@@ -408,10 +379,10 @@ class HitMapWidget(qt_import.QWidget):
 
     def mouse_left_plot(self):
         self.__hitmap_clicked = False
-        #self._hit_map_plot.setToolTip(self.__tooltip_text)
+        #self._osc_hit_map_plot.setToolTip(self.__tooltip_text)
  
     def autoscale_pressed(self):
-        self._hit_map_plot.autoscale_axes()
+        self._osc_hit_map_plot.autoscale_axes()
 
     def move_to_position_clicked(self):
         self.move_to_selected_position()
@@ -419,42 +390,45 @@ class HitMapWidget(qt_import.QWidget):
     def set_results(self, results_raw, results_aligned):
         """Displays results on the widget
         """
-
         self.__results_raw = results_raw
         self.__results_aligned = results_aligned
 
-        if self.__plot_type  == 1:
-            if self.__first_result:
+        #self.__is_mesh_scan = list(self.__results_aligned.values())[0].ndim == 2
+
+        if self.__first_result:
+            if self.__grid:
+                self.__score_key = "score"
+                self._score_type_cbox.setCurrentIndex(1)
+            else:
                 self.__score_key = "spots_resolution"
                 self._score_type_cbox.setCurrentIndex(0)
-        else:
-            if self.__first_result:
-                self.__score_key = "spots_num"
-                self._score_type_cbox.setCurrentIndex(2)
+            self.adjust_y_labels()
+            self.__first_result = False
 
-        self.__first_result = False
-        self._hit_map_plot.autoscale_axes()
+        self._osc_hit_map_plot.autoscale_axes()
+        #self._grid_hit_map_plot.autoscale_axes()
 
     def update_results(self, last_results):
-        if self.__plot_type == "1D":
-            self._hit_map_plot.update_curves(self.__results_raw)
-        elif self.__associated_grid:
-            self._hit_map_plot.update_plot(self.__results_aligned[self.__score_key])
-        self._hit_map_plot.autoscale_axes()
-
+        self._osc_hit_map_plot.update_curves(self.__results_raw)
+        self._osc_hit_map_plot.autoscale_axes()
+        self.adjust_y_labels()
+        if self.__grid:
+            self._grid_hit_map_plot.plot_result(self.__results_aligned[self.__score_key])
+        
     def clean_result(self):
         """
         Method to clean hit map, summary log and table with best positions
         """
         self.__results_raw = None
         self.__results_aligned = None
-        self.__associated_grid = None
-        self.__associated_data_collection = None
-        self._hit_map_plot.clear()
+        self.__grid = None
+        self.__data_collection = None
+        self._osc_hit_map_plot.clear()
+        self._grid_hit_map_plot.clear()
         self._threshold_slider.setValue(0)
-        self._summary_textbrowser.clear()
-        self._best_pos_table.setRowCount(0)
-        self._best_pos_table.setSortingEnabled(False)
+        #self._summary_textbrowser.clear()
+        #self._best_pos_table.setRowCount(0)
+        #self._best_pos_table.setSortingEnabled(False)
 
     def create_centring_point_clicked(self):
         """
@@ -500,14 +474,8 @@ class HitMapWidget(qt_import.QWidget):
         )
         tooltip_text = "Image no. %d" % self.selected_image_serial
         if self.__results_raw:
-            if self.__plot_type == "1D":
-                tooltip_text += (
-                    "\nTotal score: %.1f" % self.__results_raw["score"][image]
-                    + "\nNumber of spots: %d" % self.__results_raw["spots_num"][image]
-                )
-
-            elif self.__associated_grid:
-                col, row = self.__associated_grid.get_col_row_from_image(
+            if self.__grid:
+                col, row = self.__grid.get_col_row_from_image(
                     self.selected_image_serial - 1
                 )
                 tooltip_text += (
@@ -515,7 +483,13 @@ class HitMapWidget(qt_import.QWidget):
                     + "\nNumber of spots: %d"
                     % self.__results_raw["spots_num"][col][row]
                 )
-        self._hit_map_plot.setToolTip(tooltip_text)
+
+            else:
+                tooltip_text += (
+                    "\nTotal score: %.1f" % self.__results_raw["score"][image]
+                    + "\nNumber of spots: %d" % self.__results_raw["spots_num"][image]
+                )
+        self._osc_hit_map_plot.setToolTip(tooltip_text)
 
     def enable_image_display_state_changed(self, state):
         self.__enable_continues_image_display = state
@@ -524,21 +498,22 @@ class HitMapWidget(qt_import.QWidget):
         """
         returns image parameters for selected hit map frame
         """
-        if self.__plot_type == "1D":
+        if self.__grid:
+            image, line, image_num = self.__grid.get_image_from_col_row(
+                self.__selected_col, self.__selected_row
+            ) 
+        else:
             image = int(self.__selected_col)
             line = 1
             image_num = (
                 image
-                + self.__associated_data_collection.acquisitions[
+                + self.__data_collection.acquisitions[
                     0
                 ].acquisition_parameters.first_image
             )
-        elif self.__associated_grid:
-            image, line, image_num = self.__associated_grid.get_image_from_col_row(
-                self.__selected_col, self.__selected_row
-            ) 
 
-        image_path = self.__associated_data_collection.acquisitions[
+
+        image_path = self.__data_collection.acquisitions[
             0
         ].path_template.get_image_path()
         image_path = image_path % image_num
@@ -548,7 +523,7 @@ class HitMapWidget(qt_import.QWidget):
         """
         Returns col and row from image and line
         """
-        col, row = self.__associated_grid.get_col_row_from_line_image(line, image)
+        col, row = self.__grid.get_col_row_from_line_image(line, image)
         if self.__results_aligned:
             row = self.__results_aligned[self.__score_key].shape[1] - row - 1
         return int(col), int(row)
@@ -556,27 +531,27 @@ class HitMapWidget(qt_import.QWidget):
     def create_centring_point(self, coord_x=None, coord_y=None):
         """
         Descript. : creates a new centring point for selected coordinate.
-                    For mesh scan coord_x, and coord_y are grid coordinates in microns
+                    For grid scan coord_x, and coord_y are grid coordinates in microns
                     For helical line coord_x represents frame number
         """
         if coord_x is None:
             coord_x = self.__selected_col
         if coord_y is None:
             coord_y = self.__selected_row
-        num_images = self.__associated_data_collection.acquisitions[
+        num_images = self.__data_collection.acquisitions[
             0
         ].acquisition_parameters.num_images
-        osc_start = self.__associated_data_collection.acquisitions[
+        osc_start = self.__data_collection.acquisitions[
             0
         ].acquisition_parameters.osc_start
-        osc_range = self.__associated_data_collection.acquisitions[
+        osc_range = self.__data_collection.acquisitions[
             0
         ].acquisition_parameters.osc_range
 
         omega = None
-        if self.__associated_grid:
-            self.__associated_grid.set_osc_range(osc_range)
-            motor_pos_dict = self.__associated_grid.get_motor_pos_from_col_row(
+        if self.__grid:
+            self.__grid.set_osc_range(osc_range)
+            motor_pos_dict = self.__grid.get_motor_pos_from_col_row(
                 coord_x, coord_y
             )
         else:
@@ -584,7 +559,7 @@ class HitMapWidget(qt_import.QWidget):
             (
                 point_one,
                 point_two,
-            ) = self.__associated_data_collection.get_centred_positions()
+            ) = self.__data_collection.get_centred_positions()
             motor_pos_dict = HWR.beamline.diffractometer.get_point_from_line(
                 point_one, point_two, coord_x, num_images
             )
@@ -594,7 +569,7 @@ class HitMapWidget(qt_import.QWidget):
         )
 
     def create_helical_line_clicked(self):
-        motor_pos_dict = self.__associated_grid.get_motor_pos_from_col_row(
+        motor_pos_dict = self.__grid.get_motor_pos_from_col_row(
             self.__selected_col, self.__selected_row
         )
         HWR.beamline.sample_view.create_auto_line(motor_pos_dict)
@@ -608,17 +583,17 @@ class HitMapWidget(qt_import.QWidget):
         """Moves to grid position x and y are positions in micrometers starting
            from left top corner (as graphical coordinates)
         """
-        osc_range = self.__associated_data_collection.acquisitions[
+        osc_range = self.__data_collection.acquisitions[
             0
         ].acquisition_parameters.osc_range
-        if self.__associated_grid:
-            self.__associated_grid.set_osc_range(osc_range)
-            motor_pos_dict = self.__associated_grid.get_motor_pos_from_col_row(
+        if self.__grid:
+            self.__grid.set_osc_range(osc_range)
+            motor_pos_dict = self.__grid.get_motor_pos_from_col_row(
                 self.__selected_col, self.__selected_row
             )
         else:
             num_images = (
-                self.__associated_data_collection.acquisitions[
+                self.__data_collection.acquisitions[
                     0
                 ].acquisition_parameters.num_images
                 - 1
@@ -626,7 +601,7 @@ class HitMapWidget(qt_import.QWidget):
             (
                 point_one,
                 point_two,
-            ) = self.__associated_data_collection.get_centred_positions()
+            ) = self.__data_collection.get_centred_positions()
             motor_pos_dict = HWR.beamline.diffractometer.get_point_from_line(
                 point_one, point_two, int(self.__selected_x), num_images
             )
@@ -638,6 +613,8 @@ class HitMapWidget(qt_import.QWidget):
     def set_best_pos(self):
         """Displays 10 (if exists) best positions
         """
+
+        return
         self._best_pos_table.setRowCount(
             len(self.__results_raw.get("best_positions", []))
         )
@@ -713,7 +690,7 @@ class HitMapWidget(qt_import.QWidget):
         """
         Relaunches parallel processing
         """
-        if self.__associated_data_collection and self.__associated_grid:
+        if self.__data_collection and self.__grid:
             HWR.beamline.online_processing.run_processing(
-                self.__associated_data_collection
+                self.__data_collection
             )
