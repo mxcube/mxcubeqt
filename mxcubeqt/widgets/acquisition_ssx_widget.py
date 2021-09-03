@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""AcquisitionSsxlWidget is customized for ssx type acquisitions"""
+"""AcquisitionSsxWidget is customized for ssx type acquisitions"""
 
 from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
