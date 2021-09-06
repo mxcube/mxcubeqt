@@ -74,8 +74,8 @@ LOGGER.addHandler(HWR_LOG_HANDLER)
 
 
 for logger_name in ("matplotlib", "PyMca5"):
-    mpl_logger = logging.getLogger(logger_name)
-    mpl_logger.setLevel(logging.WARNING)
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.WARNING)
 
 
 SPLASH_SCREEN = None
