@@ -105,6 +105,12 @@ class DataPathWidget(qt_import.QWidget):
             "compression", self.data_path_layout.compression_cbox, bool, None
         )
 
+    def set_base_image_directory(self, base_image_dir):
+        self._base_image_dir = base_image_dir
+
+    def set_base_process_directory(self, base_process_dir):
+        self._base_process_dir = base_process_dir
+
     def _browse_clicked(self):
         file_dialog = qt_import.QFileDialog(self)
         file_dialog.setNameFilter("%s*" % self._base_image_dir)
@@ -115,11 +121,11 @@ class DataPathWidget(qt_import.QWidget):
             )
         )
         if selected_dir is not None and len(selected_dir) > 0 and selected_dir.startswith(self._base_image_dir):
-             self.set_directory(selected_dir)
+            self.set_directory(selected_dir)
         else:
             msg = "Selected directory do not start " +\
                   "with the base directory %s" % self._base_image_dir
-            logging.getLogger("GUI").error(msg) 
+            logging.getLogger("GUI").error(msg)
 
     def _prefix_ledit_change(self, new_value):
         cursor_pos = self.data_path_layout.prefix_ledit.cursorPosition()
@@ -198,6 +204,7 @@ class DataPathWidget(qt_import.QWidget):
             if self.parent._tree_brick:
                 self.parent._tree_brick.compression_state = state
 
+        queue_model_objects.Characterisation.set_char_compression(state)
         self._data_model.compression = state
         self.update_file_name()
         self.pathTemplateChangedSignal.emit()
@@ -233,15 +240,23 @@ class DataPathWidget(qt_import.QWidget):
 
     def set_directory(self, directory):
         self._data_model.directory = str(directory)
+
         if len(directory.split("/")) != len(self._base_image_dir.split("/")):
             dir_parts = directory.split("/")
-            sub_dir = os.path.join(*dir_parts[len(self._base_image_dir.split("/")) - 1 :])
+            sub_dir = os.path.join(*dir_parts[len(self._base_image_dir.split("/")) :])
             self.data_path_layout.folder_ledit.setText(sub_dir)
         else:
             self.data_path_layout.folder_ledit.setText("")
             self._data_model.directory = self._base_image_dir
 
         self.data_path_layout.base_path_ledit.setText(self._base_image_dir)
+
+    # def set_run_number(self, run_number):
+    #    """
+    #    Descript. :
+    #    """
+    #    self._data_model.run_number = int(run_number)
+    #    self.data_path_layout.run_number_ledit.setText(str(run_number))
 
     def set_prefix(self, base_prefix):
         self._data_model.base_prefix = str(base_prefix)
@@ -252,20 +267,6 @@ class DataPathWidget(qt_import.QWidget):
             int(self._data_model.precision) * "#",
         )
         self.data_path_layout.file_name_value_label.setText(file_name)
-
-    def set_base_image_directory(self, base_image_dir):
-        self._base_image_dir = base_image_dir
-
-    def set_base_process_directory(self, base_process_dir):
-        self._base_process_dir = base_process_dir
-
-    def set_run_number(self, run_number):
-        """
-        Sets a run number and updates file name
-        """
-        self._data_model.run_number = run_number
-        self.update_file_name()
-        self.pathTemplateChangedSignal.emit()
 
     def update_data_model(self, data_model):
         self._data_model = data_model

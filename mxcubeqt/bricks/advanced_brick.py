@@ -20,7 +20,6 @@
 from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.widgets.advanced_parameters_widget import AdvancedParametersWidget
-from mxcubeqt.widgets.advanced_results_widget import AdvancedResultsWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
 from mxcubecore import HardwareRepository as HWR
@@ -49,17 +48,13 @@ class AdvancedBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.tool_box = qt_import.QToolBox(self)
-        self.parameters_widget = AdvancedParametersWidget(self)
-        self.results_widget = AdvancedResultsWidget(self)
+        self.mesh_parameters_widget = AdvancedParametersWidget(self)
 
         self.line_parameters_widget = AdvancedParametersWidget(self)
-        self.line_results_widget = AdvancedResultsWidget(self)
         self.snapshot_widget = SnapshotWidget(self)
 
-        self.tool_box.addItem(self.parameters_widget, "2D Heat map: Parameters")
-        self.tool_box.addItem(self.results_widget, "2D Heat map: Results")
+        self.tool_box.addItem(self.mesh_parameters_widget, "2D Heat map: Parameters")
         self.tool_box.addItem(self.line_parameters_widget, "Line scan: Parameters")
-        self.tool_box.addItem(self.line_results_widget, "Line scan: Results")
 
         # Layout --------------------------------------------------------------
         _main_vlayout = qt_import.QHBoxLayout(self)
@@ -77,10 +72,10 @@ class AdvancedBrick(BaseWidget):
         )
 
     def populate_advanced_widget(self, item):
-        self.parameters_widget._data_path_widget.set_base_image_directory(
+        self.mesh_parameters_widget._data_path_widget.set_base_image_directory(
             HWR.beamline.session.get_base_image_directory()
         )
-        self.parameters_widget._data_path_widget.set_base_process_directory(
+        self.mesh_parameters_widget._data_path_widget.set_base_process_directory(
             HWR.beamline.session.get_base_process_directory()
         )
 
@@ -92,23 +87,17 @@ class AdvancedBrick(BaseWidget):
         )
 
         if isinstance(item, queue_item.XrayCenteringQueueItem):
-            self._data_collection = item.get_model().reference_image_collection
-            self.parameters_widget.populate_widget(item, self._data_collection)
-            self.results_widget.populate_widget(item)
+            self._data_collection = item.get_model().mesh_dc
+            self.mesh_parameters_widget.populate_widget(item, self._data_collection)
 
-            self.line_parameters_widget.populate_widget(
-                item, item.get_model().line_collection
-            )
-            self.line_results_widget.populate_widget(item)
+            #self.line_parameters_widget.populate_widget(
+            #    item, item.get_model().
+            #)
         else:
             self._data_collection = item.get_model()
-            self.parameters_widget.populate_widget(item, self._data_collection)
-            self.results_widget.populate_widget(item)
+            self.mesh_parameters_widget.populate_widget(item, self._data_collection)
 
         self.line_parameters_widget.setEnabled(
-            isinstance(item, queue_item.XrayCenteringQueueItem)
-        )
-        self.line_results_widget.setEnabled(
             isinstance(item, queue_item.XrayCenteringQueueItem)
         )
 
@@ -116,8 +105,6 @@ class AdvancedBrick(BaseWidget):
             self.snapshot_widget.display_snapshot(self._data_collection.grid.get_snapshot())
         except BaseException:
             pass
-
-        self.tool_box.setCurrentWidget(self.results_widget)
 
     def grid_clicked(self, grid, image, line, image_num):
         if self._data_collection is not None:

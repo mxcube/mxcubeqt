@@ -7,15 +7,15 @@
             children: []
             connections:
             - {receiver: '', receiverWindow: mxCuBE, signal: loggedIn, slot: exitExpertMode}
-            - {receiver: tree_brick, receiverWindow: mxCuBE, signal: loggedIn, slot: logged_in}
             - {receiver: task_toolbox_brick, receiverWindow: mxCuBE, signal: loggedIn,
               slot: logged_in}
             - {receiver: task_toolbox_brick, receiverWindow: mxCuBE, signal: sessionSelected,
               slot: set_session}
-            - {receiver: tree_brick, receiverWindow: mxCuBE, signal: sessionSelected,
-              slot: set_session}
             - {receiver: task_toolbox_brick, receiverWindow: mxCuBE, signal: userGroupSaved,
               slot: user_group_saved}
+            - {receiver: tree_brick, receiverWindow: mxCuBE, signal: loggedIn, slot: logged_in}
+            - {receiver: tree_brick, receiverWindow: mxCuBE, signal: sessionSelected,
+              slot: set_session}
             name: proposal_brick
             properties:
             - {comment: '', default_value: '', hidden: false, name: autoSessionUsers,
@@ -23,8 +23,6 @@
             - {comment: '', default_value: fx ifx ih im ix ls mx opid, hidden: false,
               name: codes, old_value: fx ifx ih im ix ls mx opid, type: string, value: fx
                 ifx ih im ix ls mx opid mxihr idtest}
-            - {comment: '', default_value: '', hidden: false, name: dbConnection,
-              old_value: '', type: string, value: /lims-client-mockup}
             - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
               name: fixedHeight, old_value: -1, type: integer, value: -1}
             - {comment: Set fixed width in pixels, default_value: -1, hidden: false,
@@ -41,10 +39,6 @@
               name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
               name: instanceAllowConnected, old_value: 0, type: boolean, value: 1}
-            - {comment: '', default_value: '', hidden: false, name: instanceServer,
-              old_value: '', type: string, value: /instanceconnection}
-            - {comment: '', default_value: '', hidden: false, name: localLogin, old_value: '',
-              type: string, value: ''}
             - {comment: '', default_value: '', hidden: false, name: secondaryProposals,
               old_value: '', type: string, value: ''}
             - {comment: '', default_value: 500, hidden: false, name: serverStartDelay,
@@ -55,16 +49,24 @@
           - brick: {class: TreeBrick, name: tree_brick}
             children: []
             connections:
+            - {receiver: advanced_brick, receiverWindow: mxCuBE, signal: populate_advanced_widget,
+              slot: populate_advanced_widget}
             - {receiver: aperture_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: transmission_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
             - {receiver: camera_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
+            - {receiver: char_parameters_brick, receiverWindow: mxCuBE, signal: populate_char_parameter_widget,
+              slot: populate_char_parameter_widget}
+            - {receiver: dc_parameters_brick, receiverWindow: mxCuBE, signal: populate_dc_parameter_widget,
+              slot: populate_dc_parameter_widget}
+            - {receiver: dcgroup_brick, receiverWindow: mxCuBE, signal: populate_dc_group_widget,
+              slot: populate_dc_group_widget}
             - {receiver: door_interlock_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
             - {receiver: energy_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
+            - {receiver: energy_scan_brick, receiverWindow: mxCuBE, signal: populate_energy_scan_widget,
+              slot: populate_parameter_widget}
             - {receiver: graphics_manager_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
             - {receiver: graphics_tools_brick, receiverWindow: mxCuBE, signal: enable_widgets,
@@ -77,22 +79,10 @@
               slot: enable_widget}
             - {receiver: omega_brick, receiverWindow: mxCuBE, signal: enable_widgets,
               slot: enable_widget}
-            - {receiver: phase_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: plate_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: proposal_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: resolution_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: sample_changer_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: shutter_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: slits_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
-            - {receiver: zoom_brick, receiverWindow: mxCuBE, signal: enable_widgets,
-              slot: enable_widget}
+            - {receiver: online_processing_brick, receiverWindow: mxCuBE, signal: populate_dc_parameter_widget,
+              slot: populate_widget}
+            - {receiver: online_processing_brick, receiverWindow: mxCuBE, signal: populate_advanced_widget,
+              slot: populate_widget}
             - {receiver: parameters_tab, receiverWindow: mxCuBE, signal: hide_advanced_tab,
               slot: hidePage_Advanced}
             - {receiver: parameters_tab, receiverWindow: mxCuBE, signal: hide_char_parameters_tab,
@@ -111,24 +101,32 @@
               slot: hidePage_Sample_changer}
             - {receiver: parameters_tab, receiverWindow: mxCuBE, signal: hide_xrf_spectrum_tab,
               slot: hidePage_XRF_spectrum}
-            - {receiver: advanced_brick, receiverWindow: mxCuBE, signal: populate_advanced_widget,
-              slot: populate_advanced_widget}
-            - {receiver: char_parameters_brick, receiverWindow: mxCuBE, signal: populate_char_parameter_widget,
-              slot: populate_char_parameter_widget}
-            - {receiver: dcgroup_brick, receiverWindow: mxCuBE, signal: populate_dc_group_widget,
-              slot: populate_dc_group_widget}
-            - {receiver: dc_parameters_brick, receiverWindow: mxCuBE, signal: populate_dc_parameter_widget,
-              slot: populate_dc_parameter_widget}
-            - {receiver: energy_scan_brick, receiverWindow: mxCuBE, signal: populate_energy_scan_widget,
-              slot: populate_parameter_widget}
+            - {receiver: phase_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
+            - {receiver: plate_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
+            - {receiver: proposal_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
+            - {receiver: resolution_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
+            - {receiver: sample_changer_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
             - {receiver: sample_details_brick, receiverWindow: mxCuBE, signal: populate_sample_details,
               slot: populate_sample_details}
-            - {receiver: xrf_spectrum_parameters, receiverWindow: mxCuBE, signal: populate_xrf_spectrum_widget,
-              slot: populate_xrf_widget}
+            - {receiver: shutter_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
+            - {receiver: slits_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
             - {receiver: task_toolbox_brick, receiverWindow: mxCuBE, signal: selection_changed,
               slot: selection_changed}
             - {receiver: task_toolbox_brick, receiverWindow: mxCuBE, signal: get_tree_brick,
               slot: set_tree_brick}
+            - {receiver: transmission_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
+            - {receiver: xrf_spectrum_parameters, receiverWindow: mxCuBE, signal: populate_xrf_spectrum_widget,
+              slot: populate_xrf_widget}
+            - {receiver: zoom_brick, receiverWindow: mxCuBE, signal: enable_widgets,
+              slot: enable_widget}
             name: tree_brick
             properties:
             - {comment: '', default_value: 1, hidden: false, name: enableQueueAutoSave,
@@ -149,10 +147,6 @@
               name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
             - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
               name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-            - {comment: '', default_value: /queue, hidden: false, name: queue, old_value: /queue,
-              type: string, value: /queue}
-            - {comment: '', default_value: /queue-model, hidden: false, name: queue_model,
-              old_value: /queue-model, type: string, value: /queue-model}
             - {comment: '', default_value: '', hidden: false, name: redis_client,
               old_value: '', type: string, value: ''}
             - {comment: '', default_value: Sample changer, hidden: false, name: scOneName,
@@ -169,8 +163,6 @@
               old_value: 0, type: boolean, value: 1}
             - {comment: '', default_value: 1, hidden: false, name: useSampleWidget,
               old_value: 1, type: boolean, value: 1}
-            - {comment: '', default_value: /xml_rpc_server, hidden: false, name: xml_rpc_server,
-              old_value: /xml_rpc_server, type: string, value: /xml-rpc-server}
             type: tree_brick
           - brick: {class: ProgressBarBrick, name: progress_bar_brick}
             children: []
@@ -2729,6 +2721,8 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
+        - {comment: '', default_value: Shutter, hidden: false, name: title, old_value: null,
+          type: string, value: Shutter}
         type: shutter_brick
       connections: []
       name: right_info_hbox
@@ -2885,7 +2879,7 @@
       name: online_processing_brick
       properties:
       - {comment: Set fixed height in pixels, default_value: -1, hidden: false, name: fixedHeight,
-        old_value: 300, type: integer, value: 200}
+        old_value: -1, type: integer, value: 200}
       - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
         old_value: -1, type: integer, value: -1}
       - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',

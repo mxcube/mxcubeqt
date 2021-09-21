@@ -17,17 +17,16 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-"""CreateStillScanWidget allows to create a ssx acquisition method"""
+"""CreateSsxWidget allows to create a ssx acquisition method"""
 
 import copy
 
 from mxcubeqt.utils import queue_item, qt_import
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
-from mxcubeqt.widgets.acquisition_still_widget import AcquisitionStillWidget
+from mxcubeqt.widgets.acquisition_ssx_widget import AcquisitionSsxWidget
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.ssx_sequence_widget import SSXSequenceWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
-#from mxcubeqt.widgets.comment_widget import CommentWidget
 
 
 from mxcubecore.HardwareObjects import (
@@ -42,15 +41,15 @@ __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
 
-class CreateStillScanWidget(CreateTaskBase):
+class CreateSsxWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, flags=0):
 
         CreateTaskBase.__init__(
-            self, parent, name, qt_import.Qt.WindowFlags(flags), "Still"
+            self, parent, name, qt_import.Qt.WindowFlags(flags), "SSX"
         )
 
         if not name:
-            self.setObjectName("create_still_scan_widget")
+            self.setObjectName("create_ssx_widget")
 
         # Hardware objects ----------------------------------------------------
 
@@ -58,7 +57,7 @@ class CreateStillScanWidget(CreateTaskBase):
         self.init_models()
 
         # Graphic elements ----------------------------------------------------
-        self._acq_widget = AcquisitionStillWidget(
+        self._acq_widget = AcquisitionSsxWidget(
             self,
             "acquisition_widget",
             layout="vertical",
@@ -210,7 +209,7 @@ class CreateStillScanWidget(CreateTaskBase):
 
     def _create_task(self, sample, shape, comments=None):
         """
-        Creates a new Still scan task
+        Creates a new SSX scan task
         :param sample: sample node
         :param shape: centering point
         :return: Acquisition item
@@ -281,7 +280,7 @@ class CreateStillScanWidget(CreateTaskBase):
         )
         data_collection.set_name(acq.path_template.get_prefix())
         data_collection.set_number(acq.path_template.run_number)
-        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
+        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.STILL
         run_processing_after, run_online_processing = \
             self._processing_widget.get_processing_state()
 

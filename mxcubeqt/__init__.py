@@ -72,8 +72,10 @@ HWR_LOG_HANDLER = logging.StreamHandler(sys.stdout)
 HWR_LOG_HANDLER.setFormatter(LOG_FORMATTER)
 LOGGER.addHandler(HWR_LOG_HANDLER)
 
-mpl_logger = logging.getLogger("matplotlib")
-mpl_logger.setLevel(logging.WARNING)
+
+for logger_name in ("matplotlib", "PyMca5"):
+    logging.getLogger(logger_name).setLevel(logging.WARNING)
+
 
 SPLASH_SCREEN = None
 
@@ -90,8 +92,6 @@ for p in ['configuration/mockup', 'configuration/mockup/qt']:
     path.append(resource_filename('mxcubecore', p))
 
 MOCKUP_CORE_CONFIG_PATH = ":".join(path)
-print(MOCKUP_CORE_CONFIG_PATH)
-
 
 def get_splash():
     return get_splash_screen()
@@ -419,7 +419,7 @@ def create_app(gui_config_path=None, core_config_path=None):
     if (
         len(
             os.popen(
-                "ps -aef | grep 'python' -i | grep 'hardwareRepository'"
+                "ps -aef | grep 'python' -i | grep 'mxcubecore'"
                 + "  | grep -v 'grep' | awk '{ print $3 }'"
             )
             .read()

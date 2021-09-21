@@ -90,9 +90,6 @@ class TreeBrick(BaseWidget):
         self.queue_sync_action = None
 
         # Properties ----------------------------------------------------------
-        self.add_property("queue", "string", "/queue")
-        self.add_property("queue_model", "string", "/queue-model")
-        self.add_property("xml_rpc_server", "string", "/xml_rpc_server")
         self.add_property("redis_client", "string", "")
         self.add_property("useFilterWidget", "boolean", True)
         self.add_property("useSampleWidget", "boolean", True)
@@ -299,23 +296,25 @@ class TreeBrick(BaseWidget):
         self.connect(HWR.beamline.queue_model, "child_added", self.dc_tree_widget.add_to_view)
 
         if hasattr(HWR.beamline, "ppu_control"):
-            self.connect(
-               HWR.beamline.ppu_control,
-                "ppuStatusChanged",
-                self.ppu_status_changed,
-            )
+            if HWR.beamline.ppu_control is not None:
+                self.connect(
+                   HWR.beamline.ppu_control,
+                   "ppuStatusChanged",
+                   self.ppu_status_changed,
+                )
 
         if HWR.beamline.safety_shutter is not None:
             self.connect(
-                HWR.beamline.safety_shutter, "shutterStateChanged", self.shutter_state_changed
+                HWR.beamline.safety_shutter,
+                "valueChanged",
+                self.shutter_state_changed
             )
         if HWR.beamline.machine_info is not None:
             self.connect(
                 HWR.beamline.machine_info, "machineCurrentChanged", self.machine_current_changed
             )
 
-        has_shutter_less = HWR.beamline.detector.has_shutterless()
-        if has_shutter_less:
+        if HWR.beamline.detector.has_shutterless():
             self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
 
     def run(self):
@@ -1132,9 +1131,8 @@ class TreeBrick(BaseWidget):
         #  Necessary because shutter states can be both 'opened', 'OPEN'. (and more?)
         # NBNB fixme
         #is_open = bool(state and state.lower().startswith('open'))
-        is_open = bool(state and state.lower().startswith('open'))
-        if self.enable_collect_conditions.get("shutter") != is_open:
-            self.enable_collect_conditions["shutter"] = is_open
+        if self.enable_collect_conditions.get("shutter") != HWR.beamline.safety_shutter.is_open():
+            self.enable_collect_conditions["shutter"] = HWR.beamline.safety_shutter.is_open()
             self.update_enable_collect()
 
     def machine_current_changed(self, value, in_range):

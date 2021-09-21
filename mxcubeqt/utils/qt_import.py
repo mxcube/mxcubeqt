@@ -132,6 +132,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QSize,
             QT_VERSION_STR,
             QTimer,
+            QUrl,
         )
         from PyQt5.QtWidgets import (
             QAbstractItemView,
@@ -174,6 +175,7 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QRadioButton,
             QScrollArea,
             QScrollBar,
+            QShortcut,
             QSizePolicy,
             QSlider,
             QSpacerItem,
@@ -346,6 +348,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QRegExpValidator,
             QScrollArea,
             QScrollBar,
+            QShortcut,
             QSizePolicy,
             QSlider,
             QSpacerItem,

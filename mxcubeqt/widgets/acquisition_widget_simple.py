@@ -267,6 +267,11 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             self.resolution_validator,
         )
 
+        if HWR.beamline.diffractometer.in_plate_mode():
+            self.acq_widget_layout.num_images_cbox.clear()
+            self.acq_widget_layout.num_images_cbox.addItem("1")
+            self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
+
     def set_energy(self, energy, wav):
         if not self.acq_widget_layout.energy_ledit.hasFocus():
             self.acq_widget_layout.energy_ledit.setText(str(energy))
