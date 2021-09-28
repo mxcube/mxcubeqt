@@ -1162,8 +1162,8 @@
                   old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showHelicalTask,
                   old_value: 1, type: boolean, value: 0}
-                - {comment: '', default_value: 0, hidden: false, name: showStillScanTask,
-                  old_value: 0, type: boolean, value: 0}
+                - {comment: '', default_value: 0, hidden: false, name: showSsxTask,
+                  old_value: 0, type: boolean, value: 1}
                 - {comment: '', default_value: 0, hidden: false, name: useCompression,
                   old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: useOscStartCbox,

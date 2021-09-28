@@ -608,7 +608,6 @@ class DataCollectTree(qt_import.QWidget):
                     if item.parent().indexOfChild(item) < item.parent().childCount() - 1:
                         self.down_button.setDisabled(False)
             break
-
         self.selection_changed_cb(items)
         self.toggle_collect_button_enabled()
 
@@ -1429,7 +1428,6 @@ class DataCollectTree(qt_import.QWidget):
         if self.last_added_item:
             self.sample_tree_widget.clearSelection()
             self.last_added_item.setSelected(True)
-            self.sample_tree_widget_selection()
 
     def hide_empty_baskets(self):
         """Hides empty baskets after the tree filtering"""
