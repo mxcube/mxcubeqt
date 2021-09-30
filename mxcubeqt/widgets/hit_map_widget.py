@@ -253,7 +253,7 @@ class HitMapWidget(qt_import.QWidget):
         ].acquisition_parameters.num_images
         self.__first_result = True
 
-        y_array = np.zeros(num_images)
+        y_array = np.zeros(1)
         for result_type in self.__result_types:
             self._osc_hit_map_plot.add_curve(
                 result_type["key"],
@@ -261,7 +261,6 @@ class HitMapWidget(qt_import.QWidget):
                 x_array=None,
                 color=result_type["color"],
             )
-
         self._osc_hit_map_plot.hide_all_curves()
         self._osc_hit_map_plot.show_curve(self.__score_key)
         self._osc_hit_map_plot.autoscale_axes()
@@ -332,32 +331,32 @@ class HitMapWidget(qt_import.QWidget):
         self._grid_hit_map_plot.plot_result(result)
 
     def mouse_moved(self, pos_x, pos_y):
-        do_update = False
+        if self.__results_raw:
+            do_update = False
 
-        if self.__grid: 
-            (num_col, num_row) = self.__grid.get_col_row_num()
-            pos_y = num_row - pos_y
+            if self.__grid: 
+                (num_col, num_row) = self.__grid.get_col_row_num()
+                pos_y = num_row - pos_y
 
-            if abs(int(pos_x) - int(self.__selected_col)):
-                self.__selected_col = pos_x
-                do_update = True
-            if abs(int(pos_y) - int(self.__selected_row)):
-                self.__selected_row = pos_y
-                do_update = True
-        else:
-            if pos_x < 0:
-                pos_x = 0
-            elif pos_x > len(self.__results_raw[self.__score_key])- 1:
-                pos_x = len(self.__results_raw[self.__score_key]) - 1
-            if abs(pos_x - self.__selected_col) > 1:
-                self.__selected_col = pos_x
-                do_update = True
+                if abs(int(pos_x) - int(self.__selected_col)):
+                    self.__selected_col = pos_x
+                    do_update = True
+                if abs(int(pos_y) - int(self.__selected_row)):
+                    self.__selected_row = pos_y
+                    do_update = True
+            else:
+                if pos_x < 0:
+                    pos_x = 0
+                elif pos_x > len(self.__results_raw[self.__score_key])- 1:
+                    pos_x = len(self.__results_raw[self.__score_key]) - 1
+                if abs(pos_x - self.__selected_col) > 1:
+                    self.__selected_col = pos_x
+                    do_update = True
 
-        if do_update and self.__results_raw is not None:
-            self.update_image_info()
-            #self.display_image_tooltip()
-            if self.__enable_continues_image_display: 
-                self.display_image_clicked()
+            if do_update:
+                self.update_image_info()
+                if self.__enable_continues_image_display: 
+                    self.display_image_clicked()
 
     def mouse_clicked(self, pos_x, pos_y):
         self.__hitmap_clicked = True

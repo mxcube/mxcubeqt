@@ -515,14 +515,17 @@ class TaskToolBoxWidget(qt_import.QWidget):
         self.toggle_queue_button_enable()
 
     def toggle_queue_button_enable(self):
-        self.create_task_button.setDisabled(self.path_conflict or self.acq_conflict)
-        self.collect_now_button.setDisabled(
-            self.path_conflict or self.acq_conflict or not self.enable_collect
-        )
-        if self.tool_box.currentWidget() in (self.helical_page, self.advanced_page):
-            if len(self.tool_box.currentWidget().get_selected_shapes()) == 0:
-                self.create_task_button.setEnabled(False)
-                self.collect_now_button.setEnabled(False)
-        if self.tool_box.currentWidget() == self.xray_imaging_page:
-            self.create_task_button.setEnabled(True)
-            self.collect_now_button.setEnabled(True)
+        enable_create_task_button = False
+        enable_collect_now_button = False
+        if self.tree_brick.get_selected_items():
+            enable_create_task_button = not self.path_conflict and not self.acq_conflict
+            enable_collect_now_button = enable_create_task_button and self.enable_collect
+            if self.tool_box.currentWidget() in (self.helical_page, self.advanced_page):
+                if len(self.tool_box.currentWidget().get_selected_shapes()) == 0:
+                    enable_create_task_button = False
+                    enable_collect_now_button = False
+            elif self.tool_box.currentWidget() == self.xray_imaging_page:
+                enable_create_task_button = True
+                enable_collect_now_button = True
+        self.create_task_button.setEnabled(enable_create_task_button)
+        self.collect_now_button.setEnabled(enable_collect_now_button)

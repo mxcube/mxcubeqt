@@ -1155,15 +1155,15 @@
                 - {comment: '', default_value: 1, hidden: false, name: showAdvancedTask,
                   old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showCharTask,
-                  old_value: 1, type: boolean, value: 0}
+                  old_value: 0, type: boolean, value: 1}
                 - {comment: '', default_value: 0, hidden: false, name: showCollectNowButton,
                   old_value: 0, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showDiscreetTask,
                   old_value: 1, type: boolean, value: 1}
                 - {comment: '', default_value: 1, hidden: false, name: showHelicalTask,
-                  old_value: 1, type: boolean, value: 0}
-                - {comment: '', default_value: 0, hidden: false, name: showStillScanTask,
-                  old_value: 0, type: boolean, value: 0}
+                  old_value: 0, type: boolean, value: 1}
+                - {comment: '', default_value: 0, hidden: false, name: showSsxTask,
+                  old_value: 0, type: boolean, value: 1}
                 - {comment: '', default_value: 0, hidden: false, name: useCompression,
                   old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: useOscStartCbox,
@@ -2721,7 +2721,7 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        - {comment: '', default_value: Shutter, hidden: false, name: title, old_value: null,
+        - {comment: '', default_value: Shutter, hidden: false, name: title, old_value: Shutter,
           type: string, value: Shutter}
         type: shutter_brick
       connections: []

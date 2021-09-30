@@ -50,7 +50,7 @@ class TaskToolboxBrick(BaseWidget):
         self.add_property("showHelicalTask", "boolean", True)
         self.add_property("showCharTask", "boolean", True)
         self.add_property("showAdvancedTask", "boolean", True)
-        self.add_property("showStillScanTask", "boolean", False)
+        self.add_property("showSsxTask", "boolean", False)
         self.add_property("showCollectNowButton", "boolean", False)
 
         # Signals -------------------------------------------------------------
@@ -171,10 +171,10 @@ class TaskToolboxBrick(BaseWidget):
                 self.task_tool_box_widget.hide_task(
                     self.task_tool_box_widget.advanced_page
                 )
-        elif property_name == "showStillScanTask":
+        elif property_name == "showSsxTask":
             if not new_value:
                 self.task_tool_box_widget.hide_task(
-                    self.task_tool_box_widget.still_scan_page
+                    self.task_tool_box_widget.ssx_page
                 )
 
     def selection_changed(self, items):
