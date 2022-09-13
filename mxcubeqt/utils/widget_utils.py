@@ -20,7 +20,7 @@
 
 from mxcubeqt.utils import colors, qt_import
 from mxcubecore.dispatcher import dispatcher
-from mxcubecore.ConvertUtils import string_types
+from mxcubecore.utils.conversion import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]
