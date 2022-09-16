@@ -21,6 +21,7 @@ from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import colors, qt_import
 
 from mxcubecore import HardwareRepository as HWR
+import logging
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -75,6 +76,11 @@ class PhaseBrick(BaseWidget):
         self.connect(
             HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
+        self.connect(
+            HWR.beamline.diffractometer, "minidiffPhaseStateChanged", self.phase_state_changed
+        )
+        self.phase_changed()
+
 
     def init_phase_list(self):
         self.phase_combobox.clear()
@@ -107,10 +113,27 @@ class PhaseBrick(BaseWidget):
             else:
                 HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
 
-    def phase_changed(self, phase):
+    def phase_changed(self, phase=None):
+        if phase is None:
+            phase = HWR.beamline.diffractometer.get_phase()
+
         if phase.lower() != "unknown" and self.phase_combobox.count() > 0:
             # index = self.phase_combobox.findText(phase)
             # self.phase_combobox.setEditText(phase)
             self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
         else:
             self.phase_combobox.setCurrentIndex(-1)
+
+    def phase_state_changed(self, state):
+
+        if state.value == "moving":
+            color = colors.LIGHT_YELLOW
+        elif state.value == "ready":
+            color = colors.LIGHT_GREEN
+        else:
+            self.phase_combobox.setCurrentText("unknown")
+            color = colors.DARK_GRAY
+
+        colors.set_widget_color(
+            self.phase_combobox, color, qt_import.QPalette.Button
+        )
