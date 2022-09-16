@@ -366,6 +366,9 @@ class MotorSpinboxBrick(BaseWidget):
             self.step_editor.show()
 
     def position_changed(self, position):
+        if self.editing:
+            return
+
         if not(position is None or math.isinf(position) or math.isnan(position)):
             self.position_spinbox.blockSignals(True)
             self.position_slider.blockSignals(True)
@@ -551,11 +554,12 @@ class MotorSpinboxBrick(BaseWidget):
             self.motor_label.hide()
             self.main_gbox.setTitle(label)
         else:
-            if label != "":
-                label += ": "
-            self.main_gbox.setTitle("")
-            self.motor_label.setText(label)
-            self.motor_label.show()
+            if label is not None:
+                if label != "":
+                    label += ": "
+                self.main_gbox.setTitle("")
+                self.motor_label.setText(label)
+                self.motor_label.show()
 
     def set_motor(self, motor, motor_ho_name=None):
         if self.motor_hwobj is not None:
