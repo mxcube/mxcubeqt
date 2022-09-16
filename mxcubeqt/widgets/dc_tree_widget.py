@@ -295,6 +295,7 @@ class DataCollectTree(qt_import.QWidget):
                         self.item_menu.addAction("Move", self.mount_sample)
                     else:
                         if self.is_mounted_sample_item(item):
+                            self.item_menu.addAction("Wash", self.wash_sample)
                             self.item_menu.addAction("Un-Mount", self.unmount_sample)
                         else:
                             self.item_menu.addAction("Mount",
@@ -496,10 +497,12 @@ class DataCollectTree(qt_import.QWidget):
                     if self.close_kappa:
                         HWR.beamline.diffractometer.close_kappa()
                 except Exception as e:
+                    import traceback
                     items[0].setText(1, "Error loading")
                     items[0].set_background_color(3)
                     msg = "Error loading sample, " + str(e)
                     logging.getLogger("GUI").error(msg)
+                    logging.getLogger("GUI").error(traceback.format_exc())
                 finally:
                     self.enable_collect(True)
                     self.tree_brick.sample_mount_finished.emit()
@@ -515,6 +518,79 @@ class DataCollectTree(qt_import.QWidget):
             msg = "Loop centring failed or was cancelled, " +\
                   "please continue manually."
             logging.getLogger("GUI").warning(msg)
+
+    def wash_sample(self):
+        """Sample wash task"""
+        self.enable_collect(False)
+        gevent.spawn(self.wash_sample_task)
+
+    def wash_sample_task(self):
+        items = self.get_selected_items()
+
+        if len(items) == 1:
+            if self.show_sc_during_mount:
+                self.tree_brick.sample_mount_started.emit()
+            items[0].setText(1, "Washing sample...")
+
+            location = items[0].get_model().location
+
+            if self.show_sc_during_mount:
+                self.tree_brick.sample_mount_started.emit()
+
+            self.tree_brick.enable_widgets.emit(False)
+
+            sample_changer = None
+            if self.sample_mount_method == 1:
+                try:
+                    sample_changer = HWR.beamline.sample_changer
+                except AttributeError:
+                    sample_changer = None
+            elif self.sample_mount_method == 2:
+                try:
+                    sample_changer = HWR.beamline.plate_manipulator
+                except AttributeError:
+                    sample_changer = None
+
+            if self.sample_mount_method == 1:  # only implemented for SC
+                robot_action_dict = {"actionType": "WASH",
+                                     "containerLocation": location[1],
+                                     "dewarLocation": location[0],
+                                     "sampleBarcode": items[0].get_model().code,
+                                     "sampleId": items[0].get_model().lims_id,
+                                     "sessionId": HWR.beamline.session.session_id,
+                                     "startTime": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+                try:
+                    if hasattr(sample_changer, '__TYPE__')\
+                            and sample_changer.__TYPE__ in ('CATS', 'Marvin', 'Mockup'):
+                        sample_changer.wash(wait=True)
+                    else:
+                        sample_changer.wash(wait=True)
+                except Exception as e:
+                    import traceback
+                    logging.getLogger("HWR").error(traceback.format_exc())
+                    items[0].setText(1, "Error in washing")
+                    msg = "Error washing sample, " + str(3) #please check" +\
+                    #    " sample changer: " + str(e)
+                    logging.getLogger("GUI").error(msg)
+
+                robot_action_dict["endTime"] = time.strftime("%Y-%m-%d %H:%M:%S")
+                if sample_changer.has_loaded_sample():
+                    robot_action_dict['status'] = "SUCCESS"
+                else:
+                    robot_action_dict['message'] = "Sample wash failed"
+                    robot_action_dict['status'] = "ERROR"
+
+                HWR.beamline.lims.store_robot_action(
+                    robot_action_dict)
+
+            items[0].setText(1, "")
+            items[0].setOn(True)
+
+        self.enable_collect(True)
+        self.tree_brick.enable_widgets.emit(True)
+        self.tree_brick.sample_mount_finished.emit()
+
 
     def unmount_sample(self):
         """Sample unmount task"""
@@ -926,6 +1002,7 @@ class DataCollectTree(qt_import.QWidget):
         """
         HWR.beamline.sample_view.de_select_all()
 
+        logging.getLogger("HWR").debug(" tree_brick - collecting items")
         collection_par_list = []
         for item in checked_items:
             # update the run-number text incase of re-collect
@@ -935,6 +1012,7 @@ class DataCollectTree(qt_import.QWidget):
             item.setText(1, "")
             item.reset_style()
             if isinstance(item.get_model(), queue_model_objects.DataCollection):
+                logging.getLogger("HWR").debug(" tree_brick -  adding DataCollection item")
                 collection_par_list.append(item.get_model().as_dict())
         """
         invalid_parameters = HWR.beamline.\
@@ -963,9 +1041,11 @@ class DataCollectTree(qt_import.QWidget):
         self.continue_button.setEnabled(True)
         self.parent().set_condition_state("confirmation_window_accepted",
                                           True)
+        logging.getLogger("HWR").debug(" tree_brick -  running run_cb() %s" % str(self.run_cb))
         self.run_cb()
         HWR.beamline.sample_view.set_cursor_busy(True)
         try:
+            logging.getLogger("HWR").debug(" tree_brick -  executing queue manager")
             HWR.beamline.queue_manager.execute()
         except Exception as ex:
             raise ex
