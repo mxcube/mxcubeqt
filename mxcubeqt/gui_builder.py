@@ -1071,7 +1071,8 @@ class GUIEditorWindow(qt_import.QWidget):
         while source_item_ancestors[0]:
             source_item_ancestors.insert(0, source_item_ancestors[0].parent())
 
-        common_ancestor = zip(target_item_ancestors, source_item_ancestors)[-1][0]
+        common_ancestor = list(zip(target_item_ancestors, source_item_ancestors))[-1][0]
+
         if common_ancestor != self.root_element:
             common_ancestor_name = str(common_ancestor.text(0))
         else:
