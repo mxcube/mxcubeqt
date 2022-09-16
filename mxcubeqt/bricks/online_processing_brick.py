@@ -76,13 +76,17 @@ class OnlineProcessingBrick(BaseWidget):
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = data_collection.mesh_dc
         self.hit_map_widget.set_data_collection(data_collection)
+
         if data_collection.is_executed():
-            processing_results = data_collection.get_online_processing_results()
-            self.hit_map_widget.set_results(
+            try:
+                processing_results = data_collection.get_online_processing_results()
+                self.hit_map_widget.set_results(
                     processing_results["raw"],
                     processing_results["aligned"]
-            )
-            self.hit_map_widget.update_results(True)
+                )
+                self.hit_map_widget.update_results(True)
+            except Exception as e:
+                print("error while displaying processing results in hit_map")
 
     def processing_started(self, data_collection, results_raw, results_aligned):
         self.hit_map_widget.set_results(results_raw, results_aligned)
