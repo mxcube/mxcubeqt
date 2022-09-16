@@ -189,7 +189,7 @@ class DigitalZoomBrick(BaseWidget):
                         self.motor_hwobj.get_value(), 0
                     )
                 if self["label"] == "":
-                    lbl = self.motor_hwobj.user_name
+                    lbl = self.motor_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
                 colors.set_widget_color(
                     self.positions_combo,
@@ -251,7 +251,6 @@ class DigitalZoomBrick(BaseWidget):
         self.previous_position_button.setEnabled(index >= 0)
 
     def predefined_position_changed(self, position, offset):
-        log.debug("ZOOMBrick / predefined position changed %s / %s" % (position.name, offset))
 
         if self.positions:
             for index, item in enumerate(self.positions):
