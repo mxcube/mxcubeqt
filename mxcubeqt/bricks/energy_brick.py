@@ -148,6 +148,8 @@ class EnergyBrick(BaseWidget):
         
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
+        HWR.beamline.energy.re_emit_values()
+
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "defaultMode":
             if new_value == "keV":
