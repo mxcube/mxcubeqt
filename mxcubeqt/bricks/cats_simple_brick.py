@@ -101,7 +101,7 @@ class CatsSimpleBrick(SampleChangerBrick):
         self._pathRunning = None
         self._poweredOn = None
 
-        self.addProperty("use_basket_HT", "boolean", False)
+        self.add_property("use_basket_HT", "boolean", False)
 
         # display operations widget
         self.operations_widget.show()
