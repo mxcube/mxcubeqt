@@ -20,15 +20,12 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 """GPhL runtime-set parameter input widget. """
-from __future__ import division, absolute_import
-from __future__ import print_function, unicode_literals
+import logging
 
 from mxcubecore.utils import conversion
 
 from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.paramsgui import FieldsWidget
-
-from mxcubecore import HardwareRepository as HWR
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -50,6 +47,7 @@ class SelectionTable(qt_import.QTableWidget):
         self.setColumnCount(len(header))
         self.setSelectionMode(qt_import.QTableWidget.SingleSelection)
         self.setHorizontalHeaderLabels(header)
+        self.horizontalHeader().setDefaultAlignment(qt_import.Qt.AlignLeft)
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
@@ -68,6 +66,9 @@ class SelectionTable(qt_import.QTableWidget):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
+        selectRow = None
+        no_colours = not colours or not any(colours)
+        colour = None
         for rowNum, text in enumerate(values):
             wdg = qt_import.QLineEdit(self)
             wdg.setFont(qt_import.QFont("Courier"))
@@ -79,12 +80,20 @@ class SelectionTable(qt_import.QTableWidget):
                     colors.set_widget_color(
                         wdg, getattr(colors, colour), qt_import.QPalette.Base
                     )
-                    # wdg.setBackground(getattr(qt_import.QColor, colour))
             self.setCellWidget(rowNum, colNum, wdg)
+            if "*" in text and (colour or no_colours):
+                selectRow = rowNum
+        if selectRow is not None:
+            self.setCurrentCell(selectRow, 0)
+
 
     def get_value(self):
         """Get value - list of cell contents for selected row"""
         row_id = self.currentRow()
+        if not self.cellWidget(row_id, 0):
+            logging.getLogger("user_log").warning(
+                "Select a row of the table, and then press [Continue]"
+            )
         return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
 
 
@@ -106,7 +115,7 @@ class GphlDataDialog(qt_import.QDialog):
         qt_import.QVBoxLayout(self)
         main_layout = self.layout()
         main_layout.setSpacing(10)
-        main_layout.setMargin(6)
+        main_layout.setContentsMargins(6, 6, 6, 6)
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
@@ -115,17 +124,19 @@ class GphlDataDialog(qt_import.QDialog):
 
         # Info box
         self.info_gbox = qt_import.QGroupBox("Info", self)
-        qt_import.QVBoxLayout(self.info_gbox)
-        main_layout.addWidget(self.info_gbox)
+        info_vbox = qt_import.QVBoxLayout()
+        self.info_gbox.setLayout(info_vbox)
+        main_layout.addWidget(self.info_gbox, stretch=8)
         self.info_text = qt_import.QTextEdit(self.info_gbox)
         self.info_text.setFont(qt_import.QFont("Courier"))
         self.info_text.setReadOnly(True)
-        self.info_gbox.layout().addWidget(self.info_text)
+        info_vbox.addWidget(self.info_text, stretch=8)
 
         # Special parameter box
         self.cplx_gbox = qt_import.QGroupBox("Indexing solution", self)
-        qt_import.QVBoxLayout(self.cplx_gbox)
-        main_layout.addWidget(self.cplx_gbox)
+        cplx_vbox = qt_import.QVBoxLayout()
+        self.cplx_gbox.setLayout(cplx_vbox)
+        main_layout.addWidget(self.cplx_gbox, stretch=8)
         self.cplx_gbox.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
@@ -133,14 +144,18 @@ class GphlDataDialog(qt_import.QDialog):
 
         # Parameter box
         self.parameter_gbox = qt_import.QGroupBox("Parameters", self)
-        main_layout.addWidget(self.parameter_gbox)
+        parameter_vbox =  qt_import.QVBoxLayout()
+        self.parameter_gbox.setLayout(parameter_vbox)
+        main_layout.addWidget(self.parameter_gbox, stretch=1)
         self.parameter_gbox.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         self.params_widget = None
 
         # Button bar
+        self.button_widget = qt_import.QWidget(self)
         button_layout = qt_import.QHBoxLayout(None)
+        self.button_widget.setLayout(button_layout)
         hspacer = qt_import.QSpacerItem(
             1, 20, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum
         )
@@ -149,13 +164,22 @@ class GphlDataDialog(qt_import.QDialog):
         button_layout.addWidget(self.continue_button)
         self.cancel_button = qt_import.QPushButton("Abort", self)
         button_layout.addWidget(self.cancel_button)
-        main_layout.addLayout(button_layout)
+        main_layout.addWidget(self.button_widget)
 
         self.continue_button.clicked.connect(self.continue_button_click)
         self.cancel_button.clicked.connect(self.cancel_button_click)
 
-        self.resize(qt_import.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
-        # self.clearWState(qt_import.WState_Polished)
+        self.resize(qt_import.QSize(1200, 578).expandedTo(self.minimumSizeHint()))
+
+    def keyPressEvent(self, event):
+        """This should disable having Qt interpret [Return] as [Continue] """
+        if ((not event.modifiers() and
+             event.key() == qt_import.Qt.Key_Return) or
+            (event.modifiers() == qt_import.Qt.KeypadModifier and
+             event.key() == qt_import.Qt.Key_Enter)):
+            event.accept()
+        else:
+            super(qt_import.QDialog, self).keyPressEvent(event)
 
     def continue_button_click(self):
         result = {}
@@ -168,10 +192,15 @@ class GphlDataDialog(qt_import.QDialog):
         self._async_result = None
 
     def cancel_button_click(self):
+        logging.getLogger("HWR").debug("GPhL Data dialog abort pressed.")
         self.reject()
-        HWR.beamline.gphl_workflow.abort("Manual abort")
+        self._async_result.set(StopIteration)
+        self._async_result = None
 
-    def open_dialog(self, field_list, async_result):
+    def open_dialog(self, field_list, async_result, parameter_update_function):
+
+        msg = "GPhL Workflow waiting for input, verify parameters and press continue."
+        logging.getLogger("user_level_log").info(msg)
 
         self._async_result = async_result
 
@@ -209,7 +238,10 @@ class GphlDataDialog(qt_import.QDialog):
                 self.cplx_widget = SelectionTable(
                     self.cplx_gbox, "cplx_widget", cplx["header"]
                 )
-                self.cplx_gbox.layout().addWidget(self.cplx_widget)
+                self.cplx_widget.setSizePolicy(
+                    qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
+                )
+                self.cplx_gbox.layout().addWidget(self.cplx_widget, stretch=8)
                 self.cplx_gbox.setTitle(cplx.get("uiLabel"))
                 for ii, values in enumerate(cplx["defaultValue"]):
                     self.cplx_widget.populateColumn(
@@ -225,23 +257,40 @@ class GphlDataDialog(qt_import.QDialog):
 
         # parameters widget
         if self.params_widget is not None:
+            self.params_widget.parametersValidSignal.disconnect(
+                self.continue_button.setEnabled
+            )
             self.params_widget.close()
             self.params_widget = None
         if parameters:
-            self.params_widget = FieldsWidget(
-                fields=parameters, parent=self.parameter_gbox
-            )
-
-            values = {}
-            for dd0 in field_list:
-                name = dd0["variableName"]
-                value = dd0.get("defaultValue")
-                if value is not None:
-                    dd0[name] = value
-            self.params_widget.set_values(values)
+            params_widget = self.params_widget = LocalFieldsWidget(fields=parameters)
+            self.parameter_gbox.layout().addWidget(params_widget, stretch=1)
+            if parameter_update_function:
+                parameter_update_function(params_widget)
             self.parameter_gbox.show()
+            params_widget.parametersValidSignal.connect(self.continue_button.setEnabled)
+            params_widget.validate_fields()
         else:
             self.parameter_gbox.hide()
+            self.continue_button.setEnabled(True)
 
         self.show()
         self.setEnabled(True)
+        self.update()
+
+class LocalFieldsWidget(FieldsWidget):
+    """Local version, adding custom input_field_changed function"""
+
+    def input_field_changed(self):
+        """Color use_dose field for warning if > dose_budget"""
+
+        parameters = self.get_parameters_map()
+        use_dose = parameters.get("use_dose")
+        dose_budget = parameters.get("dose_budget")
+        if use_dose and dose_budget:
+            use_dose = float(use_dose)
+            dose_budget = float(dose_budget)
+            if use_dose > dose_budget:
+                for field in self.field_widgets:
+                    if field.get_name() in ("use_dose", "dose_budget"):
+                        field.color_by_error(warning=True)
