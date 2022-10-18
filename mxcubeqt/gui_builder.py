@@ -36,7 +36,7 @@ from mxcubeqt.bricks import log_view_brick
 from mxcubeqt.base_layout_items import ContainerCfg
 
 from mxcubecore import HardwareRepository as HWR
-from mxcubecore.ConvertUtils import string_types
+from mxcubecore.utils.conversion import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]
