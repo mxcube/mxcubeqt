@@ -324,7 +324,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments=None):
+
+        # NBNB Put here init_from_task_data
         tasks = []
 
         path_template = self._create_path_template(sample, self._path_template)
@@ -337,7 +339,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 workflow_hwobj.shutdown
             )
 
-        wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
+        wf = queue_model_objects.GphlWorkflow()
         wf_type = conversion.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
@@ -349,9 +351,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
         strategy_type = wf_parameters.get("strategy_type")
-        variant = wf_parameters["variants"][0]
-        wf.set_variant(variant)
-        wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
+        # variant = wf_parameters["variants"][0]
+        # wf.set_variant(variant)
+        # wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
         if strategy_type == "transcal":
             pass
 
