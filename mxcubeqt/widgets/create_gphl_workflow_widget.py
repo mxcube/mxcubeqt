@@ -406,7 +406,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     )
 
             wf.set_characterisation_strategy(characterisation_strategy)
-            wf.set_use_cell_for_processing(use_for_indexing)
+            wf.use_cell_for_processing = use_for_indexing
             tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
             if tag:
