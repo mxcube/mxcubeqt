@@ -63,19 +63,19 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # NB widget must start out hidden,
         # so as to be shown when workflow type is initialiesd
         self._workflow_cbox = qt_import.QComboBox(self._workflow_type_widget)
-        self._gphl_acq_widget = qt_import.QGroupBox("Acquisition", self)
-        self._gphl_acq_param_widget = GphlAcquisitionWidget(
-            self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
-        )
-        self._gphl_acq_param_widget.hide()
-        self._gphl_diffractcal_widget = GphlDiffractcalWidget(
-            self._gphl_acq_widget, "gphl_diffractcal_widget"
-        )
-        self._gphl_diffractcal_widget.hide()
-
-        self._gphl_runtime_widget = GphlRuntimeWidget(
-            self._gphl_acq_widget, "gphl_runtime_widge"
-        )
+        # self._gphl_acq_widget = qt_import.QGroupBox("Acquisition", self)
+        # self._gphl_acq_param_widget = GphlAcquisitionWidget(
+        #     self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
+        # )
+        # self._gphl_acq_param_widget.hide()
+        # self._gphl_diffractcal_widget = GphlDiffractcalWidget(
+        #     self._gphl_acq_widget, "gphl_diffractcal_widget"
+        # )
+        # self._gphl_diffractcal_widget.hide()
+        #
+        # self._gphl_runtime_widget = GphlRuntimeWidget(
+        #     self._gphl_acq_widget, "gphl_runtime_widge"
+        # )
 
         self._data_path_widget = DataPathWidget(
             self,
@@ -97,14 +97,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = qt_import.QVBoxLayout(self._workflow_type_widget)
         _workflow_type_vlayout.addWidget(self._workflow_cbox)
-        _gphl_acq_vlayout = qt_import.QVBoxLayout(self._gphl_acq_widget)
-        _gphl_acq_vlayout.addWidget(self._gphl_acq_param_widget)
-        _gphl_acq_vlayout.addWidget(self._gphl_diffractcal_widget)
-        _gphl_acq_vlayout.addWidget(self._gphl_runtime_widget)
+        # _gphl_acq_vlayout = qt_import.QVBoxLayout(self._gphl_acq_widget)
+        # _gphl_acq_vlayout.addWidget(self._gphl_acq_param_widget)
+        # _gphl_acq_vlayout.addWidget(self._gphl_diffractcal_widget)
+        # _gphl_acq_vlayout.addWidget(self._gphl_runtime_widget)
         _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._workflow_type_widget)
         _main_vlayout.addWidget(self._data_path_widget)
-        _main_vlayout.addWidget(self._gphl_acq_widget)
+        # _main_vlayout.addWidget(self._gphl_acq_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -126,7 +126,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         workflow_hwobj = HWR.beamline.gphl_workflow
         if workflow_hwobj is not None:
             # workflow_hwobj.setup_workflow_object()
-            workflow_names = list(workflow_hwobj.get_available_workflows())
+            workflow_names = list(workflow_hwobj.workflow_strategies)
             self._initialize_graphics()
             self._workflow_cbox.clear()
             for workflow_name in workflow_names:
@@ -164,10 +164,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def gphl_start_acquisition(self, workflow_model):
         """Change tab to runtime display"""
-        self._gphl_diffractcal_widget.hide()
-        self._gphl_acq_param_widget.hide()
-        self._gphl_runtime_widget.populate_widget(workflow_model)
-        self._gphl_runtime_widget.show()
+        pass
+        # self._gphl_diffractcal_widget.hide()
+        # self._gphl_acq_param_widget.hide()
+        # self._gphl_runtime_widget.populate_widget(workflow_model)
+        # self._gphl_runtime_widget.show()
 
 
     def gphl_done_acquisition(self, workflow_model):
@@ -185,33 +186,36 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # self.init_models()
         # self._data_path_widget.update_data_model(self._path_template)
 
-        parameters = HWR.beamline.gphl_workflow.get_available_workflows()[name]
+        parameters = HWR.beamline.gphl_workflow.workflow_strategies[name]
         strategy_type = parameters.get("strategy_type")
         if strategy_type == "transcal":
             # NB Once we do not have to set unique prefixes, this should be readOnly
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
-            self._gphl_diffractcal_widget.hide()
-            self._gphl_acq_param_widget.hide()
-            self._gphl_runtime_widget.hide()
-            self._gphl_acq_widget.hide()
+            pass
+            # self._gphl_diffractcal_widget.hide()
+            # self._gphl_acq_param_widget.hide()
+            # self._gphl_runtime_widget.hide()
+            # self._gphl_acq_widget.hide()
         elif strategy_type == "diffractcal":
             # TODO update this
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
-            self._gphl_acq_widget.show()
-            if self._gphl_diffractcal_widget.isHidden():
-                self._gphl_diffractcal_widget.populate_widget()
-                self._gphl_diffractcal_widget.show()
-            self._gphl_acq_param_widget.hide()
-            self._gphl_runtime_widget.hide()
+            pass
+            # self._gphl_acq_widget.show()
+            # if self._gphl_diffractcal_widget.isHidden():
+            #     self._gphl_diffractcal_widget.populate_widget()
+            #     self._gphl_diffractcal_widget.show()
+            # self._gphl_acq_param_widget.hide()
+            # self._gphl_runtime_widget.hide()
         else:
             # acquisition type strategy
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
-            self._gphl_acq_widget.show()
-            if self._gphl_acq_param_widget.isHidden():
-                self._gphl_acq_param_widget.populate_widget()
-                self._gphl_acq_param_widget.show()
-            self._gphl_diffractcal_widget.hide()
-            self._gphl_runtime_widget.hide()
+            pass
+            # self._gphl_acq_widget.show()
+            # if self._gphl_acq_param_widget.isHidden():
+            #     self._gphl_acq_param_widget.populate_widget()
+            #     self._gphl_acq_param_widget.show()
+            # self._gphl_diffractcal_widget.hide()
+            # self._gphl_runtime_widget.hide()
 
         self.current_prefix = parameters.get("prefix")
 
@@ -259,45 +263,45 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     model.get_name() or HWR.beamline.session.get_proposal()
                 )
                 self._data_path_widget.update_data_model(self._path_template)
-            crystals = model.crystals
-            space_group = ""
-            if crystals:
-                spg = crystals[0].space_group
-                if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
-                    space_group = spg
-            self._gphl_acq_param_widget.set_parameter_value(
-                "crystal_system", ""
-            )
-            self._gphl_acq_param_widget._refresh_interface(
-                "crystal_system", None
-            )
-            self._gphl_acq_param_widget.set_parameter_value(
-                "space_group", space_group
-            )
-            diffraction_plan = model.diffraction_plan
-            if diffraction_plan:
-                # It is not clear if diffraction_plan is a dict or an object,
-                # and if so which kind
-                if hasattr(diffraction_plan, "radiationSensitivity"):
-                    radiationSensitivity = diffraction_plan.radiationSensitivity
-                else:
-                    radiationSensitivity = diffraction_plan.get("radiationSensitivity")
-
-                if radiationSensitivity:
-                    self._gphl_acq_param_widget.set_parameter_value(
-                        "relative_rad_sensitivity", radiationSensitivity
-                    )
-
-                if hasattr(diffraction_plan, "observedResolution"):
-                    observedResolution = diffraction_plan.observedResolution
-                else:
-                    observedResolution = diffraction_plan.get("observedResolution")
-
-                if observedResolution:
-                    logging.getLogger("user_level_log").warning(
-                        "Diffraction plan observed resolution is %.3f A, "
-                        % observedResolution
-                    )
+            # crystals = model.crystals
+            # space_group = ""
+            # if crystals:
+            #     spg = crystals[0].space_group
+            #     if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
+            #         space_group = spg
+            # self._gphl_acq_param_widget.set_parameter_value(
+            #     "crystal_system", ""
+            # )
+            # self._gphl_acq_param_widget._refresh_interface(
+            #     "crystal_system", None
+            # )
+            # self._gphl_acq_param_widget.set_parameter_value(
+            #     "space_group", space_group
+            # )
+            # diffraction_plan = model.diffraction_plan
+            # if diffraction_plan:
+            #     # It is not clear if diffraction_plan is a dict or an object,
+            #     # and if so which kind
+            #     if hasattr(diffraction_plan, "radiationSensitivity"):
+            #         radiationSensitivity = diffraction_plan.radiationSensitivity
+            #     else:
+            #         radiationSensitivity = diffraction_plan.get("radiationSensitivity")
+            #
+            #     if radiationSensitivity:
+            #         self._gphl_acq_param_widget.set_parameter_value(
+            #             "relative_rad_sensitivity", radiationSensitivity
+            #         )
+            #
+            #     if hasattr(diffraction_plan, "observedResolution"):
+            #         observedResolution = diffraction_plan.observedResolution
+            #     else:
+            #         observedResolution = diffraction_plan.get("observedResolution")
+            #
+            #     if observedResolution:
+            #         logging.getLogger("user_level_log").warning(
+            #             "Diffraction plan observed resolution is %.3f A, "
+            #             % observedResolution
+            #         )
 
         # elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
         #     self.setDisabled(True)
@@ -349,7 +353,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf.set_name(path_template.get_prefix())
         wf.set_number(path_template.run_number)
 
-        wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
+        wf_parameters = wf.get_workflow_parameters()
         strategy_type = wf_parameters.get("strategy_type")
         # variant = wf_parameters["variants"][0]
         # wf.set_variant(variant)
@@ -358,84 +362,86 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             pass
 
         elif strategy_type == "diffractcal":
-            ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
-            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
-            wf.set_space_group(crystal_data.space_group)
-            wf.set_cell_parameters(
-                tuple(
-                    getattr(crystal_data, tag)
-                    for tag in ("a", "b", "c", "alpha", "beta", "gamma")
-                )
-            )
-            val = self._gphl_diffractcal_widget.get_parameter_value(
-                "relative_rad_sensitivity"
-            )
-            wf.set_relative_rad_sensitivity(val)
-            # The entire strategy runs as a 'characterisation'
-            wf.set_characterisation_budget_fraction(1.0)
+            pass
+            # ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
+            # crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
+            # wf.set_space_group(crystal_data.space_group)
+            # wf.set_cell_parameters(
+            #     tuple(
+            #         getattr(crystal_data, tag)
+            #         for tag in ("a", "b", "c", "alpha", "beta", "gamma")
+            #     )
+            # )
+            # val = self._gphl_diffractcal_widget.get_parameter_value(
+            #     "relative_rad_sensitivity"
+            # )
+            # wf.set_relative_rad_sensitivity(val)
+            # # The entire strategy runs as a 'characterisation'
+            # wf.set_characterisation_budget_fraction(1.0)
         else:
             # Coulds be native_... phasing_... etc.
+            pass
 
-            wf.set_space_group(
-                self._gphl_acq_param_widget.get_parameter_value("space_group")
-            )
-            use_for_indexing = False
-            characterisation_strategy = (
-                HWR.beamline.gphl_workflow.settings["characterisation_strategies"][0]
-            )
-            if  HWR.beamline.gphl_workflow.settings.get("advanced_mode"):
-                characterisation_strategy = (
-                    self._gphl_acq_param_widget.get_parameter_value(
-                        "characterisation_strategy"
-                    )
-                )
-
-                crystalObj = sample.crystals[0]
-                cell_params = list(
-                    getattr(crystalObj, tag)
-                    for tag in (
-                        "cell_a", "cell_b", "cell_c",
-                        "cell_alpha", "cell_beta", "cell_gamma",
-                    )
-                )
-                if all(cell_params):
-                    use_for_indexing = (
-                        self._gphl_acq_param_widget.get_parameter_value(
-                            "use_for_indexing"
-                        )
-                    )
-
-            wf.set_characterisation_strategy(characterisation_strategy)
-            wf.use_cell_for_processing = use_for_indexing
-            tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
-            crystal_system, point_group = None, None
-            if tag:
-                data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
-                crystal_system = data.crystal_system
-                point_groups = data.point_groups
-                if len(point_groups) == 1 or point_groups[0] == "32":
-                    # '32' is a special case; '312' and '321' are also returned as '32'
-                    point_group = point_groups[0]
-            wf.set_point_group(point_group)
-            wf.set_crystal_system(crystal_system)
-            val = self._gphl_acq_param_widget.get_parameter_value(
-                "relative_rad_sensitivity"
-            )
-            wf.set_relative_rad_sensitivity(val)
-            # wf.set_characterisation_budget_fraction(
-            #     HWR.beamline.gphl_workflow.get_property(
-            #         "characterisation_budget_percent", 5.0
-            #     )
-            #     / 100.0
+            # wf.set_space_group(
+            #     self._gphl_acq_param_widget.get_parameter_value("space_group")
             # )
-            if  HWR.beamline.gphl_workflow.settings.get("advanced_mode"):
-                val = self._gphl_acq_param_widget.get_parameter_value(
-                    "decay_limit"
-                )
-                wf.set_decay_limit(val)
-        beam_energy_tags = wf_parameters.get("beam_energy_tags")
-        if beam_energy_tags:
-            wf.set_beam_energy_tags(beam_energy_tags)
+            # use_for_indexing = False
+            # characterisation_strategy = (
+            #     HWR.beamline.gphl_workflow.settings["characterisation_strategies"][0]
+            # )
+            # if  HWR.beamline.gphl_workflow.settings.get("advanced_mode"):
+            #     characterisation_strategy = (
+            #         self._gphl_acq_param_widget.get_parameter_value(
+            #             "characterisation_strategy"
+            #         )
+            #     )
+            #
+            #     crystalObj = sample.crystals[0]
+            #     cell_params = list(
+            #         getattr(crystalObj, tag)
+            #         for tag in (
+            #             "cell_a", "cell_b", "cell_c",
+            #             "cell_alpha", "cell_beta", "cell_gamma",
+            #         )
+            #     )
+            #     if all(cell_params):
+            #         use_for_indexing = (
+            #             self._gphl_acq_param_widget.get_parameter_value(
+            #                 "use_for_indexing"
+            #             )
+            #         )
+
+        #     wf.set_characterisation_strategy(characterisation_strategy)
+        #     wf.use_cell_for_processing = use_for_indexing
+        #     tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
+        #     crystal_system, point_group = None, None
+        #     if tag:
+        #         data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
+        #         crystal_system = data.crystal_system
+        #         point_groups = data.point_groups
+        #         if len(point_groups) == 1 or point_groups[0] == "32":
+        #             # '32' is a special case; '312' and '321' are also returned as '32'
+        #             point_group = point_groups[0]
+        #     wf.set_point_group(point_group)
+        #     wf.set_crystal_system(crystal_system)
+        #     val = self._gphl_acq_param_widget.get_parameter_value(
+        #         "relative_rad_sensitivity"
+        #     )
+        #     wf.set_relative_rad_sensitivity(val)
+        #     # wf.set_characterisation_budget_fraction(
+        #     #     HWR.beamline.gphl_workflow.get_property(
+        #     #         "characterisation_budget_percent", 5.0
+        #     #     )
+        #     #     / 100.0
+        #     # )
+        #     if  HWR.beamline.gphl_workflow.settings.get("advanced_mode"):
+        #         val = self._gphl_acq_param_widget.get_parameter_value(
+        #             "decay_limit"
+        #         )
+        #         wf.set_decay_limit(val)
+        # beam_energy_tags = wf_parameters.get("beam_energy_tags")
+        # if beam_energy_tags:
+        #     wf.set_beam_energy_tags(beam_energy_tags)
 
         tasks.append(wf)
 
