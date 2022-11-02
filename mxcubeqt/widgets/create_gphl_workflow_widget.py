@@ -27,7 +27,7 @@ from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlRuntimeWidget
-from mxcubeqt.widgets.gphl_data_dialog import GphlDataDialog
+from mxcubeqt.widgets.gphl_json_dialog import GphlJsonDialog
 
 from mxcubecore.utils import conversion
 from mxcubecore import HardwareRepository as HWR
@@ -118,7 +118,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
 
         # set up popup data dialog
-        self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
+        self.gphl_data_dialog = GphlJsonDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
 
     def initialise_workflows(self):
@@ -134,6 +134,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self.workflow_selected()
             workflow_hwobj.connect(
                 "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
+            )
+            workflow_hwobj.connect(
+                "gphlJsonParametersNeeded", self.gphl_data_dialog.open_dialog
             )
             workflow_hwobj.connect(
                 "gphlStartAcquisition", self.gphl_start_acquisition
