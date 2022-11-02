@@ -31,8 +31,8 @@ from mxcubeqt.widgets.gphl_data_dialog import GphlDataDialog
 
 from mxcubecore.utils import conversion
 from mxcubecore import HardwareRepository as HWR
-from mxcubecore.HardwareObjects import queue_model_objects
-from mxcubecore.HardwareObjects import queue_model_enumerables
+from mxcubecore.model import queue_model_objects
+from mxcubecore.model import queue_model_enumerables
 
 __copyright__ = """ Copyright © 2016 - 2022 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"

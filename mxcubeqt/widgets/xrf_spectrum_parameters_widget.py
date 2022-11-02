@@ -22,7 +22,7 @@ from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.mca_spectrum_widget import McaSpectrumWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 from mxcubecore import HardwareRepository as HWR
 

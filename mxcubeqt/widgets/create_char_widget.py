@@ -26,11 +26,11 @@ from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.acquisition_widget_simple import AcquisitionWidgetSimple
 
-from mxcubecore.HardwareObjects import (
+from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
 )
-from mxcubecore.HardwareObjects.queue_model_enumerables import XTAL_SPACEGROUPS
+from mxcubecore.model.queue_model_enumerables import XTAL_SPACEGROUPS
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from mxcubecore.HardwareObjects.abstract.AbstractCharacterisation import AbstractCharacterisation
 

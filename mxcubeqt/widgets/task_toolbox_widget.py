@@ -32,7 +32,7 @@ from mxcubeqt.widgets.create_xray_imaging_widget import CreateXrayImagingWidget
 from mxcubeqt.widgets.create_ssx_widget import CreateSsxWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 from mxcubecore import HardwareRepository as HWR
 

@@ -27,8 +27,8 @@ from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
-from mxcubecore.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
+from mxcubecore.model import queue_model_objects
+from mxcubecore.model.queue_model_enumerables import EXPERIMENT_TYPE
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemLine
 
 from mxcubecore import HardwareRepository as HWR
