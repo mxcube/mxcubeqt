@@ -1,0 +1,6 @@
+[console_scripts]
+mxcube = mxcubeqt.__main__:run
+
+[gui_scripts]
+
+
