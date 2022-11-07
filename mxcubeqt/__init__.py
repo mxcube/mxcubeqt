@@ -35,8 +35,6 @@ from pkg_resources import resource_filename, resource_string
 
 import gevent
 import gevent.monkey
-
-#gevent.monkey.patch_all(thread=False)
 gevent.monkey.patch_all()
 
 from mxcubecore import HardwareRepository as HWR
