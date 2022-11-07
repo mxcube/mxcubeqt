@@ -101,16 +101,21 @@ class ProposalBrick(BaseWidget):
         self.main_gbox = qt_import.QGroupBox("ISPyB proposal", self)
 
         self.login_as_proposal_widget = qt_import.QWidget(self.main_gbox)
-        code_label = qt_import.QLabel("  Code: ", self.login_as_proposal_widget)
+        self.code_label = qt_import.QLabel("  Code: ", self.login_as_proposal_widget)
         self.proposal_type_combox = qt_import.QComboBox(self.login_as_proposal_widget)
         self.proposal_type_combox.setEditable(True)
         self.proposal_type_combox.setFixedWidth(60)
         dash_label = qt_import.QLabel(" - ", self.login_as_proposal_widget)
         self.proposal_number_ledit = qt_import.QLineEdit(self.login_as_proposal_widget)
         self.proposal_number_ledit.setFixedWidth(60)
-        password_label = qt_import.QLabel("   Password: ", self.login_as_proposal_widget)
+        self.password_label = qt_import.QLabel("   Password: ", self.login_as_proposal_widget)
         self.proposal_password_ledit = qt_import.QLineEdit(self.login_as_proposal_widget)
         self.proposal_password_ledit.setEchoMode(qt_import.QLineEdit.Password)
+
+        self.proposal_info = qt_import.QLabel(self.login_as_proposal_widget)
+        self.proposal_info.setFixedWidth(250) 
+        self.proposal_info.hide() 
+
         # self.proposal_password_ledit.setFixedWidth(40)
         self.login_button = qt_import.QPushButton("Login", self.login_as_proposal_widget)
         self.login_button.setFixedWidth(70)
@@ -146,12 +151,15 @@ class ProposalBrick(BaseWidget):
         _login_as_proposal_widget_layout = qt_import.QHBoxLayout(
             self.login_as_proposal_widget
         )
-        _login_as_proposal_widget_layout.addWidget(code_label)
+        _login_as_proposal_widget_layout.addWidget(self.code_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_type_combox)
         _login_as_proposal_widget_layout.addWidget(dash_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_number_ledit)
-        _login_as_proposal_widget_layout.addWidget(password_label)
+        _login_as_proposal_widget_layout.addWidget(self.password_label)
         _login_as_proposal_widget_layout.addWidget(self.proposal_password_ledit)
+
+        _login_as_proposal_widget_layout.addWidget(self.proposal_info)
+
         _login_as_proposal_widget_layout.addWidget(self.login_button)
         _login_as_proposal_widget_layout.setSpacing(2)
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -326,6 +334,7 @@ class ProposalBrick(BaseWidget):
 
     # Sets the current session; changes from login mode to logout mode
     def set_proposal(self, proposal, session):
+        logging.getLogger("ACCEPTING proposal %s - session is %s" % (str(proposal), str(session)))
         HWR.beamline.lims.enable()
         HWR.beamline.session.proposal_code = proposal["code"]
         HWR.beamline.session.session_id = session["sessionId"]
@@ -335,8 +344,8 @@ class ProposalBrick(BaseWidget):
         # Change mode
         if not self.login_as_user:
             self.login_button.hide()
-            self.login_as_proposal_widget.setDisabled(True)
-            self.logout_button.show()
+            # self.login_as_proposal_widget.setDisabled(True)
+            # self.logout_button.show()
 
         # Store info in the brick
         self.proposal = proposal
@@ -450,23 +459,34 @@ class ProposalBrick(BaseWidget):
         self.setEnabled(True)
 
     def set_ispyb_down(self):
-        msg_dialog = qt_import.QMessageBox(
-            "Register user",
-            "Couldn't contact "
+        # msg_dialog = qt_import.QMessageBox(
+            # "Register user",
+            # "Couldn't contact "
+            # + "the ISPyB database server: you've been logged as the local user.\n"
+            # + "Your experiments' information will not be stored in ISPyB!",
+            # qt_import.QMessageBox.Warning,
+            # qt_import.QMessageBox.Ok,
+            # qt_import.QMessageBox.NoButton,
+            # qt_import.QMessageBox.NoButton,
+            # self,
+        # )
+        msg_dialog = qt_import.QMessageBox()
+        msg_dialog.setWindowTitle("Register user")
+        msg_dialog.setText("Couldn't contact "
             + "the ISPyB database server: you've been logged as the local user.\n"
             + "Your experiments' information will not be stored in ISPyB!",
-            qt_import.QMessageBox.Warning,
-            qt_import.QMessageBox.Ok,
-            qt_import.QMessageBox.NoButton,
-            qt_import.QMessageBox.NoButton,
-            self,
+            )
+        msg_dialog.setIcon(qt_import.QMessageBox.Warning)
+        msg_dialog.setStandardButtons(
+            qt_import.QMessageBox.Ok 
         )
         s = self.font().pointSize()
         f = msg_dialog.font()
         f.setPointSize(s)
         msg_dialog.setFont(f)
         msg_dialog.updateGeometry()
-        msg_dialog.show()
+        # msg_dialog.show()
+        msg_dialog.exec_()
 
         now = time.strftime("%Y-%m-%d %H:%M:S")
         prop_dict = {"code": "", "number": "", "title": "", "proposalId": ""}
@@ -573,7 +593,7 @@ class ProposalBrick(BaseWidget):
         impersonate=False,
     ):
         # Get proposal and sessions
-        logging.getLogger().debug("ProposalBrick: querying ISPyB database...")
+        logging.getLogger("HWR").debug("ProposalBrick: querying ISPyB database...")
         prop = HWR.beamline.lims.getProposal(proposal_code, proposal_number)
 
         # Check if everything went ok
@@ -582,10 +602,12 @@ class ProposalBrick(BaseWidget):
             prop_ok = prop["status"]["code"] == "ok"
         except KeyError:
             prop_ok = False
+
         if not prop_ok:
             self.set_ispyb_down()
             BaseWidget.set_status_info("ispyb", "error")
         else:
+            logging.getLogger("HWR").debug("ProposalBrick: proposal %s %s is valid" % (proposal_code, proposal_number))
             self.select_proposal(prop)
             BaseWidget.set_status_info(
                 "user", "%s%s@%s" % (proposal_code, str(proposal_number), beamline_name)
@@ -595,9 +617,19 @@ class ProposalBrick(BaseWidget):
     def proposal_combo_activated(self, item_index):
         self.select_proposal(self.proposals[item_index])
 
+    def show_selected_proposal(self,proposal):
+        pass
+
     def select_proposal(self, selected_proposal):
         beamline_name = HWR.beamline.lims.beamline_name
         proposal = selected_proposal["Proposal"]
+
+        self.show_selected_proposal(proposal)  # local implementation can go here
+
+        # self.proposal_number_ledit.setText(str(proposal['number']))
+        # self.password_label.hide()
+        # self.proposal_password_ledit.hide() 
+
         # person = selected_proposal['Person']
         # laboratory = selected_proposal['Laboratory']
         sessions = selected_proposal["Session"]
@@ -632,6 +664,8 @@ class ProposalBrick(BaseWidget):
                                 todays_session = session
                                 break
 
+        logging.getLogger("HWR").debug("TODAY Sessions: %s" % str(todays_session))
+
         if todays_session is None:
             is_inhouse = HWR.beamline.session.is_inhouse(
                 proposal["code"], proposal["number"]
@@ -665,7 +699,7 @@ class ProposalBrick(BaseWidget):
             localcontact = None
         else:
             session_id = todays_session["sessionId"]
-            logging.getLogger().debug(
+            logging.getLogger("HWR").debug(
                 "ProposalBrick: getting local contact for %s" % session_id
             )
             localcontact = HWR.beamline.lims.get_session_local_contact(session_id)
