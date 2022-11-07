@@ -1,7 +1,7 @@
 
 
 from mxcubeqt.utils import colors, icons, qt_import
-from mxcubeqt.bricks.proposal_brick import ProposalBrick
+from mxcubeqt.bricks.proposal_brick import ProposalBrick, ProposalGUIEvent
 from mxcubecore import HardwareRepository as HWR
 import logging
 
@@ -81,3 +81,23 @@ class P11ProposalBrick(ProposalBrick):
                 None,
                 HWR.beamline.lims.beamline_name,
         )
+
+    def show_selected_proposal(self, proposal):
+
+        beamtime_id = HWR.beamline.session.get_current_beamtime_id()
+        prop_number = str(proposal['number'])
+        prop_code = str(proposal['code'])
+
+        prop_info = f"ID: {prop_code}-{prop_number} - beamtime_id: {beamtime_id}"
+
+        self.proposal_info.setText(prop_info)
+        self.proposal_info.show()
+
+
+        self.code_label.hide()
+        self.proposal_type_combox.hide()
+        self.proposal_number_ledit.hide()
+        self.password_label.hide()
+        self.proposal_password_ledit.hide() 
+
+
