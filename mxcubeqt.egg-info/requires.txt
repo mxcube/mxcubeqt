@@ -1,0 +1,5 @@
+mxcubecore
+pyqtgraph
+
+[pyqt5]
+PyQt5==5.14
