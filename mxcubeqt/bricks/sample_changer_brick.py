@@ -24,6 +24,9 @@ from mxcubeqt.base_components import BaseWidget
 from mxcubecore.HardwareObjects.abstract.sample_changer import Container
 from mxcubecore import HardwareRepository as HWR
 
+import logging
+log = logging.getLogger("HWR")
+
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -336,7 +339,7 @@ class BasketView(qt_import.QWidget):
         self.basket_label = basket_label
 
         self.contents_widget = qt_import.QGroupBox(
-            "%s %s" % (self.basket_label, basket_index + 1), self
+            "%s %s" % (self.basket_label, basket_index), self
         )
         obj_name = "basket_%d" % (basket_index + 1)
         self.contents_widget.setObjectName(obj_name)
@@ -1277,7 +1280,7 @@ class SampleChangerBrick(BaseWidget):
             basket.reset_selection()
 
     def select_sample(self, basket_no, sample_no):
-        basket = self.baskets[basket_no]
+        basket = self.baskets[basket_no-1]
         basket.select_sample(sample_no)
 
     def load_this_sample(self, basket_index, vial_index):
