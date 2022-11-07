@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import re
 import importlib
 
 from mxcubeqt.utils import icons, queue_item, qt_import
@@ -335,6 +336,17 @@ class TaskToolBoxWidget(qt_import.QWidget):
 
             elif isinstance(items[0], queue_item.SampleQueueItem):
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
+                display_name = data_model.get_display_name()
+                m = re.match("(?P<puckno>\d+)\:(?P<sampleno>\d+)$", display_name)
+                if m:
+                    puckno = int(m.group('puckno'))
+                    sampleno = int(m.group('sampleno'))
+                    base_prefix = "puck%02d_sample%02d" % (puckno, sampleno)
+                else:
+                    base_prefix = display_name
+
+                current_page = self.tool_box.currentWidget()
+                current_page._path_template.base_prefix = base_prefix
             self.method_label.setText(title)
         else:
             self.create_task_button.setEnabled(True)
