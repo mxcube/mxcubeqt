@@ -418,13 +418,18 @@ class ColumnGridWidget(qt_import.QWidget):
 def make_widget(parent, options):
     return WIDGET_CLASSES[options["type"]](parent, options)
 
-def create_widgets(fields, ui_schema, parent_widget=None):
-    """
+def create_widgets(
+    fields, ui_schema, field_name=None, parent_widget=None, parameter_widgets=None
+):
+    """Recursive widget creation function
 
     Args:
-        fields (dict): Dictionary of fields matches jsonschema
-        ui_schema (dict): ui:schema dictionary.
+        fields (dict): Dictionary of all fields, taken from jsonschema
+        ui_schema (dict): ui:schema dictionary for widget being created
+        field_name (str): Unique name of field (or container) being created.
+                          Equal to tag in ui_schema, and used as variable)_name
         parent_widget(qt_import.QWidget): parent widget
+        parameter_widgets (dict): variable_name:widget dictionary
 
     Returns (qt_import.QWidget):
 
@@ -432,26 +437,24 @@ def create_widgets(fields, ui_schema, parent_widget=None):
     fields and layout are taken from the ui:schema, so the schema order is mandatory
     there are grouping constructs correspondign to columns and boxes in the ui:schema
     that do not match any object in the jsonschema.
-
     """
+    default_container_name = "vertical_box"
 
-
-    """Create compund UI widget from schema and ui_schema
-    """
-
-    type_ = schema["type"]
-    title = ui_schema.get("title") or schema.get("title")
-    print ('@~@~ tags', sorted(schema.items()), sorted(ui_schema.items()))
-    options = ui_schema.get("ui:options", {})
-    widget_name = ui_schema.get("ui:widget") or type_
-    if type_ == "object":
-        # Container type
-        order = ui_schema.get("ui:order") or list(schema["properties"])
-        if widget_name == "object":
-            widget_name = "default_layout"
-        if parameter_widgets is None:
+    field_data = fields.get(field_name)
+    if field_data:
+        # This is an actual data field
+        widget_name = ui_schema.get("ui:widget") or field_data.get("type")
+        options = field_data.copy()
+        options["variable_name"] = field_name
+        options.update(ui_schema.get("ui:options", {}))
+        widget = WIDGET_CLASSES[widget_name](parent_widget, options)
+        parameter_widgets[widget_name] = widget
+    else:
+        # This is a container field
+        title = ui_schema.get("title")
+        widget_name = ui_schema.get("ui:widget") or default_container_name
+        if parent_widget is None:
             # Top of schema
-            parameter_widgets = {}
             widget = LayoutWidget(parameter_widgets=parameter_widgets)
         elif title:
             widget = qt_import.QGroupBox(title, parent=parent_widget)
@@ -462,23 +465,118 @@ def create_widgets(fields, ui_schema, parent_widget=None):
         widget.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
+        layout.populate_widget(
+            fields, ui_schema, field_name, parameter_widgets
+        )
 
-        for tag in order:
-            use_schema = schema["properties"][tag]
-            use_ui_schema = ui_schema.get(tag, {})
-            options = use_ui_schema.get("ui:options")
-            if not options:
-                options = use_ui_schema["ui:options"] = {}
-            if "variable_name" not in options:
-                options ["variable_name"] = tag
-            new_widget = create_widgets(
-                use_schema, use_ui_schema, widget, parameter_widgets
-            )
-            layout.addWidget(new_widget)
-    else:
-        widget = WIDGET_CLASSES[widget_name](parent_widget, options)
+        # if widget_name == "column_grid":
+        #     for colnum, colname in enumerate(
+        #         (ui_schema["ui:order"])
+        #         or list(x for x in ui_schema if not x.startswith("ui:"))
+        #     ):
+        #         column = ui_schema[colname]
+        #         for rownum, rowname in  enumerate(
+        #             (column["ui:order"])
+        #             or list(x for x in column if not x.startswith("ui:"))
+        #         ):
+        #             new_widget = create_widgets(
+        #                 fields, column[rowname], rowname, widget, parameter_widgets
+        #             )
+        #             layout.addWidget(
+        #                 new_widget, rowname, column[rowname], colnum, rownum
+        #             )
+        # else:
+        #
+        #     for field_name in order:
+        #         use_ui_schema = ui_schema.get(field_name, {})
+        #         new_widget = create_widgets(
+        #             fields, use_ui_schema, field_name, widget, parameter_widgets
+        #         )
+        #         layout.addWidget(new_widget, fields.get(field_name), use_ui_schema)
     #
     return widget
+
+class ColumnGridQWidget (qt_import.QGridLayout):
+    """Gridded layout, content specified by column"""
+
+    def __init__(self, parent):
+        """
+        Args:
+            parent (qtimport.QtWidget:
+        """
+        super().__init__(parent)
+
+    def populate_widget(
+        self, fields, ui_schema, field_name, parameter_widgets
+    ):
+        for colnum, colname in enumerate(
+            (ui_schema["ui:order"])
+            or list(x for x in ui_schema if not x.startswith("ui:"))
+        ):
+            column = ui_schema[colname]
+            col1 = 2 * colnum
+            col2 = col1 + 1
+            for rownum, rowname in  enumerate(
+                (column["ui:order"])
+                or list(x for x in column if not x.startswith("ui:"))
+            ):
+                field = fields.get(rowname)
+                new_widget = create_widgets(
+                    fields,
+                    column.get(rowname) or field,
+                    rowname, self.parent(),
+                    parameter_widgets
+                )
+                if field:
+                    type_ = field.get(type, "string")
+                    title = field.get("title") or ui_schema.get("ui:title")
+                    if title:
+                        if type_ == "textarea":
+                            # Specials case - title goes above
+                            outer_box = qt_import.QGroupBox(title, parent=self.parent())
+                            self.addWidget(
+                                outer_box, rownum, col2, 1, 2, qt_import.Qt.AlignLeft
+                            )
+                            outer_layout = qt_import.QVBoxLayout()
+                            outer_box.setLayout(outer_layout)
+                            outer_layout.addWidget(new_widget)
+                        elif type_ != "hidden":
+                            label =  qt_import.QLabel(title, self.parent())
+                            self.addWidget(label, rownum, col1, qt_import.Qt.AlignLeft)
+                            self.addWidget(
+                                new_widget, rownum, col2, qt_import.Qt.AlignLeft
+                            )
+                    else:
+                        self.addWidget(
+                            new_widget, rownum, col2, 1, 2, qt_import.Qt.AlignLeft
+                        )
+                else:
+                    self.addWidget(
+                        new_widget, rownum, col2, 1, 2, qt_import.Qt.AlignLeft
+                    )
+
+class VerticalBox(ColumnGridQWidget):
+    """Treated as a single column gridded box, with input not groupoed in columns"""
+
+    def populate_widget(
+        self, fields, ui_schema, field_name, parameter_widgets
+    ):
+        wrap_schema = {
+        }
+        col_schema = wrap_schema["column"] = {}
+        for tag, val in ui_schema.items():
+            if tag.startswith("ui:"):
+                wrap_schema[tag] = val
+            else:
+                col_schema[tag] = val
+        col_schema["ui:order"] = wrap_schema["ui:order"]
+        wrap_schema["ui:order"] = ("column",)
+        #
+        super().populate_widget(fields, wrap_schema, field_name, parameter_widgets)
+
+class HorizontalBox(qt_import.QHBoxLayout):
+    def __init__(self):
+        raise NotImplementedError()
 
 class LayoutWidget(qt_import.QWidget):
     """Collection-of-widgets widget for parameter query"""
@@ -608,7 +706,7 @@ WIDGET_CLASSES = {
     "textarea": TextEdit,
     "select": Combo,
     "column_grid": ColumnGridQWidget,
-    "iorizontal_box": HorizontalBox
-    "layout": LayoutWidget,
+    "horizontal_box": HorizontalBox,
+    "vertical_box": VerticalBox,
     "hidden": HiddenWidget,
 }

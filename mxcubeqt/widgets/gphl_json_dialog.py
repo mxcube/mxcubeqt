@@ -143,7 +143,7 @@ class GphlJsonDialog(qt_import.QDialog):
         # self.cplx_widget = None
 
         # Parameter box
-        self.parameter_gbox = qt_import.QGroupBox("Parameters", self)
+        self.parameter_gbox = qt_import.QGroupBox(self)
         parameter_vbox =  qt_import.QVBoxLayout()
         self.parameter_gbox.setLayout(parameter_vbox)
         main_layout.addWidget(self.parameter_gbox, stretch=1)
@@ -183,10 +183,10 @@ class GphlJsonDialog(qt_import.QDialog):
 
     def continue_button_click(self):
         result = {}
-        if self.parameter_gbox.isVisible():
-            result.update(self.params_widget.get_parameters_map())
-        if self.cplx_gbox.isVisible():
-            result["_cplx"] = self.cplx_widget.get_value()
+        # if self.parameter_gbox.isVisible():
+        #     result.update(self.params_widget.get_parameters_map())
+        # if self.cplx_gbox.isVisible():
+        #     result["_cplx"] = self.cplx_widget.get_value()
         self.accept()
         self._async_result.set(result)
         self._async_result = None
@@ -275,10 +275,15 @@ class GphlJsonDialog(qt_import.QDialog):
         #     self.parameter_gbox.hide()
         #     self.continue_button.setEnabled(True)
 
-        params_widget = self.params_widget = create_widgets(schema, ui_schema)
-        self.parameter_gbox.layout().addWidget(params_widget, stretch=1)
+        # Dictionary of unique variable name : description
+        # Can be generated from proper jsonschema if necessary
+        fields = schema["properties"]
+        parameter_widgets = {}
+        params_widget = self.params_widget = create_widgets(
+            fields, ui_schema, parent_widget=self, parameter_widgets=parameter_widgets
+        )
+        self.parameter_gbox.layout().addWidget(params_widget, stretch=8)
         self.parameter_gbox.show()
-
         self.show()
         self.setEnabled(True)
         self.update()
