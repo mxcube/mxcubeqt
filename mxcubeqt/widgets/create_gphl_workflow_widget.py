@@ -186,8 +186,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
-        # self.init_models()
-        # self._data_path_widget.update_data_model(self._path_template)
 
         parameters = HWR.beamline.gphl_workflow.workflow_strategies[name]
         strategy_type = parameters.get("strategy_type")
@@ -347,12 +345,13 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
 
         wf = queue_model_objects.GphlWorkflow()
+        wf.path_template = path_template
         wf_type = conversion.text_type(self._workflow_cbox.currentText())
-        wf.set_type(wf_type)
+        # wf.set_type(wf_type)
+        wf.init_from_task_data(sample, {"strategy_name": wf_type})
 
         if self.current_prefix:
             path_template.base_prefix = self.current_prefix
-        wf.path_template = path_template
         wf.set_name(path_template.get_prefix())
         wf.set_number(path_template.run_number)
 

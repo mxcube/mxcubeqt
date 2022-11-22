@@ -275,12 +275,9 @@ class GphlJsonDialog(qt_import.QDialog):
         #     self.parameter_gbox.hide()
         #     self.continue_button.setEnabled(True)
 
-        # Dictionary of unique variable name : description
-        # Can be generated from proper jsonschema if necessary
-        fields = schema["properties"]
         parameter_widgets = {}
         params_widget = self.params_widget = create_widgets(
-            fields, ui_schema, parent_widget=self, parameter_widgets=parameter_widgets
+            schema, ui_schema, parent_widget=self, parameter_widgets=parameter_widgets
         )
         self.parameter_gbox.layout().addWidget(params_widget, stretch=8)
         self.parameter_gbox.show()
