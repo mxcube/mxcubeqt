@@ -42,12 +42,13 @@ class LineEdit(qt_import.QLineEdit):
 
     def __init__(self, parent, options):
         qt_import.QLineEdit.__init__(self, parent)
+        self.is_hidden = False
         self.setAlignment(qt_import.Qt.AlignLeft)
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
         self.setAlignment(qt_import.Qt.AlignRight)
-        if options.get("readonly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
 
@@ -90,48 +91,12 @@ class LineEdit(qt_import.QLineEdit):
     def is_valid(self):
         return True
 
-class HiddenWidget(LineEdit):
-    """Widget for hidden, non-editable attribtues,used for storing values only.
-    Treated as string value
-
-    This is a bit of a kludge, but it is simpler to treat all widgets the same"""
-
-    def __init__(self, parent, options):
-        qt_import.QLineEdit.__init__(self, parent)
-        self.setAlignment(qt_import.Qt.AlignLeft)
-        self.__name = options["variable_name"]
-        if "default" in options:
-            self.setText(str(options["default"]))
-        self.setAlignment(qt_import.Qt.AlignRight)
-        self.setReadOnly(True)
-        self.setEnabled(False)
-        self.hide()
-
-    def set_value(self, value):
-        raise TypeError("Cannot set valule for a hidden attribute")
-
-    def get_name(self):
-        return self.__name
-
-    def get_value(self):
-        return conversion.text_type(self.text())
-
-    def input_field_changed(self):
-        """UI update function triggered by field value changes"""
-        pass
-
-    def color_by_error(self, warning=False):
-        pass
-
-    def is_valid(self):
-        return True
-
-
 class FloatString(LineEdit):
     """LineEdit widget with validators and formatting for floating point numbers"""
 
     def __init__(self, parent, options):
         decimals = options.get("decimals")
+        self.is_hidden = False
         # NB We do NOT enforce a maximum number of decimals in edited text,
         # Only in set values.
         if decimals is None:
@@ -156,6 +121,13 @@ class FloatString(LineEdit):
     def set_value(self, value):
         self.setText(self.formatstr % value)
 
+    def get_value(self):
+        val = self.text().strip()
+        if val:
+            return float(val)
+        else:
+            return None
+
     def is_valid(self):
 
         if (
@@ -175,12 +147,13 @@ class TextEdit(qt_import.QTextEdit):
 
     def __init__(self, parent, options):
         qt_import.QTextEdit.__init__(self, parent)
+        self.is_hidden = False
         self.setAlignment(qt_import.Qt.AlignLeft)
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
         self.setAlignment(qt_import.Qt.AlignRight)
-        if options.get("readonly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
         self.setSizePolicy(
@@ -194,7 +167,7 @@ class TextEdit(qt_import.QTextEdit):
         return self.__name
 
     def get_value(self):
-        return conversion.text_type(self.text())
+        return conversion.text_type(self.toPlainText())
 
 
 class Combo(qt_import.QComboBox):
@@ -203,6 +176,7 @@ class Combo(qt_import.QComboBox):
     def __init__(self, parent, options):
         qt_import.QComboBox.__init__(self, parent)
         self.__name = options["variable_name"]
+        self.is_hidden = False
         self.value_dict = options["value_dict"]
         for val in self.value_dict:
             self.addItem(str(val))
@@ -296,83 +270,49 @@ class IntSpinBox(qt_import.QSpinBox):
         self.setValue(int(value))
 
     def get_value(self):
-        val = int(self.value())
-        return conversion.text_type(val)
-
-    def get_name(self):
-        return self.__name
-
-
-class DoubleSpinBox(qt_import.QDoubleSpinBox):
-    """Standard float/double (spinbox) widget"""
-
-    CHANGED_COLOR = colors.LINE_EDIT_CHANGED
-
-    def __init__(self, parent, options):
-        qt_import.QDoubleSpinBox.__init__(self, parent)
-        self.lineEdit().setAlignment(qt_import.Qt.AlignLeft)
-        self.__name = options["variable_name"]
-        if "unit" in options:
-            self.setSuffix(" " + options["unit"])
-        if "default" in options:
-            val = float(options["default"])
-            self.setValue(val)
-        if "maximum" in options:
-            self.setMaximum(float(options["maximum"]))
+        val = self.value().strip()
+        if val:
+            return int(val)
         else:
-            self.setMaximum(sys.maxsize)
-        if "minimum" in options:
-            self.setMinimum(float(options["minimum"]))
-        if "tooltip" in options:
-            self.setToolTip(options["tooltip"])
-
-    def set_value(self, value):
-        self.setValue(int(value))
-
-    def get_value(self):
-        val = int(self.value())
-        return conversion.text_type(val)
+            return None
 
     def get_name(self):
         return self.__name
 
 
-class Message(qt_import.QWidget):
-    """Message display widget"""
+# class DoubleSpinBox(qt_import.QDoubleSpinBox):
+#     """Standard float/double (spinbox) widget"""
+#
+#     CHANGED_COLOR = colors.LINE_EDIT_CHANGED
+#
+#     def __init__(self, parent, options):
+#         qt_import.QDoubleSpinBox.__init__(self, parent)
+#         self.lineEdit().setAlignment(qt_import.Qt.AlignLeft)
+#         self.__name = options["variable_name"]
+#         if "unit" in options:
+#             self.setSuffix(" " + options["unit"])
+#         if "default" in options:
+#             val = float(options["default"])
+#             self.setValue(val)
+#         if "maximum" in options:
+#             self.setMaximum(float(options["maximum"]))
+#         else:
+#             self.setMaximum(sys.maxsize)
+#         if "minimum" in options:
+#             self.setMinimum(float(options["minimum"]))
+#         if "tooltip" in options:
+#             self.setToolTip(options["tooltip"])
+#
+#     def set_value(self, value):
+#         self.setValue(int(value))
+#
+#     def get_value(self):
+#         val = int(self.value())
+#         return conversion.text_type(val)
+#
+#     def get_name(self):
+#         return self.__name
 
-    def __init__(self, parent, options):
-        qt_import.QWidget.__init__(self, parent)
-        logging.debug("making message with options %r", options)
-        qt_import.QHBoxLayout(self)
-        icon = qt_import.QLabel(self)
-        icon.setSizePolicy(qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed)
-
-        # all the following stuff is there to get the standard icon
-        # for our level directly from qt
-        mapping = {
-            "warning": qt_import.QMessageBox.Warning,
-            "info": qt_import.QMessageBox.Information,
-            "error": qt_import.QMessageBox.Critical,
-        }
-        level = mapping.get(options["level"])
-        if level is not None:
-            icon.setPixmap(qt_import.QMessageBox.standardIcon(level))
-
-        text = qt_import.QLabel(options["text"], self)
-
-        self.layout().addWidget(icon)
-        self.layout().addWidget(text)
-
-    # make the current code happy, temp hack
-
-    def get_value(self):
-        return "no value"
-
-    def get_name(self):
-        return "a message"
-
-    def set_value(self, value):
-        pass
 
 
 class CheckBox(qt_import.QCheckBox):
@@ -381,6 +321,7 @@ class CheckBox(qt_import.QCheckBox):
     def __init__(self, parent, options):
         qt_import.QCheckBox.__init__(self, options.get("uiLabel"), parent)
         # self.setAlignment(qt_import.Qt.AlignLeft)
+        self.is_hidden = False
         self.__name = options["variable_name"]
         state = (
             qt_import.Qt.Checked
@@ -402,6 +343,23 @@ class CheckBox(qt_import.QCheckBox):
     def get_value(self):
         return self.isChecked()
 
+class UIContainer:
+
+    def input_field_changed(self):
+        self.parent().input_field_changed()
+
+    def validate_fields(self):
+        self.parent().validate_fields()
+
+class LocalQGroupbox(qt_import.QGroupBox, UIContainer):
+    is_hidden = False
+
+    pass
+
+class LocalQWidget(qt_import.QGroupBox, UIContainer):
+    is_hidden = False
+
+    pass
 
 def make_widget(parent, options):
     return WIDGET_CLASSES[options["type"]](parent, options)
@@ -434,13 +392,16 @@ def create_widgets(
     field_data = fields.get(field_name)
     if field_data:
         # This is an actual data field
-        widget_name = ui_schema.get("ui:widget") or field_data.get("type")
+        widget_name = ui_schema.get("ui:widget")
+        widget_hidden = (widget_name == "hidden")
+        if widget_hidden or not widget_name:
+            widget_name = field_data.get("type")
         options = field_data.copy()
         options["variable_name"] = field_name
 
         pathstr = field_data.get("$ref")
         if pathstr:
-            if not widget_name:
+            if not ui_schema.get("ui:widget"):
                 widget_name = "select"
             tags = pathstr.split("/")[1:]
             dd0 = schema
@@ -452,19 +413,27 @@ def create_widgets(
             )
 
         options.update(ui_schema.get("ui:options", {}))
+        if ui_schema.get("ui:readonly"):
+            options["readOnly"] = True
         widget = WIDGET_CLASSES[widget_name](parent_widget, options)
-        parameter_widgets[widget_name] = widget
+        widget.is_hidden = widget_hidden
+        if widget_hidden:
+            widget.setReadOnly(True)
+            widget.setEnabled(False)
+            widget.hide()
+        parameter_widgets[field_name] = widget
     else:
         # This is a container field
         title = ui_schema.get("ui:title")
         widget_name = ui_schema.get("ui:widget") or default_container_name
-        if parent_widget is None:
+        if parameter_widgets is None:
             # Top of schema
-            widget = LayoutWidget(parameter_widgets=parameter_widgets)
+            widget = LayoutWidget()
+            parameter_widgets = widget.parameter_widgets
         elif title:
-            widget = qt_import.QGroupBox(title, parent=parent_widget)
+            widget = LocalQGroupbox(title, parent=parent_widget)
         else:
-            widget = qt_import.QWidget(parent=parent_widget)
+            widget = LocalQWidget(parent=parent_widget)
         layout_class = WIDGET_CLASSES[widget_name]
         layout = layout_class(widget)
         layout.setSpacing(6)
@@ -513,6 +482,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
             parent (qtimport.QtWidget:
         """
         super().__init__(parent)
+        self.is_hidden = False
 
     def populate_widget(
         self, schema, ui_schema, field_name, parameter_widgets
@@ -555,7 +525,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             outer_layout = qt_import.QVBoxLayout()
                             outer_box.setLayout(outer_layout)
                             outer_layout.addWidget(new_widget)
-                        elif widget_type != "hidden":
+                        elif not new_widget.is_hidden:
                             if col1:
                                 # Add spacing to columns after the first
                                 title = self.col_spacing + title
@@ -620,6 +590,7 @@ class VerticalBox(ColumnGridWidget):
         wrap_schema = {
         }
         col_schema = wrap_schema["column"] = {}
+        self.is_hidden = False
         for tag, val in ui_schema.items():
             if tag.startswith("ui:"):
                 wrap_schema[tag] = val
@@ -632,15 +603,16 @@ class VerticalBox(ColumnGridWidget):
 
 class HorizontalBox(qt_import.QHBoxLayout):
     def __init__(self):
+        self.is_hidden = False
         raise NotImplementedError()
 
 class LayoutWidget(qt_import.QWidget):
     """Collection-of-widgets widget for parameter query"""
     parametersValidSignal = qt_import.pyqtSignal(bool)
 
-    def __init__(self, parameter_widgets):
+    def __init__(self):
 
-        self.parameter_widgets = parameter_widgets
+        self.parameter_widgets = {}
         qt_import.QWidget.__init__(self)
 
         # current_row = 0
@@ -735,7 +707,9 @@ class LayoutWidget(qt_import.QWidget):
 
     def get_parameters_map(self):
         """Get parameter values dictionary for all fields"""
-        return dict(self.parameter_widgets)
+        return dict(
+            (tag, val.get_value()) for tag, val in self.parameter_widgets.items()
+        )
 
     def validate_fields(self):
         all_valid = True
@@ -764,5 +738,4 @@ WIDGET_CLASSES = {
     "column_grid": ColumnGridWidget,
     "horizontal_box": HorizontalBox,
     "vertical_box": VerticalBox,
-    "hidden": HiddenWidget,
 }

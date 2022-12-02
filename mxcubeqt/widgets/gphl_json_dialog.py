@@ -183,6 +183,7 @@ class GphlJsonDialog(qt_import.QDialog):
 
     def continue_button_click(self):
         result = {}
+        result.update(self.params_widget.get_parameters_map())
         # if self.parameter_gbox.isVisible():
         #     result.update(self.params_widget.get_parameters_map())
         # if self.cplx_gbox.isVisible():
@@ -203,6 +204,13 @@ class GphlJsonDialog(qt_import.QDialog):
         logging.getLogger("user_level_log").info(msg)
 
         self._async_result = async_result
+
+        print ('@~@~ open_dialog, schemas')
+        for item in sorted(schema.items()):
+            print(item)
+        for item in sorted(ui_schema.items()):
+            print(item)
+        print ('@~@~ end schemas')
 
         # # get special parameters
         # parameters = []
@@ -257,9 +265,9 @@ class GphlJsonDialog(qt_import.QDialog):
 
         # parameters widget
         if self.params_widget is not None:
-            self.params_widget.parametersValidSignal.disconnect(
-                self.continue_button.setEnabled
-            )
+            # self.params_widget.parametersValidSignal.disconnect(
+            #     self.continue_button.setEnabled
+            # )
             self.params_widget.close()
             self.params_widget = None
 
@@ -275,9 +283,8 @@ class GphlJsonDialog(qt_import.QDialog):
         #     self.parameter_gbox.hide()
         #     self.continue_button.setEnabled(True)
 
-        parameter_widgets = {}
         params_widget = self.params_widget = create_widgets(
-            schema, ui_schema, parent_widget=self, parameter_widgets=parameter_widgets
+            schema, ui_schema, parent_widget=self
         )
         self.parameter_gbox.layout().addWidget(params_widget, stretch=8)
         self.parameter_gbox.show()
