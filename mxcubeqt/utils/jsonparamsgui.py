@@ -43,7 +43,7 @@ class LineEdit(qt_import.QLineEdit):
     def __init__(self, parent, options):
         qt_import.QLineEdit.__init__(self, parent)
         self.is_hidden = False
-        self.setAlignment(qt_import.Qt.AlignLeft)
+        # self.setAlignment(qt_import.Qt.AlignLeft)
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
@@ -149,16 +149,17 @@ class TextEdit(qt_import.QTextEdit):
         qt_import.QTextEdit.__init__(self, parent)
         self.is_hidden = False
         self.setAlignment(qt_import.Qt.AlignLeft)
+        self.setFont(qt_import.QFont("Courier"))
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
-        self.setAlignment(qt_import.Qt.AlignRight)
+        # self.setAlignment(qt_import.Qt.AlignRight)
         if options.get("readOnly"):
             self.setReadOnly(True)
-            self.setEnabled(False)
-        self.setSizePolicy(
-            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
-        )
+            # self.setEnabled(False)
+        # self.setSizePolicy(
+        #     qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
+        # )
 
     def set_value(self, value):
         self.setText(value)
@@ -444,30 +445,6 @@ def create_widgets(
             schema, ui_schema, field_name, parameter_widgets
         )
 
-        # if widget_name == "column_grid":
-        #     for colnum, colname in enumerate(
-        #         (ui_schema["ui:order"])
-        #         or list(x for x in ui_schema if not x.startswith("ui:"))
-        #     ):
-        #         column = ui_schema[colname]
-        #         for rownum, rowname in  enumerate(
-        #             (column["ui:order"])
-        #             or list(x for x in column if not x.startswith("ui:"))
-        #         ):
-        #             new_widget = create_widgets(
-        #                 fields, column[rowname], rowname, widget, parameter_widgets
-        #             )
-        #             layout.addWidget(
-        #                 new_widget, rowname, column[rowname], colnum, rownum
-        #             )
-        # else:
-        #
-        #     for field_name in order:
-        #         use_ui_schema = ui_schema.get(field_name, {})
-        #         new_widget = create_widgets(
-        #             fields, use_ui_schema, field_name, widget, parameter_widgets
-        #         )
-        #         layout.addWidget(new_widget, fields.get(field_name), use_ui_schema)
     #
     return widget
 
@@ -509,9 +486,13 @@ class ColumnGridWidget (qt_import.QGridLayout):
                 )
                 if field:
                     widget_type = ui_field.get("ui:widget") or field.get(type, "string")
-                    title = field.get("title") or ui_schema.get("ui:title")
+                    title = field.get("title") or ui_field.get("ui:title")
                     if title:
                         if widget_type == "textarea":
+                            new_widget.setSizePolicy(
+                                qt_import.QSizePolicy.MinimumExpanding,
+                                qt_import.QSizePolicy.Minimum,
+                            )
                             # Special case - title goes above
                             outer_box = qt_import.QGroupBox(title, parent=self.parent())
                             self.addWidget(
@@ -520,12 +501,16 @@ class ColumnGridWidget (qt_import.QGridLayout):
                                 col2,
                                 1,
                                 2,
-                                qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
+                                # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
                             )
                             outer_layout = qt_import.QVBoxLayout()
                             outer_box.setLayout(outer_layout)
                             outer_layout.addWidget(new_widget)
+                            # outer_layout.setStretch(0, 8)
                         elif not new_widget.is_hidden:
+                            new_widget.setSizePolicy(
+                                qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed
+                            )
                             if col1:
                                 # Add spacing to columns after the first
                                 title = self.col_spacing + title
@@ -534,7 +519,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                                 label,
                                 rownum,
                                 col1,
-                                qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
+                                qt_import.Qt.AlignRight | qt_import.Qt.AlignTop
                             )
                             self.addWidget(
                                 new_widget,
@@ -546,11 +531,14 @@ class ColumnGridWidget (qt_import.QGridLayout):
                         self.addWidget(
                             new_widget,
                             rownum,
-                            col2,
+                            col1,
                             1,
                             2,
-                            qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
+                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
                         )
+                    # if widget_type == "text_area":
+                    #     self.setRowStretch(rownum, 8)
+                    #     self.setColumnStretch(col2, 8)
                 else:
                     title = ui_schema.get("ui:title")
                     if title:
@@ -561,24 +549,39 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             col2,
                             1,
                             2,
-                            qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
+                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
                             )
                         outer_layout = qt_import.QVBoxLayout()
                         outer_box.setLayout(outer_layout)
                         outer_layout.addWidget(
                             new_widget,
                             0,
-                            qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
+                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
                         )
+                        # outer_layout.setStretch(0, 8)
                     else:
                         self.addWidget(
                             new_widget,
                             rownum,
-                            col2,
+                            col1,
                             1,
                             2,
-                            qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
+                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
                         )
+                    # self.setRowStretch(rownum, 8)
+                    # self.setColumnStretch(col2, 8)
+        # Add spacer to compress layout
+        spacerItem = qt_import.QSpacerItem(
+            6,
+            6,
+            qt_import.QSizePolicy.Expanding,
+            qt_import.QSizePolicy.Expanding,
+        )
+        self.addItem(
+            spacerItem,
+            rownum + 1,
+            col2 + 1
+        )
 
 class VerticalBox(ColumnGridWidget):
     """Treated as a single column gridded box, with input not grouped in columns"""
