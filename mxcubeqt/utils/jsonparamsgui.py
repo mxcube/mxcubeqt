@@ -465,6 +465,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
         self, schema, ui_schema, field_name, parameter_widgets
     ):
         fields = schema["properties"]
+        maxrownum = 0
         for colnum, colname in enumerate(
             (ui_schema["ui:order"])
             or list(x for x in ui_schema if not x.startswith("ui:"))
@@ -498,7 +499,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             self.addWidget(
                                 outer_box,
                                 rownum,
-                                col2,
+                                col1,
                                 1,
                                 2,
                                 # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
@@ -546,7 +547,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                         self.addWidget(
                             outer_box,
                             rownum,
-                            col2,
+                            col1,
                             1,
                             2,
                             # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
@@ -570,6 +571,8 @@ class ColumnGridWidget (qt_import.QGridLayout):
                         )
                     # self.setRowStretch(rownum, 8)
                     # self.setColumnStretch(col2, 8)
+            else:
+                maxrownum = max(maxrownum, rownum)
         # Add spacer to compress layout
         spacerItem = qt_import.QSpacerItem(
             6,
@@ -579,7 +582,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
         )
         self.addItem(
             spacerItem,
-            rownum + 1,
+            maxrownum + 1,
             col2 + 1
         )
 
