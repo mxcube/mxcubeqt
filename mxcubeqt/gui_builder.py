@@ -36,7 +36,7 @@ from mxcubeqt.bricks import log_view_brick
 from mxcubeqt.base_layout_items import ContainerCfg
 
 from mxcubecore import HardwareRepository as HWR
-from mxcubecore.utils.conversion import string_types
+from mxcubecore.utils import conversion
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -679,7 +679,7 @@ class GUIEditorWindow(qt_import.QWidget):
         self.tree_widget.setDragEnabled(True)
         self.tree_widget.setAcceptDrops(True)
 
-        if isinstance(icon, string_types):
+        if isinstance(icon, conversion.string_types):
             new_treewidget_item.setIcon(0, icons.load_icon(icon))
         self.tree_widget.setCurrentItem(new_treewidget_item)
         self.tree_widget.scrollToItem(

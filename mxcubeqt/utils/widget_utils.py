@@ -18,7 +18,8 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import colors, qt_import, conversion
+from mxcubeqt.utils import colors, qt_import
+from mxcubecore.utils import conversion
 from mxcubecore.dispatcher import dispatcher
 
 

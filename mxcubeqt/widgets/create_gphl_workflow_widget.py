@@ -21,7 +21,8 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from mxcubeqt.utils import queue_item, qt_import, conversion
+from mxcubeqt.utils import queue_item, qt_import
+from mxcubecore.utils import conversion
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
@@ -29,7 +30,7 @@ from mxcubeqt.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from mxcubeqt.widgets.gphl_data_dialog import GphlDataDialog
 
 from mxcubecore import HardwareRepository as HWR
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"

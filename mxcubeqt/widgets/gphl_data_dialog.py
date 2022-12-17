@@ -23,9 +23,9 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from mxcubeqt.utils import colors, qt_import, conversion
+from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.paramsgui import FieldsWidget
-
+from mxcubecore.utils import conversion
 from mxcubecore import HardwareRepository as HWR
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
