@@ -26,7 +26,7 @@ from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
 
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 from mxcubecore import HardwareRepository as HWR
 

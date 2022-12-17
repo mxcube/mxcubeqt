@@ -29,7 +29,7 @@ from mxcubeqt.widgets.ssx_sequence_widget import SSXSequenceWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
 
 
-from mxcubecore.HardwareObjects import (
+from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
 )

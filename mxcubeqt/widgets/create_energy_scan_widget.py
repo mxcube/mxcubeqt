@@ -26,7 +26,7 @@ from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.periodic_table_widget import PeriodicTableWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 
 from mxcubecore import HardwareRepository as HWR

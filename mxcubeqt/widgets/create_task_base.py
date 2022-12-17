@@ -23,7 +23,7 @@ import logging
 from copy import deepcopy
 
 from mxcubeqt.utils import queue_item, qt_import
-from mxcubecore.HardwareObjects import (
+from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
 )
