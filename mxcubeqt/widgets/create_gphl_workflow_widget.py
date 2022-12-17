@@ -21,14 +21,13 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from mxcubeqt.utils import queue_item, qt_import
+from mxcubeqt.utils import queue_item, qt_import, conversion
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from mxcubeqt.widgets.gphl_data_dialog import GphlDataDialog
 
-from mxcubecore import ConvertUtils
 from mxcubecore import HardwareRepository as HWR
 from mxcubecore.HardwareObjects import queue_model_objects
 
@@ -118,7 +117,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def workflow_selected(self):
         # necessary as this comes in as a QString object
-        name = ConvertUtils.text_type(self._workflow_cbox.currentText())
+        name = conversion.text_type(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
@@ -219,7 +218,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 )
 
         wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
-        wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
+        wf_type = conversion.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
         if self.current_prefix:

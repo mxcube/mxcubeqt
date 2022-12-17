@@ -28,9 +28,7 @@ import os.path
 import logging
 import sys
 
-from mxcubecore import ConvertUtils
-
-from mxcubeqt.utils import qt_import, colors
+from mxcubeqt.utils import qt_import, colors, conversion
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -58,7 +56,7 @@ class LineEdit(qt_import.QLineEdit):
         return self.__name
 
     def get_value(self):
-        return ConvertUtils.text_type(self.text())
+        return conversion.text_type(self.text())
 
 
 class FloatString(LineEdit):
@@ -128,7 +126,7 @@ class TextEdit(qt_import.QTextEdit):
         return self.__name
 
     def get_value(self):
-        return ConvertUtils.text_type(self.text())
+        return conversion.text_type(self.text())
 
 
 class Combo(qt_import.QComboBox):
@@ -155,7 +153,7 @@ class Combo(qt_import.QComboBox):
         self.setCurrentIndex(self.findText(value))
 
     def get_value(self):
-        return ConvertUtils.text_type(self.currentText())
+        return conversion.text_type(self.currentText())
 
     def get_name(self):
         return self.__name
@@ -188,13 +186,13 @@ class File(qt_import.QWidget):
         self.filepath.setText(value)
 
     def get_value(self):
-        return ConvertUtils.text_type(self.filepath.text())
+        return conversion.text_type(self.filepath.text())
 
     def get_name(self):
         return self.__name
 
     def open_file_dialog(self):
-        start_path = os.path.dirname(ConvertUtils.text_type(self.filepath.text()))
+        start_path = os.path.dirname(conversion.text_type(self.filepath.text()))
         if not os.path.exists(start_path):
             start_path = ""
         path = qt_import.QFileDialog(self).getOpenFileName(directory=start_path)
@@ -230,7 +228,7 @@ class IntSpinBox(qt_import.QSpinBox):
 
     def get_value(self):
         val = int(self.value())
-        return ConvertUtils.text_type(val)
+        return conversion.text_type(val)
 
     def get_name(self):
         return self.__name
@@ -264,7 +262,7 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox):
 
     def get_value(self):
         val = int(self.value())
-        return ConvertUtils.text_type(val)
+        return conversion.text_type(val)
 
     def get_name(self):
         return self.__name

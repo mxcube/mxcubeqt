@@ -18,9 +18,8 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mxcubeqt.utils import colors, qt_import
+from mxcubeqt.utils import colors, qt_import, conversion
 from mxcubecore.dispatcher import dispatcher
-from mxcubecore.ConvertUtils import string_types
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -53,7 +52,7 @@ class DataModelInputBinder(object):
                 new_value = pattern % float(new_value)
 
             # fix validation if PyQt4 and sipapi 1 is used
-            if isinstance(new_value, string_types):
+            if isinstance(new_value, conversion.string_types):
                 if "QString" in globals():
                     new_value = qt_import.QString(new_value)
 
