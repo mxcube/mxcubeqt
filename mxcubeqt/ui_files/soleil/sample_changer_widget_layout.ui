@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SampleChangerWidgetLayout</class>
+ <widget class="QWidget" name="SampleChangerWidgetLayout">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>435</width>
+    <height>186</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>32767</width>
+    <height>32767</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Acquisition widget</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Sample tree</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="filter_cbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>27</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>Manually mounted</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Sample changer</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Plate</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Mounted sample</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="4" colspan="3">
+       <widget class="QPushButton" name="details_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Show sample changer tab</string>
+        </property>
+        <property name="text">
+         <string>Show SC-Details</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="sample_label">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Sample:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="sample_combo">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>27</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>100</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="4" colspan="3">
+       <widget class="QPushButton" name="synch_ispyb_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Sync samples with ISPyB</string>
+        </property>
+        <property name="text">
+         <string>ISPyB</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../../../Icons/Refresh2.png</normaloff>../../../Icons/Refresh2.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="centring_mode_label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Centring:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="centring_cbox">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>110</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;B&gt;Manual&lt;/B&gt; 3-Click centring &lt;BR&gt; &lt;B&gt;Semi Automatic&lt;/B&gt; - Gives the possibility to confirm centring &lt;BR&gt; &lt;B&gt;Fully Automatic&lt;/B&gt; - Continues without waiting for confirmation</string>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>Double Click</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Manual n-clicks</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Refractive model </string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Optical semi automatic </string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Optical fully automatic</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Automatic X-ray</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>60</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="nclicks_label">
+        <property name="minimumSize">
+         <size>
+          <width>55</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>n-clicks:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QLineEdit" name="nclicks_ledit">
+        <property name="minimumSize">
+         <size>
+          <width>20</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="step_label">
+        <property name="text">
+         <string>step:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="QLineEdit" name="step_ledit">
+        <property name="minimumSize">
+         <size>
+          <width>20</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>120.0</string>
+        </property>
+        <property name="placeholderText">
+         <string>step</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="filter_label">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Filter:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="filter_ledit">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>110</width>
+          <height>27</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4" colspan="3">
+       <widget class="QComboBox" name="filter_combo">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>27</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>No filter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Star</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Sample name</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Protein name</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Basket index</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Executed</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Not executed</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>OSC</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Helical</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Charaterisation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Energy Scan</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>XRF Spectrum</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Advanced</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <resources/>
+ <connections/>
+</ui>

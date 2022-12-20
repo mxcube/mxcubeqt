@@ -20,7 +20,7 @@
 import os
 
 from mxcubeqt.utils import colors, queue_item, qt_import
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -211,7 +211,7 @@ class ConfirmDialog(qt_import.QDialog):
                     if os.path.exists(file_path):
                         (dir_name, file_name) = os.path.split(file_path)
                         sample_name = current_sample_item.get_model().get_display_name()
-                        if sample_name is "":
+                        if sample_name == "":
                             sample_name = current_sample_item.get_model().loc_str
                         file_str_list = []
                         file_str_list.append(sample_name)

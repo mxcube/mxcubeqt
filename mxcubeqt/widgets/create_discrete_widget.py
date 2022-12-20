@@ -25,7 +25,7 @@ from mxcubeqt.widgets.processing_widget import ProcessingWidget
 from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 
-from mxcubecore.HardwareObjects import (
+from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
 )

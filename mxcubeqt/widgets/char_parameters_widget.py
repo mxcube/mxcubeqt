@@ -25,7 +25,7 @@ from mxcubeqt.widgets.optimisation_parameters_widget_layout import (
     OptimisationParametersWidgetLayout,
 )
 
-from mxcubecore.HardwareObjects import (
+from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
 )

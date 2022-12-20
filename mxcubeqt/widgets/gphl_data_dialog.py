@@ -23,11 +23,9 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from mxcubecore import ConvertUtils
-
 from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.paramsgui import FieldsWidget
-
+from mxcubecore.utils import conversion
 from mxcubecore import HardwareRepository as HWR
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
@@ -72,7 +70,7 @@ class SelectionTable(qt_import.QTableWidget):
             wdg = qt_import.QLineEdit(self)
             wdg.setFont(qt_import.QFont("Courier"))
             wdg.setReadOnly(True)
-            wdg.setText(ConvertUtils.text_type(text))
+            wdg.setText(conversion.text_type(text))
             if colours:
                 colour = colours[rowNum]
                 if colour:
