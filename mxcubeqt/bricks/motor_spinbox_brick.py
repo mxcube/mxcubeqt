@@ -263,7 +263,7 @@ class MotorSpinboxBrick(BaseWidget):
 
     def move_down(self):
         # self.demand_move = -1
-        self.set_editing(False)   
+        self.set_editing(False)
         self.update_gui()
         state = self.motor_hwobj.get_state()
         if state == self.motor_hwobj.STATES.READY:
@@ -312,7 +312,7 @@ class MotorSpinboxBrick(BaseWidget):
 
     def limits_changed(self, limits):
         if limits and not(None in limits or any(math.isnan(x) for x in limits)):
-            #limits = self.make_limits_bounded(limits) 
+            #limits = self.make_limits_bounded(limits)
             self.position_spinbox.blockSignals(True)
             self.position_spinbox.setMinimum(limits[0])
             self.position_spinbox.setMaximum(limits[1])
@@ -451,7 +451,7 @@ class MotorSpinboxBrick(BaseWidget):
         if self.editing:
             colors.set_widget_color(
                 self.position_spinbox.lineEdit(),
-                qt_import.QColor(255, 165, 0),
+                colors.LINE_EDIT_CHANGED,
                 qt_import.QPalette.Base,
             )
         else:

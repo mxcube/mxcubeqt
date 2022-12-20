@@ -50,9 +50,9 @@ class EnergyBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.group_box = qt_import.QGroupBox("Energy", self)
-        energy_label = qt_import.QLabel("Current:", self.group_box)
-        energy_label.setFixedWidth(75)
-        wavelength_label = qt_import.QLabel("Wavelength: ", self.group_box)
+        current_label = qt_import.QLabel("Current:", self.group_box)
+        current_label.setFixedWidth(75)
+        
         self.energy_ledit = qt_import.QLineEdit(self.group_box)
         self.energy_ledit.setReadOnly(True)
         self.wavelength_ledit = qt_import.QLineEdit(self.group_box)
@@ -87,9 +87,8 @@ class EnergyBrick(BaseWidget):
         _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _group_box_gridlayout = qt_import.QGridLayout(self.group_box)
-        _group_box_gridlayout.addWidget(energy_label, 0, 0)
+        _group_box_gridlayout.addWidget(current_label, 0, 0, 2, 1)
         _group_box_gridlayout.addWidget(self.energy_ledit, 0, 1)
-        _group_box_gridlayout.addWidget(wavelength_label, 1, 0)
         _group_box_gridlayout.addWidget(self.wavelength_ledit, 1, 1)
         _group_box_gridlayout.addWidget(self.status_label, 2, 0)
         _group_box_gridlayout.addWidget(self.status_ledit, 2, 1)
