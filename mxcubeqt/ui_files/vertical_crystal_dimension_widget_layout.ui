@@ -376,6 +376,13 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <tabstops>
+  <tabstop>space_group_ledit</tabstop>
+  <tabstop>min_vdim_ledit</tabstop>
+  <tabstop>max_vdim_ledit</tabstop>
+  <tabstop>min_vphi_ledit</tabstop>
+  <tabstop>max_vphi_ledit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

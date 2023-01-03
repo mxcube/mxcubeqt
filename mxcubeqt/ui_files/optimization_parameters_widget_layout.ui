@@ -304,6 +304,19 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>i_over_sigma_ledit</tabstop>
+  <tabstop>start_comp_cbox</tabstop>
+  <tabstop>aimed_comp_ledit</tabstop>
+  <tabstop>permitted_range_cbx</tabstop>
+  <tabstop>maximum_res_cbx</tabstop>
+  <tabstop>maximum_res_ledit</tabstop>
+  <tabstop>phi_start_ledit</tabstop>
+  <tabstop>aimed_mult_cbx</tabstop>
+  <tabstop>aimed_mult_ledit</tabstop>
+  <tabstop>phi_end_ledit</tabstop>
+  <tabstop>low_res_pass_cbx</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

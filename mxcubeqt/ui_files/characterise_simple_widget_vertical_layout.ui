@@ -115,6 +115,14 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <tabstops>
+  <tabstop>characterisation_gbox</tabstop>
+  <tabstop>start_comp_cbox</tabstop>
+  <tabstop>account_rad_dmg_cbx</tabstop>
+  <tabstop>optimised_sad_cbx</tabstop>
+  <tabstop>wait_result_cbx</tabstop>
+  <tabstop>execute_plan_cbx</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

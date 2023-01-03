@@ -22,6 +22,7 @@
 import logging
 
 from mxcubeqt.utils import queue_item, qt_import
+from mxcubecore.utils import conversion
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
@@ -29,7 +30,6 @@ from mxcubeqt.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
 from mxcubeqt.widgets.gphl_acquisition_widget import GphlRuntimeWidget
 from mxcubeqt.widgets.gphl_json_dialog import GphlJsonDialog
 
-from mxcubecore.utils import conversion
 from mxcubecore import HardwareRepository as HWR
 from mxcubecore.model import queue_model_objects
 from mxcubecore.model import queue_model_enumerables

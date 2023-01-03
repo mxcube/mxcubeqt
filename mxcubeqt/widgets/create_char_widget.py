@@ -30,7 +30,6 @@ from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
 )
-from mxcubecore.model.queue_model_enumerables import XTAL_SPACEGROUPS
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from mxcubecore.HardwareObjects.abstract.AbstractCharacterisation import AbstractCharacterisation
 
@@ -151,7 +150,7 @@ class CreateCharWidget(CreateTaskBase):
                 qt_import.QDoubleValidator(0.0, 1000, 2, self),
             )
 
-        self._vertical_dimension_widget.space_group_ledit.addItems(XTAL_SPACEGROUPS)
+        self._vertical_dimension_widget.space_group_ledit.addItems(queue_model_enumerables.XTAL_SPACEGROUPS)
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
@@ -168,8 +167,8 @@ class CreateCharWidget(CreateTaskBase):
         index = 0
 
         if self._vertical_dimension_widget:
-            if space_group in XTAL_SPACEGROUPS:
-                index = XTAL_SPACEGROUPS.index(space_group)
+            if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
+                index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
 
             self._space_group_change(index)
             self._vertical_dimension_widget.space_group_ledit.setCurrentIndex(index)

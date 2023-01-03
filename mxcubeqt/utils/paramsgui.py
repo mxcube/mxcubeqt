@@ -28,9 +28,8 @@ import os.path
 import logging
 import sys
 
-from mxcubecore.utils import conversion
-
 from mxcubeqt.utils import qt_import, colors
+from mxcubecore.utils import conversion
 
 
 __credits__ = ["MXCuBE collaboration"]

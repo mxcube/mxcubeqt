@@ -37,7 +37,7 @@ class ResolutionBrick(BaseWidget):
         colors.LIGHT_YELLOW,
         colors.LIGHT_YELLOW,
         colors.LIGHT_YELLOW,
-        qt_import.QColor(255, 165, 0),
+        colors.LIGHT_ORANGE,
         colors.LIGHT_RED,
     )
 
@@ -52,8 +52,8 @@ class ResolutionBrick(BaseWidget):
 
         # Properties ----------------------------------------------------------
         self.add_property("defaultMode", "combo", ("Ang", "mm"), "Ang")
-        self.add_property("mmFormatString", "formatString", "###.##")
-        self.add_property("angFormatString", "formatString", "##.###")
+        self.add_property("mmFormatString", "formatString", "###.###")
+        self.add_property("angFormatString", "formatString", "##.####")
 
         self.group_box = qt_import.QGroupBox("Resolution", self)
         current_label = qt_import.QLabel("Current:", self.group_box)

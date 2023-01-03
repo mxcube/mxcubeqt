@@ -433,6 +433,21 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <tabstops>
+  <tabstop>num_residues_ledit</tabstop>
+  <tabstop>space_group_combo</tabstop>
+  <tabstop>a_ledit</tabstop>
+  <tabstop>b_ledit</tabstop>
+  <tabstop>c_ledit</tabstop>
+  <tabstop>alpha_ledit</tabstop>
+  <tabstop>beta_ledit</tabstop>
+  <tabstop>gamma_ledit</tabstop>
+  <tabstop>run_offline_processing_cbox</tabstop>
+  <tabstop>run_online_processing_cbox</tabstop>
+  <tabstop>resolution_cutoff_ledit</tabstop>
+  <tabstop>pdb_file_ledit</tabstop>
+  <tabstop>pdb_file_browse_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

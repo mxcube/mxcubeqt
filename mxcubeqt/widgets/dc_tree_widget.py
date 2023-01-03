@@ -35,9 +35,11 @@ from mxcubeqt.utils import colors, icons, queue_item, qt_import
 from mxcubeqt.widgets.confirm_dialog import ConfirmDialog
 from mxcubeqt.widgets.plate_navigator_widget import PlateNavigatorWidget
 
+from mxcubecore.model import (
+    queue_model_objects,
+    queue_model_enumerables
+)
 from mxcubecore import queue_entry
-from mxcubecore.model import queue_model_objects
-from mxcubecore.model.queue_model_enumerables import CENTRING_METHOD
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -819,7 +821,7 @@ class DataCollectTree(qt_import.QWidget):
         try:
             dm = HWR.beamline.diffractometer
 
-            if self.centring_method == CENTRING_METHOD.FULLY_AUTOMATIC:
+            if self.centring_method == queue_model_enumerables.CENTRING_METHOD.FULLY_AUTOMATIC:
                 dm.user_confirms_centring = False
             else:
                 dm.user_confirms_centring = True
