@@ -18,7 +18,7 @@ setup_requirements = []
 
 tests_requirements = []
 
-extras_requirements = {'pyqt5': ['PyQt5==5.14']}
+extras_requirements = {'pyqt5': ['PyQt5==5.15.7']}
 
 console_scripts = ['mxcube = mxcubeqt.__main__:run']
 
