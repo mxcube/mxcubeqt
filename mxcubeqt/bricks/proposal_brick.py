@@ -100,6 +100,9 @@ class ProposalBrick(BaseWidget):
         # Graphic elements ----------------------------------------------------
         self.main_gbox = qt_import.QGroupBox("ISPyB proposal", self)
 
+        self.message_widget = qt_import.QLabel()
+        self.message_widget.hide() 
+
         self.login_as_proposal_widget = qt_import.QWidget(self.main_gbox)
         self.code_label = qt_import.QLabel("  Code: ", self.login_as_proposal_widget)
         self.proposal_type_combox = qt_import.QComboBox(self.login_as_proposal_widget)
@@ -170,6 +173,7 @@ class ProposalBrick(BaseWidget):
         _login_as_user_widget_layout.setContentsMargins(0, 0, 0, 0)
 
         _main_gboxlayout = qt_import.QHBoxLayout(self.main_gbox)
+        _main_gboxlayout.addWidget(self.message_widget)
         _main_gboxlayout.addWidget(self.login_as_proposal_widget)
         _main_gboxlayout.addWidget(self.logout_button)
         _main_gboxlayout.addWidget(self.login_as_user_widget)
