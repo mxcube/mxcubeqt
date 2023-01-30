@@ -4,6 +4,7 @@ from mxcubeqt.utils import colors, icons, qt_import
 from mxcubeqt.bricks.proposal_brick import ProposalBrick, ProposalGUIEvent
 from mxcubecore import HardwareRepository as HWR
 import logging
+import os
 
 class P11ProposalBrick(ProposalBrick):
     def __init__(self, *args):
@@ -22,7 +23,11 @@ class P11ProposalBrick(ProposalBrick):
             self.login_as_proposal_widget.show()
 
         # find if we are using dbconnection, etc. or not
-        if not HWR.beamline.lims:
+        proposal_code = HWR.beamline.session.get_current_proposal_code()
+
+        if not HWR.beamline.lims or proposal_code is None:
+            self.message_widget.setText('not connected')
+            self.message_widget.show()
             self.login_as_proposal_widget.hide()
             self.login_button.hide()
             # self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
@@ -34,16 +39,18 @@ class P11ProposalBrick(ProposalBrick):
             HWR.beamline.session.proposal_number = ""
 
             self.setWindowTitle.emit(self["titlePrefix"])
+            self.proposal_number_ledit.setText('no ispyb')
+
             # self.loggedIn.emit(False)
             # self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(True)
             self.sessionSelected.emit(
                 HWR.beamline.session.session_id,
                 str(os.environ["USER"]),
+                str(HWR.beamline.session.session_id),
                 0,
                 "",
                 "",
-                HWR.beamline.session.session_id,
                 False,
             )
         else:
@@ -92,7 +99,6 @@ class P11ProposalBrick(ProposalBrick):
 
         self.proposal_info.setText(prop_info)
         self.proposal_info.show()
-
 
         self.code_label.hide()
         self.proposal_type_combox.hide()
