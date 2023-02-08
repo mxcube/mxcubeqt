@@ -6,4 +6,3 @@ dependencies:
   - openldap
   - pip
   - poetry
-  - qt =5.15.6
