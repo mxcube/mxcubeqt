@@ -1333,7 +1333,7 @@ class WindowDisplayWidget(qt_import.QScrollArea):
             window.close()
 
         # reset colors
-        if isinstance(self.__put_back_colors, collections.Callable):
+        if isinstance(self.__put_back_colors, collections.abc.Callable):
             self.__put_back_colors()
             self.__put_back_colors = None
 
@@ -1438,7 +1438,7 @@ class WindowDisplayWidget(qt_import.QScrollArea):
     def update_preview(self, selected_item):
         """Method selects a widget in the gui"""
 
-        if isinstance(self.__put_back_colors, collections.Callable):
+        if isinstance(self.__put_back_colors, collections.abc.Callable):
             self.__put_back_colors()
             self.__put_back_colors = None
         if len(selected_item) and len(self.preview_items) > 0:
@@ -1450,7 +1450,7 @@ class WindowDisplayWidget(qt_import.QScrollArea):
     def select_widget(self, widget):
         """colors selected widget"""
 
-        if isinstance(self.__put_back_colors, collections.Callable):
+        if isinstance(self.__put_back_colors, collections.abc.Callable):
             self.__put_back_colors()
         original_color = widget.palette().color(qt_import.QPalette.Window)
         selected_color = qt_import.QColor(150, 150, 200)

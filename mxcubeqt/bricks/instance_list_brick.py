@@ -994,7 +994,7 @@ class InstanceListBrick(BaseWidget):
                     self,
                 )
                 msg_dialog.exec_()
-                if isinstance(event.callback, collections.Callable):
+                if isinstance(event.callback, collections.abc.Callable):
                     event.callback()
 
             elif event.type() == USER_INFO_DIALOG_EVENT:

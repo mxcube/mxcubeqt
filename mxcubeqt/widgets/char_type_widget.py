@@ -86,20 +86,20 @@ class CharTypeWidget(qt_import.QWidget):
         self.routine_dc_page.dose_ledit.setEnabled(state)
 
     def _toggle_time_dose(self, index):
-        if index is 1:
+        if index == 1:
             self.routine_dc_page.dose_ledit.setEnabled(False)
             self.routine_dc_page.dose_limit_cbx.setEnabled(False)
             self.routine_dc_page.time_limit_cbx.setEnabled(True)
             self.routine_dc_page.radiation_damage_cbx.setEnabled(True)
             self.enable_time_ledit(self.routine_dc_page.time_limit_cbx.isChecked())
-        elif index is 0:
+        elif index == 0:
             self.routine_dc_page.dose_limit_cbx.setEnabled(True)
             self.enable_dose_ledit(self.routine_dc_page.dose_limit_cbx.isChecked())
             self.routine_dc_page.time_ledit.setEnabled(False)
             self.routine_dc_page.time_limit_cbx.setEnabled(False)
             self.routine_dc_page.radiation_damage_cbx.setEnabled(False)
             self.routine_dc_page.radiation_damage_cbx.setOn(True)
-        elif index is -1:
+        elif index == -1:
             self.routine_dc_page.dose_ledit.setEnabled(False)
             self.routine_dc_page.time_ledit.setEnabled(False)
             self.routine_dc_page.time_limit_cbx.setEnabled(False)
