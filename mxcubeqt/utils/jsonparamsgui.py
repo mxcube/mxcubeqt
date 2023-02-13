@@ -382,7 +382,7 @@ def create_widgets(
 
     NB the input data structures differ from standard ui:schema usage
     fields and layout are taken from the ui:schema, so the schema order is mandatory
-    there are grouping constructs correspondign to columns and boxes in the ui:schema
+    there are grouping constructs corresponding to columns and boxes in the ui:schema
     that do not match any object in the jsonschema.
     """
     default_container_name = "vertical_box"
