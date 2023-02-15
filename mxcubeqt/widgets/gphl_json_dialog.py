@@ -32,69 +32,69 @@ __license__ = "LGPLv3+"
 __author__ = "Rasmus H Fogh"
 
 
-class SelectionTable(qt_import.QTableWidget):
-    """Read-only table for data display and selection"""
-
-    def __init__(self, parent=None, name="selection_table", header=None):
-        qt_import.QTableWidget.__init__(self, parent)
-        if not header:
-            raise ValueError("DisplayTable must be initialised with header")
-
-        self.setObjectName(name)
-        self.setFrameShape(qt_import.QFrame.StyledPanel)
-        self.setFrameShadow(qt_import.QFrame.Sunken)
-        self.setContentsMargins(0, 3, 0, 3)
-        self.setColumnCount(len(header))
-        self.setSelectionMode(qt_import.QTableWidget.SingleSelection)
-        self.setHorizontalHeaderLabels(header)
-        self.horizontalHeader().setDefaultAlignment(qt_import.Qt.AlignLeft)
-        self.setSizePolicy(
-            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
-        )
-        self.setFont(qt_import.QFont("Courier"))
-
-        hdr = self.horizontalHeader()
-        hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
-        for ii in range(1, len(header)):
-            hdr.setResizeMode(ii, qt_import.QHeaderView.ResizeToContents)
-
-    def resizeData(self, ii):
-        """Dummy method, recommended by docs when not using std cell widgets"""
-        pass
-
-    def populateColumn(self, colNum, values, colours=None):
-        """Fill values into column, extending if necessary"""
-        if len(values) > self.rowCount():
-            self.setRowCount(len(values))
-        selectRow = None
-        no_colours = not colours or not any(colours)
-        colour = None
-        for rowNum, text in enumerate(values):
-            wdg = qt_import.QLineEdit(self)
-            wdg.setFont(qt_import.QFont("Courier"))
-            wdg.setReadOnly(True)
-            wdg.setText(conversion.text_type(text))
-            if colours:
-                colour = colours[rowNum]
-                if colour:
-                    colors.set_widget_color(
-                        wdg, getattr(colors, colour), qt_import.QPalette.Base
-                    )
-            self.setCellWidget(rowNum, colNum, wdg)
-            if "*" in text and (colour or no_colours):
-                selectRow = rowNum
-        if selectRow is not None:
-            self.setCurrentCell(selectRow, 0)
-
-
-    def get_value(self):
-        """Get value - list of cell contents for selected row"""
-        row_id = self.currentRow()
-        if not self.cellWidget(row_id, 0):
-            logging.getLogger("user_log").warning(
-                "Select a row of the table, and then press [Continue]"
-            )
-        return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
+# class SelectionTable(qt_import.QTableWidget):
+#     """Read-only table for data display and selection"""
+#
+#     def __init__(self, parent=None, name="selection_table", header=None):
+#         qt_import.QTableWidget.__init__(self, parent)
+#         if not header:
+#             raise ValueError("DisplayTable must be initialised with header")
+#
+#         self.setObjectName(name)
+#         self.setFrameShape(qt_import.QFrame.StyledPanel)
+#         self.setFrameShadow(qt_import.QFrame.Sunken)
+#         self.setContentsMargins(0, 3, 0, 3)
+#         self.setColumnCount(len(header))
+#         self.setSelectionMode(qt_import.QTableWidget.SingleSelection)
+#         self.setHorizontalHeaderLabels(header)
+#         self.horizontalHeader().setDefaultAlignment(qt_import.Qt.AlignLeft)
+#         self.setSizePolicy(
+#             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
+#         )
+#         self.setFont(qt_import.QFont("Courier"))
+#
+#         hdr = self.horizontalHeader()
+#         hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
+#         for ii in range(1, len(header)):
+#             hdr.setResizeMode(ii, qt_import.QHeaderView.ResizeToContents)
+#
+#     def resizeData(self, ii):
+#         """Dummy method, recommended by docs when not using std cell widgets"""
+#         pass
+#
+#     def populateColumn(self, colNum, values, colours=None):
+#         """Fill values into column, extending if necessary"""
+#         if len(values) > self.rowCount():
+#             self.setRowCount(len(values))
+#         selectRow = None
+#         no_colours = not colours or not any(colours)
+#         colour = None
+#         for rowNum, text in enumerate(values):
+#             wdg = qt_import.QLineEdit(self)
+#             wdg.setFont(qt_import.QFont("Courier"))
+#             wdg.setReadOnly(True)
+#             wdg.setText(conversion.text_type(text))
+#             if colours:
+#                 colour = colours[rowNum]
+#                 if colour:
+#                     colors.set_widget_color(
+#                         wdg, getattr(colors, colour), qt_import.QPalette.Base
+#                     )
+#             self.setCellWidget(rowNum, colNum, wdg)
+#             if "*" in text and (colour or no_colours):
+#                 selectRow = rowNum
+#         if selectRow is not None:
+#             self.setCurrentCell(selectRow, 0)
+#
+#
+#     def get_value(self):
+#         """Get value - list of cell contents for selected row"""
+#         row_id = self.currentRow()
+#         if not self.cellWidget(row_id, 0):
+#             logging.getLogger("user_log").warning(
+#                 "Select a row of the table, and then press [Continue]"
+#             )
+#         return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
 
 
 class GphlJsonDialog(qt_import.QDialog):
