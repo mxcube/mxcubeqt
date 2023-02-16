@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONTAINER=mxcube_dev_qt5
+CONTAINER=mxcube_dev_qt5f
 
 # This file is for test runs on your local computer and needs to be customised
 # It relies on access to existing directories and files on the host, so
@@ -15,7 +15,7 @@ MAC_ADDRESS="54:ee:75:b6:8e:d3"
 
 # Host side home directory
 USER_HOME="/home/rhfogh"
-# host side directory used for docker home (must be different to avoid overwriting
+# host side directory used for docker home (must be different to avoid overwriting)
 DOCKER_HOME="/home/rhfogh/dockerhome/"
 # Docker side MXCuBE location (mount point) - do not change
 MXCUBE_BASE="/MXCuBE"
@@ -40,12 +40,12 @@ MXCUBE_CORE_CONFIG_PATH="${MXCUBE_CORE_CONFIG_PATH}:${MXCUBE_CORE}/configuration
 # User name - used only for file names etc.
 USER_NAME="test_user"
 
-# Additional locations. must be the same inside and outside docker,
-# And the relevant directory must be made so it can be mounted,
-ALT_ROOT="/alt/rhfogh/"
-DATA_ROOT="${ALT_ROOT}/calc/mxcube_data"
+# Additional locations. Must be the same inside and outside docker,
+#
+# Location for data, matching session base_directory and processed_data_base_directory
+DATA_ROOT="/alt/rhfogh/calc/mxcube_data"
 # GPhL Software to be found in $GPHL_SOFTWARE_ROOT/GPhL/gphl_release
-GPHL_SOFTWARE_ROOT="${ALT_ROOT}/Software/"
+GPHL_SOFTWARE_ROOT="/alt/rhfogh/Software/"
 
 # End of settable parameters.
 

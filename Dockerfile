@@ -1,12 +1,9 @@
 FROM ubuntu:22.04
 
-# Build docker as:
-# docker build --build-arg dockerhome=/home/rhfogh/dockerhome/ \
-#  --build-arg data_root=/alt/rhfogh/calc/mxcube_data/ \
-#  --build-arg gphl_software_root=/alt/rhfogh/Software/ \
-#  -t mxcube_dev_qt5d ~/pycharm/mxcubeqt
+# Build docker as (e.g.):
+# docker build -t mxcube_qt5 ~/pycharm/mxcubeqt
 
-# See start_mxcube for running adn setting up docker
+# See start_mxcube for running and setting up docker
 
 # Set terminal and time zone, to catch installer interaction attempts
 ENV TERM linux
