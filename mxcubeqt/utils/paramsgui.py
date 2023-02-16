@@ -59,6 +59,36 @@ class LineEdit(qt_import.QLineEdit):
     def get_value(self):
         return conversion.text_type(self.text())
 
+    def input_field_changed(self):
+        """UI update function triggered by field value changes"""
+        self.parent().validate_fields()
+        valid = self.is_valid()
+        if valid:
+            if self.update_function is not None:
+                self.update_function(self.parent())
+            colors.set_widget_color(
+                self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base
+            )
+        self.parent().input_field_changed()
+
+    def color_by_error(self, warning=False):
+        if self.is_valid():
+            if warning:
+                colors.set_widget_color(
+                    self, colors.LIGHT_ORANGE, qt_import.QPalette.Base
+                )
+            else:
+                colors.set_widget_color(
+                    self, colors.WHITE, qt_import.QPalette.Base
+                )
+        else:
+            colors.set_widget_color(
+                self, colors.LINE_EDIT_ERROR, qt_import.QPalette.Base
+            )
+
+    def is_valid(self):
+        return True
+
 
 class FloatString(LineEdit):
     """LineEdit widget with validators and formatting for floating point numbers"""
@@ -80,27 +110,27 @@ class FloatString(LineEdit):
         if val is not None:
             self.validator.setTop(val)
         self.update_function = options.get("update_function")
+        extra_validator = options.get("extra_validator")
+        if extra_validator is not None:
+            self.extra_validator = extra_validator
 
-        self.textChanged.connect(self.input_field_changed)
-
-    def input_field_changed(self, input_field_text):
-        """UI update function triggered by field value changes"""
-        if self.update_function is not None:
-            self.update_function(self.parent())
-        if (
-            self.validator.validate(input_field_text, 0)[0]
-            == qt_import.QValidator.Acceptable
-        ):
-            colors.set_widget_color(
-                self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base
-            )
-        else:
-            colors.set_widget_color(
-                self, colors.LINE_EDIT_ERROR, qt_import.QPalette.Base
-            )
+        self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value):
         self.setText(self.formatstr % value)
+
+    def is_valid(self):
+
+        if (
+            self.validator.validate(self.text(), 0)[0]
+            != qt_import.QValidator.Acceptable
+        ):
+            return False
+
+        if hasattr(self, "extra_validator"):
+            return self.extra_validator(self)
+        else:
+            return True
 
 
 class TextEdit(qt_import.QTextEdit):
@@ -131,7 +161,7 @@ class TextEdit(qt_import.QTextEdit):
 
 
 class Combo(qt_import.QComboBox):
-    """STandard ComboBox (pulldown) widget"""
+    """Standard ComboBox (pulldown) widget"""
 
     def __init__(self, parent, options):
         qt_import.QComboBox.__init__(self, parent)
@@ -149,6 +179,7 @@ class Combo(qt_import.QComboBox):
         """UI update function triggered by field value changes"""
         if self.update_function is not None:
             self.update_function(self.parent())
+        self.parent().input_field_changed()
 
     def set_value(self, value):
         self.setCurrentIndex(self.findText(value))
@@ -338,6 +369,7 @@ class CheckBox(qt_import.QCheckBox):
 # Mapping of type fields to Classes
 WIDGET_CLASSES = {
     "combo": Combo,
+    "dblcombo": Combo,
     "spinbox": IntSpinBox,
     "text": LineEdit,
     "floatstring": FloatString,
@@ -355,6 +387,7 @@ def make_widget(parent, options):
 
 class FieldsWidget(qt_import.QWidget):
     """Collection-of-widgets widget for parameter query"""
+    parametersValidSignal = qt_import.pyqtSignal(bool)
 
     def __init__(self, fields, parent=None):
         qt_import.QWidget.__init__(self, parent)
@@ -367,10 +400,18 @@ class FieldsWidget(qt_import.QWidget):
 
         current_row = 0
         col_incr = 0
-        pad = ""
+        # pad1: width of empty separating columns
+        pad1 = " " * 4
+        # Extra padding in front of columns 2, 3, ...
+        # to offset space for boolean widgets
+        pad2 = ""
         for field in fields:
             # should not happen but lets just skip them
-            if field["type"] != "message" and "uiLabel" not in field:
+            if (
+                field["type"] != "message"
+                and "uiLabel" not in field
+                and not field["type"].startswith("dbl")
+            ):
                 continue
 
             # hack until the 'real' xml gets implemented server side
@@ -395,41 +436,71 @@ class FieldsWidget(qt_import.QWidget):
                         qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed
                     )
                 self.field_widgets.append(widget)
+                col = col_incr
                 if field["type"] == "boolean":
                     self.layout().addWidget(
-                        widget, current_row, 0 + col_incr, 1, 2, qt_import.Qt.AlignLeft
+                        widget, current_row, col, 1, 2, qt_import.Qt.AlignLeft
+                    )
+                elif field["type"].startswith("dbl"):
+                    # Double width widget, no label
+                    self.layout().addWidget(
+                        widget, current_row, col, 1, 2, qt_import.Qt.AlignLeft
                     )
                 else:
+                    pad = pad2 if col_incr else ""
                     label = qt_import.QLabel(pad + field["uiLabel"], self)
                     self.layout().addWidget(
-                        label, current_row, 0 + col_incr, qt_import.Qt.AlignLeft
+                        label, current_row, col, qt_import.Qt.AlignLeft
                     )
                     self.layout().addWidget(
-                        widget, current_row, 1 + col_incr, qt_import.Qt.AlignLeft
+                        widget, current_row, 1 + col, qt_import.Qt.AlignLeft
+                    )
+                    # Add empty column, for separation purposes
+
+                    hspacer = qt_import.QSpacerItem(
+                        10,
+                        20,
+                        qt_import.QSizePolicy.MinimumExpanding,
+                        qt_import.QSizePolicy.Minimum
+                    )
+                    # empty = qt_import.QLabel(pad1, self)
+                    self.layout().addItem(
+                        hspacer, current_row, col + 2, qt_import.Qt.AlignLeft
                     )
 
             current_row += 1
             if field.pop("NEW_COLUMN", False):
-                # Increment column
-                col_incr += 2
                 current_row = 0
-                pad = " " * 5
-        self.update()
+                # Increment column
+                col_incr += 3
 
-    def set_values(self, values):
+    def set_values(self, **values):
         """Set values for all fields from values dictionary"""
         for field in self.field_widgets:
             if field.get_name() in values:
                 field.set_value(values[field.get_name()])
 
+    def input_field_changed(self):
+        """Placeholder function, can be overridden in individual instances
+
+        Executed at the end of all input_field_changed functions """
+        pass
+
     def get_parameters_map(self):
-        """Get paramer values dictionary for all fields"""
+        """Get parameter values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
 
-    def update(self):
-        """Call update functions"""
-        for field in self.field_widgets:
-            if hasattr(field, 'update_function'):
-                update_function = field.update_function
-                if update_function:
-                    update_function(self)
+    def validate_fields(self):
+        all_valid = True
+        for widget in self.field_widgets:
+            # The two functions should go in parallel, but for precision, ...
+            if hasattr(widget, "color_by_error"):
+                widget.color_by_error()
+            if hasattr(widget, "is_valid"):
+                if not widget.is_valid():
+                    all_valid = False
+                    print (
+                        "WARNING, invalid value %s for %s"
+                        % (widget.get_value(), widget.get_name())
+                    )
+        self.parametersValidSignal.emit(all_valid)
