@@ -180,7 +180,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         # Adjust periodic table width
         if width > -1:
             self.energy_scan_page._periodic_table_widget.setFixedWidth(width - 4)
-            self.energy_scan_page._periodic_table_widget.setFixedHeight(width / 1.5)
+            self.energy_scan_page._periodic_table_widget.setFixedHeight(int(width / 1.5))
 
     def set_expert_mode(self, state):
         for i in range(0, self.tool_box.count()):

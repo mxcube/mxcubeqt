@@ -48,10 +48,6 @@ import numpy as np
 
 from mxcubeqt.utils import qt_import
 pymca_imported = False
-
-from PyMca5.PyMca import McaAdvancedFit
-from PyMca5.PyMca import ConfigDict
-
 try:
     if qt_import.qt_variant == "PyQt5":
         from PyMca5.PyMca import McaAdvancedFit
