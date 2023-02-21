@@ -357,11 +357,6 @@ class LocalQGroupbox(qt_import.QGroupBox, UIContainer):
 
     pass
 
-class LocalQWidget(qt_import.QGroupBox, UIContainer):
-    is_hidden = False
-
-    pass
-
 def make_widget(parent, options):
     return WIDGET_CLASSES[options["type"]](parent, options)
 
@@ -434,7 +429,7 @@ def create_widgets(
         elif title:
             widget = LocalQGroupbox(title, parent=parent_widget)
         else:
-            widget = LocalQWidget(parent=parent_widget)
+            widget = LocalQGroupbox(parent=parent_widget)
         layout_class = WIDGET_CLASSES[widget_name]
         layout = layout_class(widget)
         layout.setSpacing(6)
@@ -451,7 +446,7 @@ def create_widgets(
 class ColumnGridWidget (qt_import.QGridLayout):
     """Gridded layout, content specified by column"""
 
-    col_spacing = " " * 4
+    col_spacing = " " * 7
 
     def __init__(self, parent):
         """
@@ -482,14 +477,15 @@ class ColumnGridWidget (qt_import.QGridLayout):
                 new_widget = create_widgets(
                     schema,
                     ui_field,
-                    rowname, self.parent(),
+                    rowname,
+                    self.parent(),
                     parameter_widgets
                 )
                 if field:
                     widget_type = ui_field.get("ui:widget") or field.get(type, "string")
                     title = field.get("title") or ui_field.get("ui:title")
                     if title:
-                        if widget_type == "textarea":
+                        if widget_type in ("textarea", "selection_table"):
                             new_widget.setSizePolicy(
                                 qt_import.QSizePolicy.MinimumExpanding,
                                 qt_import.QSizePolicy.Minimum,
@@ -699,9 +695,6 @@ class LayoutWidget(qt_import.QWidget):
 
     def set_values(self, **values):
         """Set values for all fields from values dictionary"""
-        for field in self.field_widgets:
-            if field.get_name() in values:
-                field.set_value(values[field.get_name()])
         for tag, val in values.items():
             self.parameter_widgets[tag].set_value(val)
 
@@ -719,7 +712,7 @@ class LayoutWidget(qt_import.QWidget):
 
     def validate_fields(self):
         all_valid = True
-        for widget in self.parameter_widgets.values():
+        for field_name, widget in self.parameter_widgets.items():
             # The two functions should go in parallel, but for precision, ...
             if hasattr(widget, "color_by_error"):
                 widget.color_by_error()
@@ -728,7 +721,7 @@ class LayoutWidget(qt_import.QWidget):
                     all_valid = False
                     print (
                         "WARNING, invalid value %s for %s"
-                        % (widget.get_value(), widget.get_name())
+                        % (widget.get_value(),field_name)
                     )
         self.parametersValidSignal.emit(all_valid)
 
@@ -736,12 +729,11 @@ class LayoutWidget(qt_import.QWidget):
 class SelectionTable(qt_import.QTableWidget):
     """Read-only table for data display and selection"""
 
-    def __init__(self, parent=None, name="selection_table", header=None):
+    def __init__(self, parent, options):
         qt_import.QTableWidget.__init__(self, parent)
-        if not header:
-            raise ValueError("DisplayTable must be initialised with header")
+        header = options["header"]
 
-        self.setObjectName(name)
+        # self.setObjectName(name)
         self.setFrameShape(qt_import.QFrame.StyledPanel)
         self.setFrameShadow(qt_import.QFrame.Sunken)
         self.setContentsMargins(0, 3, 0, 3)
@@ -759,34 +751,35 @@ class SelectionTable(qt_import.QTableWidget):
         for ii in range(1, len(header)):
             hdr.setResizeMode(ii, qt_import.QHeaderView.ResizeToContents)
 
+        colouring = options.get("colouring")
+        for ii, data in enumerate(options["content"]):
+            self.populateColumn(ii, data, colouring)
+
     def resizeData(self, ii):
         """Dummy method, recommended by docs when not using std cell widgets"""
         pass
 
-    def populateColumn(self, colNum, values, colours=None):
+    def populateColumn(self, colNum, values, colouring=None):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
         selectRow = None
-        no_colours = not colours or not any(colours)
-        colour = None
+        if colouring and any(colouring):
+            colour = getattr(colors,"LIGHT_GREEN")
+        else:
+            colour = None
         for rowNum, text in enumerate(values):
             wdg = qt_import.QLineEdit(self)
             wdg.setFont(qt_import.QFont("Courier"))
             wdg.setReadOnly(True)
             wdg.setText(conversion.text_type(text))
-            if colours:
-                colour = colours[rowNum]
-                if colour:
-                    colors.set_widget_color(
-                        wdg, getattr(colors, colour), qt_import.QPalette.Base
-                    )
+            if colour and colouring[rowNum]:
+                colors.set_widget_color(wdg, colour, qt_import.QPalette.Base)
             self.setCellWidget(rowNum, colNum, wdg)
-            if "*" in text and (colour or no_colours):
+            if "*" in text and (colouring[rowNum] or not colour):
                 selectRow = rowNum
         if selectRow is not None:
             self.setCurrentCell(selectRow, 0)
-
 
     def get_value(self):
         """Get value - list of cell contents for selected row"""
@@ -810,4 +803,5 @@ WIDGET_CLASSES = {
     "column_grid": ColumnGridWidget,
     "horizontal_box": HorizontalBox,
     "vertical_box": VerticalBox,
+    "selection_table": SelectionTable,
 }

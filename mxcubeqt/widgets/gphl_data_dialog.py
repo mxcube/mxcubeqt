@@ -284,6 +284,8 @@ class LocalFieldsWidget(FieldsWidget):
     def input_field_changed(self):
         """Color use_dose field for warning if > dose_budget"""
 
+        # NBNB REDO - field_widgets is no longer used
+
         parameters = self.get_parameters_map()
         use_dose = parameters.get("use_dose")
         dose_budget = parameters.get("dose_budget")
