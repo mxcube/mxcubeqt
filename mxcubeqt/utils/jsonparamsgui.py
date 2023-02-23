@@ -30,6 +30,8 @@ import sys
 
 from mxcubecore.utils import conversion
 
+from mxcubecore import HardwareRepository as HWR
+
 from mxcubeqt.utils import qt_import, colors
 
 
@@ -111,7 +113,8 @@ class FloatString(LineEdit):
         val = options.get("maximum")
         if val is not None:
             self.validator.setTop(val)
-        self.update_function = options.get("update_function")
+        fname = options.get("update_function")
+        self.update_function = fname or getattr(HWR.beamline.gphl_workflow, fname)
         extra_validator = options.get("extra_validator")
         if extra_validator is not None:
             self.extra_validator = extra_validator
@@ -183,8 +186,8 @@ class Combo(qt_import.QComboBox):
             self.addItem(str(val))
         if "default" in options:
             self.set_value(options["default"])
-
-        self.update_function = options.get("update_function")
+        fname = options.get("update_function")
+        self.update_function = fname or getattr(HWR.beamline.gphl_workflow, fname)
         self.currentIndexChanged.connect(self.input_field_changed)
 
     def input_field_changed(self, input_field_text):
