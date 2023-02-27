@@ -262,7 +262,7 @@ class P11DeiceBrick(DuoStateBrick):
             else:
                 self.buttons_widget.show()
         elif property_name == "icons":
-            # w = self.fontMetrics().width("Set out")
+            #w = self.fontMetrics().width("Set out")
             icons_list = new_value.split()
             try:
                 self.set_in_button.setIcon(icons.load_icon(icons_list[0]))
