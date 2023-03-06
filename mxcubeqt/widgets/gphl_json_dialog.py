@@ -183,7 +183,7 @@ class GphlJsonDialog(qt_import.QDialog):
 
     def continue_button_click(self):
         result = {}
-        result.update(self.params_widget.get_parameters_map())
+        result.update(self.params_widget.get_values_map())
         # if self.parameter_gbox.isVisible():
         #     result.update(self.params_widget.get_parameters_map())
         # if self.cplx_gbox.isVisible():

@@ -28,7 +28,7 @@ import os.path
 import logging
 import sys
 
-from mxcubecore.utils import conversion
+from mxcubecore.utils import conversion, ui_communication
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -44,17 +44,21 @@ class LineEdit(qt_import.QLineEdit):
 
     def __init__(self, parent, options):
         qt_import.QLineEdit.__init__(self, parent)
-        self.is_hidden = False
+        self.is_hidden = options.get("hidden")
         # self.setAlignment(qt_import.Qt.AlignLeft)
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
         self.setAlignment(qt_import.Qt.AlignRight)
-        if options.get("readOnly"):
+        if self.is_hidden or options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
 
     def set_value(self, value):
+        try:
+            print ('@~@~ LineEdit set_value', self.__name, value)
+        except:
+            pass
         self.setText(value)
 
     def get_name(self):
@@ -65,11 +69,14 @@ class LineEdit(qt_import.QLineEdit):
 
     def input_field_changed(self):
         """UI update function triggered by field value changes"""
+        # print ('@~@~ input_field_changed')
+        # for item in self.parent().gui_root_widget.get_values_map().items():
+        #     print (' ---> %s: %s' % item)
         self.parent().validate_fields()
         valid = self.is_valid()
         if valid:
             if self.update_function is not None:
-                self.update_function(self.parent())
+                self.update_function(self.parent().gui_root_widget)
             colors.set_widget_color(
                 self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base
             )
@@ -98,7 +105,6 @@ class FloatString(LineEdit):
 
     def __init__(self, parent, options):
         decimals = options.get("decimals")
-        self.is_hidden = False
         # NB We do NOT enforce a maximum number of decimals in edited text,
         # Only in set values.
         if decimals is None:
@@ -114,14 +120,18 @@ class FloatString(LineEdit):
         if val is not None:
             self.validator.setTop(val)
         fname = options.get("update_function")
-        self.update_function = fname or getattr(HWR.beamline.gphl_workflow, fname)
-        extra_validator = options.get("extra_validator")
-        if extra_validator is not None:
-            self.extra_validator = extra_validator
+        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
+        # extra_validator = options.get("extra_validator")
+        # if extra_validator is not None:
+        #     self.extra_validator = extra_validator
 
         self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value):
+        try:
+            print ('@~@~ FLoatString set_value', self.__name, repr(value))
+        except:
+            pass
         self.setText(self.formatstr % value)
 
     def get_value(self):
@@ -138,11 +148,12 @@ class FloatString(LineEdit):
             != qt_import.QValidator.Acceptable
         ):
             return False
+        return True
 
-        if hasattr(self, "extra_validator"):
-            return self.extra_validator(self)
-        else:
-            return True
+        # if hasattr(self, "extra_validator"):
+        #     return self.extra_validator(self)
+        # else:
+        #     return True
 
 
 class TextEdit(qt_import.QTextEdit):
@@ -150,14 +161,14 @@ class TextEdit(qt_import.QTextEdit):
 
     def __init__(self, parent, options):
         qt_import.QTextEdit.__init__(self, parent)
-        self.is_hidden = False
+        self.is_hidden = options.get("hidden")
         self.setAlignment(qt_import.Qt.AlignLeft)
         self.setFont(qt_import.QFont("Courier"))
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
         # self.setAlignment(qt_import.Qt.AlignRight)
-        if options.get("readOnly"):
+        if self.is_hidden or options.get("readOnly"):
             self.setReadOnly(True)
             # self.setEnabled(False)
         # self.setSizePolicy(
@@ -180,23 +191,29 @@ class Combo(qt_import.QComboBox):
     def __init__(self, parent, options):
         qt_import.QComboBox.__init__(self, parent)
         self.__name = options["variable_name"]
-        self.is_hidden = False
+        self.is_hidden = options.get("hidden")
         self.value_dict = options["value_dict"]
         for val in self.value_dict:
             self.addItem(str(val))
         if "default" in options:
             self.set_value(options["default"])
         fname = options.get("update_function")
-        self.update_function = fname or getattr(HWR.beamline.gphl_workflow, fname)
+        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
         self.currentIndexChanged.connect(self.input_field_changed)
 
     def input_field_changed(self, input_field_text):
         """UI update function triggered by field value changes"""
+        print ('@~@~ Combo input_field_changed', input_field_text, self.update_function)
         if self.update_function is not None:
-            self.update_function(self.parent())
+            self.update_function(self.parent().gui_root_widget)
         self.parent().input_field_changed()
+        print ('@~@~ currentINdex, Text ', self.currentIndex(), self.currentText())
 
     def set_value(self, value):
+        try:
+            print ('@~@~ combo set_value', self.__name, repr(value))
+        except:
+            pass
         self.setCurrentIndex(self.findText(value))
 
     def get_value(self):
@@ -325,7 +342,7 @@ class CheckBox(qt_import.QCheckBox):
     def __init__(self, parent, options):
         qt_import.QCheckBox.__init__(self, options.get("uiLabel"), parent)
         # self.setAlignment(qt_import.Qt.AlignLeft)
-        self.is_hidden = False
+        self.is_hidden = options.get("hidden")
         self.__name = options["variable_name"]
         state = (
             qt_import.Qt.Checked
@@ -349,6 +366,13 @@ class CheckBox(qt_import.QCheckBox):
 
 class UIContainer:
 
+    @property
+    def gui_root_widget(self):
+        root = self
+        while isinstance(root, UIContainer):
+            root = root.parent()
+        return root
+
     def input_field_changed(self):
         self.parent().input_field_changed()
 
@@ -360,11 +384,11 @@ class LocalQGroupbox(qt_import.QGroupBox, UIContainer):
 
     pass
 
-def make_widget(parent, options):
-    return WIDGET_CLASSES[options["type"]](parent, options)
+# def make_widget(parent, options):
+#     return WIDGET_CLASSES[options["type"]](parent, options)
 
 def create_widgets(
-    schema, ui_schema, field_name=None, parent_widget=None, parameter_widgets=None
+    schema, ui_schema, field_name=None, parent_widget=None, gui_root_widget=None
 ):
     """Recursive widget creation function
 
@@ -374,7 +398,7 @@ def create_widgets(
         field_name (str): Unique name of field (or container) being created.
                           Equal to tag in ui_schema, and used as variable)_name
         parent_widget(qt_import.QWidget): parent widget
-        parameter_widgets (dict): variable_name:widget dictionary
+        gui_root_widget (dict): root (layoutWidget) widget
 
     Returns (qt_import.QWidget):
 
@@ -383,17 +407,21 @@ def create_widgets(
     there are grouping constructs corresponding to columns and boxes in the ui:schema
     that do not match any object in the jsonschema.
     """
+
+    print ('@~@~ Creating', field_name)
+
+    is_top_object = (gui_root_widget is None)
+
     default_container_name = "vertical_box"
 
     fields = schema["properties"]
-    definitions = schema["definitions"]
+    # definitions = schema["definitions"]
 
     field_data = fields.get(field_name)
     if field_data:
         # This is an actual data field
         widget_name = ui_schema.get("ui:widget")
-        widget_hidden = (widget_name == "hidden")
-        if widget_hidden or not widget_name:
+        if not widget_name:
             widget_name = field_data.get("type")
         options = field_data.copy()
         options["variable_name"] = field_name
@@ -415,20 +443,19 @@ def create_widgets(
         if ui_schema.get("ui:readonly"):
             options["readOnly"] = True
         widget = WIDGET_CLASSES[widget_name](parent_widget, options)
-        widget.is_hidden = widget_hidden
-        if widget_hidden:
+        widget.widget_name = widget_name  # @~@~
+        if widget.is_hidden:
             widget.setReadOnly(True)
             widget.setEnabled(False)
             widget.hide()
-        parameter_widgets[field_name] = widget
+        gui_root_widget.parameter_widgets[field_name] = widget
     else:
         # This is a container field
         title = ui_schema.get("ui:title")
         widget_name = ui_schema.get("ui:widget") or default_container_name
-        if parameter_widgets is None:
+        if is_top_object:
             # Top of schema
-            widget = LayoutWidget()
-            parameter_widgets = widget.parameter_widgets
+            widget = gui_root_widget = LayoutWidget()
         elif title:
             widget = LocalQGroupbox(title, parent=parent_widget)
         else:
@@ -440,10 +467,29 @@ def create_widgets(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         layout.populate_widget(
-            schema, ui_schema, field_name, parameter_widgets
+            schema, ui_schema, field_name, gui_root_widget
         )
+    if is_top_object:
+        # This is the root widget
+        # Now everything is populated, put the hidden widgets in as data holders
+        for field_name, field in fields.items():
+            if field_name not in gui_root_widget.parameter_widgets:
+                if field.get("hidden"):
+                    create_widgets(
+                        schema,
+                        field,
+                        field_name,
+                        parent_widget=gui_root_widget,
+                        gui_root_widget=gui_root_widget
+                    )
+                else:
+                    raise RuntimeError(
+                        "Coding error: UI fields %s is neither hidden nor displayed"
+                        % field_name
+                    )
 
     #
+    print ('@~@~ done create widget')
     return widget
 
 class ColumnGridWidget (qt_import.QGridLayout):
@@ -460,8 +506,9 @@ class ColumnGridWidget (qt_import.QGridLayout):
         self.is_hidden = False
 
     def populate_widget(
-        self, schema, ui_schema, field_name, parameter_widgets
+        self, schema, ui_schema, field_name, gui_root_widget
     ):
+        print ('@~@~ populate grid widget', field_name, ui_schema["ui:order"])
         fields = schema["properties"]
         maxrownum = 0
         for colnum, colname in enumerate(
@@ -469,6 +516,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
             or list(x for x in ui_schema if not x.startswith("ui:"))
         ):
             column = ui_schema[colname]
+            print ('@~@~ column', column["ui:order"])
             col1 = 2 * colnum
             col2 = col1 + 1
             for rownum, rowname in  enumerate(
@@ -482,7 +530,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                     ui_field,
                     rowname,
                     self.parent(),
-                    parameter_widgets
+                    gui_root_widget,
                 )
                 if field:
                     widget_type = ui_field.get("ui:widget") or field.get(type, "string")
@@ -589,9 +637,9 @@ class VerticalBox(ColumnGridWidget):
     """Treated as a single column gridded box, with input not grouped in columns"""
 
     def populate_widget(
-        self, schema, ui_schema, field_name, parameter_widgets
+        self, schema, ui_schema, field_name, gui_root_widget
     ):
-        fields = schema["properties"]
+        print ('@~@~ populate vbox widget', field_name)
         wrap_schema = {
         }
         col_schema = wrap_schema["column"] = {}
@@ -604,14 +652,14 @@ class VerticalBox(ColumnGridWidget):
         col_schema["ui:order"] = wrap_schema["ui:order"]
         wrap_schema["ui:order"] = ("column",)
         #
-        super().populate_widget(schema, wrap_schema, field_name, parameter_widgets)
+        super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
 
 class HorizontalBox(qt_import.QHBoxLayout):
     def __init__(self):
         self.is_hidden = False
         raise NotImplementedError()
 
-class LayoutWidget(qt_import.QWidget):
+class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
     """Collection-of-widgets widget for parameter query"""
     parametersValidSignal = qt_import.pyqtSignal(bool)
 
@@ -705,10 +753,13 @@ class LayoutWidget(qt_import.QWidget):
         """Placeholder function, can be overridden in individual instances
 
         Executed at the end of all input_field_changed functions """
-        pass
+        print ('@~@~ after changes')
+        self.get_values_map()
 
-    def get_parameters_map(self):
+    def get_values_map(self):
         """Get parameter values dictionary for all fields"""
+        for tag, value in self.parameter_widgets.items():
+            print (' ----> %s: %s' % (tag, value.get_value()))
         return dict(
             (tag, val.get_value()) for tag, val in self.parameter_widgets.items()
         )
@@ -735,6 +786,8 @@ class SelectionTable(qt_import.QTableWidget):
     def __init__(self, parent, options):
         qt_import.QTableWidget.__init__(self, parent)
         header = options["header"]
+
+        self.is_hidden = options.get("hidden")
 
         # self.setObjectName(name)
         self.setFrameShape(qt_import.QFrame.StyledPanel)

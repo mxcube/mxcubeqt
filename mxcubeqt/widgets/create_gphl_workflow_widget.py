@@ -133,9 +133,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._workflow_cbox.addItem(workflow_name)
             self.workflow_selected()
             workflow_hwobj.connect(
-                "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
-            )
-            workflow_hwobj.connect(
                 "gphlJsonParametersNeeded", self.gphl_data_dialog.open_dialog
             )
             workflow_hwobj.connect(
