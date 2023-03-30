@@ -280,18 +280,17 @@ class IntSpinBox(qt_import.QSpinBox):
             self.setValue(val)
         if "maximum" in options:
             self.setMaximum(int(options["maximum"]))
-        else:
-            self.setMaximum(sys.maxsize)
         if "minimum" in options:
             self.setMinimum(int(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
+        self.is_hidden = options.get("hidden")
 
     def set_value(self, value):
         self.setValue(int(value))
 
     def get_value(self):
-        val = self.value().strip()
+        val = self.value()
         if val:
             return int(val)
         else:
@@ -300,41 +299,40 @@ class IntSpinBox(qt_import.QSpinBox):
     def get_name(self):
         return self.__name
 
+class DoubleSpinBox(qt_import.QDoubleSpinBox):
+    """Standard float (spinbox) widget"""
 
-# class DoubleSpinBox(qt_import.QDoubleSpinBox):
-#     """Standard float/double (spinbox) widget"""
-#
-#     CHANGED_COLOR = colors.LINE_EDIT_CHANGED
-#
-#     def __init__(self, parent, options):
-#         qt_import.QDoubleSpinBox.__init__(self, parent)
-#         self.lineEdit().setAlignment(qt_import.Qt.AlignLeft)
-#         self.__name = options["variable_name"]
-#         if "unit" in options:
-#             self.setSuffix(" " + options["unit"])
-#         if "default" in options:
-#             val = float(options["default"])
-#             self.setValue(val)
-#         if "maximum" in options:
-#             self.setMaximum(float(options["maximum"]))
-#         else:
-#             self.setMaximum(sys.maxsize)
-#         if "minimum" in options:
-#             self.setMinimum(float(options["minimum"]))
-#         if "tooltip" in options:
-#             self.setToolTip(options["tooltip"])
-#
-#     def set_value(self, value):
-#         self.setValue(int(value))
-#
-#     def get_value(self):
-#         val = int(self.value())
-#         return conversion.text_type(val)
-#
-#     def get_name(self):
-#         return self.__name
+    CHANGED_COLOR = qt_import.QColor(255, 165, 0)
 
+    def __init__(self, parent, options):
+        qt_import.QDoubleSpinBox.__init__(self, parent)
+        self.lineEdit().setAlignment(qt_import.Qt.AlignLeft)
+        self.__name = options["variable_name"]
+        if "unit" in options:
+            self.setSuffix(" " + options["unit"])
+        if "default" in options:
+            val = float(options["default"])
+            self.setValue(val)
+        if "maximum" in options:
+            self.setMaximum(float(options["maximum"]))
+        if "minimum" in options:
+            self.setMinimum(float(options["minimum"]))
+        if "tooltip" in options:
+            self.setToolTip(options["tooltip"])
+        self.is_hidden = options.get("hidden")
 
+    def set_value(self, value):
+        self.setValue(float(value))
+
+    def get_value(self):
+        val = self.value()
+        if val:
+            return float(val)
+        else:
+            return None
+
+    def get_name(self):
+        return self.__name
 
 class CheckBox(qt_import.QCheckBox):
     """Standard Boolean (CheckBox) widget"""
@@ -489,7 +487,6 @@ def create_widgets(
                     )
 
     #
-    print ('@~@~ done create widget')
     return widget
 
 class ColumnGridWidget (qt_import.QGridLayout):
@@ -753,7 +750,6 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
         """Placeholder function, can be overridden in individual instances
 
         Executed at the end of all input_field_changed functions """
-        print ('@~@~ after changes')
         self.get_values_map()
 
     def get_values_map(self):
@@ -848,13 +844,15 @@ class SelectionTable(qt_import.QTableWidget):
 
 
 
-# Class is selectde from ui:widget or, failing that, from type
+# Class is selected from ui:widget or, failing that, from type
 WIDGET_CLASSES = {
     "number": FloatString,
     "string": LineEdit,
     "boolean": CheckBox,
     "integer": FloatString,
     "textarea": TextEdit,
+    "spinbox": IntSpinBox,
+    "float": DoubleSpinBox,
     "select": Combo,
     "column_grid": ColumnGridWidget,
     "horizontal_box": HorizontalBox,
