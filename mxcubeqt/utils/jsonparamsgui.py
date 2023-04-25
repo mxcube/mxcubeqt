@@ -406,8 +406,6 @@ def create_widgets(
     that do not match any object in the jsonschema.
     """
 
-    print ('@~@~ Creating', field_name)
-
     is_top_object = (gui_root_widget is None)
 
     default_container_name = "vertical_box"
@@ -744,6 +742,7 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
     def set_values(self, **values):
         """Set values for all fields from values dictionary"""
         for tag, val in values.items():
+            print ('@~@~ setting', tag, val)
             self.parameter_widgets[tag].set_value(val)
 
     def input_field_changed(self):

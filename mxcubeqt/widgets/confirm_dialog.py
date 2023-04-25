@@ -173,7 +173,7 @@ class ConfirmDialog(qt_import.QDialog):
                 # This part is also in data_path_widget. Mote to PathTemplate
                 file_name = path_template.get_image_file_name()
                 file_name = file_name.replace(
-                    "%" + path_template.precision + "d",
+                    "%0" + str(path_template.precision) + "d",
                     int(path_template.precision) * "#",
                 )
                 file_name = file_name.strip(" ")
