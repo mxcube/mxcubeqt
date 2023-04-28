@@ -55,10 +55,6 @@ class LineEdit(qt_import.QLineEdit):
             self.setEnabled(False)
 
     def set_value(self, value):
-        try:
-            print ('@~@~ LineEdit set_value', self.__name, value)
-        except:
-            pass
         self.setText(value)
 
     def get_name(self):
@@ -69,9 +65,6 @@ class LineEdit(qt_import.QLineEdit):
 
     def input_field_changed(self):
         """UI update function triggered by field value changes"""
-        # print ('@~@~ input_field_changed')
-        # for item in self.parent().gui_root_widget.get_values_map().items():
-        #     print (' ---> %s: %s' % item)
         self.parent().validate_fields()
         valid = self.is_valid()
         if valid:
@@ -128,10 +121,6 @@ class FloatString(LineEdit):
         self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value):
-        try:
-            print ('@~@~ FLoatString set_value', self.__name, repr(value))
-        except:
-            pass
         self.setText(self.formatstr % value)
 
     def get_value(self):
@@ -191,29 +180,26 @@ class Combo(qt_import.QComboBox):
     def __init__(self, parent, options):
         qt_import.QComboBox.__init__(self, parent)
         self.__name = options["variable_name"]
+        self.setup_pulldown(**options)
+        fname = options.get("update_function")
+        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
+        self.currentIndexChanged.connect(self.input_field_changed)
+
+    def setup_pulldown(self, **options):
         self.is_hidden = options.get("hidden")
         self.value_dict = options["value_dict"]
         for val in self.value_dict:
             self.addItem(str(val))
         if "default" in options:
             self.set_value(options["default"])
-        fname = options.get("update_function")
-        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
-        self.currentIndexChanged.connect(self.input_field_changed)
 
     def input_field_changed(self, input_field_text):
         """UI update function triggered by field value changes"""
-        print ('@~@~ Combo input_field_changed', input_field_text, self.update_function)
         if self.update_function is not None:
             self.update_function(self.parent().gui_root_widget)
         self.parent().input_field_changed()
-        print ('@~@~ currentINdex, Text ', self.currentIndex(), self.currentText())
 
     def set_value(self, value):
-        try:
-            print ('@~@~ combo set_value', self.__name, repr(value))
-        except:
-            pass
         self.setCurrentIndex(self.findText(value))
 
     def get_value(self):
@@ -377,10 +363,8 @@ class UIContainer:
     def validate_fields(self):
         self.parent().validate_fields()
 
-class LocalQGroupbox(qt_import.QGroupBox, UIContainer):
+class LocalQGroupBox(qt_import.QGroupBox, UIContainer):
     is_hidden = False
-
-    pass
 
 # def make_widget(parent, options):
 #     return WIDGET_CLASSES[options["type"]](parent, options)
@@ -394,7 +378,7 @@ def create_widgets(
         schema (dict):  jsonschema
         ui_schema (dict): ui:schema dictionary for widget being created
         field_name (str): Unique name of field (or container) being created.
-                          Equal to tag in ui_schema, and used as variable)_name
+                          Equal to tag in ui_schema, and used as variable_name
         parent_widget(qt_import.QWidget): parent widget
         gui_root_widget (dict): root (layoutWidget) widget
 
@@ -453,9 +437,9 @@ def create_widgets(
             # Top of schema
             widget = gui_root_widget = LayoutWidget()
         elif title:
-            widget = LocalQGroupbox(title, parent=parent_widget)
+            widget = LocalQGroupBox(title, parent=parent_widget)
         else:
-            widget = LocalQGroupbox(parent=parent_widget)
+            widget = LocalQGroupBox(parent=parent_widget)
         layout_class = WIDGET_CLASSES[widget_name]
         layout = layout_class(widget)
         layout.setSpacing(6)
@@ -503,7 +487,6 @@ class ColumnGridWidget (qt_import.QGridLayout):
     def populate_widget(
         self, schema, ui_schema, field_name, gui_root_widget
     ):
-        print ('@~@~ populate grid widget', field_name, ui_schema["ui:order"])
         fields = schema["properties"]
         maxrownum = 0
         for colnum, colname in enumerate(
@@ -511,7 +494,6 @@ class ColumnGridWidget (qt_import.QGridLayout):
             or list(x for x in ui_schema if not x.startswith("ui:"))
         ):
             column = ui_schema[colname]
-            print ('@~@~ column', column["ui:order"])
             col1 = 2 * colnum
             col2 = col1 + 1
             for rownum, rowname in  enumerate(
@@ -533,11 +515,14 @@ class ColumnGridWidget (qt_import.QGridLayout):
                     if title:
                         if widget_type in ("textarea", "selection_table"):
                             new_widget.setSizePolicy(
-                                qt_import.QSizePolicy.MinimumExpanding,
-                                qt_import.QSizePolicy.Minimum,
+                                qt_import.QSizePolicy.Expanding,
+                                qt_import.QSizePolicy.Expanding,
+                                # qt_import.QSizePolicy.Minimum,
                             )
                             # Special case - title goes above
-                            outer_box = qt_import.QGroupBox(title, parent=self.parent())
+                            outer_box = LocalQGroupBox(
+                                title, parent=self.parent(),
+                            )
                             self.addWidget(
                                 outer_box,
                                 rownum,
@@ -549,7 +534,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             outer_layout = qt_import.QVBoxLayout()
                             outer_box.setLayout(outer_layout)
                             outer_layout.addWidget(new_widget)
-                            # outer_layout.setStretch(0, 8)
+                            outer_layout.setStretch(8, 8)
                         elif not new_widget.is_hidden:
                             new_widget.setSizePolicy(
                                 qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed
@@ -585,7 +570,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                 else:
                     title = ui_schema.get("ui:title")
                     if title:
-                        outer_box = qt_import.QGroupBox(title, parent=self.parent())
+                        outer_box = LocalQGroupBox(title, parent=self.parent())
                         self.addWidget(
                             outer_box,
                             rownum,
@@ -634,7 +619,6 @@ class VerticalBox(ColumnGridWidget):
     def populate_widget(
         self, schema, ui_schema, field_name, gui_root_widget
     ):
-        print ('@~@~ populate vbox widget', field_name)
         wrap_schema = {
         }
         col_schema = wrap_schema["column"] = {}
@@ -662,6 +646,7 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
 
         self.parameter_widgets = {}
         qt_import.QWidget.__init__(self)
+        self.block_updates = False
 
         # current_row = 0
         # col_incr = 0
@@ -742,7 +727,6 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
     def set_values(self, **values):
         """Set values for all fields from values dictionary"""
         for tag, val in values.items():
-            print ('@~@~ setting', tag, val)
             self.parameter_widgets[tag].set_value(val)
 
     def input_field_changed(self):
@@ -758,6 +742,44 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
         return dict(
             (tag, val.get_value()) for tag, val in self.parameter_widgets.items()
         )
+
+    def reset_options(self, widget_name, **options):
+        """Function to reset widgets.
+        As of 202304 only the option 'value_dict' is supported
+        - a label:value dictionary that sets the enum for pulldowns.
+        More options may be supported in the future.
+
+        Args:
+            widget_name: Name of widget to modify
+            **options: name and value of options to reset
+
+        Returns: None
+
+        """
+        self.block_updates = True
+        try:
+            widget = self.parameter_widgets.get(widget_name)
+            if widget is None:
+                raise (ValueError*"Attempt to reset non-existing widget: %s" % widget_name)
+            if isinstance(widget, Combo):
+                # Supported options are: value_dict, hidden, and default
+                supported = frozenset(("hidden", "value_dict", "default"))
+                disallowed = frozenset(options).difference(supported)
+                if disallowed:
+                    raise ValueError(
+                        "Disallowed reset options for widget %s: %s"
+                    % (widget_name, sorted(disallowed)))
+                widget.clear()
+                widget.setup_pulldown(**options)
+            else:
+                raise ValueError(
+                    " reset_options not supported for widget %s of type %s"
+                    % (widget_name, widget.__class__.__name__)
+                )
+        finally:
+            self.block_updates = False
+
+
 
     def validate_fields(self):
         all_valid = True
@@ -795,6 +817,7 @@ class SelectionTable(qt_import.QTableWidget):
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
+        self.setSizeAdjustPolicy(qt_import.QAbstractScrollArea.AdjustToContents)
         self.setFont(qt_import.QFont("Courier"))
 
         hdr = self.horizontalHeader()
@@ -805,6 +828,10 @@ class SelectionTable(qt_import.QTableWidget):
         colouring = options.get("colouring")
         for ii, data in enumerate(options["content"]):
             self.populateColumn(ii, data, colouring)
+
+        fname = options.get("update_function")
+        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
+        self.currentCellChanged.connect(self.input_field_changed)
 
     def resizeData(self, ii):
         """Dummy method, recommended by docs when not using std cell widgets"""
@@ -840,6 +867,19 @@ class SelectionTable(qt_import.QTableWidget):
                 "Select a row of the table, and then press [Continue]"
             )
         return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
+
+    def input_field_changed(self, current_row, current_col, previous_row, previous_col):
+        """UI update function triggered by selection changes"""
+        print (
+            current_row, current_col,
+            previous_row,
+            previous_col,
+            self.update_function
+        )
+        if self.update_function is not None and current_row != previous_row:
+            self.update_function(self.parent().gui_root_widget)
+        self.parent().input_field_changed()
+
 
 
 
