@@ -29,10 +29,9 @@ from mxcubeqt.widgets.acquisition_widget_simple import AcquisitionWidgetSimple
 from mxcubecore.model import (
     queue_model_objects,
     queue_model_enumerables,
+    crystal_symmetry,
 )
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-from mxcubecore.HardwareObjects.abstract.AbstractCharacterisation import AbstractCharacterisation
-
 from mxcubecore import HardwareRepository as HWR
 
 
@@ -150,7 +149,9 @@ class CreateCharWidget(CreateTaskBase):
                 qt_import.QDoubleValidator(0.0, 1000, 2, self),
             )
 
-        self._vertical_dimension_widget.space_group_ledit.addItems(queue_model_enumerables.XTAL_SPACEGROUPS)
+        self._vertical_dimension_widget.space_group_ledit.addItems(
+            crystal_symmetry.XTAL_SPACEGROUPS
+        )
 
         self._data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
@@ -161,14 +162,14 @@ class CreateCharWidget(CreateTaskBase):
         self._acquisition_parameters.induce_burn = state
 
     def _space_group_change(self, index):
-        self._char_params.space_group = queue_model_enumerables.XTAL_SPACEGROUPS[index]
+        self._char_params.space_group = crystal_symmetry.XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
         index = 0
 
         if self._vertical_dimension_widget:
-            if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
-                index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
+            if space_group in crystal_symmetry.XTAL_SPACEGROUPS:
+                index = crystal_symmetry.XTAL_SPACEGROUPS.index(space_group)
 
             self._space_group_change(index)
             self._vertical_dimension_widget.space_group_ledit.setCurrentIndex(index)

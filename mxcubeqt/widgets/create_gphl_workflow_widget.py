@@ -245,11 +245,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._data_path_widget.update_data_model(self._path_template)
 
         elif isinstance(tree_item, queue_item.SampleQueueItem):
-            # # Reset directory to default (and folder edit field to empty)
-            # (data_directory, proc_directory) = self.get_default_directory()
-            # self._path_template.directory = data_directory
-            # self._path_template.process_directory = proc_directory
-
             if not model.has_lims_data() and not HWR.beamline.session.get_group_name():
                 # When noprefix is set, override prefix setting;
                 # globally we cannot set location as name, apparently, but here we can
@@ -257,50 +252,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     model.get_name() or HWR.beamline.session.get_proposal()
                 )
                 self._data_path_widget.update_data_model(self._path_template)
-            # crystals = model.crystals
-            # space_group = ""
-            # if crystals:
-            #     spg = crystals[0].space_group
-            #     if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
-            #         space_group = spg
-            # self._gphl_acq_param_widget.set_parameter_value(
-            #     "crystal_system", ""
-            # )
-            # self._gphl_acq_param_widget._refresh_interface(
-            #     "crystal_system", None
-            # )
-            # self._gphl_acq_param_widget.set_parameter_value(
-            #     "space_group", space_group
-            # )
-            # diffraction_plan = model.diffraction_plan
-            # if diffraction_plan:
-            #     # It is not clear if diffraction_plan is a dict or an object,
-            #     # and if so which kind
-            #     if hasattr(diffraction_plan, "radiationSensitivity"):
-            #         radiationSensitivity = diffraction_plan.radiationSensitivity
-            #     else:
-            #         radiationSensitivity = diffraction_plan.get("radiationSensitivity")
-            #
-            #     if radiationSensitivity:
-            #         self._gphl_acq_param_widget.set_parameter_value(
-            #             "relative_rad_sensitivity", radiationSensitivity
-            #         )
-            #
-            #     if hasattr(diffraction_plan, "observedResolution"):
-            #         observedResolution = diffraction_plan.observedResolution
-            #     else:
-            #         observedResolution = diffraction_plan.get("observedResolution")
-            #
-            #     if observedResolution:
-            #         logging.getLogger("user_level_log").warning(
-            #             "Diffraction plan observed resolution is %.3f A, "
-            #             % observedResolution
-            #         )
-
-        # elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-        #     self.setDisabled(True)
-
-
 
     def init_models(self):
         CreateTaskBase.init_models(self)

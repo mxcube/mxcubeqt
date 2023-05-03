@@ -26,7 +26,7 @@ from __future__ import print_function, unicode_literals
 
 import os.path
 import logging
-import sys
+from collections import OrderedDict
 
 from mxcubecore.utils import conversion, ui_communication
 
@@ -184,6 +184,7 @@ class Combo(qt_import.QComboBox):
         fname = options.get("update_function")
         self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
         self.currentIndexChanged.connect(self.input_field_changed)
+        self.setSizeAdjustPolicy(qt_import.QComboBox.AdjustToContents)
 
     def setup_pulldown(self, **options):
         self.is_hidden = options.get("hidden")
@@ -407,7 +408,9 @@ def create_widgets(
         options["variable_name"] = field_name
 
         pathstr = field_data.get("$ref")
-        if pathstr:
+        if "value_dict" in options and not ui_schema.get("ui:widget"):
+            widget_name = "select"
+        elif pathstr:
             if not ui_schema.get("ui:widget"):
                 widget_name = "select"
             tags = pathstr.split("/")[1:]
@@ -415,7 +418,7 @@ def create_widgets(
             for tag in tags:
                 dd0 = dd0[tag]
             enums = dd0
-            options["value_dict"] = dict(
+            options["value_dict"] = OrderedDict(
                 (dd1["title"], dd1["enum"][0]) for dd1 in enums
             )
 
@@ -425,7 +428,8 @@ def create_widgets(
         widget = WIDGET_CLASSES[widget_name](parent_widget, options)
         widget.widget_name = widget_name  # @~@~
         if widget.is_hidden:
-            widget.setReadOnly(True)
+            if hasattr(widget, "setReadOnly"):
+                widget.setReadOnly(True)
             widget.setEnabled(False)
             widget.hide()
         gui_root_widget.parameter_widgets[field_name] = widget

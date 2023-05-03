@@ -24,7 +24,7 @@ from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
 from mxcubecore.model import (
     queue_model_objects,
-    queue_model_enumerables,
+    crystal_symmetry,
 )
 
 from mxcubecore import HardwareRepository as HWR
@@ -61,7 +61,7 @@ class ProcessingWidget(qt_import.QWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
         self.processing_widget.space_group_combo.addItems(
-            queue_model_enumerables.XTAL_SPACEGROUPS
+            crystal_symmetry.XTAL_SPACEGROUPS
         )
 
         self._model_mib.bind_value_update(
@@ -141,13 +141,13 @@ class ProcessingWidget(qt_import.QWidget):
 
 
     def _space_group_change(self, index):
-        self._model.space_group = queue_model_enumerables.XTAL_SPACEGROUPS[index]
+        self._model.space_group = crystal_symmetry.XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
         index = 0
 
-        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
-            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in crystal_symmetry.XTAL_SPACEGROUPS:
+            index = crystal_symmetry.XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
         self.processing_widget.space_group_combo.setCurrentIndex(index)
