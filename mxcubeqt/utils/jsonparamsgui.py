@@ -637,10 +637,28 @@ class VerticalBox(ColumnGridWidget):
         #
         super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
 
-class HorizontalBox(qt_import.QHBoxLayout):
-    def __init__(self):
+class HorizontalBox(ColumnGridWidget):
+    def populate_widget(
+        self, schema, ui_schema, field_name, gui_root_widget
+    ):
+        wrap_schema = {
+        }
         self.is_hidden = False
-        raise NotImplementedError()
+        title = ui_schema.get("ui:title")
+        if title:
+            wrap_schema["ui:title"] = title
+        wrap_schema["ui:order"] = new_order = []
+        for tag in ui_schema["ui:order"]:
+            colname = tag + "_col"
+            new_order.append((colname))
+            dd0 = {
+                "ui:order": [tag]
+            }
+            if tag in ui_schema:
+                dd0[tag] = ui_schema[tag]
+            wrap_schema[colname] = dd0
+        #
+        super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
 
 class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
     """Collection-of-widgets widget for parameter query"""

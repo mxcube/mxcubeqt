@@ -275,7 +275,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape, comments=None):
 
-        # NBNB Put here init_from_task_data
         tasks = []
 
         path_template = self._create_path_template(sample, self._path_template)
@@ -291,7 +290,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf = queue_model_objects.GphlWorkflow()
         wf.path_template = path_template
         wf_type = conversion.text_type(self._workflow_cbox.currentText())
-        # wf.set_type(wf_type)
         wf.init_from_task_data(sample, {"strategy_name": wf_type})
 
         if self.current_prefix:
@@ -301,101 +299,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         wf_parameters = wf.get_workflow_parameters()
         strategy_type = wf_parameters.get("strategy_type")
-        # variant = wf_parameters["variants"][0]
-        # wf.set_variant(variant)
-        # wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
-        if strategy_type == "transcal":
-            pass
-
-        elif strategy_type == "diffractcal":
-            pass
-            # ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
-            # crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
-            # wf.set_space_group(crystal_data.space_group)
-            # wf.set_cell_parameters(
-            #     tuple(
-            #         getattr(crystal_data, tag)
-            #         for tag in ("a", "b", "c", "alpha", "beta", "gamma")
-            #     )
-            # )
-            # val = self._gphl_diffractcal_widget.get_parameter_value(
-            #     "relative_rad_sensitivity"
-            # )
-            # wf.set_relative_rad_sensitivity(val)
-            # # The entire strategy runs as a 'characterisation'
-            # wf.set_characterisation_budget_fraction(1.0)
-        else:
-            # Coulds be native_... phasing_... etc.
-            pass
-
-            # wf.set_space_group(
-            #     self._gphl_acq_param_widget.get_parameter_value("space_group")
-            # )
-            # use_for_indexing = False
-            # characterisation_strategy = (
-            #     HWR.beamline.gphl_workflow.settings["characterisation_strategies"][0]
-            # )
-            # if  HWR.beamline.gphl_workflow.settings.get("advanced_mode"):
-            #     characterisation_strategy = (
-            #         self._gphl_acq_param_widget.get_parameter_value(
-            #             "characterisation_strategy"
-            #         )
-            #     )
-            #
-            #     crystalObj = sample.crystals[0]
-            #     cell_params = list(
-            #         getattr(crystalObj, tag)
-            #         for tag in (
-            #             "cell_a", "cell_b", "cell_c",
-            #             "cell_alpha", "cell_beta", "cell_gamma",
-            #         )
-            #     )
-            #     if all(cell_params):
-            #         use_for_indexing = (
-            #             self._gphl_acq_param_widget.get_parameter_value(
-            #                 "use_for_indexing"
-            #             )
-            #         )
-
-        #     wf.set_characterisation_strategy(characterisation_strategy)
-        #     wf.use_cell_for_processing = use_for_indexing
-        #     tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
-        #     crystal_system, point_group = None, None
-        #     if tag:
-        #         data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
-        #         crystal_system = data.crystal_system
-        #         point_groups = data.point_groups
-        #         if len(point_groups) == 1 or point_groups[0] == "32":
-        #             # '32' is a special case; '312' and '321' are also returned as '32'
-        #             point_group = point_groups[0]
-        #     wf.set_point_group(point_group)
-        #     wf.set_crystal_system(crystal_system)
-        #     val = self._gphl_acq_param_widget.get_parameter_value(
-        #         "relative_rad_sensitivity"
-        #     )
-        #     wf.set_relative_rad_sensitivity(val)
-        #     # wf.set_characterisation_budget_fraction(
-        #     #     HWR.beamline.gphl_workflow.get_property(
-        #     #         "characterisation_budget_percent", 5.0
-        #     #     )
-        #     #     / 100.0
-        #     # )
-        #     if  HWR.beamline.gphl_workflow.settings.get("advanced_mode"):
-        #         val = self._gphl_acq_param_widget.get_parameter_value(
-        #             "decay_limit"
-        #         )
-        #         wf.set_decay_limit(val)
-        # beam_energy_tags = wf_parameters.get("beam_energy_tags")
-        # if beam_energy_tags:
-        #     wf.set_beam_energy_tags(beam_energy_tags)
 
         tasks.append(wf)
 
         return tasks
-
-    # NB do we need this? Check what happens when prefix is changed
-    # # Added in porting to master branch
-    # def _prefix_ledit_change(self, new_value):
-    #     prefix = self._data_path_widget._data_model.base_prefix
-    #     self._data_collection.set_name(prefix)
-    #     self._tree_view_item.setText(0, self._data_collection.get_name())
