@@ -819,6 +819,15 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
         self.parametersValidSignal.emit(all_valid)
 
 
+class MultiSelectionTable(qt_import.QTableWidget):
+    """Read-only table for data display and selection; a
+    #llows slection of multiple cells"""
+
+    def __init__(self, parent, options):
+        qt_import.QTableWidget.__init__(self, parent)
+        raise NotImplementedError()
+
+
 class SelectionTable(qt_import.QTableWidget):
     """Read-only table for data display and selection"""
 
@@ -919,4 +928,5 @@ WIDGET_CLASSES = {
     "horizontal_box": HorizontalBox,
     "vertical_box": VerticalBox,
     "selection_table": SelectionTable,
+    "multi_selection_table": MultiSelectionTable,
 }
