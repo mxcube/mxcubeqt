@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""PyQt GUI for runtiem queries - port of paramsgui - rhfogh Jan 2018
+"""PyQt GUI for runtime queries - port of paramsgui - rhfogh Jan 2018, May 2023
 
 Incorporates additions for GPhL workflow code"""
 from __future__ import division, absolute_import
