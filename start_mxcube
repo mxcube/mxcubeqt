@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONTAINER=mxcube_dev_qt5f
+CONTAINER=mxcube_dev_qt5g
 
 # This file is for test runs on your local computer and needs to be customised
 # It relies on access to existing directories and files on the host, so
