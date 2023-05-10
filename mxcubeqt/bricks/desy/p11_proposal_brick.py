@@ -95,7 +95,7 @@ class P11ProposalBrick(ProposalBrick):
         prop_number = str(proposal['number'])
         prop_code = str(proposal['code'])
 
-        prop_info = f"ID: {prop_code}-{prop_number} - beamtime_id: {beamtime_id}"
+        prop_info = f"ID: {prop_code}-{prop_number} - BT_ID: {beamtime_id}"
 
         self.proposal_info.setText(prop_info)
         self.proposal_info.show()
