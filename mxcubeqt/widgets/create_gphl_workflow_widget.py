@@ -19,16 +19,14 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+from mxcubecore.utils import conversion
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.model import queue_model_objects
 
 from mxcubeqt.utils import queue_item, qt_import
-from mxcubecore.utils import conversion
 from mxcubeqt.widgets.create_task_base import CreateTaskBase
 from mxcubeqt.widgets.data_path_widget import DataPathWidget
 from mxcubeqt.widgets.gphl_json_dialog import GphlJsonDialog
-
-from mxcubecore import HardwareRepository as HWR
-from mxcubecore.model import queue_model_objects
 
 __copyright__ = """ Copyright © 2016 - 2022 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -48,7 +46,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # Hardware objects ----------------------------------------------------
 
         # Internal variables --------------------------------------------------
-        self.current_prefix = None
+        self._workflow_type_widget = None
+        self._workflow_cbox = None
+        self.gphl_data_dialog = None
 
         self.init_models()
 
@@ -77,7 +77,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self,
             "create_dc_path_widget",
             data_model=self._path_template,
-            layout="vertical"
+            layout="vertical",
         )
         self._data_path_widget._base_image_dir = (
             HWR.beamline.session.get_base_image_directory()
@@ -114,7 +114,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
 
         # set up popup data dialog
-        self.gphl_data_dialog = GphlJsonDialog(self, "GPhL Workflow Data")
+        self.gphl_data_dialog = GphlJsonDialog(self, "GΦL Workflow Data")
         self.gphl_data_dialog.setModal(True)
 
     def initialise_workflows(self):
@@ -131,12 +131,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             workflow_hwobj.connect(
                 "gphlJsonParametersNeeded", self.gphl_data_dialog.open_dialog
             )
-            workflow_hwobj.connect(
-                "gphlStartAcquisition", self.gphl_start_acquisition
-            )
-            workflow_hwobj.connect(
-                "gphlDoneAcquisition", self.gphl_done_acquisition
-            )
+            workflow_hwobj.connect("gphlStartAcquisition", self.gphl_start_acquisition)
+            workflow_hwobj.connect("gphlDoneAcquisition", self.gphl_done_acquisition)
 
     def init_data_path_model(self):
         # Initialize the path_template of the widget to default
@@ -161,11 +157,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def gphl_start_acquisition(self, workflow_model):
         """Change tab to runtime display"""
         pass
-        # self._gphl_diffractcal_widget.hide()
-        # self._gphl_acq_param_widget.hide()
-        # self._gphl_runtime_widget.populate_widget(workflow_model)
-        # self._gphl_runtime_widget.show()
-
 
     def gphl_done_acquisition(self, workflow_model):
         """Change tab back to acquisition display"""
@@ -179,48 +170,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
-
-        parameters = HWR.beamline.gphl_workflow.workflow_strategies[name]
-        strategy_type = parameters.get("strategy_type")
-        if strategy_type == "transcal":
-            # NB Once we do not have to set unique prefixes, this should be readOnly
-            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
-            pass
-            # self._gphl_diffractcal_widget.hide()
-            # self._gphl_acq_param_widget.hide()
-            # self._gphl_runtime_widget.hide()
-            # self._gphl_acq_widget.hide()
-        elif strategy_type == "diffractcal":
-            # TODO update this
-            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
-            pass
-            # self._gphl_acq_widget.show()
-            # if self._gphl_diffractcal_widget.isHidden():
-            #     self._gphl_diffractcal_widget.populate_widget()
-            #     self._gphl_diffractcal_widget.show()
-            # self._gphl_acq_param_widget.hide()
-            # self._gphl_runtime_widget.hide()
-        else:
-            # acquisition type strategy
-            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
-            pass
-            # self._gphl_acq_widget.show()
-            # if self._gphl_acq_param_widget.isHidden():
-            #     self._gphl_acq_param_widget.populate_widget()
-            #     self._gphl_acq_param_widget.show()
-            # self._gphl_diffractcal_widget.hide()
-            # self._gphl_runtime_widget.hide()
-
-        self.current_prefix = parameters.get("prefix")
-
-    # def get_default_directory(self, tree_item=None, sub_dir=''):
-    #     # Add placeholder for enactment number
-    #     if sub_dir:
-    #         sub_dir += "_000"
-    #     #
-    #     return super(CreateGphlWorkflowWidget, self).get_default_directory(
-    #         tree_item=tree_item, sub_dir=sub_dir
-    #     )
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -246,7 +195,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         elif isinstance(tree_item, queue_item.SampleQueueItem):
             if not model.has_lims_data() and not HWR.beamline.session.get_group_name():
-                # When noprefix is set, override prefix setting;
+                # When no prefix is set, override prefix setting;
                 # globally we cannot set location as name, apparently, but here we can
                 self._path_template.base_prefix = (
                     model.get_name() or HWR.beamline.session.get_proposal()
@@ -287,19 +236,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 workflow_hwobj.shutdown
             )
 
-        wf = queue_model_objects.GphlWorkflow()
-        wf.path_template = path_template
-        wf_type = conversion.text_type(self._workflow_cbox.currentText())
-        wf.init_from_task_data(sample, {"strategy_name": wf_type})
+        wfl = queue_model_objects.GphlWorkflow()
+        wfl.path_template = path_template
+        strategy_name = conversion.text_type(self._workflow_cbox.currentText())
+        wfl.init_from_task_data(
+            sample,
+            {"strategy_name": strategy_name, "prefix": path_template.get_prefix()},
+        )
+        wfl.set_number(path_template.run_number)
 
-        if self.current_prefix:
-            path_template.base_prefix = self.current_prefix
-        wf.set_name(path_template.get_prefix())
-        wf.set_number(path_template.run_number)
-
-        wf_parameters = wf.get_workflow_parameters()
-        strategy_type = wf_parameters.get("strategy_type")
-
-        tasks.append(wf)
+        tasks.append(wfl)
 
         return tasks

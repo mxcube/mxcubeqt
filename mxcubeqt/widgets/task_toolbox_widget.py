@@ -86,7 +86,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         if self.gphl_workflow_page is not None:
-            self.tool_box.addItem(self.gphl_workflow_page, "GPhL Workflows")
+            self.tool_box.addItem(self.gphl_workflow_page, "GΦL Workflows")
         self.tool_box.addItem(self.advanced_page, "Advanced")
         self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
         self.tool_box.addItem(self.ssx_page, "SSX")
@@ -163,7 +163,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         if HWR.beamline.gphl_connection and HWR.beamline.gphl_workflow:
             self.gphl_workflow_page.initialise_workflows()
         else:
-            logging.getLogger("HWR").info("GPhL workflow task not available")
+            logging.getLogger("HWR").info("GΦL workflow task not available")
 
     def set_available_tasks(self, available_tasks):
         for task_name in available_tasks.split():

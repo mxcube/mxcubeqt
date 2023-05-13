@@ -22,9 +22,7 @@
 """GPhL runtime-set parameter input widget. """
 import logging
 
-from mxcubecore.utils import conversion
-
-from mxcubeqt.utils import colors, qt_import
+from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.jsonparamsgui import create_widgets
 
 __copyright__ = """ Copyright © 2016 - 2022 by Global Phasing Ltd. """
@@ -55,11 +53,11 @@ class GphlJsonDialog(qt_import.QDialog):
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
-        self.setWindowTitle("GPhL Workflow parameters")
+        self.setWindowTitle("GΦL Workflow parameters")
 
         # Parameter box
         self.parameter_gbox = qt_import.QGroupBox(self)
-        parameter_vbox =  qt_import.QVBoxLayout()
+        parameter_vbox = qt_import.QVBoxLayout()
         self.parameter_gbox.setLayout(parameter_vbox)
         main_layout.addWidget(self.parameter_gbox, stretch=1)
         self.parameter_gbox.setSizePolicy(
@@ -87,11 +85,11 @@ class GphlJsonDialog(qt_import.QDialog):
         self.resize(qt_import.QSize(1200, 578).expandedTo(self.minimumSizeHint()))
 
     def keyPressEvent(self, event):
-        """This should disable having Qt interpret [Return] as [Continue] """
-        if ((not event.modifiers() and
-             event.key() == qt_import.Qt.Key_Return) or
-            (event.modifiers() == qt_import.Qt.KeypadModifier and
-             event.key() == qt_import.Qt.Key_Enter)):
+        """This should disable having Qt interpret [Return] as [Continue]"""
+        if (not event.modifiers() and event.key() == qt_import.Qt.Key_Return) or (
+            event.modifiers() == qt_import.Qt.KeypadModifier
+            and event.key() == qt_import.Qt.Key_Enter
+        ):
             event.accept()
         else:
             super(qt_import.QDialog, self).keyPressEvent(event)
@@ -104,36 +102,35 @@ class GphlJsonDialog(qt_import.QDialog):
         self._async_result = None
 
     def cancel_button_click(self):
-        logging.getLogger("HWR").debug("GPhL Data dialog abort pressed.")
+        logging.getLogger("HWR").debug("GΦL Data dialog abort pressed.")
         self.reject()
         self._async_result.set(StopIteration)
         self._async_result = None
 
     def open_dialog(self, schema, ui_schema, async_result):
 
-        msg = "GPhL Workflow waiting for input, verify parameters and press continue."
+        msg = "GΦL Workflow waiting for input, verify parameters and press continue."
         logging.getLogger("user_level_log").info(msg)
 
         self._async_result = async_result
 
-        # print ('@~@~ open_dialog, schemas')
-        # for item in sorted(schema.items()):
-        #     print(item)
-        # for item in sorted(ui_schema.items()):
-        #     print(item)
-        # print ('@~@~ end schemas')
-
         # parameters widget
         if self.params_widget is not None:
+            self.params_widget.parametersValidSignal.disconnect(
+                self.continue_button.setEnabled
+            )
             self.params_widget.close()
             self.params_widget = None
-
 
         params_widget = self.params_widget = create_widgets(
             schema, ui_schema, parent_widget=self
         )
         self.parameter_gbox.layout().addWidget(params_widget, stretch=8)
         self.parameter_gbox.show()
+        params_widget.parametersValidSignal.connect(self.continue_button.setEnabled)
+        params_widget.validate_fields()
+        if params_widget.update_function:
+            params_widget.update_function()
         self.show()
         self.setEnabled(True)
         self.update()

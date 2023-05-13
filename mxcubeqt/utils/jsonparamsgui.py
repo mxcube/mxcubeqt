@@ -19,18 +19,16 @@
 
 
 """PyQt GUI for runtime queries - port of paramsgui - rhfogh Jan 2018, May 2023
-
-Incorporates additions for GPhL workflow code"""
+"""
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
+import json
 import os.path
 import logging
 from collections import OrderedDict
 
 from mxcubecore.utils import conversion, ui_communication
-
-from mxcubecore import HardwareRepository as HWR
 
 from mxcubeqt.utils import qt_import, colors
 
@@ -78,20 +76,26 @@ class LineEdit(qt_import.QLineEdit):
     def color_by_error(self, warning=False):
         if self.is_valid():
             if warning:
-                colors.set_widget_color(
-                    self, colors.LIGHT_ORANGE, qt_import.QPalette.Base
-                )
+                self.colour_widget("LIGHT_ORANGE")
             else:
-                colors.set_widget_color(
-                    self, colors.WHITE, qt_import.QPalette.Base
-                )
+                self.colour_widget("WHITE")
         else:
-            colors.set_widget_color(
-                self, colors.LINE_EDIT_ERROR, qt_import.QPalette.Base
-            )
+            self.colour_widget("LINE_EDIT_ERROR")
 
     def is_valid(self):
         return True
+
+    def colour_widget(self, colour):
+        """
+
+        Args:
+            colour (str): One of WIDGET_COLOURS
+
+        Returns: None
+
+        """
+        colors.set_widget_color(self, getattr(colors, colour), qt_import.QPalette.Base)
+
 
 class FloatString(LineEdit):
     """LineEdit widget with validators and formatting for floating point numbers"""
@@ -112,11 +116,18 @@ class FloatString(LineEdit):
         val = options.get("maximum")
         if val is not None:
             self.validator.setTop(val)
+        import_module = self.import_module = options.get("import_module")
         fname = options.get("update_function")
-        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
-        # extra_validator = options.get("extra_validator")
-        # if extra_validator is not None:
-        #     self.extra_validator = extra_validator
+        if fname:
+            if import_module:
+                self.update_function = getattr(import_module, fname)
+            else:
+                raise ValueError(
+                    "Widget %s has update_function %s but lacks import_module"
+                    % (self, fname)
+                )
+        else:
+            self.update_function = None
 
         self.textEdited.connect(self.input_field_changed)
 
@@ -139,11 +150,6 @@ class FloatString(LineEdit):
             return False
         return True
 
-        # if hasattr(self, "extra_validator"):
-        #     return self.extra_validator(self)
-        # else:
-        #     return True
-
 
 class TextEdit(qt_import.QTextEdit):
     """Standard text edit widget (multiline text)"""
@@ -152,17 +158,16 @@ class TextEdit(qt_import.QTextEdit):
         qt_import.QTextEdit.__init__(self, parent)
         self.is_hidden = options.get("hidden")
         self.setAlignment(qt_import.Qt.AlignLeft)
+        self.setSizePolicy(
+            qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
+        )
+        self.setSizeAdjustPolicy(qt_import.QAbstractScrollArea.AdjustToContents)
         self.setFont(qt_import.QFont("Courier"))
         self.__name = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
-        # self.setAlignment(qt_import.Qt.AlignRight)
         if self.is_hidden or options.get("readOnly"):
             self.setReadOnly(True)
-            # self.setEnabled(False)
-        # self.setSizePolicy(
-        #     qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
-        # )
 
     def set_value(self, value):
         self.setText(value)
@@ -181,8 +186,18 @@ class Combo(qt_import.QComboBox):
         qt_import.QComboBox.__init__(self, parent)
         self.__name = options["variable_name"]
         self.setup_pulldown(**options)
+        import_module = self.import_module = options.get("import_module")
         fname = options.get("update_function")
-        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
+        if fname:
+            if import_module:
+                self.update_function = getattr(import_module, fname)
+            else:
+                raise ValueError(
+                    "Widget %s has update_function %s but lacks import_module"
+                    % (self, fname)
+                )
+        else:
+            self.update_function = None
         self.currentIndexChanged.connect(self.input_field_changed)
         self.setSizeAdjustPolicy(qt_import.QComboBox.AdjustToContents)
 
@@ -286,6 +301,7 @@ class IntSpinBox(qt_import.QSpinBox):
     def get_name(self):
         return self.__name
 
+
 class DoubleSpinBox(qt_import.QDoubleSpinBox):
     """Standard float (spinbox) widget"""
 
@@ -321,6 +337,7 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox):
     def get_name(self):
         return self.__name
 
+
 class CheckBox(qt_import.QCheckBox):
     """Standard Boolean (CheckBox) widget"""
 
@@ -330,12 +347,9 @@ class CheckBox(qt_import.QCheckBox):
         self.is_hidden = options.get("hidden")
         self.__name = options["variable_name"]
         state = (
-            qt_import.Qt.Checked
-            if options.get("default")
-            else qt_import.Qt.Unchecked
+            qt_import.Qt.Checked if options.get("default") else qt_import.Qt.Unchecked
         )
         self.setCheckState(state)
-        # self.setAlignment(qt_import.Qt.AlignRight)
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
@@ -349,8 +363,8 @@ class CheckBox(qt_import.QCheckBox):
     def get_value(self):
         return self.isChecked()
 
-class UIContainer:
 
+class UIContainer:
     @property
     def gui_root_widget(self):
         root = self
@@ -364,11 +378,10 @@ class UIContainer:
     def validate_fields(self):
         self.parent().validate_fields()
 
+
 class LocalQGroupBox(qt_import.QGroupBox, UIContainer):
     is_hidden = False
 
-# def make_widget(parent, options):
-#     return WIDGET_CLASSES[options["type"]](parent, options)
 
 def create_widgets(
     schema, ui_schema, field_name=None, parent_widget=None, gui_root_widget=None
@@ -391,7 +404,7 @@ def create_widgets(
     that do not match any object in the jsonschema.
     """
 
-    is_top_object = (gui_root_widget is None)
+    is_top_object = gui_root_widget is None
 
     default_container_name = "vertical_box"
 
@@ -425,8 +438,8 @@ def create_widgets(
         options.update(ui_schema.get("ui:options", {}))
         if ui_schema.get("ui:readonly"):
             options["readOnly"] = True
+        options["import_module"] = gui_root_widget.import_module
         widget = WIDGET_CLASSES[widget_name](parent_widget, options)
-        widget.widget_name = widget_name  # @~@~
         if widget.is_hidden:
             if hasattr(widget, "setReadOnly"):
                 widget.setReadOnly(True)
@@ -439,7 +452,13 @@ def create_widgets(
         widget_name = ui_schema.get("ui:widget") or default_container_name
         if is_top_object:
             # Top of schema
-            widget = gui_root_widget = LayoutWidget()
+            options = ui_schema["ui:options"]
+            widget = gui_root_widget = LayoutWidget(
+                import_module_name=options["import_module_name"]
+            )
+            # schemas = {"SCHEMA": schema, "UI_SCHEMA": ui_schema}
+            # fp0 = open("/home/rhfogh/schemas.json", "w")
+            # print(json.dump(schemas, fp0, sort_keys=True, indent=4))
         elif title:
             widget = LocalQGroupBox(title, parent=parent_widget)
         else:
@@ -450,32 +469,31 @@ def create_widgets(
         widget.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
-        layout.populate_widget(
-            schema, ui_schema, field_name, gui_root_widget
-        )
+        layout.populate_widget(schema, ui_schema, field_name, gui_root_widget)
     if is_top_object:
         # This is the root widget
         # Now everything is populated, put the hidden widgets in as data holders
-        for field_name, field in fields.items():
-            if field_name not in gui_root_widget.parameter_widgets:
+        for fname, field in fields.items():
+            if fname not in gui_root_widget.parameter_widgets:
                 if field.get("hidden"):
                     create_widgets(
                         schema,
                         field,
-                        field_name,
+                        fname,
                         parent_widget=gui_root_widget,
-                        gui_root_widget=gui_root_widget
+                        gui_root_widget=gui_root_widget,
                     )
                 else:
                     raise RuntimeError(
                         "Coding error: UI fields %s is neither hidden nor displayed"
-                        % field_name
+                        % fname
                     )
 
     #
     return widget
 
-class ColumnGridWidget (qt_import.QGridLayout):
+
+class ColumnGridWidget(qt_import.QGridLayout):
     """Gridded layout, content specified by column"""
 
     col_spacing = " " * 7
@@ -488,9 +506,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
         super().__init__(parent)
         self.is_hidden = False
 
-    def populate_widget(
-        self, schema, ui_schema, field_name, gui_root_widget
-    ):
+    def populate_widget(self, schema, ui_schema, field_name, gui_root_widget):
         fields = schema["properties"]
         maxrownum = 0
         for colnum, colname in enumerate(
@@ -500,7 +516,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
             column = ui_schema[colname]
             col1 = 2 * colnum
             col2 = col1 + 1
-            for rownum, rowname in  enumerate(
+            for rownum, rowname in enumerate(
                 (column["ui:order"])
                 or list(x for x in column if not x.startswith("ui:"))
             ):
@@ -515,17 +531,16 @@ class ColumnGridWidget (qt_import.QGridLayout):
                 )
                 if field:
                     widget_type = ui_field.get("ui:widget") or field.get(type, "string")
+                    if widget_type in ("textarea", "selection_table"):
+                        self.setRowStretch(rownum, 8)
+                        self.setColumnStretch(colnum, 8)
                     title = field.get("title") or ui_field.get("ui:title")
                     if title:
                         if widget_type in ("textarea", "selection_table"):
-                            new_widget.setSizePolicy(
-                                qt_import.QSizePolicy.Expanding,
-                                qt_import.QSizePolicy.Expanding,
-                                # qt_import.QSizePolicy.Minimum,
-                            )
                             # Special case - title goes above
                             outer_box = LocalQGroupBox(
-                                title, parent=self.parent(),
+                                title,
+                                parent=self.parent(),
                             )
                             self.addWidget(
                                 outer_box,
@@ -533,7 +548,6 @@ class ColumnGridWidget (qt_import.QGridLayout):
                                 col1,
                                 1,
                                 2,
-                                # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
                             )
                             outer_layout = qt_import.QVBoxLayout()
                             outer_box.setLayout(outer_layout)
@@ -546,18 +560,18 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             if col1:
                                 # Add spacing to columns after the first
                                 title = self.col_spacing + title
-                            label =  qt_import.QLabel(title, self.parent())
+                            label = qt_import.QLabel(title, self.parent())
                             self.addWidget(
                                 label,
                                 rownum,
                                 col1,
-                                qt_import.Qt.AlignRight | qt_import.Qt.AlignTop
+                                qt_import.Qt.AlignRight | qt_import.Qt.AlignTop,
                             )
                             self.addWidget(
                                 new_widget,
                                 rownum,
                                 col2,
-                                qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
+                                qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
                             )
                     else:
                         self.addWidget(
@@ -566,11 +580,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             col1,
                             1,
                             2,
-                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
                         )
-                    # if widget_type == "text_area":
-                    #     self.setRowStretch(rownum, 8)
-                    #     self.setColumnStretch(col2, 8)
                 else:
                     title = ui_schema.get("ui:title")
                     if title:
@@ -581,14 +591,12 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             col1,
                             1,
                             2,
-                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
-                            )
+                        )
                         outer_layout = qt_import.QVBoxLayout()
                         outer_box.setLayout(outer_layout)
                         outer_layout.addWidget(
                             new_widget,
                             0,
-                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
                         )
                         # outer_layout.setStretch(0, 8)
                     else:
@@ -598,10 +606,7 @@ class ColumnGridWidget (qt_import.QGridLayout):
                             col1,
                             1,
                             2,
-                            # qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop
                         )
-                    # self.setRowStretch(rownum, 8)
-                    # self.setColumnStretch(col2, 8)
             else:
                 maxrownum = max(maxrownum, rownum)
         # Add spacer to compress layout
@@ -611,20 +616,14 @@ class ColumnGridWidget (qt_import.QGridLayout):
             qt_import.QSizePolicy.Expanding,
             qt_import.QSizePolicy.Expanding,
         )
-        self.addItem(
-            spacerItem,
-            maxrownum + 1,
-            col2 + 1
-        )
+        self.addItem(spacerItem, maxrownum + 1, col2 + 1)
+
 
 class VerticalBox(ColumnGridWidget):
     """Treated as a single column gridded box, with input not grouped in columns"""
 
-    def populate_widget(
-        self, schema, ui_schema, field_name, gui_root_widget
-    ):
-        wrap_schema = {
-        }
+    def populate_widget(self, schema, ui_schema, field_name, gui_root_widget):
+        wrap_schema = {}
         col_schema = wrap_schema["column"] = {}
         self.is_hidden = False
         for tag, val in ui_schema.items():
@@ -637,12 +636,10 @@ class VerticalBox(ColumnGridWidget):
         #
         super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
 
+
 class HorizontalBox(ColumnGridWidget):
-    def populate_widget(
-        self, schema, ui_schema, field_name, gui_root_widget
-    ):
-        wrap_schema = {
-        }
+    def populate_widget(self, schema, ui_schema, field_name, gui_root_widget):
+        wrap_schema = {}
         self.is_hidden = False
         title = ui_schema.get("ui:title")
         if title:
@@ -651,100 +648,27 @@ class HorizontalBox(ColumnGridWidget):
         for tag in ui_schema["ui:order"]:
             colname = tag + "_col"
             new_order.append((colname))
-            dd0 = {
-                "ui:order": [tag]
-            }
+            dd0 = {"ui:order": [tag]}
             if tag in ui_schema:
                 dd0[tag] = ui_schema[tag]
             wrap_schema[colname] = dd0
         #
         super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
 
+
 class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
     """Collection-of-widgets widget for parameter query"""
+
     parametersValidSignal = qt_import.pyqtSignal(bool)
 
-    def __init__(self):
+    def __init__(self, import_module_name=None):
 
         self.parameter_widgets = {}
         qt_import.QWidget.__init__(self)
-        self.block_updates = False
 
-        # current_row = 0
-        # col_incr = 0
-        # # pad1: width of empty separating columns
-        # pad1 = " " * 4
-        # # Extra padding in front of columns 2, 3, ...
-        # # to offset space for boolean widgets
-        # pad2 = ""
-        # for field in fields:
-        #     # should not happen but lets just skip them
-        #     if (
-        #         field["type"] != "message"
-        #         and "uiLabel" not in field
-        #         and not field["type"].startswith("dbl")
-        #     ):
-        #         continue
-        #
-        #     # hack until the 'real' xml gets implemented server side
-        #     # and this mess gets rewritten
-        #     if field["type"] == "message":
-        #         logging.debug("creating widget with options: %s", field)
-        #         widget = make_widget(self, field)
-        #         # message will be alone in the layout
-        #         # so that will not fsck up the layout
-        #         self.layout().addWidget(widget, current_row, current_row, 0, 1)
-        #     else:
-        #         logging.debug("creating widget with options: %s", field)
-        #         widget = make_widget(self, field)
-        #         # Temporary (like this brick ...) hack to get a nicer UI
-        #         if isinstance(widget, TextEdit):
-        #             widget.setSizePolicy(
-        #                 qt_import.QSizePolicy.MinimumExpanding,
-        #                 qt_import.QSizePolicy.Minimum,
-        #             )
-        #         else:
-        #             widget.setSizePolicy(
-        #                 qt_import.QSizePolicy.Fixed, qt_import.QSizePolicy.Fixed
-        #             )
-        #         self.field_widgets.append(widget)
-        #         col = col_incr
-        #         if field["type"] == "boolean":
-        #             self.layout().addWidget(
-        #                 widget, current_row, col, 1, 2, qt_import.Qt.AlignLeft
-        #             )
-        #         elif field["type"].startswith("dbl"):
-        #             # Double width widget, no label
-        #             self.layout().addWidget(
-        #                 widget, current_row, col, 1, 2, qt_import.Qt.AlignLeft
-        #             )
-        #         else:
-        #             pad = pad2 if col_incr else ""
-        #             label = qt_import.QLabel(pad + field["uiLabel"], self)
-        #             self.layout().addWidget(
-        #                 label, current_row, col, qt_import.Qt.AlignLeft
-        #             )
-        #             self.layout().addWidget(
-        #                 widget, current_row, 1 + col, qt_import.Qt.AlignLeft
-        #             )
-        #             # Add empty column, for separation purposes
-        #
-        #             hspacer = qt_import.QSpacerItem(
-        #                 10,
-        #                 20,
-        #                 qt_import.QSizePolicy.MinimumExpanding,
-        #                 qt_import.QSizePolicy.Minimum
-        #             )
-        #             # empty = qt_import.QLabel(pad1, self)
-        #             self.layout().addItem(
-        #                 hspacer, current_row, col + 2, qt_import.Qt.AlignLeft
-        #             )
-        #
-        #     current_row += 1
-        #     if field.pop("NEW_COLUMN", False):
-        #         current_row = 0
-        #         # Increment column
-        #         col_incr += 3
+        ui_communication.AbstractValuesMap.__init__(
+            self, import_module_name=import_module_name
+        )
 
     def set_values(self, **values):
         """Set values for all fields from values dictionary"""
@@ -752,15 +676,12 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
             self.parameter_widgets[tag].set_value(val)
 
     def input_field_changed(self):
-        """Placeholder function, can be overridden in individual instances
-
-        Executed at the end of all input_field_changed functions """
-        self.get_values_map()
+        """UI update function triggered by field value changes"""
+        if self.update_function is not None:
+            self.update_function(self.parent().gui_root_widget)
 
     def get_values_map(self):
         """Get parameter values dictionary for all fields"""
-        for tag, value in self.parameter_widgets.items():
-            print (' ----> %s: %s' % (tag, value.get_value()))
         return dict(
             (tag, val.get_value()) for tag, val in self.parameter_widgets.items()
         )
@@ -782,7 +703,10 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
         try:
             widget = self.parameter_widgets.get(widget_name)
             if widget is None:
-                raise (ValueError*"Attempt to reset non-existing widget: %s" % widget_name)
+                raise ValueError(
+                    "Attempt to reset non-existing widget: %s"
+                    % widget_name
+                )
             if isinstance(widget, Combo):
                 # Supported options are: value_dict, hidden, and default
                 supported = frozenset(("hidden", "value_dict", "default"))
@@ -790,7 +714,8 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
                 if disallowed:
                     raise ValueError(
                         "Disallowed reset options for widget %s: %s"
-                    % (widget_name, sorted(disallowed)))
+                        % (widget_name, sorted(disallowed))
+                    )
                 widget.clear()
                 widget.setup_pulldown(**options)
             else:
@@ -801,8 +726,6 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
         finally:
             self.block_updates = False
 
-
-
     def validate_fields(self):
         all_valid = True
         for field_name, widget in self.parameter_widgets.items():
@@ -812,11 +735,36 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
             if hasattr(widget, "is_valid"):
                 if not widget.is_valid():
                     all_valid = False
-                    print (
+                    print(
                         "WARNING, invalid value %s for %s"
-                        % (widget.get_value(),field_name)
+                        % (widget.get_value(), field_name)
                     )
         self.parametersValidSignal.emit(all_valid)
+
+    def colour_widget(self, widget_name, colour):
+        """
+
+        Args:
+            widget_name (str):
+            colour (str): One of WIDGET_COLOURS
+
+        Returns: None
+
+        """
+        if colour == "LINE_EDIT_WARNING":
+            colour = "LIGHT_YELLOW"
+        widget = self.parameter_widgets.get(widget_name)
+        if widget is None:
+            raise (
+                ValueError * "Attempt to colour non-existing widget: %s" % widget_name
+            )
+        if hasattr(widget, "colour_widget"):
+            widget.colour_widget(colour)
+        else:
+            raise ValueError(
+                " colour_widget not supported for widget %s of type %s"
+                % (widget_name, widget.__class__.__name__)
+            )
 
 
 class MultiSelectionTable(qt_import.QTableWidget):
@@ -853,42 +801,49 @@ class SelectionTable(qt_import.QTableWidget):
 
         hdr = self.horizontalHeader()
         hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
-        for ii in range(1, len(header)):
-            hdr.setResizeMode(ii, qt_import.QHeaderView.ResizeToContents)
+        for idx in range(1, len(header)):
+            hdr.setResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
 
         colouring = options.get("colouring")
-        for ii, data in enumerate(options["content"]):
-            self.populateColumn(ii, data, colouring)
+        for idx, data in enumerate(options["content"]):
+            self.populateColumn(idx, data, colouring)
 
+        self.setCurrentCell(options.get("select_row", 0), 0)
+
+        import_module = self.import_module = options.get("import_module")
         fname = options.get("update_function")
-        self.update_function = fname and getattr(HWR.beamline.gphl_workflow, fname)
+        if fname:
+            if import_module:
+                self.update_function = getattr(import_module, fname)
+            else:
+                raise ValueError(
+                    "Widget %s has update_function %s but lacks import_module"
+                    % (self, fname)
+                )
+        else:
+            self.update_function = None
         self.currentCellChanged.connect(self.input_field_changed)
 
     def resizeData(self, ii):
         """Dummy method, recommended by docs when not using std cell widgets"""
         pass
 
-    def populateColumn(self, colNum, values, colouring=None):
+    def populateColumn(self, colnum, values, colouring=None):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
-        selectRow = None
         if colouring and any(colouring):
-            colour = getattr(colors,"LIGHT_GREEN")
+            colour = getattr(colors, "LIGHT_GREEN")
         else:
             colour = None
-        for rowNum, text in enumerate(values):
+        for rownum, text in enumerate(values):
             wdg = qt_import.QLineEdit(self)
             wdg.setFont(qt_import.QFont("Courier"))
             wdg.setReadOnly(True)
             wdg.setText(conversion.text_type(text))
-            if colour and colouring[rowNum]:
+            if colour and colouring[rownum]:
                 colors.set_widget_color(wdg, colour, qt_import.QPalette.Base)
-            self.setCellWidget(rowNum, colNum, wdg)
-            if "*" in text and (colouring[rowNum] or not colour):
-                selectRow = rowNum
-        if selectRow is not None:
-            self.setCurrentCell(selectRow, 0)
+            self.setCellWidget(rownum, colnum, wdg)
 
     def get_value(self):
         """Get value - list of cell contents for selected row"""
@@ -901,17 +856,12 @@ class SelectionTable(qt_import.QTableWidget):
 
     def input_field_changed(self, current_row, current_col, previous_row, previous_col):
         """UI update function triggered by selection changes"""
-        print (
-            current_row, current_col,
-            previous_row,
-            previous_col,
-            self.update_function
+        print(
+            current_row, current_col, previous_row, previous_col, self.update_function
         )
         if self.update_function is not None and current_row != previous_row:
             self.update_function(self.parent().gui_root_widget)
         self.parent().input_field_changed()
-
-
 
 
 # Class is selected from ui:widget or, failing that, from type
