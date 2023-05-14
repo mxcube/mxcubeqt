@@ -699,32 +699,27 @@ class LayoutWidget(qt_import.QWidget, ui_communication.AbstractValuesMap):
         Returns: None
 
         """
-        self.block_updates = True
-        try:
-            widget = self.parameter_widgets.get(widget_name)
-            if widget is None:
+        widget = self.parameter_widgets.get(widget_name)
+        if widget is None:
+            raise ValueError(
+                "Attempt to reset non-existing widget: %s" % widget_name
+            )
+        if isinstance(widget, Combo):
+            # Supported options are: value_dict, hidden, and default
+            supported = frozenset(("hidden", "value_dict", "default"))
+            disallowed = frozenset(options).difference(supported)
+            if disallowed:
                 raise ValueError(
-                    "Attempt to reset non-existing widget: %s"
-                    % widget_name
+                    "Disallowed reset options for widget %s: %s"
+                    % (widget_name, sorted(disallowed))
                 )
-            if isinstance(widget, Combo):
-                # Supported options are: value_dict, hidden, and default
-                supported = frozenset(("hidden", "value_dict", "default"))
-                disallowed = frozenset(options).difference(supported)
-                if disallowed:
-                    raise ValueError(
-                        "Disallowed reset options for widget %s: %s"
-                        % (widget_name, sorted(disallowed))
-                    )
-                widget.clear()
-                widget.setup_pulldown(**options)
-            else:
-                raise ValueError(
-                    " reset_options not supported for widget %s of type %s"
-                    % (widget_name, widget.__class__.__name__)
-                )
-        finally:
-            self.block_updates = False
+            widget.clear()
+            widget.setup_pulldown(**options)
+        else:
+            raise ValueError(
+                " reset_options not supported for widget %s of type %s"
+                % (widget_name, widget.__class__.__name__)
+            )
 
     def validate_fields(self):
         all_valid = True
