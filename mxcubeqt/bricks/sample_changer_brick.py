@@ -66,11 +66,15 @@ class VialView(qt_import.QWidget):
 
     def set_vial(self, vial_state):
         """Sets vial state"""
-        self.vial_state = vial_state[0]
-        try:
-            self.vial_code = vial_state[1]
-        except BaseException:
-            self.vial_code = ""
+        if isinstance(vial_state, int):
+            self.vial_state = vial_state
+        else:
+            self.vial_state = vial_state[0]
+            try:
+                self.vial_code = vial_state[1]
+            except BaseException:
+                self.vial_code = ""
+
         self.setEnabled(self.vial_state != VialView.VIAL_NONE)
         self.setToolTip(self.vial_code)
         self.update()
@@ -1391,6 +1395,12 @@ class SampleChangerBrick(BaseWidget):
             if sample.is_loaded():
                 presences[basket_index][vial_index] = [VialView.VIAL_AXIS, matrix]
 
+        import logging
+        logging.getLogger("HWR").debug(f"presences: {presences} {len(presences[0])}")
+        logging.getLogger("HWR").debug(f"basket_count: {self.basket_count} ")
+        # 
+        # self.basket_count = 5
+     
         for basket_index in range(self.basket_count):
             presence = presences[basket_index]
             self.baskets[basket_index].set_matrices(presence)
