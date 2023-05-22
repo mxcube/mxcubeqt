@@ -185,7 +185,7 @@ class CreateCharWidget(CreateTaskBase):
         self._set_space_group(self._processing_parameters.space_group)
 
         self._acquisition_parameters = (
-            HWR.beamline.get_default_acquisition_parameters("default")
+            HWR.beamline.get_default_acquisition_parameters("characterisation")
         )
 
         self._char_params = (
