@@ -24,7 +24,7 @@ import logging
 from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -229,7 +229,7 @@ class DataPathWidget(qt_import.QWidget):
         if self._data_model.precision:
             precision = self._data_model.precision
         else:
-            precision = "5"
+            precision = "05"
 
         self.set_directory(dir_name)
         file_name = file_name.replace(

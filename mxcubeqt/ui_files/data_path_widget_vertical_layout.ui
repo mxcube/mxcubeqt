@@ -278,6 +278,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>base_path_ledit</tabstop>
+  <tabstop>folder_ledit</tabstop>
+  <tabstop>browse_button</tabstop>
+  <tabstop>prefix_ledit</tabstop>
+  <tabstop>run_number_ledit</tabstop>
+  <tabstop>compression_cbox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

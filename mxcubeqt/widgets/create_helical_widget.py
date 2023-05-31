@@ -27,8 +27,11 @@ from mxcubeqt.widgets.acquisition_widget import AcquisitionWidget
 from mxcubeqt.widgets.processing_widget import ProcessingWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
-from mxcubecore.HardwareObjects.queue_model_enumerables import EXPERIMENT_TYPE
+from mxcubecore.model import (
+    queue_model_objects,
+    queue_model_enumerables,
+)
+
 from mxcubecore.HardwareObjects.QtGraphicsLib import GraphicsItemLine
 
 from mxcubecore import HardwareRepository as HWR
@@ -305,7 +308,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
             dc.set_name(start_acq.path_template.get_prefix())
             dc.set_number(start_acq.path_template.run_number)
-            dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
+            dc.set_experiment_type(queue_model_enumerables.EXPERIMENT_TYPE.HELICAL)
             dc.set_requires_centring(False)
             dc.run_processing_after = (
                 self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()

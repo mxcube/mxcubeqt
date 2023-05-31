@@ -83,6 +83,7 @@ class PhaseBrick(BaseWidget):
             for phase in phase_list:
                 self.phase_combobox.addItem(phase)
             self.setEnabled(True)
+            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(HWR.beamline.diffractometer.current_phase))
         else:
             self.setEnabled(False)
 

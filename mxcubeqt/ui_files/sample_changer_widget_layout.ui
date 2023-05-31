@@ -440,6 +440,15 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <tabstops>
+  <tabstop>filter_cbox</tabstop>
+  <tabstop>details_button</tabstop>
+  <tabstop>sample_combo</tabstop>
+  <tabstop>synch_ispyb_button</tabstop>
+  <tabstop>centring_cbox</tabstop>
+  <tabstop>filter_ledit</tabstop>
+  <tabstop>filter_combo</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -309,177 +309,177 @@ class CatsMaintBrick(BaseWidget):
     def regulation_set_on(self):
         try:
             if self.device is not None:
-                self.device._doEnableRegulation()
+                self.device._do_enable_regulation()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def regulation_set_off(self):
         try:
             if self.device is not None:
-                self.device._doDisableRegulation()
+                self.device._do_disable_regulation()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def power_on(self):
         try:
             if self.device is not None:
-                self.device._doPowerState(True)
+                self.device._do_power_state(True)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def power_off(self):
         try:
             if self.device is not None:
-                self.device._doPowerState(False)
+                self.device._do_power_state(False)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid1_open(self):
         try:
             if self.device is not None:
-                self.device._doLid1State(True)
+                self.device._do_lid1_state(True)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid1_close(self):
         try:
             if self.device is not None:
-                self.device._doLid1State(False)
+                self.device._do_lid1_state(False)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid2_open(self):
         try:
             if self.device is not None:
-                self.device._doLid2State(True)
+                self.device._do_lid2_state(True)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid2_close(self):
         try:
             if self.device is not None:
-                self.device._doLid2State(False)
+                self.device._do_lid2_state(False)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid3_open(self):
         try:
             if self.device is not None:
-                self.device._doLid3State(True)
+                self.device._do_lid3_state(True)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def lid3_close(self):
         try:
             if self.device is not None:
-                self.device._doLid3State(False)
+                self.device._do_lid3_state(False)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def tool_open(self):
         try:
             if self.device is not None:
-                self.device._doToolOpen()
+                self.device._do_tool_open()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def tool_close(self):
         try:
             if self.device is not None:
-                self.device._doToolClose()
+                self.device._do_tool_close()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def tool_calibrate(self):
         try:
             if self.device is not None:
-                self.device._doCalibration()  # adds a parameter 2 (for tool) in device
+                self.device._do_calibration()  # adds a parameter 2 (for tool) in device
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def magnet_on(self):
         try:
             if self.device is not None:
-                self.device._doMagnetOn()
+                self.device._do_magnet_on()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def magnet_off(self):
         try:
             if self.device is not None:
-                self.device._doMagnetOff()
+                self.device._do_magnet_off()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def resetError(self):
         try:
             if self.device is not None:
-                self.device._doReset()
+                self.device._do_reset()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def home(self):
         try:
             if self.device is not None:
-                self.device._doHome()
+                self.device._do_home()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def dry(self):
         try:
             if self.device is not None:
-                self.device._doDryGripper()
+                self.device._do_dry_gripper()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def soak(self):
         try:
             if self.device is not None:
-                self.device._doSoak()
+                self.device._do_soak()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def back_traj(self):
         try:
             if self.device is not None:
-                # self.device._doBack()
-                self.device.backTraj()
+                # self.device._do_back()
+                self.device.back_traj()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def safe_traj(self):
         try:
             if self.device is not None:
-                # self.device._doSafe()
-                self.device.safeTraj()
+                # self.device._do_safe()
+                self.device.safe_traj()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def abort(self):
         try:
             if self.device is not None:
-                self.device._doAbort()
+                self.device._do_abort()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def panic(self):
         try:
             if self.device is not None:
-                self.device._doPanic()
+                self.device._do_panic()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def restart(self):
         try:
             if self.device is not None:
-                self.device._doRestart()
+                self.device._do_restart()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
     def reset_motion(self):
         try:
             if self.device is not None:
-                self.device._doResetMotion()
+                self.device._do_reset_motion()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
@@ -500,7 +500,7 @@ class CatsMaintBrick(BaseWidget):
     def clear_memory(self):
         try:
             if self.device is not None:
-                self.device._doResetMemory()
+                self.device._do_reset_memory()
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 

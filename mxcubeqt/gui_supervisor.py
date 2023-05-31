@@ -120,7 +120,6 @@ class SplashScreen(qt_import.QSplashScreen):
             qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
             "Starting MXCuBE. Please wait...",
         )
-        painter.font().setPixelSize(self.pxsize * 2.5)
         painter.font().setPixelSize(self.pxsize)
 
         top_y = bot_y
@@ -388,7 +387,7 @@ class GUISupervisor(qt_import.QWidget):
             widgets_dict = dict(
                 [
                     (
-                        isinstance(w.objectName, collections.Callable)
+                        isinstance(w.objectName, collections.abc.Callable)
                         and str(w.objectName())
                         or None,
                         w,

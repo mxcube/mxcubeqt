@@ -32,7 +32,7 @@ from mxcubeqt.widgets.create_xray_imaging_widget import CreateXrayImagingWidget
 from mxcubeqt.widgets.create_ssx_widget import CreateSsxWidget
 from mxcubeqt.widgets.comments_widget import CommentsWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 
 from mxcubecore import HardwareRepository as HWR
 
@@ -86,7 +86,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         if self.gphl_workflow_page is not None:
-            self.tool_box.addItem(self.gphl_workflow_page, "GPhL Workflows")
+            self.tool_box.addItem(self.gphl_workflow_page, "GΦL Workflows")
         self.tool_box.addItem(self.advanced_page, "Advanced")
         self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
         self.tool_box.addItem(self.ssx_page, "SSX")
@@ -163,7 +163,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         if HWR.beamline.gphl_connection and HWR.beamline.gphl_workflow:
             self.gphl_workflow_page.initialise_workflows()
         else:
-            logging.getLogger("HWR").info("GPhL workflow task not available")
+            logging.getLogger("HWR").info("GΦL workflow task not available")
 
     def set_available_tasks(self, available_tasks):
         for task_name in available_tasks.split():
@@ -180,7 +180,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         # Adjust periodic table width
         if width > -1:
             self.energy_scan_page._periodic_table_widget.setFixedWidth(width - 4)
-            self.energy_scan_page._periodic_table_widget.setFixedHeight(width / 1.5)
+            self.energy_scan_page._periodic_table_widget.setFixedHeight(int(width / 1.5))
 
     def set_expert_mode(self, state):
         for i in range(0, self.tool_box.count()):

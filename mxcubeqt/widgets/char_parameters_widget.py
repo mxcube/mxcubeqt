@@ -25,9 +25,9 @@ from mxcubeqt.widgets.optimisation_parameters_widget_layout import (
     OptimisationParametersWidgetLayout,
 )
 
-from mxcubecore.HardwareObjects import (
+from mxcubecore.model import (
     queue_model_objects,
-    queue_model_enumerables,
+    crystal_symmetry,
 )
 
 
@@ -320,7 +320,7 @@ class CharParametersWidget(qt_import.QWidget):
         #                                        None)
 
         self.vertical_dimension_widget.space_group_ledit.addItems(
-            queue_model_enumerables.XTAL_SPACEGROUPS
+            crystal_symmetry.XTAL_SPACEGROUPS
         )
 
         self.char_type_widget.charact_type_tbox.currentChanged.connect(
@@ -349,7 +349,7 @@ class CharParametersWidget(qt_import.QWidget):
         """
         Descript. :
         """
-        self._char_params.space_group = queue_model_enumerables.XTAL_SPACEGROUPS[index]
+        self._char_params.space_group = crystal_symmetry.XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
         """
@@ -357,8 +357,8 @@ class CharParametersWidget(qt_import.QWidget):
         """
         index = 0
 
-        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
-            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in crystal_symmetry.XTAL_SPACEGROUPS:
+            index = crystal_symmetry.XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
         self.vertical_dimension_widget.space_group_ledit.setCurrentIndex(index)

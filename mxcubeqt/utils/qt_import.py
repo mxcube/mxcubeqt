@@ -113,6 +113,8 @@ elif "--pyqt3" in sys.argv:
 # PyQt5
 #
 if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
+    # NB These are the only versions that are licensed to use with this code
+    SUPPORTED_VERSIONS = ["5.15.9"]
     try:
         from PyQt5.QtCore import (
             pyqtSignal,
@@ -134,8 +136,14 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QTimer,
             QUrl,
         )
+        if PYQT_VERSION_STR not in SUPPORTED_VERSIONS:
+            raise NotImplementedError(
+                "PyQt version %s is not supported or licensed\n For Qt5 use one of %s"
+                % (PYQT_VERSION_STR, SUPPORTED_VERSIONS)
+            )
         from PyQt5.QtWidgets import (
             QAbstractItemView,
+            QAbstractScrollArea,
             QAction,
             QActionGroup,
             QApplication,
@@ -261,6 +269,8 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
     #   !! this means the classes below will not exist !!
     # but code is guaranteed to be compatible
     try:
+        # NB These are the only versions that are licensed to use with this code
+        SUPPORTEDVERSIONS = ["4.12.3"]
         from PyQt4.QtCore import (
             pyqtSignal,
             pyqtSlot,
@@ -282,6 +292,11 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QTimer,
             SIGNAL,
         )
+        if PYQT_VERSION_STR not in SUPPORTED_VERSIONS:
+            raise NotImplementedError(
+                "PyQt version %s is not supported or licensed\n For Qt4 use one of %s"
+                % (PYQT_VERSION_STR, SUPPORTED_VERSIONS)
+            )
         from PyQt4.QtGui import (
             qApp,
             QAbstractItemView,

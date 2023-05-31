@@ -4,10 +4,7 @@ import sys
 from setuptools import setup, find_packages
 
 
-if sys.version_info >= (3, 0):
-    requirements_filename = 'requirements_python3.txt'
-else:
-    requirements_filename = 'requirements_python2.txt'
+requirements_filename = 'requirements_mxcubecore.txt'
 
 with open(requirements_filename) as f:
     content = f.readlines()
@@ -18,7 +15,7 @@ setup_requirements = []
 
 tests_requirements = []
 
-extras_requirements = {'pyqt5': ['PyQt5==5.14']}
+extras_requirements = {}
 
 console_scripts = ['mxcube = mxcubeqt.__main__:run']
 
@@ -50,7 +47,6 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: Lesser General Public License v3 (LGPLv3)',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering',
     ],
@@ -61,5 +57,5 @@ setup(
     setup_requires=setup_requirements,
     tests_require=tests_requirements,
     extras_require=extras_requirements,
-    python_requires='>=2.7',
+    python_requires='>=3.8',
    )

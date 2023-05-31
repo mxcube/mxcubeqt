@@ -23,7 +23,7 @@ from mxcubeqt.widgets.periodic_table_widget import PeriodicTableWidget
 from mxcubeqt.widgets.pyqtgraph_widget import PlotWidget
 from mxcubeqt.widgets.snapshot_widget import SnapshotWidget
 
-from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore.model import queue_model_objects
 from mxcubecore import HardwareRepository as HWR
 
 

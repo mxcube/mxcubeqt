@@ -237,13 +237,13 @@ class SlitsBrick(BaseWidget):
 
         # value = int(self.slitbox_hwobj.get_gap_hor() * 1000)
         self.hor_pos_dspinbox.setRange(
-            gap_min_limits[0] * 1000, gap_max_limits[0] * 1000
+            int(gap_min_limits[0] * 1000), int(gap_max_limits[0] * 1000)
         )
         self.hor_pos_dspinbox.setSingleStep(1)
         self.hor_pos_dspinbox.setValue(int(gap_values[0] * 1000))
 
         self.ver_pos_dspinbox.setRange(
-            gap_min_limits[1] * 1000, gap_max_limits[1] * 1000
+            int(gap_min_limits[1] * 1000), int(gap_max_limits[1] * 1000)
         )
         self.ver_pos_dspinbox.setSingleStep(1)
         self.ver_pos_dspinbox.setValue(int(gap_values[1] * 1000))
