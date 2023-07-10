@@ -122,5 +122,6 @@ class ShutterBrick(BaseWidget):
         colors.set_widget_color_by_state(self.state_label, value)
         self.state_label.setText(value.value.title())
         self.setDisabled(value.name == "DISABLED")
-        self.open_button.setEnabled(self.shutter_hwobj.is_closed())
-        self.close_button.setEnabled(self.shutter_hwobj.is_open())
+        is_open = self.shutter_hwobj.is_open
+        self.open_button.setEnabled(not is_open)
+        self.close_button.setEnabled(is_open)
