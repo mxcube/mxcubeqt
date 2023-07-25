@@ -24,6 +24,8 @@ import logging
 
 from mxcubeqt.utils import qt_import
 from mxcubeqt.utils.jsonparamsgui import create_widgets
+from mxcubecore import HardwareRepository as HWR
+from mxcubecore.dispatcher import dispatcher
 
 __copyright__ = """ Copyright © 2016 - 2022 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -98,21 +100,38 @@ class GphlJsonDialog(qt_import.QDialog):
         result = {}
         result.update(self.params_widget.get_values_map())
         self.accept()
-        self._async_result.set(result)
-        self._async_result = None
+        responses = dispatcher.send(
+            HWR.beamline.gphl_workflow.PARAMETER_RETURN_SIGNAL,
+            self,
+            HWR.beamline.gphl_workflow.PARAMETERS_READY,
+            result,
+        )
+        if not responses:
+            self._return_parameters.set_exception(
+                RuntimeError("Signal 'gphlJsonParametersNeeded' is not connected")
+            )
 
     def cancel_button_click(self):
         logging.getLogger("HWR").debug("GΦL Data dialog abort pressed.")
+        result = {}
+        result.update(self.params_widget.get_values_map())
         self.reject()
-        self._async_result.set(StopIteration)
-        self._async_result = None
+        return_signal = HWR.beamline.gphl_workflow.PARAMETER_RETURN_SIGNAL
+        responses = dispatcher.send(
+            return_signal,
+            self,
+            HWR.beamline.gphl_workflow.PARAMETERS_CANCELLED,
+            result,
+        )
+        if not responses:
+            self._return_parameters.set_exception(
+                RuntimeError("Signal '%s' is not connected" % return_signal)
+            )
 
-    def open_dialog(self, schema, ui_schema, async_result):
+    def open_dialog(self, schema, ui_schema):
 
         msg = "GΦL Workflow waiting for input, verify parameters and press continue."
         logging.getLogger("user_level_log").info(msg)
-
-        self._async_result = async_result
 
         # parameters widget
         if self.params_widget is not None:
@@ -129,8 +148,6 @@ class GphlJsonDialog(qt_import.QDialog):
         self.parameter_gbox.show()
         params_widget.parametersValidSignal.connect(self.continue_button.setEnabled)
         params_widget.validate_fields()
-        if params_widget.update_function:
-            params_widget.update_function()
         self.show()
         self.setEnabled(True)
         self.update()
