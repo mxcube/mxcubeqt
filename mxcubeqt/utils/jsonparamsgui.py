@@ -18,20 +18,20 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""PyQt GUI for runtime queries - port of paramsgui - rhfogh Jan 2018, May 2023
+"""PyQt Schema-driven UI for runtime queries - port of paramsgui - rhfogh Jan 2018,
+Refactored May 2023 to taek JSON schema as input
+Refactored July 2024 to work with web version (update functions on server side)
 """
-from __future__ import division, absolute_import
-from __future__ import print_function, unicode_literals
-
+import abc
 import os.path
 import logging
+from collections import OrderedDict
+from typing import Any, Optional, Dict, Sequence, List, Tuple
 import gevent
 import gevent.event
 
-from collections import OrderedDict
-
-from mxcubeqt.utils import qt_import, colors
 from mxcubecore.dispatcher import dispatcher
+from mxcubeqt.utils import qt_import, colors
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -42,125 +42,229 @@ ColourMap = {
     "WARNING": colors.LIGHT_ORANGE,
     "ERROR": colors.LINE_EDIT_ERROR,
     "CHANGED": colors.LINE_EDIT_CHANGED,
+    "HIGHLIGHT": colors.LIGHT_GREEN,
 }
 
-class ValueWidget:
+
+class LayoutWidget(qt_import.QWidget):
+    """Collection-of-widgets widget for parameter query"""
+
+    parametersValidSignal = qt_import.pyqtSignal(bool)
+
+    def __init__(self, options: Dict[str, Any]):
+
+        self.parameter_widgets: Dict[str, ValueWidget] = {}
+        self.return_signal: str = options.get("return_signal")
+        self.update_signal: str = options.get("update_signal")
+        self.update_on_change: Optional[bool] = options.get("update_on_change")
+        qt_import.QWidget.__init__(self)
+        dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
+
+        # event to handle waiting for parameter input
+        self.wait_event: gevent.event.Event = gevent.event.Event()
+
+    def close(self) -> None:
+        """Close widget and disconnect signals"""
+        super().close()
+        dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
+
+    def set_values(self, **values) -> None:
+        """Set values for all fields from values dictionary"""
+        for tag, val in values.items():
+            self.parameter_widgets[tag].set_value(val)
+
+    def get_values_map(self) -> Dict[str, Any]:
+        """Get parameter values dictionary for all fields"""
+        return dict(
+            (tag, val.get_value()) for tag, val in self.parameter_widgets.items()
+        )
+
+    def update_values(self, changes_dict: Dict[str, dict]) -> None:
+        """Apply GUI updates returned from server
+
+        Input is a field_name: dict2 dictionary
+        with dict2 having (optional) keys "
+        value" (Any), "options"  (dict) and "highlight"
+        """
+
+        for tag, ddict in changes_dict.items():
+            widget: ValueWidget = self.parameter_widgets[tag]
+            if "value" in ddict:
+                widget.set_value(ddict["value"])
+            options: dict = ddict.get("options")
+            if options is not None:
+                if hasattr(widget, "reset_options"):
+                    widget.reset_options(options)
+                else:
+                    raise ValueError(
+                        " reset_options not supported for widget %s of type %s"
+                        % (tag, widget.__class__.__name__)
+                    )
+            highlight: str = ddict.get("highlight")
+            widget.highlight = highlight
+        self.wait_event.set()
+
+    def validate_fields(self, editing: Optional[str] = None) -> None:
+        """Validate fields, emit all_valid signal, and set widget colours"""
+        all_valid: bool = True
+        for field_name, widget in self.parameter_widgets.items():
+            if widget.is_valid():
+                highlight: str = widget.highlight
+                if not highlight:
+                    if field_name == editing:
+                        highlight = "CHANGED"
+                    else:
+                        highlight = "OK"
+            else:
+                all_valid = False
+                print(
+                    "WARNING, invalid value %s for %s"
+                    % (widget.get_value(), field_name)
+                )
+                highlight = "ERROR"
+            widget.colour_widget(highlight)
+        self.parametersValidSignal.emit(all_valid)
+
+
+class ValueWidget(qt_import.QWidget):
     """Mixin class for widgets containg actual values (i..e not containers)"""
-    def __init__(self, gui_root_widget, options):
-        self.is_hidden = options.get("hidden")
-        self.gui_root_widget = gui_root_widget
-        self.__name = options["variable_name"]
+
+    def __init__(
+        self,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
+        # NB QWidget.__init__ is called from subclasses, should NOT be called here
+        self.is_hidden: bool = options.get("hidden")
+        self.gui_root_widget: LayoutWidget = gui_root_widget
+        self.__name: str = options["variable_name"]
         if "default" in options:
             self.set_value(options["default"])
-        self.update_on_change = bool(options.get("update_on_change"))
-        self.highlight = options.get("highlight")
+        self.update_on_change: bool = bool(options.get("update_on_change"))
+        self.highlight: Optional[str] = options.get("highlight")
 
-        if self.is_hidden or options.get("readOnly"):
-            self.setReadOnly(True)
+        if self.is_hidden:
+            self.hide()
+            self.setEnabled(False)
+        elif options.get("read_only"):
             self.setEnabled(False)
 
-    def get_name(self):
+    @abc.abstractmethod
+    def set_value(self, value: Any) -> None:
+        """Set widget value."""
+
+    def get_name(self) -> str:
+        """Get field name"""
         return self.__name
 
-    def is_valid(self):
-        """Override in subclasses where there is validity checking"""
+    def is_valid(self) -> bool:
+        """Default value. Override in subclasses, when there is validity checking"""
         return True
 
-    def input_field_changed(self):
-        """UI update function triggered by field value changes"""
-        root_widget = self.gui_root_widge
-        valid = self.is_valid()
+    def input_field_changed(self) -> None:
+        """UI update function triggered by field value changes
+
+        Sends root_widget.return_signal and waits for reply"""
+        root_widget: LayoutWidget = self.gui_root_widget
+        valid: bool = self.is_valid()
         if valid:
-            update_on_change = self.gui_root_widget.update_on_change
-            if (update_on_change
-                and (self.update_on_change or update_on_change == "always")
+            update_on_change: Optional[str] = self.gui_root_widget.update_on_change
+            if update_on_change and (
+                self.update_on_change or update_on_change == "always"
             ):
-                self._wait_event.clear()
-                responses = dispatcher.send(
+                self.gui_root_widget.wait_event.clear()
+                responses: list = dispatcher.send(
                     root_widget.return_signal,
                     self,
                     self.get_name(),
                     root_widget.get_values_map(),
                 )
                 if not responses:
-                    self._return_parameters.set_exception(
-                        RuntimeError("Signal 'gphlJsonParametersNeeded' is not connected")
+                    raise RuntimeError(
+                        "Signal %s is not connected" % root_widget.return_signal
                     )
-                self._wait_event.wait()
+                self.gui_root_widget.wait_event.wait()
         root_widget.validate_fields()
-        colors.set_widget_color(
-            self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base
-        )
+        colors.set_widget_color(self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base)
 
-    def colour_widget(self, colour):
-        """
+    def colour_widget(self, highlight: str) -> None:
+        """Colour widget according to highlight string
 
         Args:
-            colour (str): One of WIDGET_COLOURS
+            highlight: A string key to the ColourMap mapping
 
         Returns: None
 
         """
-        colors.set_widget_color(self, getattr(colors, colour), qt_import.QPalette.Base)
+        colour = ColourMap[highlight]
+        colors.set_widget_color(self, colour, qt_import.QPalette.Base)
+
 
 class LineEdit(qt_import.QLineEdit, ValueWidget):
     """Standard LineEdit widget"""
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QLineEdit.__init__(self, parent)
+        ValueWidget.__init__(self, gui_root_widget, options)
         self.setAlignment(qt_import.Qt.AlignRight)
+        if options.get("readOnly"):
+            self.setReadOnly(True)
 
-    def set_value(self, value):
+    def set_value(self, value: str) -> None:
+        """Set widget value"""
         self.setText(value)
 
-    def get_value(self):
+    def get_value(self) -> str:
+        """Get widget value"""
         return str(self.text())
+
 
 class FloatString(LineEdit):
     """LineEdit widget with validators and formatting for floating point numbers"""
 
-    def __init__(self, parent, options):
-        decimals = options.get("decimals")
-        # NB We do NOT enforce a maximum number of decimals in edited text,
-        # Only in set values.
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
+        decimals: int = options.get("decimals")
         if decimals is None:
             self.formatstr = "%s"
         else:
             self.formatstr = "%%.%sf" % decimals
-        LineEdit.__init__(self, parent, options)
-        self.validator = qt_import.QDoubleValidator(self)
-        val = options.get("minimum")
+        # NB __init__ call must be AFTER setting self.formatstr
+        LineEdit.__init__(self, parent, gui_root_widget, options)
+        self.validator: qt_import.QDoubleValidator = qt_import.QDoubleValidator(self)
+        val: Optional[float] = options.get("minimum")
         if val is not None:
             self.validator.setBottom(val)
-        val = options.get("maximum")
+        val: Optional[float] = options.get("maximum")
         if val is not None:
             self.validator.setTop(val)
-        import_module = self.import_module = options.get("import_module")
-        fname = options.get("update_function")
-        if fname:
-            if import_module:
-                self.update_function = getattr(import_module, fname)
-            else:
-                raise ValueError(
-                    "Widget %s has update_function %s but lacks import_module"
-                    % (self, fname)
-                )
-        else:
-            self.update_function = None
-
+        if decimals is not None:
+            self.validator.setDecimals(decimals)
         self.textEdited.connect(self.input_field_changed)
 
-    def set_value(self, value):
-        self.setText(self.formatstr % value)
-
-    def get_value(self):
-        val = self.text().strip()
-        if val:
-            return float(val)
+    def set_value(self, value: Optional[float]) -> None:
+        """Setter for widget value"""
+        if value is None:
+            self.setText(" ")
         else:
-            return None
+            self.setText(self.formatstr % value)
 
-    def is_valid(self):
+    def get_value(self) -> Optional[float]:
+        """Getter for widget value"""
+        val = self.text().strip()
+        return float(val) if val else None
+
+    def is_valid(self) -> bool:
+        """Check if current value is valid"""
 
         if (
             self.validator.validate(self.text(), 0)[0]
@@ -173,68 +277,76 @@ class FloatString(LineEdit):
 class TextEdit(qt_import.QTextEdit, ValueWidget):
     """Standard text edit widget (multiline text)"""
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QTextEdit.__init__(self, parent)
-        self.is_hidden = options.get("hidden")
+        ValueWidget.__init__(self, gui_root_widget, options)
         self.setAlignment(qt_import.Qt.AlignLeft)
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
         self.setSizeAdjustPolicy(qt_import.QAbstractScrollArea.AdjustToContents)
         self.setFont(qt_import.QFont("Courier"))
-        self.__name = options["variable_name"]
-        if "default" in options:
-            self.set_value(options["default"])
-        if self.is_hidden or options.get("readOnly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
 
-    def set_value(self, value):
+    def set_value(self, value: str) -> None:
+        """Setter for widget value"""
         self.setText(value)
 
-    def get_value(self):
+    def get_value(self) -> str:
+        """Getter for widget value"""
         return str(self.toPlainText())
 
 
 class Combo(qt_import.QComboBox, ValueWidget):
     """Standard ComboBox (pulldown) widget"""
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QComboBox.__init__(self, parent)
-        self.__name = options["variable_name"]
+        self.value_dict: Dict[str, Any] = {}
         self.setup_pulldown(**options)
-        import_module = self.import_module = options.get("import_module")
-        fname = options.get("update_function")
-        if fname:
-            if import_module:
-                self.update_function = getattr(import_module, fname)
-            else:
-                raise ValueError(
-                    "Widget %s has update_function %s but lacks import_module"
-                    % (self, fname)
-                )
-        else:
-            self.update_function = None
+        ValueWidget.__init__(self, gui_root_widget, options)
         self.currentIndexChanged.connect(self.input_field_changed)
         self.setSizeAdjustPolicy(qt_import.QComboBox.AdjustToContents)
 
-    def setup_pulldown(self, **options):
-        self.is_hidden = options.get("hidden")
-        self.value_dict = options["value_dict"]
+    def setup_pulldown(self, **options) -> None:
+        """Set up pulldown from emapty state (also used in resetting)"""
+        self.is_hidden: bool = options.get("hidden")
+        self.value_dict: Dict[str, Any] = dict(options["value_dict"])
         for val in self.value_dict:
             self.addItem(str(val))
         if "default" in options:
             self.set_value(options["default"])
 
-    def set_value(self, value):
-        self.setCurrentIndex(self.findText(value))
+    def set_value(self, value) -> None:
+        """Setter for widget value"""
+        indx = self.findText(value)
+        if indx >= 0:
+            self.setCurrentIndex(indx)
+        else:
+            raise ValueError(
+                "Value %s not found in widget %s" % (value, self.get_name())
+            )
 
-    def get_value(self):
+    def get_value(self) -> Any:
+        """Getter for widget value"""
         return self.value_dict.get(str(self.currentText()))
 
-    def reset_options(self, options):
+    def reset_options(self, options: Dict[str, Any]):
+        """Reset pulldown contents, value, and is_hidden"""
         # Supported options are: value_dict, hidden, and default
-        supported = frozenset(("hidden", "value_dict", "default"))
-        disallowed = frozenset(options).difference(supported)
+        supported: frozenset = frozenset(("hidden", "value_dict", "default"))
+        disallowed: frozenset = frozenset(options).difference(supported)
         if disallowed:
             raise ValueError(
                 "Disallowed reset options for widget %s: %s"
@@ -244,39 +356,46 @@ class Combo(qt_import.QComboBox, ValueWidget):
         self.setup_pulldown(**options)
 
 
-class File(qt_import.QWidget, ValueWidget):
+class File(ValueWidget, qt_import.QWidget):
     """Standard file selection widget"""
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QWidget.__init__(self, parent)
+        ValueWidget.__init__(self, gui_root_widget, options)
 
         # do not allow qt to stretch us vertically
-        policy = self.sizePolicy()
+        policy: qt_import.QSizePolicy = self.sizePolicy()
         policy.setVerticalPolicy(qt_import.QSizePolicy.Fixed)
         self.setSizePolicy(policy)
 
         qt_import.QHBoxLayout(self)
-        self.__name = options["variable_name"]
-        self.filepath = qt_import.QLineEdit(self)
+        self.filepath: qt_import.QLineEdit = qt_import.QLineEdit(self)
         self.filepath.setAlignment(qt_import.Qt.AlignLeft)
-        if "default" in options:
-            self.filepath.setText(options["default"])
-        self.open_dialog_btn = qt_import.QPushButton("...", self)
+        self.open_dialog_btn: qt_import.QPushButton = qt_import.QPushButton("...", self)
         self.open_dialog_btn.clicked.connect(self.open_file_dialog)
 
         self.layout().addWidget(self.filepath)
         self.layout().addWidget(self.open_dialog_btn)
 
-    def set_value(self, value):
+    def set_value(self, value: str) -> None:
+        """Setter for widget value"""
         self.filepath.setText(value)
 
-    def get_value(self):
+    def get_value(self) -> str:
+        """Getter for widget value"""
         return str(self.filepath.text())
 
-    def open_file_dialog(self):
-        start_path = os.path.dirname(str(self.filepath.text()))
+    def open_file_dialog(self) -> None:
+        """Ope file selection dialogue"""
+        start_path: str = os.path.dirname(str(self.filepath.text()))
         if not os.path.exists(start_path):
             start_path = ""
+        # Some Qt type, not sure of the class name
         path = qt_import.QFileDialog(self).getOpenFileName(directory=start_path)
         if not path.isNull():
             self.filepath.setText(path)
@@ -285,16 +404,21 @@ class File(qt_import.QWidget, ValueWidget):
 class IntSpinBox(qt_import.QSpinBox, ValueWidget):
     """Standard integer (spinbox) widget"""
 
-    CHANGED_COLOR = qt_import.QColor(255, 165, 0)
+    # CHANGED_COLOR = qt_import.QColor(255, 165, 0)
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QSpinBox.__init__(self, parent)
+        ValueWidget.__init__(self, gui_root_widget, options)
         self.lineEdit().setAlignment(qt_import.Qt.AlignLeft)
-        self.__name = options["variable_name"]
         if "unit" in options:
             self.setSuffix(" " + options["unit"])
         if "default" in options:
-            val = int(options["default"])
+            val: int = int(options["default"])
             self.setValue(val)
         if "maximum" in options:
             self.setMaximum(int(options["maximum"]))
@@ -302,17 +426,17 @@ class IntSpinBox(qt_import.QSpinBox, ValueWidget):
             self.setMinimum(int(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
-        self.is_hidden = options.get("hidden")
+        if options.get("readOnly"):
+            self.setReadOnly(True)
 
-    def set_value(self, value):
+    def set_value(self, value: int) -> None:
+        """Setter for widget value"""
         self.setValue(int(value))
 
-    def get_value(self):
-        val = self.value()
-        if val:
-            return int(val)
-        else:
-            return None
+    def get_value(self) -> int:
+        """Getter for widget value"""
+        val: str = self.value()
+        return int(val) if val else None
 
 
 class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
@@ -320,10 +444,15 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
 
     # CHANGED_COLOR = qt_import.QColor(255, 165, 0)
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QDoubleSpinBox.__init__(self, parent)
+        ValueWidget.__init__(self, gui_root_widget, options)
         self.lineEdit().setAlignment(qt_import.Qt.AlignLeft)
-        self.__name = options["variable_name"]
         if "unit" in options:
             self.setSuffix(" " + options["unit"])
         if "default" in options:
@@ -335,58 +464,67 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
             self.setMinimum(float(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
-        self.is_hidden = options.get("hidden")
+        if options.get("readOnly"):
+            self.setReadOnly(True)
 
-    def set_value(self, value):
+    def set_value(self, value: float) -> None:
+        """Setter for widget value"""
         self.setValue(float(value))
 
-    def get_value(self):
-        val = self.value()
-        if val:
-            return float(val)
-        else:
-            return None
+    def get_value(self) -> float:
+        """Getter for widget value"""
+        val: str = self.value()
+        return float(val) if val else None
 
 
 class CheckBox(qt_import.QCheckBox, ValueWidget):
     """Standard Boolean (CheckBox) widget"""
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QCheckBox.__init__(self, options.get("uiLabel"), parent)
-        # self.setAlignment(qt_import.Qt.AlignLeft)
-        self.is_hidden = options.get("hidden")
-        self.__name = options["variable_name"]
-        state = (
+        ValueWidget.__init__(self, gui_root_widget, options)
+        self.setCheckState(
             qt_import.Qt.Checked if options.get("default") else qt_import.Qt.Unchecked
         )
-        self.setCheckState(state)
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
-    def set_value(self, value):
+    def set_value(self, value: bool) -> None:
+        """Setter for widget value"""
         self.setChecked(value)
 
-    def get_value(self):
+    def get_value(self) -> bool:
+        """Getter for widget value"""
         return self.isChecked()
 
 
 class LocalQGroupBox(qt_import.QGroupBox):
-    is_hidden = False
+    """Wrapper around QGroupBox to provide is_hidden attribute"""
+    is_hidden: bool = False
 
 
 def create_widgets(
-    schema, ui_schema, field_name=None, parent_widget=None, gui_root_widget=None
-):
+    schema: Dict[str, Any],
+    ui_schema: Dict[str,Any],
+    field_name: Optional[str] = None,
+    parent_widget: Optional[qt_import.QWidget] = None,
+    gui_root_widget: Optional[LayoutWidget] = None,
+) -> qt_import.QWidget:
     """Recursive widget creation function
 
     Args:
-        schema (dict):  jsonschema
-        ui_schema (dict): ui:schema dictionary for widget being created
-        field_name (str): Unique name of field (or container) being created.
+        schema :  jsonschema
+        ui_schema : ui:schema dictionary for widget being created
+        field_name (: Unique name of field (or container) being created.
                           Equal to tag in ui_schema, and used as variable_name
-        parent_widget(qt_import.QWidget): parent widget
-        gui_root_widget (dict): root (layoutWidget) widget
+        parent_widget: parent widget
+        gui_root_widget : root (layoutWidget) widget
 
     Returns (qt_import.QWidget):
 
@@ -396,30 +534,30 @@ def create_widgets(
     that do not match any object in the jsonschema.
     """
 
-    is_top_object = gui_root_widget is None
+    is_top_object: bool = gui_root_widget is None
 
-    default_container_name = "vertical_box"
+    default_container_name: str = "vertical_box"
 
-    fields = schema["properties"]
+    fields: Dict[str,Any] = schema["properties"]
     # definitions = schema["definitions"]
 
-    field_data = fields.get(field_name)
+    field_data: Optional[Dict[str,Any]] = fields.get(field_name)
     if field_data:
         # This is an actual data field
-        widget_name = ui_schema.get("ui:widget")
+        widget_name: Optional[str] = ui_schema.get("ui:widget")
         if not widget_name:
             widget_name = field_data.get("type")
-        options = field_data.copy()
+        options: Dict[str, Any] = field_data.copy()
         options["variable_name"] = field_name
 
-        pathstr = field_data.get("$ref")
+        pathstr: Optional[str] = field_data.get("$ref")
         if "value_dict" in options and not ui_schema.get("ui:widget"):
             widget_name = "select"
         elif pathstr:
             if not ui_schema.get("ui:widget"):
                 widget_name = "select"
-            tags = pathstr.split("/")[1:]
-            dd0 = schema
+            tags: list = pathstr.split("/")[1:]
+            dd0: dict = schema
             for tag in tags:
                 dd0 = dd0[tag]
             enums = dd0
@@ -430,12 +568,9 @@ def create_widgets(
         options.update(ui_schema.get("ui:options", {}))
         if ui_schema.get("ui:readonly"):
             options["readOnly"] = True
-        widget = WIDGET_CLASSES[widget_name](parent_widget, options)
-        if widget.is_hidden:
-            if hasattr(widget, "setReadOnly"):
-                widget.setReadOnly(True)
-            widget.setEnabled(False)
-            widget.hide()
+        widget: qt_import.QWidget = WIDGET_CLASSES[widget_name](
+            parent_widget, gui_root_widget, options
+        )
         gui_root_widget.parameter_widgets[field_name] = widget
     else:
         # This is a container field
@@ -444,18 +579,19 @@ def create_widgets(
         if is_top_object:
             # Top of schema
             options = ui_schema["ui:options"]
-            widget = gui_root_widget = LayoutWidget(options)
+            widget: qt_import.QWidget = LayoutWidget(options)
+            gui_root_widget = widget
         elif title:
-            widget = LocalQGroupBox(title, parent=parent_widget)
+            widget: qt_import.QWidget = LocalQGroupBox(title, parent=parent_widget)
         else:
-            widget = LocalQGroupBox(parent=parent_widget)
+            widget: qt_import.QWidget = LocalQGroupBox(parent=parent_widget)
         layout_class = WIDGET_CLASSES[widget_name]
-        layout = layout_class(widget)
+        layout: qt_import.QWidget = layout_class(widget)
         layout.setSpacing(6)
         widget.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
-        layout.populate_widget(schema, ui_schema, field_name, gui_root_widget)
+        layout.populate_widget(schema, ui_schema, gui_root_widget)
     if is_top_object:
         # This is the root widget
         # Now everything is populated, put the hidden widgets in as data holders
@@ -492,25 +628,32 @@ class ColumnGridWidget(qt_import.QGridLayout):
             parent (qtimport.QtWidget:
         """
         super().__init__(parent)
-        self.is_hidden = False
+        self.is_hidden: bool = False
 
-    def populate_widget(self, schema, ui_schema, field_name, gui_root_widget):
-        fields = schema["properties"]
-        maxrownum = 0
-        for colnum, colname in enumerate(
-            (ui_schema["ui:order"])
-            or list(x for x in ui_schema if not x.startswith("ui:"))
-        ):
-            column = ui_schema[colname]
-            col1 = 2 * colnum
-            col2 = col1 + 1
+    def populate_widget(
+        self,
+        schema: Dict[str, Any],
+        ui_schema: Dict[str, Any],
+        gui_root_widget: LayoutWidget,
+    ):
+        """Create contents and add them to container widger"""
+        fields: Dict[str, Any] = schema["properties"]
+        maxrownum: int = 0
+        rownum: int = 0
+        colnames: list = ui_schema["ui:order"] or list(
+            x for x in ui_schema if not x.startswith("ui:")
+        )
+        maxcolnum: int = 2 * len(colnames) - 1
+        for colnum, colname in enumerate(colnames):
+            column: Dict[str, Any] = ui_schema[colname]
+            col1: int = 2 * colnum
             for rownum, rowname in enumerate(
                 (column["ui:order"])
                 or list(x for x in column if not x.startswith("ui:"))
             ):
-                field = fields.get(rowname)
-                ui_field = column.get(rowname) or field
-                new_widget = create_widgets(
+                field: Dict[str, Any] = fields.get(rowname)
+                ui_field: Dict[str, Any] = column.get(rowname) or field
+                new_widget: qt_import.QWidget = create_widgets(
                     schema,
                     ui_field,
                     rowname,
@@ -518,15 +661,19 @@ class ColumnGridWidget(qt_import.QGridLayout):
                     gui_root_widget,
                 )
                 if field:
-                    widget_type = ui_field.get("ui:widget") or field.get(type, "string")
+                    widget_type: str = ui_field.get("ui:widget") or field.get(
+                        "type", "string"
+                    )
                     if widget_type in ("textarea", "selection_table"):
                         self.setRowStretch(rownum, 8)
                         self.setColumnStretch(colnum, 8)
-                    title = field.get("title") or ui_field.get("ui:title")
+                    title: Optional[str] = field.get("title") or ui_field.get(
+                        "ui:title"
+                    )
                     if title:
                         if widget_type in ("textarea", "selection_table"):
                             # Special case - title goes above
-                            outer_box = LocalQGroupBox(
+                            outer_box: LocalQGroupBox = LocalQGroupBox(
                                 title,
                                 parent=self.parent(),
                             )
@@ -537,7 +684,9 @@ class ColumnGridWidget(qt_import.QGridLayout):
                                 1,
                                 2,
                             )
-                            outer_layout = qt_import.QVBoxLayout()
+                            outer_layout: qt_import.QVBoxLayout = (
+                                qt_import.QVBoxLayout()
+                            )
                             outer_box.setLayout(outer_layout)
                             outer_layout.addWidget(new_widget)
                             outer_layout.setStretch(8, 8)
@@ -548,7 +697,9 @@ class ColumnGridWidget(qt_import.QGridLayout):
                             if col1:
                                 # Add spacing to columns after the first
                                 title = self.col_spacing + title
-                            label = qt_import.QLabel(title, self.parent())
+                            label: qt_import.QLabel = qt_import.QLabel(
+                                title, self.parent()
+                            )
                             self.addWidget(
                                 label,
                                 rownum,
@@ -558,7 +709,7 @@ class ColumnGridWidget(qt_import.QGridLayout):
                             self.addWidget(
                                 new_widget,
                                 rownum,
-                                col2,
+                                col1 + 1,
                                 qt_import.Qt.AlignLeft | qt_import.Qt.AlignTop,
                             )
                     else:
@@ -570,9 +721,11 @@ class ColumnGridWidget(qt_import.QGridLayout):
                             2,
                         )
                 else:
-                    title = ui_schema.get("ui:title")
+                    title: Optional[str] = ui_schema.get("ui:title")
                     if title:
-                        outer_box = LocalQGroupBox(title, parent=self.parent())
+                        outer_box: LocalQGroupBox = LocalQGroupBox(
+                            title, parent=self.parent()
+                        )
                         self.addWidget(
                             outer_box,
                             rownum,
@@ -580,13 +733,12 @@ class ColumnGridWidget(qt_import.QGridLayout):
                             1,
                             2,
                         )
-                        outer_layout = qt_import.QVBoxLayout()
+                        outer_layout: qt_import.QVBoxLayout = qt_import.QVBoxLayout()
                         outer_box.setLayout(outer_layout)
                         outer_layout.addWidget(
                             new_widget,
                             0,
                         )
-                        # outer_layout.setStretch(0, 8)
                     else:
                         self.addWidget(
                             new_widget,
@@ -595,25 +747,32 @@ class ColumnGridWidget(qt_import.QGridLayout):
                             1,
                             2,
                         )
-            else:
-                maxrownum = max(maxrownum, rownum)
+            maxrownum = max(maxrownum, rownum)
         # Add spacer to compress layout
-        spacerItem = qt_import.QSpacerItem(
+        spacer_item: qt_import.QSpacerItem = qt_import.QSpacerItem(
             6,
             6,
             qt_import.QSizePolicy.Expanding,
             qt_import.QSizePolicy.Expanding,
         )
-        self.addItem(spacerItem, maxrownum + 1, col2 + 1)
+        self.addItem(spacer_item, maxrownum + 1, maxcolnum + 1)
 
 
 class VerticalBox(ColumnGridWidget):
-    """Treated as a single column gridded box, with input not grouped in columns"""
+    """Container, treated as a single column gridded box,
+    with input not grouped in columns"""
 
-    def populate_widget(self, schema, ui_schema, field_name, gui_root_widget):
-        wrap_schema = {}
-        col_schema = wrap_schema["column"] = {}
-        self.is_hidden = False
+    def populate_widget(
+        self,
+        schema: Dict[str, Any],
+        ui_schema: Dict[str, Any],
+        gui_root_widget: LayoutWidget,
+    ):
+        """Create contents and add them to container widger"""
+        wrap_schema: Dict[str, Any] = {}
+        col_schema: Dict[str, Any] =  {}
+        wrap_schema["column"] = col_schema
+        self.is_hidden: bool = False
         for tag, val in ui_schema.items():
             if tag.startswith("ui:"):
                 wrap_schema[tag] = val
@@ -622,120 +781,54 @@ class VerticalBox(ColumnGridWidget):
         col_schema["ui:order"] = wrap_schema["ui:order"]
         wrap_schema["ui:order"] = ("column",)
         #
-        super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
+        super().populate_widget(schema, wrap_schema, gui_root_widget)
 
 
 class HorizontalBox(ColumnGridWidget):
-    def populate_widget(self, schema, ui_schema, field_name, gui_root_widget):
-        wrap_schema = {}
-        self.is_hidden = False
-        title = ui_schema.get("ui:title")
+    """Container, treated as a single row gridded box,
+    with input not grouped in columns"""
+
+    def populate_widget(
+        self,
+        schema: Dict[str, Any],
+        ui_schema: Dict[str, Any],
+        gui_root_widget: LayoutWidget,
+    ):
+        """Create contents and add them to container widger"""
+        wrap_schema: Dict[str, Any] = {}
+        self.is_hidden: bool = False
+        title: Optional[str] = ui_schema.get("ui:title")
         if title:
             wrap_schema["ui:title"] = title
-        wrap_schema["ui:order"] = new_order = []
+        new_order: list = []
+        wrap_schema["ui:order"] = new_order
         for tag in ui_schema["ui:order"]:
-            colname = tag + "_col"
+            colname: str = tag + "_col"
             new_order.append((colname))
-            dd0 = {"ui:order": [tag]}
+            dd0: Dict[str, Any] = {"ui:order": [tag]}
             if tag in ui_schema:
                 dd0[tag] = ui_schema[tag]
             wrap_schema[colname] = dd0
         #
-        super().populate_widget(schema, wrap_schema, field_name, gui_root_widget)
+        super().populate_widget(schema, wrap_schema, gui_root_widget)
 
-
-class LayoutWidget(qt_import.QWidget):
-    """Collection-of-widgets widget for parameter query"""
-
-    parametersValidSignal = qt_import.pyqtSignal(bool)
-
-    def __init__(self, options):
-
-
-
-        self.parameter_widgets = {}
-        self.return_signal = options.get("return_signal")
-        self.update_signal = options.get("update_signal")
-        self.update_on_change = options.get("update_on_change")
-        qt_import.QWidget.__init__(self)
-        dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
-
-        # event to handle waiting for parameter input
-        self._wait_event = gevent.event.Event()
-
-    def close(self):
-        super().close()
-        dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
-
-    def set_values(self, **values):
-        """Set values for all fields from values dictionary"""
-        for tag, val in values.items():
-            self.parameter_widgets[tag].set_value(val)
-
-    def get_values_map(self):
-        """Get parameter values dictionary for all fields"""
-        return dict(
-            (tag, val.get_value()) for tag, val in self.parameter_widgets.items()
-        )
-
-    def update_values(self, changes_dict):
-
-        for tag, ddict in changes_dict.items():
-            widget = self.parameter_widgets[tag]
-            if "value" in ddict:
-                widget.set_value(ddict["value"])
-            options = ddict.get("options")
-            if options is not None:
-                if hasattr(widget, "reset_options"):
-                    widget.reset_options(options)
-                else:
-                    raise ValueError(
-                        " reset_options not supported for widget %s of type %s"
-                        % (tag, widget.__class__.__name__)
-                    )
-            highlight = ddict.get("highlight")
-            widget.highlight = highlight
-        self._wait_event.set()
-
-    def validate_fields(self, editing=None):
-        all_valid = True
-        for field_name, widget in self.parameter_widgets.items():
-            if widget.is_valid():
-                colour = widget.highlight
-                if not colour:
-                    if field_name == editing:
-                        colour = "CHANGED"
-                    else:
-                        colour = "OK"
-            else:
-                all_valid = False
-                print(
-                    "WARNING, invalid value %s for %s"
-                    % (widget.get_value(), field_name)
-                )
-                colour = "ERROR"
-            self.colour_widget(field_name, colour)
-        self.parametersValidSignal.emit(all_valid)
-
-class MultiSelectionTable(qt_import.QTableWidget, ValueWidget):
-    """Read-only table for data display and selection;
-    allows slection of multiple cells"""
-
-    def __init__(self, parent, options):
-        qt_import.QTableWidget.__init__(self, parent)
-        raise NotImplementedError()
 
 
 class SelectionTable(qt_import.QTableWidget, ValueWidget):
     """Read-only table for data display and selection"""
 
-    def __init__(self, parent, options):
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        gui_root_widget: LayoutWidget,
+        options: Dict[str, Any],
+    ):
         qt_import.QTableWidget.__init__(self, parent)
-        header = options["header"]
+        ValueWidget.__init__(self, gui_root_widget, options)
+        header: str = options["header"]
 
-        self.is_hidden = options.get("hidden")
+        self.is_hidden: bool = options.get("hidden")
 
-        # self.setObjectName(name)
         self.setFrameShape(qt_import.QFrame.StyledPanel)
         self.setFrameShadow(qt_import.QFrame.Sunken)
         self.setContentsMargins(0, 3, 0, 3)
@@ -749,60 +842,70 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         self.setSizeAdjustPolicy(qt_import.QAbstractScrollArea.AdjustToContents)
         self.setFont(qt_import.QFont("Courier"))
 
-        hdr = self.horizontalHeader()
+        hdr: qt_import.QHeaderView = self.horizontalHeader()
         hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
         for idx in range(1, len(header)):
             hdr.setResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
 
-        colouring = options.get("colouring")
+        highlights: List[bool] = options.get("highlights")
         for idx, data in enumerate(options["content"]):
-            self.populateColumn(idx, data, colouring)
+            self.populate_column(idx, data, highlights)
 
-        self.setCurrentCell(options.get("select_row", 0), 0)
 
-        import_module = self.import_module = options.get("import_module")
-        fname = options.get("update_function")
-        if fname:
-            if import_module:
-                self.update_function = getattr(import_module, fname)
-            else:
-                raise ValueError(
-                    "Widget %s has update_function %s but lacks import_module"
-                    % (self, fname)
-                )
-        else:
-            self.update_function = None
+        cell_indx = options.get("select_cell", (0, 0))
+        self.setCurrentCell(*cell_indx)
         self.currentCellChanged.connect(self.input_field_changed)
 
-    def resizeData(self, ii):
-        """Dummy method, recommended by docs when not using std cell widgets"""
+    def resizeData(self, iii: int):
+        """Dummy method, recommended by Qt docs when not using std cell widgets"""
         pass
 
-    def populateColumn(self, colnum, values, colouring=None):
+    def populate_column(
+        self,
+        colnum: int,
+        values: Sequence,
+        highlights: Dict[Tuple[int, int], str] = None
+    ):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
-        if colouring and any(colouring):
-            colour = getattr(colors, "LIGHT_GREEN")
-        else:
-            colour = None
         for rownum, text in enumerate(values):
             wdg = qt_import.QLineEdit(self)
             wdg.setFont(qt_import.QFont("Courier"))
             wdg.setReadOnly(True)
             wdg.setText(str(text))
-            if colour and colouring[rownum]:
-                colors.set_widget_color(wdg, colour, qt_import.QPalette.Base)
+            colourname = highlights.get((rownum, colnum))
+            if colourname is not None:
+                colors.set_widget_color(
+                    wdg,
+                    ColourMap[colourname],
+                    qt_import.QPalette.Base)
             self.setCellWidget(rownum, colnum, wdg)
 
     def get_value(self):
         """Get value - list of cell contents for selected row"""
         row_id = self.currentRow()
-        if not self.cellWidget(row_id, 0):
+        col_id = self.currentColumn()
+        if not self.cellWidget(row_id, col_id):
             logging.getLogger("user_log").warning(
-                "Select a row of the table, and then press [Continue]"
+                "Select a cell of the table, and then press [Continue]"
             )
-        return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
+        return self.cellWidget(row_id, col_id).text()
+
+    def set_value(self, value):
+        """Set current row that matches list of cell contents
+
+        This is not really useful (you would use the setCurrentCell method instead)
+        But the method is there for consistency with the ValueWIdget superclass"""
+        ncols: int = self.columnCount()
+        for row_id in range(self.rowCount()):
+            for col_id in range(self.columnCount()):
+                if value == self.cellWidget(row_id, col_id).text():
+                    self.setCurrentCell(row_id, col_id)
+                    return
+        raise ValueError(
+            "Value %s not found in widget %s" % (value, self.get_name())
+        )
 
 
 # Class is selected from ui:widget or, failing that, from type
@@ -819,5 +922,4 @@ WIDGET_CLASSES = {
     "horizontal_box": HorizontalBox,
     "vertical_box": VerticalBox,
     "selection_table": SelectionTable,
-    "multi_selection_table": MultiSelectionTable,
 }
