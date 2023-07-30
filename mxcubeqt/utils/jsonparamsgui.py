@@ -322,6 +322,17 @@ class TextEdit(qt_import.QTextEdit, ValueWidget):
         """Close widget and disconnect signals"""
         self.textChanged.disconnect(self.input_field_changed)
 
+class TextDisplay(qt_import.QLabel):
+    is_hidden: bool = False
+    def __init__(
+        self,
+        parent: qt_import.QWidget,
+        options: Dict[str, Any],
+    ):
+        qt_import.QLabel.__init__(self, parent)
+        self.setFont(qt_import.QFont("Courier"))
+        self.setText(qt_import.QString(options["default"]))
+
 
 class Combo(qt_import.QComboBox, ValueWidget):
     """Standard ComboBox (pulldown) widget"""
@@ -607,26 +618,31 @@ def create_widgets(
         options.update(ui_schema.get("ui:options", {}))
         if ui_schema.get("ui:readonly"):
             options["readonly"] = True
-        widget: qt_import.QWidget = WIDGET_CLASSES[widget_name](
-            parent_widget, gui_root_widget, options
-        )
-        gui_root_widget.parameter_widgets[field_name] = widget
+        if  widget_name == "textdisplay":
+            widget = TextDisplay(parent_widget, options)
+        else:
+            widget: qt_import.QWidget = WIDGET_CLASSES[widget_name](
+                parent_widget, gui_root_widget, options
+            )
+            gui_root_widget.parameter_widgets[field_name] = widget
     else:
         # This is a container field
         title = ui_schema.get("ui:title")
         widget_name = widget_name or default_container_name
+        spacing = 6
         if is_top_object:
             # Top of schema
             options = ui_schema["ui:options"]
             widget: qt_import.QWidget = LayoutWidget(options)
             gui_root_widget = widget
+            spacing = 20
         elif title:
             widget: qt_import.QWidget = LocalQGroupBox(title, parent=parent_widget)
         else:
             widget: qt_import.QWidget = LocalQGroupBox(parent=parent_widget)
         layout_class = WIDGET_CLASSES[widget_name]
         layout: qt_import.QWidget = layout_class(widget)
-        layout.setSpacing(6)
+        layout.setSpacing(spacing)
         widget.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
@@ -646,7 +662,7 @@ def create_widgets(
                         parent_widget=gui_root_widget,
                         gui_root_widget=gui_root_widget,
                     )
-                else:
+                elif field.get("type") != "textdisplay":
                     raise RuntimeError(
                         "Coding error: UI fields %s is neither hidden nor displayed"
                         % fname
@@ -709,7 +725,7 @@ class ColumnGridWidget(qt_import.QGridLayout):
                         "ui:title"
                     )
                     if title:
-                        if widget_type in ("textarea", "selection_table"):
+                        if widget_type in ("textarea", "selection_table", "textdisplay"):
                             # Special case - title goes above
                             outer_box: LocalQGroupBox = LocalQGroupBox(
                                 title,
