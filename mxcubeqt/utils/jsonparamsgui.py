@@ -39,7 +39,7 @@ __license__ = "LGPLv3+"
 
 ColourMap = {
     "OK": colors.WHITE,
-    "WARNING": colors.LIGHT_ORANGE,
+    "WARNING": colors.LIGHT_YELLOW,
     "ERROR": colors.LINE_EDIT_ERROR,
     "CHANGED": colors.LINE_EDIT_CHANGED,
     "HIGHLIGHT": colors.LIGHT_GREEN,
@@ -57,6 +57,7 @@ class LayoutWidget(qt_import.QWidget):
         self.return_signal: str = options.get("return_signal")
         self.update_signal: str = options.get("update_signal")
         self.update_on_change: Optional[bool] = options.get("update_on_change")
+        self.block_updates: bool = False
         qt_import.QWidget.__init__(self)
         dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
 
@@ -67,6 +68,8 @@ class LayoutWidget(qt_import.QWidget):
         """Close widget and disconnect signals"""
         super().close()
         dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
+        for widget in self.parameter_widgets.values():
+            widget.close()
 
     def set_values(self, **values) -> None:
         """Set values for all fields from values dictionary"""
@@ -86,23 +89,27 @@ class LayoutWidget(qt_import.QWidget):
         with dict2 having (optional) keys "
         value" (Any), "options"  (dict) and "highlight"
         """
-
-        for tag, ddict in changes_dict.items():
-            widget: ValueWidget = self.parameter_widgets[tag]
-            if "value" in ddict:
-                widget.set_value(ddict["value"])
-            options: dict = ddict.get("options")
-            if options is not None:
-                if hasattr(widget, "reset_options"):
-                    widget.reset_options(options)
-                else:
-                    raise ValueError(
-                        " reset_options not supported for widget %s of type %s"
-                        % (tag, widget.__class__.__name__)
-                    )
-            highlight: str = ddict.get("highlight")
-            widget.highlight = highlight
-        self.wait_event.set()
+        try:
+            # Do not trigger further updates while executing these.
+            self.block_updates = True
+            for tag, ddict in changes_dict.items():
+                widget: ValueWidget = self.parameter_widgets[tag]
+                options: dict = ddict.get("options")
+                if options is not None:
+                    if hasattr(widget, "reset_options"):
+                        widget.reset_options(options)
+                    else:
+                        raise ValueError(
+                            " reset_options not supported for widget %s of type %s"
+                            % (tag, widget.__class__.__name__)
+                        )
+                if "value" in ddict:
+                    widget.set_value(ddict["value"])
+                highlight: str = ddict.get("highlight")
+                widget.highlight = highlight
+        finally:
+            self.block_updates = False
+            self.wait_event.set()
 
     def validate_fields(self, editing: Optional[str] = None) -> None:
         """Validate fields, emit all_valid signal, and set widget colours"""
@@ -142,12 +149,12 @@ class ValueWidget(qt_import.QWidget):
             self.set_value(options["default"])
         self.update_on_change: bool = bool(options.get("update_on_change"))
         self.highlight: Optional[str] = options.get("highlight")
-
         if self.is_hidden:
             self.hide()
             self.setEnabled(False)
-        elif options.get("read_only"):
+        elif options.get("readonly"):
             self.setEnabled(False)
+        self.setContentsMargins(1, 1, 1, 1)
 
     @abc.abstractmethod
     def set_value(self, value: Any) -> None:
@@ -166,6 +173,8 @@ class ValueWidget(qt_import.QWidget):
 
         Sends root_widget.return_signal and waits for reply"""
         root_widget: LayoutWidget = self.gui_root_widget
+        if root_widget.block_updates:
+            return
         valid: bool = self.is_valid()
         if valid:
             update_on_change: Optional[str] = self.gui_root_widget.update_on_change
@@ -185,7 +194,8 @@ class ValueWidget(qt_import.QWidget):
                     )
                 self.gui_root_widget.wait_event.wait()
         root_widget.validate_fields()
-        colors.set_widget_color(self, colors.LINE_EDIT_CHANGED, qt_import.QPalette.Base)
+        if valid:
+            self.colour_widget("CHANGED")
 
     def colour_widget(self, highlight: str) -> None:
         """Colour widget according to highlight string
@@ -197,7 +207,10 @@ class ValueWidget(qt_import.QWidget):
 
         """
         colour = ColourMap[highlight]
-        colors.set_widget_color(self, colour, qt_import.QPalette.Base)
+        # colors.set_widget_color(self, colour, qt_import.QPalette.Base)
+        widget_palette: qt_import.QPalette = self.palette()
+        widget_palette.setColor(qt_import.QPalette.Base, colour)
+        self.setPalette(widget_palette)
 
 
 class LineEdit(qt_import.QLineEdit, ValueWidget):
@@ -212,8 +225,9 @@ class LineEdit(qt_import.QLineEdit, ValueWidget):
         qt_import.QLineEdit.__init__(self, parent)
         ValueWidget.__init__(self, gui_root_widget, options)
         self.setAlignment(qt_import.Qt.AlignRight)
-        if options.get("readOnly"):
+        if options.get("readonly"):
             self.setReadOnly(True)
+        self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value: str) -> None:
         """Set widget value"""
@@ -222,6 +236,10 @@ class LineEdit(qt_import.QLineEdit, ValueWidget):
     def get_value(self) -> str:
         """Get widget value"""
         return str(self.text())
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.textEdited.disconnect(self.input_field_changed)
 
 
 class FloatString(LineEdit):
@@ -247,9 +265,6 @@ class FloatString(LineEdit):
         val: Optional[float] = options.get("maximum")
         if val is not None:
             self.validator.setTop(val)
-        if decimals is not None:
-            self.validator.setDecimals(decimals)
-        self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value: Optional[float]) -> None:
         """Setter for widget value"""
@@ -291,8 +306,9 @@ class TextEdit(qt_import.QTextEdit, ValueWidget):
         )
         self.setSizeAdjustPolicy(qt_import.QAbstractScrollArea.AdjustToContents)
         self.setFont(qt_import.QFont("Courier"))
-        if options.get("readOnly"):
+        if options.get("readonly"):
             self.setReadOnly(True)
+        self.textChanged.connect(self.input_field_changed)
 
     def set_value(self, value: str) -> None:
         """Setter for widget value"""
@@ -301,6 +317,10 @@ class TextEdit(qt_import.QTextEdit, ValueWidget):
     def get_value(self) -> str:
         """Getter for widget value"""
         return str(self.toPlainText())
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.textChanged.disconnect(self.input_field_changed)
 
 
 class Combo(qt_import.QComboBox, ValueWidget):
@@ -354,6 +374,10 @@ class Combo(qt_import.QComboBox, ValueWidget):
             )
         self.clear()
         self.setup_pulldown(**options)
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.currentIndexChanged.disconnect(self.input_field_changed)
 
 
 class File(ValueWidget, qt_import.QWidget):
@@ -426,8 +450,9 @@ class IntSpinBox(qt_import.QSpinBox, ValueWidget):
             self.setMinimum(int(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
-        if options.get("readOnly"):
+        if options.get("readonly"):
             self.setReadOnly(True)
+        self.valueChanged.connect(self.input_field_changed)
 
     def set_value(self, value: int) -> None:
         """Setter for widget value"""
@@ -437,6 +462,10 @@ class IntSpinBox(qt_import.QSpinBox, ValueWidget):
         """Getter for widget value"""
         val: str = self.value()
         return int(val) if val else None
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.valueChanged.disconnect(self.input_field_changed)
 
 
 class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
@@ -464,8 +493,9 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
             self.setMinimum(float(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
-        if options.get("readOnly"):
+        if options.get("readonly"):
             self.setReadOnly(True)
+        self.valueChanged.connect(self.input_field_changed)
 
     def set_value(self, value: float) -> None:
         """Setter for widget value"""
@@ -475,6 +505,10 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
         """Getter for widget value"""
         val: str = self.value()
         return float(val) if val else None
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.valueChanged.disconnect(self.input_field_changed)
 
 
 class CheckBox(qt_import.QCheckBox, ValueWidget):
@@ -494,6 +528,7 @@ class CheckBox(qt_import.QCheckBox, ValueWidget):
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
+        self.stateChanged.connect(self.input_field_changed)
 
     def set_value(self, value: bool) -> None:
         """Setter for widget value"""
@@ -502,6 +537,10 @@ class CheckBox(qt_import.QCheckBox, ValueWidget):
     def get_value(self) -> bool:
         """Getter for widget value"""
         return self.isChecked()
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.stateChanged.disconnect(self.input_field_changed)
 
 
 class LocalQGroupBox(qt_import.QGroupBox):
@@ -542,32 +581,32 @@ def create_widgets(
     # definitions = schema["definitions"]
 
     field_data: Optional[Dict[str,Any]] = fields.get(field_name)
+    widget_name: Optional[str] = ui_schema.get("ui:widget")
     if field_data:
         # This is an actual data field
-        widget_name: Optional[str] = ui_schema.get("ui:widget")
-        if not widget_name:
-            widget_name = field_data.get("type")
         options: Dict[str, Any] = field_data.copy()
         options["variable_name"] = field_name
 
         pathstr: Optional[str] = field_data.get("$ref")
-        if "value_dict" in options and not ui_schema.get("ui:widget"):
-            widget_name = "select"
-        elif pathstr:
-            if not ui_schema.get("ui:widget"):
+        if not widget_name:
+            if "value_dict" in options:
                 widget_name = "select"
-            tags: list = pathstr.split("/")[1:]
-            dd0: dict = schema
-            for tag in tags:
-                dd0 = dd0[tag]
-            enums = dd0
-            options["value_dict"] = OrderedDict(
-                (dd1["title"], dd1["enum"][0]) for dd1 in enums
-            )
+            elif pathstr:
+                widget_name = "select"
+                tags: list = pathstr.split("/")[1:]
+                dd0: dict = schema
+                for tag in tags:
+                    dd0 = dd0[tag]
+                enums = dd0
+                options["value_dict"] = OrderedDict(
+                    (dd1["title"], dd1["enum"][0]) for dd1 in enums
+                )
+            else:
+                widget_name = field_data.get("type")
 
         options.update(ui_schema.get("ui:options", {}))
         if ui_schema.get("ui:readonly"):
-            options["readOnly"] = True
+            options["readonly"] = True
         widget: qt_import.QWidget = WIDGET_CLASSES[widget_name](
             parent_widget, gui_root_widget, options
         )
@@ -575,7 +614,7 @@ def create_widgets(
     else:
         # This is a container field
         title = ui_schema.get("ui:title")
-        widget_name = ui_schema.get("ui:widget") or default_container_name
+        widget_name = widget_name or default_container_name
         if is_top_object:
             # Top of schema
             options = ui_schema["ui:options"]
@@ -612,7 +651,6 @@ def create_widgets(
                         "Coding error: UI fields %s is neither hidden nor displayed"
                         % fname
                     )
-
     #
     return widget
 
@@ -874,6 +912,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
             wdg.setFont(qt_import.QFont("Courier"))
             wdg.setReadOnly(True)
             wdg.setText(str(text))
+            wdg.setContentsMargins(1, 1, 1, 1)
             colourname = highlights.get((rownum, colnum))
             if colourname is not None:
                 colors.set_widget_color(
@@ -907,9 +946,18 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
             "Value %s not found in widget %s" % (value, self.get_name())
         )
 
+    def colour_widget(self, highlight: str) -> None:
+        """Dummy function, to disable background colouring of SelectionTable"""
+        return
+
+    def close(self):
+        """Close widget and disconnect signals"""
+        self.currentCellChanged.disconnect(self.input_field_changed)
+
 
 # Class is selected from ui:widget or, failing that, from type
 WIDGET_CLASSES = {
+    "label": qt_import.QLabel,
     "number": FloatString,
     "string": LineEdit,
     "boolean": CheckBox,
