@@ -345,6 +345,7 @@ class Combo(qt_import.QComboBox, ValueWidget):
     ):
         qt_import.QComboBox.__init__(self, parent)
         self.value_dict: Dict[str, Any] = {}
+        # NB pulldown must be set up before ValueWidget init
         self.setup_pulldown(**options)
         ValueWidget.__init__(self, gui_root_widget, options)
         self.currentIndexChanged.connect(self.input_field_changed)
@@ -365,8 +366,13 @@ class Combo(qt_import.QComboBox, ValueWidget):
         if indx >= 0:
             self.setCurrentIndex(indx)
         else:
+            try:
+                # NB this error may happen during init before ValueWidget init is called
+                namestr = self.get_name()
+            except AttributeError:
+                namestr = str(self)
             raise ValueError(
-                "Value %s not found in widget %s" % (value, self.get_name())
+                "Value %s not found in widget %s" % (value, namestr)
             )
 
     def get_value(self) -> Any:
@@ -471,7 +477,7 @@ class IntSpinBox(qt_import.QSpinBox, ValueWidget):
 
     def get_value(self) -> int:
         """Getter for widget value"""
-        val: str = self.value()
+        val: int = self.value()
         return int(val) if val else None
 
     def close(self):
@@ -514,7 +520,7 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
 
     def get_value(self) -> float:
         """Getter for widget value"""
-        val: str = self.value()
+        val: float = self.value()
         return float(val) if val else None
 
     def close(self):
@@ -901,7 +907,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         for idx in range(1, len(header)):
             hdr.setResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
 
-        highlights: List[bool] = options.get("highlights")
+        highlights: Dict[int, Dict[int, str]] = options.get("highlights")
         for idx, data in enumerate(options["content"]):
             self.populate_column(idx, data, highlights)
 
@@ -918,7 +924,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         self,
         colnum: int,
         values: Sequence,
-        highlights: Dict[Tuple[int, int], str] = None
+        highlights:  Dict[int, Dict[int, str]] = None
     ):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
@@ -929,7 +935,11 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
             wdg.setReadOnly(True)
             wdg.setText(str(text))
             wdg.setContentsMargins(1, 1, 1, 1)
-            colourname = highlights.get((rownum, colnum))
+            dd0 = highlights.get(rownum)
+            if dd0:
+                colourname = dd0.get(colnum)
+            else:
+                colourname = None
             if colourname is not None:
                 colors.set_widget_color(
                     wdg,
