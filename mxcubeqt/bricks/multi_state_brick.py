@@ -64,8 +64,8 @@ __category__ = "General"
 
 class MultiStateBrick(BaseWidget):
     units = {
-            "micron": u"\u03BC",
-            }
+        "micron": u"\u03BC",
+    }
 
     def __init__(self, *args):
 
@@ -80,10 +80,10 @@ class MultiStateBrick(BaseWidget):
         self.multibuttons = []
 
         # Properties ----------------------------------------------------------
-        self.add_property("label","string","")
-        self.add_property("title","string","")
-        self.add_property("mnemonic","string","")
-        self.add_property("multibutton","boolean",False)
+        self.add_property("label", "string", "")
+        self.add_property("title", "string", "")
+        self.add_property("mnemonic", "string", "")
+        self.add_property("multibutton", "boolean", False)
 
         # Signals ------------------------------------------------------------
 
@@ -111,7 +111,6 @@ class MultiStateBrick(BaseWidget):
         _main_gbox_hlayout.setSpacing(2)
         _main_gbox_hlayout.setContentsMargins(0, 0, 0, 0)
 
-
         # Qt signal/slot connections ------------------------------------------
         self.multi_position_combo.activated.connect(self.change_value)
         self.switch_multibutton_mode(False)
@@ -123,22 +122,18 @@ class MultiStateBrick(BaseWidget):
             else:
                 self.label.hide()
         elif property_name == "title":
-            if new_value != "": 
+            if new_value != "":
                 self.main_gbox.setTitle(new_value)
         elif property_name == "multibutton":
-            if new_value != "": 
+            if new_value != "":
                 self.multibutton = new_value
                 if len(self.positions):
                     self.switch_multibutton_mode(self.multibutton)
         elif property_name == "mnemonic":
             if self.multi_hwobj is not None:
+                self.disconnect(self.multi_hwobj, "stateChanged", self.state_changed)
                 self.disconnect(
-                    self.multi_hwobj, "stateChanged", self.state_changed
-                )
-                self.disconnect(
-                    self.multi_hwobj,
-                    "valueChanged",
-                    self.value_changed,
+                    self.multi_hwobj, "valueChanged", self.value_changed,
                 )
 
             self.multi_hwobj = self.get_hardware_object(new_value)
@@ -146,9 +141,7 @@ class MultiStateBrick(BaseWidget):
             if self.multi_hwobj is not None:
                 self.connect(self.multi_hwobj, "stateChanged", self.state_changed)
                 self.connect(
-                    self.multi_hwobj,
-                    "valueChanged",
-                    self.value_changed,
+                    self.multi_hwobj, "valueChanged", self.value_changed,
                 )
 
                 self.fill_positions()
@@ -158,18 +151,17 @@ class MultiStateBrick(BaseWidget):
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
-
     def switch_multibutton_mode(self, mode):
         if mode:
-             self.multi_position_combo.hide()
-             self.multi_button_box.show() 
+            self.multi_position_combo.hide()
+            self.multi_button_box.show()
         else:
-             self.multi_position_combo.show()
-             self.multi_button_box.hide() 
+            self.multi_position_combo.show()
+            self.multi_button_box.hide()
 
     def get_position_label(self, posidx):
         pos = self.positions[posidx]
-        unit = self.multi_hwobj.get_properties(posidx,"unit")
+        unit = self.multi_hwobj.get_properties(posidx, "unit")
         label = str(pos)
         if unit is not None:
             if unit in self.units:
@@ -177,7 +169,7 @@ class MultiStateBrick(BaseWidget):
             else:
                 label = label + unit
         return label
-           
+
     def fill_positions(self, positions=None):
 
         # fill combo
@@ -190,14 +182,18 @@ class MultiStateBrick(BaseWidget):
         # build multibuttons
         self.multibuttons = []
 
-        for posidx in range(len(self.positions)): 
+        for posidx in range(len(self.positions)):
             poslabel = self.get_position_label(posidx)
             self.multi_position_combo.addItem(poslabel)
 
             but = qt_import.QPushButton(poslabel)
-            but.clicked.connect(lambda bla, this=self, idx=posidx:MultiStateBrick.change_value(this, idx))
+            but.clicked.connect(
+                lambda bla, this=self, idx=posidx: MultiStateBrick.change_value(
+                    this, idx
+                )
+            )
             self._multi_button_hlayout.addWidget(but)
-            self.multibuttons.append(but) 
+            self.multibuttons.append(but)
 
         self.value_changed()
 
@@ -225,7 +221,7 @@ class MultiStateBrick(BaseWidget):
         )
 
         for but in self.multibuttons:
-            colors.set_widget_color( but, color, qt_import.QPalette.Button )
+            colors.set_widget_color(but, color, qt_import.QPalette.Button)
 
     def value_changed(self, value=None):
 
@@ -246,4 +242,3 @@ class MultiStateBrick(BaseWidget):
             button.setEnabled(True)
 
         self.multibuttons[value].setEnabled(False)
-
