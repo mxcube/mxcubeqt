@@ -21,6 +21,8 @@ import logging
 from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import colors, icons, qt_import
 
+import logging
+
 log = logging.getLogger("HWR")
 
 
