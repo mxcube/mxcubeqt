@@ -1,9 +1,9 @@
-from mxcubeqt.utils import colors, icons, qt_import
-from mxcubeqt.bricks.proposal_brick import ProposalBrick, ProposalGUIEvent
-from mxcubecore import HardwareRepository as HWR
 import logging
 import os
 
+from mxcubeqt.utils import colors, icons, qt_import
+from mxcubeqt.bricks.proposal_brick import ProposalBrick, ProposalGUIEvent
+from mxcubecore import HardwareRepository as HWR
 
 class P11ProposalBrick(ProposalBrick):
     def __init__(self, *args):
