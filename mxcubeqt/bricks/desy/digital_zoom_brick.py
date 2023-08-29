@@ -21,6 +21,7 @@ from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import colors, icons, qt_import
 
 import logging
+
 log = logging.getLogger("HWR")
 
 
@@ -102,7 +103,6 @@ class DigitalZoomBrick(BaseWidget):
         self.previous_position_button.clicked.connect(self.select_previous_position)
         self.next_position_button.clicked.connect(self.select_next_position)
 
-
         # Other ---------------------------------------------------------------
         self.positions_combo.setFixedHeight(27)
         self.positions_combo.setToolTip("Moves the motor to a predefined position")
@@ -131,22 +131,18 @@ class DigitalZoomBrick(BaseWidget):
 
     def motor_state_changed(self, state):
 
-        #self.positions_combo.setEnabled(self.motor_hwobj.is_ready())
+        # self.positions_combo.setEnabled(self.motor_hwobj.is_ready())
 
         if self.motor_hwobj.is_ready:
             colors.set_widget_color(
-                    self.positions_combo,
-                    colors.LIGHT_GREEN,
-                    qt_import.QPalette.Button,
-                    )
+                self.positions_combo, colors.LIGHT_GREEN, qt_import.QPalette.Button,
+            )
         else:
             colors.set_widget_color(
-                    self.positions_combo,
-                    colors.LIGHT_GRAY,
-                    qt_import.QPalette.Button,
-                    )
+                self.positions_combo, colors.LIGHT_GRAY, qt_import.QPalette.Button,
+            )
 
-        #self.setToolTip(state=state)
+        # self.setToolTip(state=state)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "label":
@@ -185,9 +181,7 @@ class DigitalZoomBrick(BaseWidget):
                 self.update_zoom()
 
                 if self.motor_hwobj.is_ready():
-                    self.predefined_position_changed(
-                        self.motor_hwobj.get_value(), 0
-                    )
+                    self.predefined_position_changed(self.motor_hwobj.get_value(), 0)
                 if self["label"] == "":
                     lbl = self.motor_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
@@ -219,29 +213,27 @@ class DigitalZoomBrick(BaseWidget):
 
         if self.motor_hwobj is not None:
             if positions is None:
-                positions = sorted(self.motor_hwobj.VALUES, key=lambda i:i.value)
+                positions = sorted(self.motor_hwobj.VALUES, key=lambda i: i.value)
 
         for p in positions:
-            if p != 'UNKNOWN':
+            if p != "UNKNOWN":
                 self.positions_combo.addItem(p.name)
 
         self.positions = positions
 
         if self.motor_hwobj is not None:
             if self.motor_hwobj.is_ready():
-                self.predefined_position_changed(
-                    self.motor_hwobj.get_value(), 0
-                )
+                self.predefined_position_changed(self.motor_hwobj.get_value(), 0)
 
     def update_zoom(self, zoom=None):
         if zoom is None:
             current, zoom = self.motor_hwobj.get_current_zoom()
         self.predefined_position_changed(current, zoom)
-            
+
     def position_edited(self):
         value = float(self.position_label.text())
         self.motor_hwobj.set_zoom_value(value)
-        
+
     def position_selected(self, index):
         self.positions_combo.setCurrentIndex(-1)
         if index >= 0:

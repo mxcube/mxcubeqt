@@ -21,6 +21,7 @@ from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import colors, icons, qt_import
 
 import logging
+
 log = logging.getLogger("HWR")
 
 
@@ -56,7 +57,7 @@ class ValueStateBrick(BaseWidget):
         _main_hlayout = qt_import.QHBoxLayout(self)
         _main_hlayout.addWidget(self.label_label)
         _main_hlayout.addWidget(self.value_label)
-        self.label_label = qt_import.QLabel("" )
+        self.label_label = qt_import.QLabel("")
         self.value_label = qt_import.QLabel("")
 
         # Layout --------------------------------------------------------------
@@ -85,7 +86,7 @@ class ValueStateBrick(BaseWidget):
             self.value_label.setStyleSheet("background-color: {self.on_color}")
 
     def channel_value_changed(self, value):
-        self.value_label.setText(f'{value}')
+        self.value_label.setText(f"{value}")
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "label":
@@ -97,7 +98,8 @@ class ValueStateBrick(BaseWidget):
                 self.connect(
                     self.channel_hwobj, "valueChanged", self.channel_value_changed
                 )
-                self.connect(self.motor_hwobj, "stateChanged", self.channel_state_changed)
+                self.connect(
+                    self.motor_hwobj, "stateChanged", self.channel_state_changed
+                )
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
-
