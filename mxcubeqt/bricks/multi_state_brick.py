@@ -170,7 +170,7 @@ class MultiStateBrick(BaseWidget):
                 label = label + unit
         return label
 
-    def fill_positions(self, positions=None):
+    def fill_positions(self):
 
         # fill combo
         self.positions = []
