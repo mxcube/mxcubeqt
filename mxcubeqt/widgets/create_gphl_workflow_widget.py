@@ -34,10 +34,10 @@ __author__ = "Rasmus H Fogh"
 
 
 class CreateGphlWorkflowWidget(CreateTaskBase):
-    def __init__(self, parent=None, name=None, fl=0):
+    def __init__(self, parent=None, name=None, flg=0):
 
         CreateTaskBase.__init__(
-            self, parent, name, qt_import.Qt.WindowFlags(fl), "GphlWorkflow"
+            self, parent, name, qt_import.Qt.WindowFlags(flg), "GphlWorkflow"
         )
 
         if not name:
@@ -56,22 +56,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # Graphic elements ----------------------------------------------------
         self._workflow_type_widget = qt_import.QGroupBox("Workflow type", self)
 
-        # NB widget must start out hidden,
-        # so as to be shown when workflow type is initialiesd
         self._workflow_cbox = qt_import.QComboBox(self._workflow_type_widget)
-        # self._gphl_acq_widget = qt_import.QGroupBox("Acquisition", self)
-        # self._gphl_acq_param_widget = GphlAcquisitionWidget(
-        #     self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
-        # )
-        # self._gphl_acq_param_widget.hide()
-        # self._gphl_diffractcal_widget = GphlDiffractcalWidget(
-        #     self._gphl_acq_widget, "gphl_diffractcal_widget"
-        # )
-        # self._gphl_diffractcal_widget.hide()
-        #
-        # self._gphl_runtime_widget = GphlRuntimeWidget(
-        #     self._gphl_acq_widget, "gphl_runtime_widge"
-        # )
 
         self._data_path_widget = DataPathWidget(
             self,
@@ -79,28 +64,22 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             data_model=self._path_template,
             layout="vertical",
         )
-        self._data_path_widget._base_image_dir = (
+        self._data_path_widget.set_base_image_directory(
             HWR.beamline.session.get_base_image_directory()
         )
-        self._data_path_widget._base_process_dir = (
+        self._data_path_widget.set_base_process_directory(
             HWR.beamline.session.get_base_process_directory()
         )
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.run_number_ledit.setReadOnly(True)
         data_path_layout.run_number_ledit.setEnabled(False)
-        # data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = qt_import.QVBoxLayout(self._workflow_type_widget)
         _workflow_type_vlayout.addWidget(self._workflow_cbox)
-        # _gphl_acq_vlayout = qt_import.QVBoxLayout(self._gphl_acq_widget)
-        # _gphl_acq_vlayout.addWidget(self._gphl_acq_param_widget)
-        # _gphl_acq_vlayout.addWidget(self._gphl_diffractcal_widget)
-        # _gphl_acq_vlayout.addWidget(self._gphl_runtime_widget)
         _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self._workflow_type_widget)
         _main_vlayout.addWidget(self._data_path_widget)
-        # _main_vlayout.addWidget(self._gphl_acq_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -121,7 +100,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         workflow_hwobj = HWR.beamline.gphl_workflow
         if workflow_hwobj is not None:
-            # workflow_hwobj.setup_workflow_object()
             workflow_names = list(workflow_hwobj.workflow_strategies)
             self._initialize_graphics()
             self._workflow_cbox.clear()
@@ -129,7 +107,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._workflow_cbox.addItem(workflow_name)
             self.workflow_selected()
             workflow_hwobj.connect(
-                "gphlJsonParametersNeeded", self.gphl_data_dialog.open_dialog
+                workflow_hwobj.PARAMETERS_NEEDED, self.gphl_data_dialog.open_dialog
             )
             workflow_hwobj.connect("gphlStartAcquisition", self.gphl_start_acquisition)
             workflow_hwobj.connect("gphlDoneAcquisition", self.gphl_done_acquisition)
@@ -138,10 +116,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # Initialize the path_template of the widget to default
         # values read from the beamline setup
         if self._data_path_widget:
-            self._data_path_widget._base_image_dir = (
+            self._data_path_widget.set_base_image_directory(
                 HWR.beamline.session.get_base_image_directory()
             )
-            self._data_path_widget._base_process_dir = (
+            self._data_path_widget.set_base_process_directory(
                 HWR.beamline.session.get_base_process_directory()
             )
 
@@ -155,7 +133,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
 
     def gphl_start_acquisition(self, workflow_model):
-        """Change tab to runtime display"""
+        """Change tab to runtime display. Kept for evt. future use"""
         pass
 
     def gphl_done_acquisition(self, workflow_model):
@@ -218,7 +196,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 if isinstance(model, queue_model_objects.GphlWorkflow):
                     dialog = tree_brick.dc_tree_widget.confirm_dialog
                     ss0 = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
-                    model.set_snapshot_count(int(ss0) if ss0 else 0)
+                    model.snapshot_count = int(ss0) if ss0 else 0
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
