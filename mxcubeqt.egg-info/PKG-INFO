@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: mxcubeqt
+Version: 0.0.0
+Summary: Qt front-end version for MXCuBE
+Home-page: http://github.com/mxcube/mxcubeqt
+License: LGPL
+Description: Front-end version for MXCuBE based on Qt framework
+Platform: all
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: Lesser General Public License v3 (LGPLv3)
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=2.7
+Provides-Extra: pyqt5
