@@ -5,11 +5,11 @@
 build
 *.swp
 \#*#
-.*
-.ab*
-.ik*
 CMakeLists.txt
 ChangeLog
 *OLD*
 .vscode\*
 .idea\*
+*.egg-info/
+develop-eggs/
+__pycache__/
