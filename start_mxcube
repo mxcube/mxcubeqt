@@ -35,7 +35,8 @@ MOCKUP_XML_PATH="${MXCUBE_CORE}/configuration/mockup"
 MXCUBE_CORE_CONFIG_PATH="${MOCKUP_XML_PATH}/gphl:${MOCKUP_XML_PATH}/qt:${MOCKUP_XML_PATH}"
 
 # Specific for SOLEIL:
-MXCUBE_CORE_CONFIG_PATH="${MXCUBE_CORE_CONFIG_PATH}:${MXCUBE_CORE}/configuration/soleil/px2/mockups"
+# MXCUBE_CORE_CONFIG_PATH="${MXCUBE_CORE_CONFIG_PATH}:${MXCUBE_CORE}/configuration/soleil/px2/mockups"
+MXCUBE_CORE_CONFIG_PATH="${MXCUBE_CORE_CONFIG_PATH}:${MXCUBE_CORE}/configuration/embl_hh_p14/"
 
 # User name - used only for file names etc.
 USER_NAME="test_user"
