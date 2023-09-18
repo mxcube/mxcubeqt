@@ -115,7 +115,12 @@ class PhaseBrick(BaseWidget):
 
     def phase_changed(self, phase=None):
         if phase is None:
-            phase = HWR.beamline.diffractometer.get_phase()
+            try:
+                # NB get_phase is only defined in P11-specific code, so this is no good.
+                # What should be here??
+                phase = HWR.beamline.diffractometer.get_phase()
+            except AttributeError:
+                return
 
         if phase.lower() != "unknown" and self.phase_combobox.count() > 0:
             # index = self.phase_combobox.findText(phase)
