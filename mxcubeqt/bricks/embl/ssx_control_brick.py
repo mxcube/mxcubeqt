@@ -419,7 +419,7 @@ class SsxControlBrick(BaseWidget):
         self.ssx_widget_layout.interlacings_tableWidget.setColumnCount(2)
 
         # resize columns respectively
-        header.setResizeMode(qt_import.QHeaderView.Stretch)
+        header.setSectionResizeMode(qt_import.QHeaderView.Stretch)
 
         # headers names
         self.ssx_widget_layout.interlacings_tableWidget.setHorizontalHeaderLabels(

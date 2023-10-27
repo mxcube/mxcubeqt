@@ -903,9 +903,9 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         self.setFont(qt_import.QFont("Courier"))
 
         hdr: qt_import.QHeaderView = self.horizontalHeader()
-        hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(0, qt_import.QHeaderView.Stretch)
         for idx in range(1, len(header)):
-            hdr.setResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
+            hdr.setSectionResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
 
         highlights: Dict[int, Dict[int, str]] = options.get("highlights")
         for idx, data in enumerate(options["content"]):

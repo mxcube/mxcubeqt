@@ -114,7 +114,7 @@ elif "--pyqt3" in sys.argv:
 #
 if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
     # NB These are the only versions that are licensed to use with this code
-    SUPPORTED_VERSIONS = ["5.15.9"]
+    SUPPORTED_VERSIONS = ["5.12.3", "5.15.7", "5.15.8", "5.15.9", "5.15.10"]
     try:
         from PyQt5.QtCore import (
             pyqtSignal,

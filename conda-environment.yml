@@ -2,7 +2,9 @@ name: mxcubeqt
 channels:
   - conda-forge
 dependencies:
-  - python >=3.8,<3.11
+  - python=3.8,<3.11
+#  - python=3.8  # For development only - we must support down to Python 3.8
   - openldap
   - pip
   - poetry
+  - openjdk=11
