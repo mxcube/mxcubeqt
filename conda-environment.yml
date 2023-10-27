@@ -7,4 +7,5 @@ dependencies:
   - openldap
   - pip
   - poetry
+  - pyqtgraph
   - openjdk=11
