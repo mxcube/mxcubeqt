@@ -352,13 +352,19 @@ class Combo(qt_import.QComboBox, ValueWidget):
         self.setSizeAdjustPolicy(qt_import.QComboBox.AdjustToContents)
 
     def setup_pulldown(self, **options) -> None:
-        """Set up pulldown from emapty state (also used in resetting)"""
+        """Set up pulldown from empty state (also used in resetting)"""
         self.is_hidden: bool = options.get("hidden")
         self.value_dict: Dict[str, Any] = dict(options["value_dict"])
         for val in self.value_dict:
             self.addItem(str(val))
         if "default" in options:
-            self.set_value(options["default"])
+            default = options["default"]
+            if default in self.value_dict:
+                self.set_value(options["default"])
+            else:
+                print ("WARNING, %s default value %s is not a valid option"
+                       % (options["variable_name"], default))
+                self.set_value(list(self.value_dict)[0])
 
     def set_value(self, value) -> None:
         """Setter for widget value"""
