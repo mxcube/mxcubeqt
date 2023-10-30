@@ -234,7 +234,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         + "Alternatively MXCUBE_GUI_CONFIG_PATH env variable"
         + "can be used",
         metavar="directory",
-        dest="coreConfigPath",
+        dest="guiConfigPath",
         default="",
     )
 
@@ -247,7 +247,7 @@ def create_app(gui_config_path=None, core_config_path=None):
         + "configuration files. "
         + "Alternatively MXCUBE_CORE_CONFIG_PATH env variable"
         + "can be used",
-        dest="guiConfigPath",
+        dest="coreConfigPath",
         default="",
     )
     parser.add_option(
