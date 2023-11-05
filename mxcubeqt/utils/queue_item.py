@@ -408,7 +408,17 @@ class OpticalCentringQueueItem(TaskQueueItem):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
 
+class DelayQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
+
 class XrayCenteringQueueItem(TaskQueueItem):
+    def __init__(self, *args, **kwargs):
+        TaskQueueItem.__init__(self, *args, **kwargs)
+
+
+class XrayCentering2QueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
 
@@ -427,11 +437,13 @@ MODEL_VIEW_MAPPINGS = {
     queue_model_objects.XRFSpectrum: XRFSpectrumQueueItem,
     queue_model_objects.SampleCentring: SampleCentringQueueItem,
     queue_model_objects.OpticalCentring: OpticalCentringQueueItem,
+    queue_model_objects.DelayTask: DelayQueueItem,
     queue_model_objects.Sample: SampleQueueItem,
     queue_model_objects.Basket: BasketQueueItem,
     queue_model_objects.Workflow: GenericWorkflowQueueItem,
     queue_model_objects.GphlWorkflow: GphlWorkflowQueueItem,
     queue_model_objects.XrayCentering: XrayCenteringQueueItem,
+    queue_model_objects.XrayCentring2: XrayCentering2QueueItem,
     queue_model_objects.XrayImaging: XrayImagingQueueItem,
     queue_model_objects.TaskGroup: DataCollectionGroupQueueItem,
 }
