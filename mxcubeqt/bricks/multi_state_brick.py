@@ -161,7 +161,7 @@ class MultiStateBrick(BaseWidget):
 
     def get_position_label(self, posidx):
         pos = self.positions[posidx]
-        unit = self.multi_hwobj.get_properties(posidx, "unit")
+        unit = self.multi_hwobj.get_properties_(posidx, "unit")
         label = str(pos)
         if unit is not None:
             if unit in self.units:
