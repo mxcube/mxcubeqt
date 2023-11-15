@@ -549,7 +549,7 @@ class GUISupervisor(qt_import.QWidget):
                 self.splash_screen.finish(main_widget)
             del self.splash_screen
         except BaseException:
-            logging.getLogger().exception("exception while loading GUI file")
+            logging.getLogger("HWR").exception("exception while loading GUI file")
             qt_import.QApplication.exit()
 
     def customEvent(self, event):

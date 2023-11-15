@@ -573,7 +573,17 @@ def create_app(gui_config_path=None, core_config_path=None):
     main_application.setApplicationName("MXCuBE")
     # app.setWindowIcon(qt_import.QIcon("images/icon.png"))
 
-    main_application.exec_()
+    import logging
+    log = logging.getLogger("HWR")
+
+    try:
+        main_application.exec_()
+    except Exception:
+        log.debug(" quitting on exception")
+        import traceback
+        traceback.print_exc()
+    else:
+        log.debug(" quitting on normal exit")
 
     supervisor.finalize()
 
@@ -596,7 +606,6 @@ def start_log(logfile, loglevel):
     logging.getLogger().setLevel(log_level)
 
     return logfile
-
 
 if __name__ == "__main__":
     app = create_app()
