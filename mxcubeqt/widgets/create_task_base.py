@@ -146,6 +146,9 @@ class CreateTaskBase(qt_import.QWidget):
     def init_acq_model(self):
         if self._acq_widget:
             def_acq_parameters = HWR.beamline.get_default_acquisition_parameters()
+            import logging
+            logging.getLogger("HWR").debug(f" creating acquisition parameters from default: {def_acq_parameters.as_dict()}")
+
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
             if HWR.beamline.diffractometer.in_plate_mode():
                 self._acq_widget.use_kappa(False)
@@ -156,6 +159,8 @@ class CreateTaskBase(qt_import.QWidget):
             self._acq_widget.update_osc_total_range()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
+            import logging
+            logging.getLogger("HWR").debug(f" creating acquisition parameters object: {self._acquisition_parameters.as_dict()}")
 
     def init_data_path_model(self):
         # Initialize the path_template of the widget to default
@@ -498,9 +503,18 @@ class CreateTaskBase(qt_import.QWidget):
         # if self._acq_widget:
         #    self._acq_widget.set_enable_parameter_update(\
         #         not isinstance(tree_item, queue_item.TaskQueueItem))
+        import logging
+        logging.getLogger("HWR").debug(f" acquisition parameters at the end of single_item_selection: {self._acquisition_parameters.as_dict()}")
 
     def _update_etr(self):
+
+        import logging
+        logging.getLogger("HWR").debug(f" acquisition parameters at the start of _update_etr: {self._acquisition_parameters.as_dict()}")
+
         default_acq_params = HWR.beamline.get_default_acquisition_parameters()
+
+        logging.getLogger("HWR").debug(f" default acquisition parameters at the start of _update_etr: {default_acq_params.as_dict()}")
+
         for tag in ("kappa", "kappa_phi", "energy", "transmission", "resolution", ):
             setattr(self._acquisition_parameters, tag, getattr(default_acq_params, tag))
 
@@ -514,6 +528,8 @@ class CreateTaskBase(qt_import.QWidget):
         if set_omega:
             self._acquisition_parameters.osc_start = default_acq_params.osc_start
 
+        import logging
+        logging.getLogger("HWR").debug(f" acquisition parameters at the end of _update_etr: {self._acquisition_parameters.as_dict()}")
         self._acq_widget.value_changed_list = []
         self._acq_widget._acquisition_mib.clear_edit()
 

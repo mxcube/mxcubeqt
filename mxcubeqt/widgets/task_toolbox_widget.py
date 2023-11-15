@@ -398,6 +398,10 @@ class TaskToolBoxWidget(qt_import.QWidget):
                             else:
                                 self.create_task(task_group)
                     else:
+                        import logging
+                        task_model = item.get_model()
+                        logging.getLogger("HWR").debug("creating collection in queue")
+                        logging.getLogger("HWR").debug(f"  task model is {task_model.as_dict()}")
                         if self.tool_box.currentWidget() in (
                             self.discrete_page,
                             self.char_page,
@@ -406,8 +410,10 @@ class TaskToolBoxWidget(qt_import.QWidget):
                             self.xray_imaging_page,
                         ) and len(shapes):
                             for shape in shapes:
+                                logging.getLogger("HWR").debug("  with shape {shape}")
                                 self.create_task(task_model, shape)
                         else:
+                            logging.getLogger("HWR").debug("  without shape")
                             self.create_task(task_model)
                 self.tree_brick.select_last_added_item()
                 self.tree_brick.update_enable_collect()
