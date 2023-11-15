@@ -305,6 +305,8 @@ class DataCollectionQueueItem(TaskQueueItem):
 
     def init_processing_info(self):
         dc_model = self.get_model()
+        import logging
+        logging.getLogger("HWR").warning(f"DataCollectionQueueitem: init_processing_info // dc_model={dc_model.as_dict()}") 
         if hasattr(dc_model, "processing_methods"):
             dc_parameters = dc_model.as_dict()
             if dc_parameters["num_images"] > 19:
@@ -312,12 +314,19 @@ class DataCollectionQueueItem(TaskQueueItem):
                     self.setIcon(2 + index, BALL_UNKNOWN)
 
     def init_tool_tip(self):
-        self.update_tool_tip()
+        try:
+            self.update_tool_tip()
+        except Exception as e:
+            import logging
+            logging.getLogger("HWR").warning(f"Cannot update tooltip: {e}") 
 
     def update_tool_tip(self):
         dc_model = self.get_model()
         dc_parameters = dc_model.as_dict()
-        dc_parameters_table = """<b>Collection parameters:</b>
+        import logging
+        logging.getLogger("HWR").warning(f"DataCollectionQueueitem: update_tool_tip // dc_parameters={dc_model.as_dict()}") 
+        try:
+           dc_parameters_table = """<b>Collection parameters:</b>
              <table border='0.5'>
              <tr><td>Osc start</td><td>%.2f</td></tr>
              <tr><td>Osc range</td><td>%.2f</td></tr>
@@ -335,7 +344,13 @@ class DataCollectionQueueItem(TaskQueueItem):
             dc_parameters["energy"],
             dc_parameters["resolution"],
             dc_parameters["transmission"],
-        )
+           )
+        except Exception as e:
+            import logging
+            logging.getLogger("HWR").warning(f"Cannot update tooltip: {e}") 
+            logging.getLogger("HWR").warning(f"   - data model is {dc_model}")
+            logging.getLogger("HWR").warning(f"   - dc parameters are {dc_parameters}")
+            return 
 
         processing_table = ""
         if len(dc_model.processing_msg_list) > 0:
