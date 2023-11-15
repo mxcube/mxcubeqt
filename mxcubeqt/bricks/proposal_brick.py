@@ -35,6 +35,9 @@ __category__ = "General"
 
 PROPOSAL_GUI_EVENT = qt_import.QEvent.User
 
+import logging
+log = logging.getLogger("HWR")
+
 
 class ProposalGUIEvent(qt_import.QEvent):
     def __init__(self, method, arguments):
@@ -276,6 +279,7 @@ class ProposalBrick(BaseWidget):
         self.logout_button.setEnabled(state)
 
     def impersonateProposal(self, proposal_code, proposal_number):
+        log.debug(" IMPERSONATE" )
         if BaseWidget.is_instance_user_id_inhouse():
             self._do_login_as_proposal(
                 proposal_code,
@@ -433,6 +437,7 @@ class ProposalBrick(BaseWidget):
             self.instance_server_hwobj.initialize_instance()
 
     def refuse_login(self, stat, message=None):
+        log.debug(f" refusing loging with message {message}")
         if message is not None:
             if stat is False:
                 icon = qt_import.QMessageBox.Critical
@@ -459,8 +464,10 @@ class ProposalBrick(BaseWidget):
         self.setEnabled(True)
 
     def accept_login(self, proposal_dict, session_dict):
+        log.debug(f"accepting proposal {proposal_dict}")
         self.set_proposal(proposal_dict, session_dict)
         self.setEnabled(True)
+        log.debug(f"proposal accepted")
 
     def set_ispyb_down(self):
         # msg_dialog = qt_import.QMessageBox(
@@ -474,6 +481,7 @@ class ProposalBrick(BaseWidget):
             # qt_import.QMessageBox.NoButton,
             # self,
         # )
+        log.debug("Setting IPSYB down")
         msg_dialog = qt_import.QMessageBox()
         msg_dialog.setWindowTitle("Register user")
         msg_dialog.setText("Couldn't contact "
@@ -495,7 +503,9 @@ class ProposalBrick(BaseWidget):
         now = time.strftime("%Y-%m-%d %H:%M:S")
         prop_dict = {"code": "", "number": "", "title": "", "proposalId": ""}
         ses_dict = {"sessionId": "", "startDate": now, "endDate": now, "comments": ""}
+        log.debug("Setting IPSYB down done - accepting login")
         self.accept_login(prop_dict, ses_dict)
+        log.debug("Setting IPSYB down done - accepting login done")
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
@@ -537,12 +547,14 @@ class ProposalBrick(BaseWidget):
                     "Not connected to the ISPyB database, unable to get proposal.",
                 )
 
+            log.debug("  login as proposal")
             self._do_login_as_proposal(
                 prop_type,
                 prop_number,
                 prop_password,
                 HWR.beamline.lims.beamline_name
             )
+            log.debug("  proposal_brick login finished")
 
     def pass_control(self, has_control_id):
         pass
