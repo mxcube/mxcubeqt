@@ -48,7 +48,7 @@ Sizes are estimated by related HO
 
 
 
-from mxcubeqt.utils import qt_import
+from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.base_components import BaseWidget
 
 from mxcubecore import HardwareRepository as HWR
@@ -60,6 +60,9 @@ except NameError:
 
 __credits__ = ["MXCuBE collaboration"]
 __category__ = "Beam definition"
+
+import logging
+log = logging.getLogger("HWR")
 
 
 class BeamSizeBrick(BaseWidget):
@@ -118,11 +121,22 @@ class BeamSizeBrick(BaseWidget):
         # Other ---------------------------------------------------------------
 
         self.connect(HWR.beamline.beam, "beamInfoChanged", self.beam_info_changed)
+        self.connect(HWR.beamline.beam, "stateChanged", self.beam_info_state_changed)
 
-    def beam_info_changed(self, beam_info):
+        log.debug(f"  BEAM INFO connected")
+        log.debug(f"     current size is: {HWR.beamline.beam.get_beam_size()}")
+        self.beam_info_changed()
+        self.beam_info_state_changed()
+
+    def beam_info_changed(self, beam_info=None):
         """
         beam size is in mm. It is displayed in microns
         """
+        if beam_info is None:
+            beam_info = HWR.beamline.beam.get_beam_info_dict()
+
+        log.debug(f"     current size is: {HWR.beamline.beam.get_beam_size()}")
+        log.debug(f"  BEAM INFO updated on beam_info brick: {beam_info}")
         hor_size = beam_info.get("size_x", None)
         ver_size = beam_info.get("size_y", None)
 
@@ -137,3 +151,16 @@ class BeamSizeBrick(BaseWidget):
             # ver_size *= 1000
             size_str = self["formatString"] % (ver_size * 1000)
             self.ver_size_ledit.setText("%s %sm" % (size_str, unichr(956)))
+ 
+    def beam_info_state_changed(self, state=None):
+        if state is None:
+            try:
+                state = HWR.beamline.beam.get_beam_info_state()
+            except AttributeError:
+                return
+
+        self._update_color(colors.COLOR_STATES[state])
+
+    def _update_color(self, color):
+        colors.set_widget_color(self.ver_size_ledit, color, qt_import.QPalette.Base)
+        colors.set_widget_color(self.hor_size_ledit, color, qt_import.QPalette.Base)
