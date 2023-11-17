@@ -59,7 +59,8 @@ class LayoutWidget(qt_import.QWidget):
         self.update_on_change: Optional[bool] = options.get("update_on_change")
         self.block_updates: bool = False
         qt_import.QWidget.__init__(self)
-        dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
+        if self.update_signal:
+            dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
 
         # event to handle waiting for parameter input
         self.wait_event: gevent.event.Event = gevent.event.Event()
@@ -67,7 +68,8 @@ class LayoutWidget(qt_import.QWidget):
     def close(self) -> None:
         """Close widget and disconnect signals"""
         super().close()
-        dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
+        if self.update_signal:
+            dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
         for widget in self.parameter_widgets.values():
             widget.close()
 
