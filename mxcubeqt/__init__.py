@@ -409,6 +409,7 @@ def create_app(gui_config_path=None, core_config_path=None):
     if app_style:
         main_application.setStyle(app_style)
 
+    gui_config_file = None
     if len(args) >= 1:
         if len(args) == 1:
             gui_config_file = os.path.abspath(args[0])

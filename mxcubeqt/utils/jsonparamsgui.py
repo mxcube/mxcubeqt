@@ -59,7 +59,8 @@ class LayoutWidget(qt_import.QWidget):
         self.update_on_change: Optional[bool] = options.get("update_on_change")
         self.block_updates: bool = False
         qt_import.QWidget.__init__(self)
-        dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
+        if self.update_signal:
+            dispatcher.connect(self.update_values, self.update_signal, dispatcher.Any)
 
         # event to handle waiting for parameter input
         self.wait_event: gevent.event.Event = gevent.event.Event()
@@ -67,7 +68,8 @@ class LayoutWidget(qt_import.QWidget):
     def close(self) -> None:
         """Close widget and disconnect signals"""
         super().close()
-        dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
+        if self.update_signal:
+            dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
         for widget in self.parameter_widgets.values():
             widget.close()
 
@@ -352,13 +354,19 @@ class Combo(qt_import.QComboBox, ValueWidget):
         self.setSizeAdjustPolicy(qt_import.QComboBox.AdjustToContents)
 
     def setup_pulldown(self, **options) -> None:
-        """Set up pulldown from emapty state (also used in resetting)"""
+        """Set up pulldown from empty state (also used in resetting)"""
         self.is_hidden: bool = options.get("hidden")
         self.value_dict: Dict[str, Any] = dict(options["value_dict"])
         for val in self.value_dict:
             self.addItem(str(val))
         if "default" in options:
-            self.set_value(options["default"])
+            default = options["default"]
+            if default in self.value_dict:
+                self.set_value(options["default"])
+            else:
+                print ("WARNING, %s default value %s is not a valid option"
+                       % (options["variable_name"], default))
+                self.set_value(list(self.value_dict)[0])
 
     def set_value(self, value) -> None:
         """Setter for widget value"""
@@ -903,9 +911,9 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         self.setFont(qt_import.QFont("Courier"))
 
         hdr: qt_import.QHeaderView = self.horizontalHeader()
-        hdr.setResizeMode(0, qt_import.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(0, qt_import.QHeaderView.Stretch)
         for idx in range(1, len(header)):
-            hdr.setResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
+            hdr.setSectionResizeMode(idx, qt_import.QHeaderView.ResizeToContents)
 
         highlights: Dict[int, Dict[int, str]] = options.get("highlights")
         for idx, data in enumerate(options["content"]):
