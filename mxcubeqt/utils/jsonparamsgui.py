@@ -30,6 +30,7 @@ import gevent
 import gevent.event
 
 from mxcubecore.dispatcher import dispatcher
+from mxcubecore import HardwareRepository as HWR
 from mxcubeqt.utils import qt_import, colors
 
 
@@ -185,16 +186,11 @@ class ValueWidget(qt_import.QWidget):
                 self.update_on_change or update_on_change == "always"
             ):
                 self.gui_root_widget.wait_event.clear()
-                responses: list = dispatcher.send(
+                HWR.beamline.emit(
                     root_widget.return_signal,
-                    self,
                     self.get_name(),
                     root_widget.get_values_map(),
                 )
-                if not responses:
-                    raise RuntimeError(
-                        "Signal %s is not connected" % root_widget.return_signal
-                    )
                 self.gui_root_widget.wait_event.wait()
         root_widget.validate_fields()
         if valid:
@@ -349,7 +345,6 @@ class Combo(qt_import.QComboBox, ValueWidget):
         options: Dict[str, Any],
     ):
         qt_import.QComboBox.__init__(self, parent)
-        self.enum: List[str] = []
         # NB pulldown must be set up before ValueWidget init
         self.setup_pulldown(**options)
         ValueWidget.__init__(self, gui_root_widget, options)
@@ -358,7 +353,7 @@ class Combo(qt_import.QComboBox, ValueWidget):
 
     def setup_pulldown(self, **options) -> None:
         """Set up pulldown from empty state (also used in resetting)"""
-        self.is_hidden: bool = options.get("hidden")
+        self.enum: List[str] = options["enum"]
         for val in self.enum:
             self.addItem(str(val))
         if "default" in options:
@@ -582,6 +577,7 @@ def create_widgets(
     field_name: Optional[str] = None,
     parent_widget: Optional[qt_import.QWidget] = None,
     gui_root_widget: Optional[LayoutWidget] = None,
+    is_hidden: bool = False,
 ) -> qt_import.QWidget:
     """Recursive widget creation function
 
@@ -592,6 +588,7 @@ def create_widgets(
                           Equal to tag in ui_schema, and used as variable_name
         parent_widget: parent widget
         gui_root_widget : root (layoutWidget) widget
+        is_hidden : is widget hidden?
 
     Returns (qt_import.QWidget):
 
@@ -623,6 +620,8 @@ def create_widgets(
         options.update(ui_schema.get("ui:options", {}))
         if ui_schema.get("ui:readOnly"):
             options["readOnly"] = True
+        if is_hidden:
+            options["hidden"] = True
         if widget_name == "textdisplay":
             widget = TextDisplay(parent_widget, options)
         else:
@@ -657,7 +656,8 @@ def create_widgets(
         # Now everything is populated, put the hidden widgets in as data holders
         for fname, field in fields.items():
             if fname not in gui_root_widget.parameter_widgets:
-                if field.get("hidden"):
+                if field.get("type") != "textdisplay":
+                    # Any field not being displayed is by definition hidden
                     # NB should not happen much,
                     # but might be used to temporarily hide fields
                     create_widgets(
@@ -666,11 +666,7 @@ def create_widgets(
                         fname,
                         parent_widget=gui_root_widget,
                         gui_root_widget=gui_root_widget,
-                    )
-                elif field.get("type") != "textdisplay":
-                    raise RuntimeError(
-                        "Coding error: UI fields %s is neither hidden nor displayed"
-                        % fname
+                        is_hidden=True,
                     )
     #
     return widget
@@ -888,8 +884,6 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         qt_import.QTableWidget.__init__(self, parent)
         ValueWidget.__init__(self, gui_root_widget, options)
         header: str = options["header"]
-
-        self.is_hidden: bool = options.get("hidden")
 
         self.setFrameShape(qt_import.QFrame.StyledPanel)
         self.setFrameShadow(qt_import.QFrame.Sunken)
