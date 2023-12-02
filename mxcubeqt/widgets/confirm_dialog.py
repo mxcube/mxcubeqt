@@ -47,9 +47,13 @@ class ConfirmDialog(qt_import.QDialog):
         self.sample_items = []
 
         # Graphic elements ----------------------------------------------------
-        self.conf_dialog_layout = qt_import.load_ui_file("confirmation_dialog_layout.ui")
+        self.conf_dialog_layout = qt_import.load_ui_file(
+            "confirmation_dialog_layout.ui"
+        )
 
-        continue_shortcut = qt_import.QShortcut(qt_import.QKeySequence("C"), self.conf_dialog_layout.continue_button)
+        continue_shortcut = qt_import.QShortcut(
+            qt_import.QKeySequence("C"), self.conf_dialog_layout.continue_button
+        )
         continue_shortcut.activated.connect(self.continue_shortcut_pressed)
 
         # Layout --------------------------------------------------------------
@@ -95,6 +99,7 @@ class ConfirmDialog(qt_import.QDialog):
         """Populates information about items to be collected"""
         self.sample_items = []
         self.checked_items = checked_items
+        print(checked_items)
 
         collection_items = []
         current_sample_item = None
@@ -147,87 +152,101 @@ class ConfirmDialog(qt_import.QDialog):
                     collection_group_treewidget_item, info_str_list
                 )
             elif isinstance(item, queue_item.DataCollectionQueueItem):
+
                 acq_parameters = item_model.acquisitions[0].acquisition_parameters
                 if not item_model.is_helical() and not item_model.is_mesh():
                     interleave_items += 1
-            elif isinstance(item, queue_item.CharacterisationQueueItem):
-                acq_parameters = item_model.reference_image_collection.acquisitions[
-                    0
-                ].acquisition_parameters
-                self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(
-                    self.conf_dialog_layout.take_snapshots_combo.count() - 1
-                )
-            elif isinstance(item, queue_item.XrayCenteringQueueItem):
-                acq_parameters = item_model.mesh_dc.acquisitions[
-                    0
-                ].acquisition_parameters
-            elif isinstance(item, queue_item.XrayImagingQueueItem):
-                acq_parameters = item_model.acquisitions[0].acquisition_parameters
 
-            path_template = item_model.get_path_template()
-
-            if acq_parameters and path_template:
-                info_str_list.append(item_type_name)
-                info_str_list.append("")
-                info_str_list.append(path_template.directory)
-                # This part is also in data_path_widget. Mote to PathTemplate
-                file_name = path_template.get_image_file_name()
-                file_name = file_name.replace(
-                    "%0" + str(path_template.precision) + "d",
-                    int(path_template.precision) * "#",
-                )
-                file_name = file_name.strip(" ")
-                info_str_list.append(file_name)
-                info_str_list.append("%.3f keV" % acq_parameters.energy)
-                info_str_list.append("%.2f A" % acq_parameters.resolution)
-                info_str_list.append("%.2f %%" % acq_parameters.transmission)
-                info_str_list.append("%.1f" % acq_parameters.osc_start)
-                info_str_list.append(str(acq_parameters.osc_range))
-                info_str_list.append(str(acq_parameters.num_images))
-                info_str_list.append("%s s" % str(acq_parameters.exp_time))
-                info_str_list.append(
-                    str(acq_parameters.num_images * acq_parameters.osc_range)
-                )
-                info_str_list.append(
-                    "%s s" % str(acq_parameters.num_images * acq_parameters.exp_time)
-                )
-
-                collection_treewidget_item = qt_import.QTreeWidgetItem(
-                    collection_group_treewidget_item, info_str_list
-                )
-                for col in range(13):
-                    collection_treewidget_item.setBackground(
-                        col, qt_import.QBrush(colors.TREE_ITEM_COLLECTION)
-                    )
-
-                collection_items.append(item)
-                file_paths = path_template.get_files_to_be_written()
-                num_images += acq_parameters.num_images
-
-                if len(file_paths) > 20:
-                    file_paths = file_paths[:20]
-
-                for file_path in file_paths:
-                    if os.path.exists(file_path):
-                        (dir_name, file_name) = os.path.split(file_path)
-                        sample_name = current_sample_item.get_model().get_display_name()
-                        if sample_name == "":
-                            sample_name = current_sample_item.get_model().loc_str
-                        file_str_list = []
-                        file_str_list.append(sample_name)
-                        file_str_list.append(dir_name)
-                        file_str_list.append(file_name)
-
-                        file_treewidgee_item = qt_import.QTreeWidgetItem(
-                            self.conf_dialog_layout.file_treewidget, file_str_list
+                if acq_parameters is not None:
+                    path_template = item_model.get_path_template()
+                    if path_template is not None:
+                        info_str_list.append(item_type_name)
+                        info_str_list.append("")
+                        info_str_list.append(path_template.directory)
+                        # This part is also in data_path_widget. Mote to PathTemplate
+                        file_name = path_template.get_image_file_name()
+                        file_name = file_name.replace(
+                            "%0" + str(path_template.precision) + "d",
+                            int(path_template.precision) * "#",
                         )
-                        if hasattr(file_treewidgee_item, "setTextcolor"):
-                            file_treewidgee_item.setTextcolor(1, qt_import.Qt.red)
-                            file_treewidgee_item.setTextcolor(2, qt_import.Qt.red)
+                        file_name = file_name.strip(" ")
+                        info_str_list.append(file_name)
+                        info_str_list.append("%.3f keV" % acq_parameters.energy)
+                        info_str_list.append("%.2f A" % acq_parameters.resolution)
+                        info_str_list.append("%.2f %%" % acq_parameters.transmission)
+                        if acq_parameters.osc_start is not None:
+                            info_str_list.append("%.1f" % acq_parameters.osc_start)
                         else:
-                            file_treewidgee_item.setForeground(1, qt_import.QBrush(qt_import.Qt.red))
-                            file_treewidgee_item.setForeground(2, qt_import.QBrush(qt_import.Qt.red))
-                        file_exists = True
+                            info_str_list.append("N/A")
+                        if acq_parameters.osc_range is not None:
+                            info_str_list.append(str(acq_parameters.osc_range))
+                        else:
+                            info_str_list.append("N/A")
+                        if acq_parameters.num_images is not None:
+                            info_str_list.append(str(acq_parameters.num_images))
+                        else:
+                            info_str_list.append("N/A")
+                        info_str_list.append("%s s" % str(acq_parameters.exp_time))
+                        if (
+                            acq_parameters.num_images is not None
+                            and acq_parameters.osc_range is not None
+                        ):
+                            info_str_list.append(
+                                "%.1f s"
+                                % (acq_parameters.num_images * acq_parameters.osc_range)
+                            )
+                        else:
+                            info_str_list.append("N/A")
+
+                        collection_treewidget_item = qt_import.QTreeWidgetItem(
+                            collection_group_treewidget_item, info_str_list
+                        )
+                        for col in range(13):
+                            collection_treewidget_item.setBackground(
+                                col, qt_import.QBrush(colors.TREE_ITEM_COLLECTION)
+                            )
+
+                        collection_items.append(item)
+                        file_paths = path_template.get_files_to_be_written()
+                        num_images += acq_parameters.num_images
+
+                        if len(file_paths) > 20:
+                            file_paths = file_paths[:20]
+
+                        for file_path in file_paths:
+                            if os.path.exists(file_path):
+                                (dir_name, file_name) = os.path.split(file_path)
+                                sample_name = (
+                                    current_sample_item.get_model().get_display_name()
+                                )
+                                if sample_name == "":
+                                    sample_name = (
+                                        current_sample_item.get_model().loc_str
+                                    )
+                                file_str_list = []
+                                file_str_list.append(sample_name)
+                                file_str_list.append(dir_name)
+                                file_str_list.append(file_name)
+
+                                file_treewidgee_item = qt_import.QTreeWidgetItem(
+                                    self.conf_dialog_layout.file_treewidget,
+                                    file_str_list,
+                                )
+                                if hasattr(file_treewidgee_item, "setTextcolor"):
+                                    file_treewidgee_item.setTextcolor(
+                                        1, qt_import.Qt.red
+                                    )
+                                    file_treewidgee_item.setTextcolor(
+                                        2, qt_import.Qt.red
+                                    )
+                                else:
+                                    file_treewidgee_item.setForeground(
+                                        1, qt_import.QBrush(qt_import.Qt.red)
+                                    )
+                                    file_treewidgee_item.setForeground(
+                                        2, qt_import.QBrush(qt_import.Qt.red)
+                                    )
+                                file_exists = True
 
         self.conf_dialog_layout.file_gbox.setEnabled(file_exists)
         self.conf_dialog_layout.interleave_cbx.setEnabled(interleave_items > 1)
