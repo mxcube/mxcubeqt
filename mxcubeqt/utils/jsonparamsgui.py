@@ -25,12 +25,12 @@ Refactored July 2024 to work with web version (update functions on server side)
 import abc
 import os.path
 import logging
-from collections import OrderedDict
-from typing import Any, Optional, Dict, Sequence, List, Tuple
+from typing import Any, Optional, Dict, Sequence, List
 import gevent
 import gevent.event
 
 from mxcubecore.dispatcher import dispatcher
+from mxcubecore import HardwareRepository as HWR
 from mxcubeqt.utils import qt_import, colors
 
 
@@ -69,7 +69,9 @@ class LayoutWidget(qt_import.QWidget):
         """Close widget and disconnect signals"""
         super().close()
         if self.update_signal:
-            dispatcher.disconnect(self.update_values, self.update_signal, dispatcher.Any)
+            dispatcher.disconnect(
+                self.update_values, self.update_signal, dispatcher.Any
+            )
         for widget in self.parameter_widgets.values():
             widget.close()
 
@@ -154,7 +156,7 @@ class ValueWidget(qt_import.QWidget):
         if self.is_hidden:
             self.hide()
             self.setEnabled(False)
-        elif options.get("readonly"):
+        elif options.get("readOnly"):
             self.setEnabled(False)
         self.setContentsMargins(1, 1, 1, 1)
 
@@ -184,16 +186,11 @@ class ValueWidget(qt_import.QWidget):
                 self.update_on_change or update_on_change == "always"
             ):
                 self.gui_root_widget.wait_event.clear()
-                responses: list = dispatcher.send(
+                HWR.beamline.emit(
                     root_widget.return_signal,
-                    self,
                     self.get_name(),
                     root_widget.get_values_map(),
                 )
-                if not responses:
-                    raise RuntimeError(
-                        "Signal %s is not connected" % root_widget.return_signal
-                    )
                 self.gui_root_widget.wait_event.wait()
         root_widget.validate_fields()
         if valid:
@@ -227,7 +224,7 @@ class LineEdit(qt_import.QLineEdit, ValueWidget):
         qt_import.QLineEdit.__init__(self, parent)
         ValueWidget.__init__(self, gui_root_widget, options)
         self.setAlignment(qt_import.Qt.AlignRight)
-        if options.get("readonly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
         self.textEdited.connect(self.input_field_changed)
 
@@ -308,7 +305,7 @@ class TextEdit(qt_import.QTextEdit, ValueWidget):
         )
         self.setSizeAdjustPolicy(qt_import.QAbstractScrollArea.AdjustToContents)
         self.setFont(qt_import.QFont("Courier"))
-        if options.get("readonly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
         self.textChanged.connect(self.input_field_changed)
 
@@ -324,8 +321,10 @@ class TextEdit(qt_import.QTextEdit, ValueWidget):
         """Close widget and disconnect signals"""
         self.textChanged.disconnect(self.input_field_changed)
 
+
 class TextDisplay(qt_import.QLabel):
     is_hidden: bool = False
+
     def __init__(
         self,
         parent: qt_import.QWidget,
@@ -346,7 +345,6 @@ class Combo(qt_import.QComboBox, ValueWidget):
         options: Dict[str, Any],
     ):
         qt_import.QComboBox.__init__(self, parent)
-        self.value_dict: Dict[str, Any] = {}
         # NB pulldown must be set up before ValueWidget init
         self.setup_pulldown(**options)
         ValueWidget.__init__(self, gui_root_widget, options)
@@ -355,18 +353,19 @@ class Combo(qt_import.QComboBox, ValueWidget):
 
     def setup_pulldown(self, **options) -> None:
         """Set up pulldown from empty state (also used in resetting)"""
-        self.is_hidden: bool = options.get("hidden")
-        self.value_dict: Dict[str, Any] = dict(options["value_dict"])
-        for val in self.value_dict:
+        self.enum: List[str] = options["enum"]
+        for val in self.enum:
             self.addItem(str(val))
         if "default" in options:
             default = options["default"]
-            if default in self.value_dict:
+            if default in self.enum:
                 self.set_value(options["default"])
             else:
-                print ("WARNING, %s default value %s is not a valid option"
-                       % (options["variable_name"], default))
-                self.set_value(list(self.value_dict)[0])
+                print(
+                    "WARNING, %s default value %s is not a valid option"
+                    % (options["variable_name"], default)
+                )
+                self.set_value(self.enum[0])
 
     def set_value(self, value) -> None:
         """Setter for widget value"""
@@ -379,18 +378,16 @@ class Combo(qt_import.QComboBox, ValueWidget):
                 namestr = self.get_name()
             except AttributeError:
                 namestr = str(self)
-            raise ValueError(
-                "Value %s not found in widget %s" % (value, namestr)
-            )
+            raise ValueError("Value %s not found in widget %s" % (value, namestr))
 
     def get_value(self) -> Any:
         """Getter for widget value"""
-        return self.value_dict.get(str(self.currentText()))
+        return str(self.currentText())
 
     def reset_options(self, options: Dict[str, Any]):
         """Reset pulldown contents, value, and is_hidden"""
         # Supported options are: value_dict, hidden, and default
-        supported: frozenset = frozenset(("hidden", "value_dict", "default"))
+        supported: frozenset = frozenset(("hidden", "enum", "default"))
         disallowed: frozenset = frozenset(options).difference(supported)
         if disallowed:
             raise ValueError(
@@ -475,7 +472,7 @@ class IntSpinBox(qt_import.QSpinBox, ValueWidget):
             self.setMinimum(int(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
-        if options.get("readonly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
         self.valueChanged.connect(self.input_field_changed)
 
@@ -518,7 +515,7 @@ class DoubleSpinBox(qt_import.QDoubleSpinBox, ValueWidget):
             self.setMinimum(float(options["minimum"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
-        if options.get("readonly"):
+        if options.get("readOnly"):
             self.setReadOnly(True)
         self.valueChanged.connect(self.input_field_changed)
 
@@ -570,15 +567,17 @@ class CheckBox(qt_import.QCheckBox, ValueWidget):
 
 class LocalQGroupBox(qt_import.QGroupBox):
     """Wrapper around QGroupBox to provide is_hidden attribute"""
+
     is_hidden: bool = False
 
 
 def create_widgets(
     schema: Dict[str, Any],
-    ui_schema: Dict[str,Any],
+    ui_schema: Dict[str, Any],
     field_name: Optional[str] = None,
     parent_widget: Optional[qt_import.QWidget] = None,
     gui_root_widget: Optional[LayoutWidget] = None,
+    is_hidden: bool = False,
 ) -> qt_import.QWidget:
     """Recursive widget creation function
 
@@ -589,6 +588,7 @@ def create_widgets(
                           Equal to tag in ui_schema, and used as variable_name
         parent_widget: parent widget
         gui_root_widget : root (layoutWidget) widget
+        is_hidden : is widget hidden?
 
     Returns (qt_import.QWidget):
 
@@ -602,37 +602,27 @@ def create_widgets(
 
     default_container_name: str = "vertical_box"
 
-    fields: Dict[str,Any] = schema["properties"]
-    # definitions = schema["definitions"]
+    fields: Dict[str, Any] = schema["properties"]
 
-    field_data: Optional[Dict[str,Any]] = fields.get(field_name)
+    field_data: Optional[Dict[str, Any]] = fields.get(field_name)
     widget_name: Optional[str] = ui_schema.get("ui:widget")
     if field_data:
         # This is an actual data field
         options: Dict[str, Any] = field_data.copy()
         options["variable_name"] = field_name
 
-        pathstr: Optional[str] = field_data.get("$ref")
         if not widget_name:
-            if "value_dict" in options:
+            if "enum" in options:
                 widget_name = "select"
-            elif pathstr:
-                widget_name = "select"
-                tags: list = pathstr.split("/")[1:]
-                dd0: dict = schema
-                for tag in tags:
-                    dd0 = dd0[tag]
-                enums = dd0
-                options["value_dict"] = OrderedDict(
-                    (dd1["title"], dd1["enum"][0]) for dd1 in enums
-                )
             else:
                 widget_name = field_data.get("type")
 
         options.update(ui_schema.get("ui:options", {}))
-        if ui_schema.get("ui:readonly"):
-            options["readonly"] = True
-        if  widget_name == "textdisplay":
+        if ui_schema.get("ui:readOnly"):
+            options["readOnly"] = True
+        if is_hidden:
+            options["hidden"] = True
+        if widget_name == "textdisplay":
             widget = TextDisplay(parent_widget, options)
         else:
             widget: qt_import.QWidget = WIDGET_CLASSES[widget_name](
@@ -666,7 +656,8 @@ def create_widgets(
         # Now everything is populated, put the hidden widgets in as data holders
         for fname, field in fields.items():
             if fname not in gui_root_widget.parameter_widgets:
-                if field.get("hidden"):
+                if field.get("type") != "textdisplay":
+                    # Any field not being displayed is by definition hidden
                     # NB should not happen much,
                     # but might be used to temporarily hide fields
                     create_widgets(
@@ -675,11 +666,7 @@ def create_widgets(
                         fname,
                         parent_widget=gui_root_widget,
                         gui_root_widget=gui_root_widget,
-                    )
-                elif field.get("type") != "textdisplay":
-                    raise RuntimeError(
-                        "Coding error: UI fields %s is neither hidden nor displayed"
-                        % fname
+                        is_hidden=True,
                     )
     #
     return widget
@@ -739,7 +726,11 @@ class ColumnGridWidget(qt_import.QGridLayout):
                         "ui:title"
                     )
                     if title:
-                        if widget_type in ("textarea", "selection_table", "textdisplay"):
+                        if widget_type in (
+                            "textarea",
+                            "selection_table",
+                            "textdisplay",
+                        ):
                             # Special case - title goes above
                             outer_box: LocalQGroupBox = LocalQGroupBox(
                                 title,
@@ -838,7 +829,7 @@ class VerticalBox(ColumnGridWidget):
     ):
         """Create contents and add them to container widger"""
         wrap_schema: Dict[str, Any] = {}
-        col_schema: Dict[str, Any] =  {}
+        col_schema: Dict[str, Any] = {}
         wrap_schema["column"] = col_schema
         self.is_hidden: bool = False
         for tag, val in ui_schema.items():
@@ -881,7 +872,6 @@ class HorizontalBox(ColumnGridWidget):
         super().populate_widget(schema, wrap_schema, gui_root_widget)
 
 
-
 class SelectionTable(qt_import.QTableWidget, ValueWidget):
     """Read-only table for data display and selection"""
 
@@ -894,8 +884,6 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         qt_import.QTableWidget.__init__(self, parent)
         ValueWidget.__init__(self, gui_root_widget, options)
         header: str = options["header"]
-
-        self.is_hidden: bool = options.get("hidden")
 
         self.setFrameShape(qt_import.QFrame.StyledPanel)
         self.setFrameShadow(qt_import.QFrame.Sunken)
@@ -919,7 +907,6 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         for idx, data in enumerate(options["content"]):
             self.populate_column(idx, data, highlights)
 
-
         cell_indx = options.get("select_cell", (0, 0))
         self.setCurrentCell(*cell_indx)
         self.currentCellChanged.connect(self.input_field_changed)
@@ -932,7 +919,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         self,
         colnum: int,
         values: Sequence,
-        highlights:  Dict[int, Dict[int, str]] = None
+        highlights: Dict[int, Dict[int, str]] = None,
     ):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
@@ -950,9 +937,8 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
                 colourname = None
             if colourname is not None:
                 colors.set_widget_color(
-                    wdg,
-                    ColourMap[colourname],
-                    qt_import.QPalette.Base)
+                    wdg, ColourMap[colourname], qt_import.QPalette.Base
+                )
             self.setCellWidget(rownum, colnum, wdg)
 
     def get_value(self):
@@ -976,9 +962,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
                 if value == self.cellWidget(row_id, col_id).text():
                     self.setCurrentCell(row_id, col_id)
                     return
-        raise ValueError(
-            "Value %s not found in widget %s" % (value, self.get_name())
-        )
+        raise ValueError("Value %s not found in widget %s" % (value, self.get_name()))
 
     def colour_widget(self, highlight: str) -> None:
         """Dummy function, to disable background colouring of SelectionTable"""
