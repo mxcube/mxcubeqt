@@ -942,7 +942,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
             self.setCellWidget(rownum, colnum, wdg)
 
     def get_value(self):
-        """Get value - list of cell contents for selected row"""
+        """Get value - list of cell contents for selected cell"""
         row_id = self.currentRow()
         col_id = self.currentColumn()
         if not self.cellWidget(row_id, col_id):
@@ -952,7 +952,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         return self.cellWidget(row_id, col_id).text()
 
     def set_value(self, value):
-        """Set current row that matches list of cell contents
+        """Set current cell that matches list of cell contents
 
         This is not really useful (you would use the setCurrentCell method instead)
         But the method is there for consistency with the ValueWIdget superclass"""
