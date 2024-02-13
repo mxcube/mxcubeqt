@@ -98,16 +98,9 @@ class LayoutWidget(qt_import.QWidget):
             self.block_updates = True
             for tag, ddict in changes_dict.items():
                 widget: ValueWidget = self.parameter_widgets[tag]
-                options: dict = ddict.get("options")
-                if options is not None:
-                    if hasattr(widget, "reset_options"):
-                        widget.reset_options(options)
-                    else:
-                        raise ValueError(
-                            " reset_options not supported for widget %s of type %s"
-                            % (tag, widget.__class__.__name__)
-                        )
-                if "value" in ddict:
+                if hasattr(widget, "reset_options"):
+                    widget.reset_options(ddict)
+                elif "value" in ddict:
                     widget.set_value(ddict["value"])
                 highlight: str = ddict.get("highlight")
                 widget.highlight = highlight
@@ -385,17 +378,16 @@ class Combo(qt_import.QComboBox, ValueWidget):
         return str(self.currentText())
 
     def reset_options(self, options: Dict[str, Any]):
-        """Reset pulldown contents, value, and is_hidden"""
-        # Supported options are: value_dict, hidden, and default
-        supported: frozenset = frozenset(("hidden", "enum", "default"))
-        disallowed: frozenset = frozenset(options).difference(supported)
-        if disallowed:
-            raise ValueError(
-                "Disallowed reset options for widget %s: %s"
-                % (self.get_name(), sorted(disallowed))
-            )
-        self.clear()
-        self.setup_pulldown(**options)
+        """Reset pulldown contents"""
+        # Supported options are: value_dict, and default
+        enum = options.get("enum")
+        value = options.get("value")
+        if enum:
+            self.clear()
+            self.setup_pulldown(enum=enum, default=value, variable_name=self.get_name())
+
+        elif value is not None:
+            self.set_value(value)
 
     def close(self):
         """Close widget and disconnect signals"""
@@ -989,3 +981,31 @@ WIDGET_CLASSES = {
     "vertical_box": VerticalBox,
     "selection_table": SelectionTable,
 }
+
+def updated_schema(schema: dict, update: dict) -> dict:
+    """Return updated schema
+
+    update is a dict of updates keyed by property name, which
+    are set in the property with the same name.
+
+    Note that the update parameter "value" is set to the schema parameter "default
+
+    This function (or rahter a copy of it) is used in the web interface
+    (only) for schema updating
+    """
+    import copy
+    result = copy.deepcopy((schema))
+    properties = result["properties"]
+    for tag, upd in update.items():
+        target = properties.get(tag)
+        if target is None:
+            raise RuntimeError(
+                "Cannot update field named %s; no such field"
+            % tag)
+        value = upd.pop("value", None)
+        if value is not None:
+            target["default"] = value
+        target.update(upd)
+    #
+    return result
+
