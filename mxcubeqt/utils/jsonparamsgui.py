@@ -981,31 +981,3 @@ WIDGET_CLASSES = {
     "vertical_box": VerticalBox,
     "selection_table": SelectionTable,
 }
-
-def updated_schema(schema: dict, update: dict) -> dict:
-    """Return updated schema
-
-    update is a dict of updates keyed by property name, which
-    are set in the property with the same name.
-
-    Note that the update parameter "value" is set to the schema parameter "default
-
-    This function (or rahter a copy of it) is used in the web interface
-    (only) for schema updating
-    """
-    import copy
-    result = copy.deepcopy((schema))
-    properties = result["properties"]
-    for tag, upd in update.items():
-        target = properties.get(tag)
-        if target is None:
-            raise RuntimeError(
-                "Cannot update field named %s; no such field"
-            % tag)
-        value = upd.pop("value", None)
-        if value is not None:
-            target["default"] = value
-        target.update(upd)
-    #
-    return result
-
