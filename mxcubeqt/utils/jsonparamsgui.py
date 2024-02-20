@@ -98,16 +98,9 @@ class LayoutWidget(qt_import.QWidget):
             self.block_updates = True
             for tag, ddict in changes_dict.items():
                 widget: ValueWidget = self.parameter_widgets[tag]
-                options: dict = ddict.get("options")
-                if options is not None:
-                    if hasattr(widget, "reset_options"):
-                        widget.reset_options(options)
-                    else:
-                        raise ValueError(
-                            " reset_options not supported for widget %s of type %s"
-                            % (tag, widget.__class__.__name__)
-                        )
-                if "value" in ddict:
+                if hasattr(widget, "reset_options"):
+                    widget.reset_options(ddict)
+                elif "value" in ddict:
                     widget.set_value(ddict["value"])
                 highlight: str = ddict.get("highlight")
                 widget.highlight = highlight
@@ -385,17 +378,16 @@ class Combo(qt_import.QComboBox, ValueWidget):
         return str(self.currentText())
 
     def reset_options(self, options: Dict[str, Any]):
-        """Reset pulldown contents, value, and is_hidden"""
-        # Supported options are: value_dict, hidden, and default
-        supported: frozenset = frozenset(("hidden", "enum", "default"))
-        disallowed: frozenset = frozenset(options).difference(supported)
-        if disallowed:
-            raise ValueError(
-                "Disallowed reset options for widget %s: %s"
-                % (self.get_name(), sorted(disallowed))
-            )
-        self.clear()
-        self.setup_pulldown(**options)
+        """Reset pulldown contents"""
+        # Supported options are: value_dict, and default
+        enum = options.get("enum")
+        value = options.get("value")
+        if enum:
+            self.clear()
+            self.setup_pulldown(enum=enum, default=value, variable_name=self.get_name())
+
+        elif value is not None:
+            self.set_value(value)
 
     def close(self):
         """Close widget and disconnect signals"""
@@ -942,7 +934,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
             self.setCellWidget(rownum, colnum, wdg)
 
     def get_value(self):
-        """Get value - list of cell contents for selected row"""
+        """Get value - list of cell contents for selected cell"""
         row_id = self.currentRow()
         col_id = self.currentColumn()
         if not self.cellWidget(row_id, col_id):
@@ -952,7 +944,7 @@ class SelectionTable(qt_import.QTableWidget, ValueWidget):
         return self.cellWidget(row_id, col_id).text()
 
     def set_value(self, value):
-        """Set current row that matches list of cell contents
+        """Set current cell that matches list of cell contents
 
         This is not really useful (you would use the setCurrentCell method instead)
         But the method is there for consistency with the ValueWIdget superclass"""
