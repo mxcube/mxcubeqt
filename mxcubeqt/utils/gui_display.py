@@ -299,6 +299,8 @@ class CustomMenuBar(qt_import.QMenuBar):
     def quit_clicked(self):
         """Exit mxcube"""
 
+        import logging
+        logging.getLogger("HWR").debug("quit clicked happened")
         if self.execution_mode:
             qt_import.QApplication.quit()
 
@@ -1109,6 +1111,8 @@ class WindowDisplayWidget(qt_import.QScrollArea):
     def closeEvent(self, event):
         event.accept()
         if self.close_on_exit:
+            import logging
+            logging.getLogger("HWR").debug("close event happened")
             qt_import.QApplication.exit(0)
 
     def hide(self, *args):

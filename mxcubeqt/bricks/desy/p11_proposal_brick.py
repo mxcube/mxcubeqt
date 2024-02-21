@@ -105,6 +105,7 @@ class P11ProposalBrick(ProposalBrick):
         self._do_login_as_proposal(
             proposal_code, proposal_number, None, HWR.beamline.lims.beamline_name,
         )
+        logging.getLogger("HWR").debug("login as proposal done")
 
     def show_selected_proposal(self, proposal):
 

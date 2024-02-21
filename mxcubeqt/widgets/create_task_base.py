@@ -146,6 +146,9 @@ class CreateTaskBase(qt_import.QWidget):
     def init_acq_model(self):
         if self._acq_widget:
             def_acq_parameters = HWR.beamline.get_default_acquisition_parameters()
+            import logging
+            logging.getLogger("HWR").debug(f" creating acquisition parameters from default: {def_acq_parameters.as_dict()}")
+
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
             if HWR.beamline.diffractometer.in_plate_mode():
                 self._acq_widget.use_kappa(False)
@@ -495,12 +498,14 @@ class CreateTaskBase(qt_import.QWidget):
         elif isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
             self.setDisabled(True)
 
-        # if self._acq_widget:
-        #    self._acq_widget.set_enable_parameter_update(\
-        #         not isinstance(tree_item, queue_item.TaskQueueItem))
+        #if self._acq_widget:
+        #   self._acq_widget.set_enable_parameter_update(\
+        #        not isinstance(tree_item, queue_item.TaskQueueItem))
 
     def _update_etr(self):
+
         default_acq_params = HWR.beamline.get_default_acquisition_parameters()
+
         for tag in ("kappa", "kappa_phi", "energy", "transmission", "resolution", ):
             setattr(self._acquisition_parameters, tag, getattr(default_acq_params, tag))
 

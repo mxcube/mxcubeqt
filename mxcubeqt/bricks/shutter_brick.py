@@ -115,11 +115,15 @@ class ShutterBrick(BaseWidget):
         
     def open_button_clicked(self):
         """Opens the shutter"""
+        log.debug("Open CLICKED")
         self.shutter_hwobj.open()
+        log.debug("CLICKED returned")
 
     def close_button_clicked(self):
         """Closes the shutter"""
+        log.debug("Close CLICKED")
         self.shutter_hwobj.close()
+        log.debug("CLICKED returned")
 
     def property_changed(self, property_name, old_value, new_value):
         """Initates the shutter hwobj"""
@@ -146,11 +150,15 @@ class ShutterBrick(BaseWidget):
     def value_changed(self, value=None):
         """Based on the shutter state enables/disables open and close buttons"""
 
+        log.debug("Shutter value changed (brick)")
 
         if value is None:
+            log.debug("  - reading new value")
             value = self.shutter_hwobj.get_value()
 
         state_str = value.name
+        log.debug(f"  - value is {state_str}")
+
         if value.name == 'OPEN':
            colors.set_widget_color(self.state_label, colors.LIGHT_GREEN)
         elif value.name == 'CLOSED':
@@ -164,5 +172,8 @@ class ShutterBrick(BaseWidget):
         self.state_label.setText(value.value.title())
         self.setDisabled(value.name == "DISABLED")
         is_open = self.shutter_hwobj.is_open
+
+        log.debug(f"SHUTTER brick - shutter is open: {is_open}")
+
         self.open_button.setEnabled(not is_open)
         self.close_button.setEnabled(is_open)

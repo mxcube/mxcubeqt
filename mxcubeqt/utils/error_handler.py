@@ -61,9 +61,13 @@ class __Handler:
         pass
 
     def excepthook(self, type, value, tb):
+        logging.getLogger("HWR").debug(f"  exception hook. quitting {value}")
+        logging.getLogger("HWR").debug(f"{tb}")
+
         if type == KeyboardInterrupt:
             qt_import.getQApp().quit()
             return
+
         try:
             exception = traceback.format_exception(type, value, tb)
             logging.getLogger().error("Uncaught exception : " + "\n".join(exception))
