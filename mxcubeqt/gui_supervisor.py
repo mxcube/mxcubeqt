@@ -26,10 +26,7 @@ import pickle
 import logging
 import collections
 
-try:
-    import ruamel.yaml as yaml
-except ImportError:
-    import yaml
+from ruamel.yaml import YAML
 
 from mxcubeqt import configuration, gui_builder
 from mxcubeqt.utils import gui_display, icons, colors, qt_import
@@ -258,7 +255,8 @@ class GUISupervisor(qt_import.QWidget):
                         if gui_config_file.endswith(".json"):
                             raw_config = json.load(gui_file)
                         elif gui_config_file.endswith(".yml"):
-                            raw_config = yaml.safe_load(gui_file)
+                            yaml = YAML(typ='safe', pure=True)
+                            raw_config = yaml.load(gui_file)
                         else:
                             raw_config = eval(gui_file.read())
                     except BaseException:
