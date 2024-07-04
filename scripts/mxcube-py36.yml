@@ -1,7 +1,7 @@
 # author: Jordi Andreu
 # email: jandreu@cells.es
 # desc: MXCuBE py36Qt5
-
+---
 name: mxcube-py36
 channels:
   - conda-forge
@@ -13,14 +13,14 @@ dependencies:
   - pyqt>=5
   - numpy
   - suds-jurko
-  - ruamel.yaml 
+  - ruamel.yaml
   - pydispatcher
   - scipy
   - matplotlib
   - jsonpickle
   - jsonschema
   - pillow
-  - pyqtgraph 
+  - pyqtgraph
   - pytest
   - autopep8
   - black
