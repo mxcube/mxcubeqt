@@ -1,19 +1,22 @@
+---
 name: mxcubeqt
 channels:
   - conda-forge
 dependencies:
   - python=3.8,<3.11
-#  - python=3.8  # For development only - we must support down to Python 3.8
+  #  - python=3.8  # For development only - we must support down to Python 3.8
   - python-ldap=3.4.3
   - openjdk=11
   - pyqtgraph=0.13
   - pip
-  # Uncomment vfake, black, and yamllint for demo environments
+  # Uncomment flake8, black, and yamllint for demo environments
+  # Put paths to repositories and PyQt and uncomment:
 #  - flake8
 #  - black
 #  - pip:
 #      - yamllint
-# Put paths to mxcubecore, mxcubeqt, and PyQt and uncomment:
 #      - --editable /home/rhfogh/pycharm/mxcubecore
 #      - --editable /home/rhfogh/pycharm/mxcubeqt
+#      - --editable /home/rhfogh/pycharm/mxlims_data_model
+# yamllint disable-line rule:line-length
 #      - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.8-cp37-abi3-manylinux_2_17_x86_64.whl
