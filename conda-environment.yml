@@ -8,8 +8,12 @@ dependencies:
   - openjdk=11
   - pyqtgraph=0.13
   - pip
-# Put paths to mxcubecore, mxcubeqt, and PyQt and uncomment:
+  # Uncomment vfake, black, and yamllint for demo environments
+#  - flake8
+#  - black
 #  - pip:
-#    - --editable /home/rhfogh/pycharm/mxcubecore
-#    - --editable /home/rhfogh/pycharm/mxcubeqt
-#    - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.8-cp37-abi3-manylinux_2_17_x86_64.whl
+#      - yamllint
+# Put paths to mxcubecore, mxcubeqt, and PyQt and uncomment:
+#      - --editable /home/rhfogh/pycharm/mxcubecore
+#      - --editable /home/rhfogh/pycharm/mxcubeqt
+#      - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.8-cp37-abi3-manylinux_2_17_x86_64.whl
