@@ -15,6 +15,7 @@ dependencies:
 #  - black
 #  - pip:
 #      - yamllint
+#      - json-schema-for-humans
 #      - --editable /home/rhfogh/pycharm/mxcubecore
 #      - --editable /home/rhfogh/pycharm/mxcubeqt
 #      - --editable /home/rhfogh/pycharm/mxlims_data_model
