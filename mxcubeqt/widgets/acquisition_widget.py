@@ -368,7 +368,7 @@ class AcquisitionWidget(qt_import.QWidget):
         self.acq_widget_layout.kappa_phi_ledit.setEnabled(state)
 
     def init_limits(self):
-        limits_dict = HWR.beamline.acquisition_limit_values
+        limits_dict = HWR.beamline.config.acquisition_limit_values
 
         tpl = limits_dict.get("osc_range")
         if tpl:

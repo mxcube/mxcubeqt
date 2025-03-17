@@ -134,7 +134,7 @@ class ApertureBrick(BaseWidget):
         aperture_size_list = HWR.beamline.beam.aperture.get_diameter_size_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
-            self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))
+            self.aperture_diameter_combo.addItem("%s%s" % (aperture_size, unichr(956)))
 
         aperture_position_list = HWR.beamline.beam.aperture.get_position_list()
         self.aperture_position_combo.clear()
