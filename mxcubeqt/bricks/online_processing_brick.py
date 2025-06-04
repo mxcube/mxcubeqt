@@ -72,6 +72,8 @@ class OnlineProcessingBrick(BaseWidget):
             self.setEnabled(False)
 
     def populate_widget(self, item):
+        if HWR.beamline.online_processing is None:
+            return
         data_collection = item.get_model()
         if isinstance(item, queue_item.XrayCenteringQueueItem):
             data_collection = data_collection.mesh_dc

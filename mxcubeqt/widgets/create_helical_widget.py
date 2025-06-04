@@ -127,7 +127,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
 
         self._processing_widget.processing_widget.run_online_processing_cbox.setChecked(
-            HWR.beamline.run_online_processing
+            HWR.beamline.config.run_online_processing
         )
         self.enable_widgets(False)
 

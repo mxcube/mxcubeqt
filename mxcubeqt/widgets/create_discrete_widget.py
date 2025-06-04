@@ -95,7 +95,7 @@ class CreateDiscreteWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
         self._processing_widget.processing_widget.run_online_processing_cbox.\
-            setChecked(HWR.beamline.run_online_processing)
+            setChecked(HWR.beamline.config.run_online_processing)
 
     def init_models(self):
         CreateTaskBase.init_models(self)
