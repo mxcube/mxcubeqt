@@ -1262,7 +1262,7 @@ class GUIBuilder(qt_import.QMainWindow):
         self.log_window.setWindowTitle("Log window")
         sw = qt_import.QApplication.desktop().screen().width()
         sh = qt_import.QApplication.desktop().screen().height()
-        self.log_window.resize(qt_import.QSize(sw * 0.8, sh * 0.2))
+        self.log_window.resize(qt_import.QSize(int(sw * 0.8), int(sh * 0.2)))
         self.property_editor_window = PropertyEditorWindow(None)
         self.gui_preview_window = GUIPreviewWindow(None)
         self.configuration = self.gui_editor_window.configuration

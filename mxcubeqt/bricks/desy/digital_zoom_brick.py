@@ -30,7 +30,6 @@ __category__ = "Motor"
 
 
 class DigitalZoomBrick(BaseWidget):
-
     STATE_COLORS = (
         colors.LIGHT_YELLOW,  # INITIALIZING
         colors.LIGHT_GREEN,  # ON
@@ -129,16 +128,15 @@ class DigitalZoomBrick(BaseWidget):
         self.label.setToolTip(tip)
 
     def motor_state_changed(self, state):
-
         # self.positions_combo.setEnabled(self.motor_hwobj.is_ready())
 
         if self.motor_hwobj.is_ready:
             colors.set_widget_color(
-                self.positions_combo, colors.LIGHT_GREEN, qt_import.QPalette.Button,
+                self.positions_combo, colors.LIGHT_GREEN, qt_import.QPalette.Button
             )
         else:
             colors.set_widget_color(
-                self.positions_combo, colors.LIGHT_GRAY, qt_import.QPalette.Button,
+                self.positions_combo, colors.LIGHT_GRAY, qt_import.QPalette.Button
             )
 
         # self.setToolTip(state=state)
@@ -242,7 +240,6 @@ class DigitalZoomBrick(BaseWidget):
         self.previous_position_button.setEnabled(index >= 0)
 
     def predefined_position_changed(self, position, offset):
-
         if self.positions:
             for index, item in enumerate(self.positions):
                 if position.name == item.name:

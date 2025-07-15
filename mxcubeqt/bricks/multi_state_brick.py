@@ -56,16 +56,13 @@ from mxcubeqt.base_components import BaseWidget
 
 from mxcubecore.BaseHardwareObjects import HardwareObjectState
 
-
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "General"
 
 
 class MultiStateBrick(BaseWidget):
-    units = {
-        "micron": u"\u03BC",
-    }
+    units = {"micron": "\u03BC"}
 
     def __init__(self, *args):
 
@@ -117,38 +114,37 @@ class MultiStateBrick(BaseWidget):
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "label":
-            if new_value == "":
+            if new_value != "":
                 self.label.setText(new_value)
             else:
-                self.label.hide()
+                self.label.show()
+
         elif property_name == "title":
             if new_value != "":
                 self.main_gbox.setTitle(new_value)
+
         elif property_name == "multibutton":
             if new_value != "":
                 self.multibutton = new_value
-                if len(self.positions):
+                if self.positions is not None and len(self.positions):
                     self.switch_multibutton_mode(self.multibutton)
-        elif property_name == "mnemonic":
-            if self.multi_hwobj is not None:
-                self.disconnect(self.multi_hwobj, "stateChanged", self.state_changed)
-                self.disconnect(
-                    self.multi_hwobj, "valueChanged", self.value_changed,
-                )
 
+        elif property_name == "mnemonic":
+            # Get the new hardware object directly without using callbacks or signals
             self.multi_hwobj = self.get_hardware_object(new_value)
 
             if self.multi_hwobj is not None:
-                self.connect(self.multi_hwobj, "stateChanged", self.state_changed)
-                self.connect(
-                    self.multi_hwobj, "valueChanged", self.value_changed,
-                )
-
+                # Set up the motor positions and buttons
                 self.fill_positions()
+
                 if self.multibutton:
                     self.switch_multibutton_mode(True)
-                self.state_changed()
+
+                # Manually check the state of the motor and update the UI
+                self.state_changed(self.multi_hwobj.get_state())
+
         else:
+            # Fall back to the base class method for other properties
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def switch_multibutton_mode(self, mode):
@@ -161,7 +157,8 @@ class MultiStateBrick(BaseWidget):
 
     def get_position_label(self, posidx):
         pos = self.positions[posidx]
-        unit = self.multi_hwobj.get_property_value_by_index(posidx, "unit")
+        # Access the unit directly from self.multi_hwobj._positions
+        unit = self.multi_hwobj._positions.get(pos, {}).get("unit", "")
         label = str(pos)
         if unit:
             label += self.units.get(unit, unit)
@@ -195,47 +192,101 @@ class MultiStateBrick(BaseWidget):
         self.value_changed()
 
     def change_value(self, index):
-        if index >= 0:
-            self.multi_hwobj.set_value(index)
+        """Change the hardware object to the selected value."""
+        # Check if positions is a list or dictionary
+        if isinstance(self.positions, list):
+            # If positions is a list, use the index directly
+            if 0 <= index < len(self.positions):
+                position_name = self.positions[index]
+                self.multi_hwobj.set_value(position_name)
+            else:
+                logging.error(f"Invalid index: {index}.")
+        elif isinstance(self.positions, dict):
+            # If positions is a dictionary, convert keys to a list and use the index
+            keys_list = list(self.positions.keys())
+            if 0 <= index < len(keys_list):
+                position_name = keys_list[index]
+                self.multi_hwobj.set_value(position_name)
+            else:
+                logging.error(f"Invalid index: {index}.")
+        else:
+            logging.error(f"Invalid type for positions: {type(self.positions)}")
 
     def state_changed(self, state=None):
-
+        """Update the UI based on the current state of the hardware."""
         if state is None:
             state = self.multi_hwobj.get_state()
 
         if state == HardwareObjectState.READY:
             color = colors.LIGHT_GREEN
+            self.label.setText("Motor Ready")
             self.setEnabled(True)
         elif state == HardwareObjectState.BUSY:
             color = colors.LIGHT_YELLOW
+            self.label.setText("Motor Busy")
             self.setEnabled(False)
         else:
             color = colors.LIGHT_GRAY
+            self.label.setText("Motor Not Ready")
             self.setEnabled(False)
 
+        # Update colors in the UI
         colors.set_widget_color(
             self.multi_position_combo, color, qt_import.QPalette.Button
         )
-
-        for but in self.multibuttons:
-            colors.set_widget_color(but, color, qt_import.QPalette.Button)
+        for button in self.multibuttons:
+            colors.set_widget_color(button, color, qt_import.QPalette.Button)
 
     def value_changed(self, value=None):
-
+        """This method is called when the hardware object's value changes."""
         self.multi_position_combo.blockSignals(True)
 
         if value is None:
+            # Get the current value from the hardware object
             value = self.multi_hwobj.get_value()
 
-        if value >= 0 and value < len(self.positions):
-            self.multi_position_combo.setCurrentIndex(value)
+        # Check if positions exist and handle both list and dict cases
+        if isinstance(self.positions, dict):
+            positions_list = list(self.positions.keys())
+        elif isinstance(self.positions, list):
+            positions_list = self.positions
         else:
-            self.multi_position_combo.setCurrentIndex(-1)
+            logging.error(f"Invalid type for positions: {type(self.positions)}")
+            positions_list = []
+
+        # Handle string positions and index values
+        if isinstance(value, str):
+            if value in positions_list:
+                # Set the current index to the matching string position
+                self.multi_position_combo.setCurrentIndex(positions_list.index(value))
+                self.label.setText(f"Current Position: {value}")
+            else:
+                logging.error(f"Unknown position: {value}")
+                self.label.setText("Unknown Position")
+                self.multi_position_combo.setCurrentIndex(-1)
+        else:
+            try:
+                # If value is an index, convert it to an integer
+                value = int(value)
+            except (ValueError, TypeError):
+                logging.error(
+                    f"Invalid value type: {value}. Expected an integer or string."
+                )
+                value = -1
+
+            if 0 <= value < len(positions_list):
+                # Set the current index based on the integer value
+                self.multi_position_combo.setCurrentIndex(value)
+                self.label.setText(f"Current Position: {positions_list[value]}")
+            else:
+                self.multi_position_combo.setCurrentIndex(-1)
+                self.label.setText("Unknown Position")
 
         self.multi_position_combo.blockSignals(False)
 
-        # value is index
+        # Update button states
         for button in self.multibuttons:
             button.setEnabled(True)
 
-        self.multibuttons[value].setEnabled(False)
+        if isinstance(value, int) and 0 <= value < len(self.multibuttons):
+            self.multibuttons[value].setEnabled(False)

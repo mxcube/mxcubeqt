@@ -76,7 +76,7 @@ class ProgressBarBrick(BaseWidget):
         # f self.use_dialog:
         #   BaseWidget.set_progress_dialog_step(step)
         # lse:
-        self.progress_bar.setValue(step)
+        self.progress_bar.setValue(int(step))
         self.setEnabled(True)
         #   BaseWidget.set_progress_bar_step(step)
 

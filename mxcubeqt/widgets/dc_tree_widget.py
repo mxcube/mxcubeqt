@@ -491,7 +491,6 @@ class DataCollectTree(qt_import.QWidget):
                     if self.show_sc_during_mount:
                         self.tree_brick.sample_mount_started.emit()
                     queue_entry.mount_sample(
-                        items[0],
                         items[0].get_model(),
                         self.centring_done,
                         self.sample_centring_result

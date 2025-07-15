@@ -32,7 +32,6 @@ __category__ = "General"
 
 
 class ValueStateBrick(BaseWidget):
-
     STATE_COLORS = (
         colors.LIGHT_RED,  # ALARM
         colors.LIGHT_YELLOW,  # WARNING

@@ -339,18 +339,20 @@ class AcquisitionSsxWidget(qt_import.QWidget):
 
     def update_transmission_limits(self, limits):
         """
-        Updates transmission limits
-        :param limits: list of two floats
-        :return: None
+        Updates transmission limits.
+        
+        Args:
+            limits (tuple): A tuple containing the minimum and maximum transmission limits.
         """
-        if limits:
+        if limits and limits[0] is not None and limits[1] is not None:
             self.transmission_validator.setBottom(limits[0])
             self.transmission_validator.setTop(limits[1])
             self.acq_widget_layout.transmission_ledit.setToolTip(
                 "Transmission limits %0.2f : %0.2f %%\n" % (limits[0], limits[1])
-                + "2 digits precision."
             )
             self._acquisition_mib.validate_all()
+        else:
+            self.acq_widget_layout.transmission_ledit.setToolTip(r"Invalid transmission limits: {}".format(limits))
 
     def update_resolution_limits(self, limits):
         """

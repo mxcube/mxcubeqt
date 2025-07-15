@@ -169,4 +169,3 @@ class CustomInfoWidget(qt_import.QWidget):
             self.value_plot.add_new_plot_value(value)
 
     def open_history_view(self):
-        self.value_plot.setVisible(not self.value_plot.isVisible())

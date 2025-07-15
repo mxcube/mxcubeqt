@@ -477,18 +477,18 @@ class Spacer(qt_import.QFrame):
 
         if self.orientation == "horizontal":
             height = self.height() / 2
-            painter.drawLine(0, height, self.width(), height)
-            painter.drawLine(0, height, 5, height - 5)
-            painter.drawLine(0, height, 5, height + 5)
-            painter.drawLine(self.width(), height, self.width() - 5, height - 5)
-            painter.drawLine(self.width(), height, self.width() - 5, height + 5)
+            painter.drawLine(0, int(height), int(self.width()), int(height))
+            painter.drawLine(0,int(height), 5, int(height) - 5)
+            painter.drawLine(0, int(height), 5, int(height) + 5)
+            painter.drawLine(self.width(), int(height), self.width() - 5, int(height) - 5)
+            painter.drawLine(self.width(), int(height), self.width() - 5, int(height) + 5)
         else:
             width = self.width() / 2
-            painter.drawLine(self.width() / 2, 0, self.width() / 2, self.height())
-            painter.drawLine(width, 0, width - 5, 5)
-            painter.drawLine(width, 0, width + 5, 5)
-            painter.drawLine(width, self.height(), width - 5, self.height() - 5)
-            painter.drawLine(width, self.height(), width + 5, self.height() - 5)
+            painter.drawLine(int(self.width() / 2), 0,int(self.width() / 2),int( self.height()))
+            painter.drawLine(int(width), 0, int(width) - 5, 5)
+            painter.drawLine(int(width), 0, int(width) + 5, 5)
+            painter.drawLine(int(width), self.height(), int(width) - 5, self.height() - 5)
+            painter.drawLine(int(width), self.height(), int(width) + 5, self.height() - 5)
 
 class CustomFrame(qt_import.QFrame):
     def __init__(self, *args, **kwargs):

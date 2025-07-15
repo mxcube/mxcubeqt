@@ -34,7 +34,12 @@ import logging
 from mxcubeqt.base_components import BaseWidget
 from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils import sample_changer_helper as sc_helper
-from mxcubeqt.bricks.sample_changer_brick import SampleChangerBrick, BasketView, VialView, StatusView
+from mxcubeqt.bricks.sample_changer_brick import (
+    SampleChangerBrick,
+    BasketView,
+    VialView,
+    StatusView,
+)
 from mxcubecore import HardwareRepository as HWR
 
 
@@ -44,12 +49,10 @@ __category__ = "Sample changer"
 
 
 class P11SCStatusView(qt_import.QWidget):
-
     # statusMsgChangedSignal = qt_import.pyqtSignal(str, qt_import.QColor)
     # resetSampleChangerSignal = qt_import.pyqtSignal()
 
     def __init__(self, parent, brick):
-
         qt_import.QWidget.__init__(self, parent)
         self._parent = brick
 
@@ -94,7 +97,6 @@ class P11SCStatusView(qt_import.QWidget):
 
         # Qt signal/slot connections ------------------------------------------
 
-
     def set_expert_mode(self, expert):
         pass
 
@@ -104,7 +106,6 @@ class P11SCStatusView(qt_import.QWidget):
         self.setToolTip(status)
 
     def setState(self, state):
-
         color = sc_helper.SC_STATE_COLOR.get(state, None)
 
         if color is None:
@@ -121,10 +122,10 @@ class P11SCStatusView(qt_import.QWidget):
     def setIcons(self, *args):
         pass
 
+
 class P11SimpleBrick(SampleChangerBrick):
     def __init__(self, *args):
-
-        super(P11SimpleBrick,self).__init__(*args)
+        super(P11SimpleBrick, self).__init__(*args)
 
         self._powered_on = None
         self.state = sc_helper.SampleChangerState.Ready
@@ -140,18 +141,18 @@ class P11SimpleBrick(SampleChangerBrick):
         self.double_click_loads_cbox.hide()
 
         self.current_basket_view.hide()
-        #self.current_sample_view.hide()
+        # self.current_sample_view.hide()
 
         if HWR.beamline.sample_changer is not None:
-            #self.connect(
-                #HWR.beamline.sample_changer,
-                #"runningStateChanged",
-                #self._updatePathRunning,
-            #)
+            # self.connect(
+            # HWR.beamline.sample_changer,
+            # "runningStateChanged",
+            # self._updatePathRunning,
+            # )
             self.connect(
                 HWR.beamline.sample_changer,
                 "powerStateChanged",
-                self._update_power_state
+                self._update_power_state,
             )
 
             self._powered_on = HWR.beamline.sample_changer.is_powered()
@@ -159,7 +160,7 @@ class P11SimpleBrick(SampleChangerBrick):
 
     def build_status_view(self, container):
         return P11SCStatusView(container, self)
-        #return StatusView(container)
+        # return StatusView(container)
 
     def build_operations_widget(self):
         self.buttons_layout = qt_import.QHBoxLayout()
@@ -168,16 +169,25 @@ class P11SimpleBrick(SampleChangerBrick):
         self.load_button = qt_import.QPushButton("Load", self)
         self.unload_button = qt_import.QPushButton("Unload", self)
         self.wash_button = qt_import.QPushButton("Wash", self)
+        self.home_button = qt_import.QPushButton("Home position", self)
+        self.cool_button = qt_import.QPushButton("Cool position", self)
+        self.deice_button = qt_import.QPushButton("Deice", self)
         self.abort_button = qt_import.QPushButton("Abort", self)
 
         self.load_button.clicked.connect(self.load_selected_sample)
         self.unload_button.clicked.connect(self.unload_sample)
         self.wash_button.clicked.connect(self.wash_sample)
+        self.home_button.clicked.connect(self.home_robot)
+        self.cool_button.clicked.connect(self.cool_robot)
+        self.deice_button.clicked.connect(self.deice_robot)
         self.abort_button.clicked.connect(self.abort_mounting)
 
         self.buttons_layout.addWidget(self.load_button)
         self.buttons_layout.addWidget(self.unload_button)
         self.buttons_layout.addWidget(self.wash_button)
+        self.buttons_layout.addWidget(self.home_button)
+        self.buttons_layout.addWidget(self.cool_button)
+        self.buttons_layout.addWidget(self.deice_button)
         self.operation_buttons_layout.addLayout(self.buttons_layout)
         self.operation_buttons_layout.addWidget(self.abort_button)
         self.operations_widget.setLayout(self.operation_buttons_layout)
@@ -217,6 +227,9 @@ class P11SimpleBrick(SampleChangerBrick):
             self.load_button.setEnabled(False)
             self.unload_button.setEnabled(False)
             self.wash_button.setEnabled(False)
+            self.home_button.setEnabled(False)
+            self.cool_button.setEnabled(False)
+            self.deice_button.setEnabled(False)
             self.abort_button.setEnabled(False)
             abort_color = colors.LIGHT_GRAY
         elif ready:
@@ -245,8 +258,8 @@ class P11SimpleBrick(SampleChangerBrick):
         logging.getLogger("GUI").info("Loading sample: %s / %s" % (basket, vial))
 
         if basket is not None and vial is not None:
-             sample_loc = "%d:%d" % (basket, vial)
-             HWR.beamline.sample_changer.load(sample_loc, wait=False)
+            sample_loc = "%d:%d" % (basket, vial)
+            HWR.beamline.sample_changer.load(sample_loc, wait=False)
 
     def unload_sample(self):
         logging.getLogger("GUI").info("Unloading sample")
@@ -256,6 +269,17 @@ class P11SimpleBrick(SampleChangerBrick):
         logging.getLogger("GUI").info("Washing sample")
         HWR.beamline.sample_changer.wash()
 
+    def home_robot(self):
+        logging.getLogger("GUI").info("Home robot")
+        HWR.beamline.sample_changer.home()
+
+    def cool_robot(self):
+        logging.getLogger("GUI").info("Cool robot")
+        HWR.beamline.sample_changer.cool()
+
+    def deice_robot(self):
+        logging.getLogger("GUI").info("Deice robot")
+        HWR.beamline.sample_changer.deice()
 
     def abort_mounting(self):
         HWR.beamline.sample_changer._do_abort()
