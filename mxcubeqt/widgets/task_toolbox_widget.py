@@ -148,7 +148,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         if (
             HWR.beamline.energy_scan is None
             or in_plate_mode
-            or not HWR.beamline.tunable_wavelength
+            or not HWR.beamline.config.tunable_wavelength
         ):
             self.hide_task(self.energy_scan_page)
             logging.getLogger("HWR").info("Energy scan task not available")

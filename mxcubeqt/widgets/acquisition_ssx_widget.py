@@ -144,7 +144,7 @@ class AcquisitionSsxWidget(qt_import.QWidget):
             1, 9999999, self.acq_widget_layout.hare_num_ledit
         )
 
-        limits_dict = HWR.beamline.acquisition_limit_values
+        limits_dict = HWR.beamline.config.acquisition_limit_values
 
         tpl = limits_dict.get("exposure_time")
         if tpl:

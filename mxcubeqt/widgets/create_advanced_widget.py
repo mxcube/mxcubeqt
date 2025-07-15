@@ -160,7 +160,7 @@ class CreateAdvancedWidget(CreateTaskBase):
             "Total osc. range per line"
         )
 
-        self._advanced_methods = list(HWR.beamline.advanced_methods)
+        self._advanced_methods = list(HWR.beamline.config.advanced_methods)
         if self._advanced_methods:
             for method in self._advanced_methods:
                 self._advanced_methods_widget.method_combo.addItem(method)

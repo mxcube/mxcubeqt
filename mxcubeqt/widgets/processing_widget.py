@@ -117,9 +117,9 @@ class ProcessingWidget(qt_import.QWidget):
         self.processing_widget.pdb_file_ledit.setHidden(True)
         self.processing_widget.pdb_file_browse_button.setHidden(True)
 
-        if HWR.beamline.offline_processing_methods:
+        if HWR.beamline.config.offline_processing_methods:
             cbox_text = "Run offline processing ("
-            for method in HWR.beamline.offline_processing_methods:
+            for method in HWR.beamline.config.offline_processing_methods:
                 cbox_text += "%s, " % method
             cbox_text = cbox_text[:-2] + ")"
             self.processing_widget.run_offline_processing_cbox.setText(cbox_text)
@@ -128,9 +128,9 @@ class ProcessingWidget(qt_import.QWidget):
             self.processing_widget.run_offline_processing_cbox.setChecked(False)
             self.processing_widget.run_offline_processing_cbox.setEnabled(False)
 
-        if HWR.beamline.online_processing_methods:
+        if HWR.beamline.config.online_processing_methods:
             cbox_text = "Run online processing ("
-            for method in HWR.beamline.online_processing_methods:
+            for method in HWR.beamline.config.online_processing_methods:
                 cbox_text += "%s, " % method
             cbox_text = cbox_text[:-2] + ")"
             self.processing_widget.run_online_processing_cbox.setText(cbox_text)

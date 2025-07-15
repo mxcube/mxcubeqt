@@ -116,7 +116,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-        self.set_tunable_energy(HWR.beamline.tunable_wavelength)
+        self.set_tunable_energy(HWR.beamline.config.tunable_wavelength)
 
         if HWR.beamline.diffractometer.in_plate_mode():
             self.acq_widget_layout.num_images_cbox.clear()
@@ -197,7 +197,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
         pass
 
     def init_limits(self):
-        limits_dict = HWR.beamline.acquisition_limit_values
+        limits_dict = HWR.beamline.config.acquisition_limit_values
 
         tpl = limits_dict.get("osc_range")
         if tpl:
