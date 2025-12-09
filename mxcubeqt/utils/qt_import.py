@@ -254,10 +254,10 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
     except ImportError:
         pass
 
-    try:
-        from PyQt5.QtWebKit import QWebPage
-    except ImportError:
-        pass
+    # try:
+    #     from PyQt5.QtWebKit import QWebPage
+    # except ImportError:
+    #     pass
 
 #
 # PyQt4
@@ -408,10 +408,10 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
     except BaseException:
         pass
 
-    try:
-        from PyQt4.QtWebKit import QWebPage
-    except ImportError:
-        pass
+    # try:
+    #     from PyQt4.QtWebKit import QWebPage
+    # except ImportError:
+    #     pass
 
 #
 # PySide
