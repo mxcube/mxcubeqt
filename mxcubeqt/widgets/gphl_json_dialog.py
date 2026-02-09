@@ -61,7 +61,7 @@ class GphlJsonDialog(qt_import.QDialog):
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Expanding
         )
 
-        self.setWindowTitle("GΦL Workflow parameters")
+        self.setWindowTitle("GPhL Workflow parameters")
 
         # Parameter box
         self.parameter_gbox = qt_import.QGroupBox(self)
@@ -128,7 +128,7 @@ class GphlJsonDialog(qt_import.QDialog):
     def cancel_button_click(self) -> None:
         """Action when pressing Cancel
         - send PARAMETER_RETURN_SIGNAL with values and PARAMETERS_CANCELLED"""
-        logging.getLogger("HWR").debug("GΦL Data dialog abort pressed.")
+        logging.getLogger("HWR").debug("GPhL Data dialog abort pressed.")
         result = {}
         result.update(self.params_widget.get_values_map())
         self.reject()
@@ -148,7 +148,7 @@ class GphlJsonDialog(qt_import.QDialog):
         """Open GPhL UI dialog"""
 
         msg: str = (
-            "GΦL Workflow waiting for input, verify parameters and press continue."
+            "GPhL Workflow waiting for input, verify parameters and press continue."
         )
         logging.getLogger("user_level_log").info(msg)
 
