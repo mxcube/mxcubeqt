@@ -8,7 +8,7 @@ dependencies:
   - openjdk=11
   - pyqtgraph=0.13
   - pip
-  - poetry ==2.1.3
+  - poetry ==2.2.1
   # Uncomment as appropriate for demo environments
   # Put paths to repositories and PyQt and uncomment:
   - pip:
@@ -18,6 +18,8 @@ dependencies:
 #      - --editable /home/rhfogh/pycharm/mxcubeqt
 #      - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.11-cp38-abi3-manylinux_2_17_x86_64.whl
 # For mxlims_data_model
+#      - packaging
 #      - json-schema-for-humans
-#      - datamodel-code-generator
+#      - datamodel-code-generator==0.37.0
 #      - --editable /home/rhfogh/pycharm/mxlims_data_model
+m
