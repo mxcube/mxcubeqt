@@ -73,7 +73,7 @@ class CreateTaskBase(qt_import.QWidget):
         self._path_template = None
         self._enable_compression = None
 
-        self._in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
+        self._in_plate_mode = HWR.beamline.diffractometer.in_plate_mode
         
         HWR.beamline.energy.connect(
             "valueChanged", self.set_energy
@@ -147,7 +147,7 @@ class CreateTaskBase(qt_import.QWidget):
         if self._acq_widget:
             def_acq_parameters = HWR.beamline.get_default_acquisition_parameters()
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
-            if HWR.beamline.diffractometer.in_plate_mode():
+            if HWR.beamline.diffractometer.in_plate_mode:
                 self._acq_widget.use_kappa(False)
                 self._acq_widget.use_max_osc_range(True)
             else:
@@ -722,11 +722,11 @@ class CreateTaskBase(qt_import.QWidget):
                 ):
 
                     # Xray centering
-                    # TODO add dg_group for XrayCentering
+                    # TODO add dg_group for XrayCentring
                     # dc_group = self._tree_brick.dc_tree_widget.create_task_group(sample)
                     mesh_dc = self._create_dc_from_grid(sample)
-                    mesh_dc.run_online_processing = "XrayCentering"
-                    sc = queue_model_objects.XrayCentering(mesh_dc)
+                    mesh_dc.run_online_processing = "XrayCentring"
+                    sc = queue_model_objects.XrayCentring(mesh_dc)
                 if sc:
                     tasks.append(sc)
 
@@ -926,7 +926,7 @@ class CreateTaskBase(qt_import.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if HWR.beamline.diffractometer.in_plate_mode() and self._acq_widget:
+        if HWR.beamline.diffractometer.in_plate_mode and self._acq_widget:
             set_max_range = False
 
             if num_images is None:

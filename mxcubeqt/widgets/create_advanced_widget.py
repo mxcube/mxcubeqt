@@ -261,10 +261,10 @@ class CreateAdvancedWidget(CreateTaskBase):
             pass
             # self.setDisabled(False)
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem) or isinstance(
-            tree_item, queue_item.XrayCenteringQueueItem
+            tree_item, queue_item.XrayCentringQueueItem
         ):
 
-            if isinstance(tree_item, queue_item.XrayCenteringQueueItem):
+            if isinstance(tree_item, queue_item.XrayCentringQueueItem):
                 data_collection = tree_item.get_model().mesh_dc
             else:
                 data_collection = tree_item.get_model()
@@ -314,8 +314,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         exp_type = str(self._advanced_methods_widget.method_combo.currentText())
         if exp_type == "MeshScan":
             tasks.append(mesh_dc)
-        elif exp_type == "XrayCentering":
-            xray_centering = queue_model_objects.XrayCentering(mesh_dc)
+        elif exp_type == "XrayCentring":
+            xray_centering = queue_model_objects.XrayCentring(mesh_dc)
             tasks.append(xray_centering)
         elif exp_type == "MXPressO":
             optical_centering = queue_model_objects.OpticalCentring()

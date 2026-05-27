@@ -86,7 +86,7 @@ class AdvancedBrick(BaseWidget):
             HWR.beamline.session.get_base_process_directory()
         )
 
-        if isinstance(item, queue_item.XrayCenteringQueueItem):
+        if isinstance(item, queue_item.XrayCentringQueueItem):
             self._data_collection = item.get_model().mesh_dc
             self.mesh_parameters_widget.populate_widget(item, self._data_collection)
 
@@ -98,7 +98,7 @@ class AdvancedBrick(BaseWidget):
             self.mesh_parameters_widget.populate_widget(item, self._data_collection)
 
         self.line_parameters_widget.setEnabled(
-            isinstance(item, queue_item.XrayCenteringQueueItem)
+            isinstance(item, queue_item.XrayCentringQueueItem)
         )
 
         try:

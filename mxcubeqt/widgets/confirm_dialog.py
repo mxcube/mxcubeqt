@@ -157,7 +157,7 @@ class ConfirmDialog(qt_import.QDialog):
                 self.conf_dialog_layout.take_snapshots_combo.setCurrentIndex(
                     self.conf_dialog_layout.take_snapshots_combo.count() - 1
                 )
-            elif isinstance(item, queue_item.XrayCenteringQueueItem):
+            elif isinstance(item, queue_item.XrayCentringQueueItem):
                 acq_parameters = item_model.mesh_dc.acquisitions[
                     0
                 ].acquisition_parameters
@@ -267,7 +267,7 @@ class ConfirmDialog(qt_import.QDialog):
                 acq_parameters = item_model.reference_image_collection.acquisitions[
                     0
                 ].acquisition_parameters
-            elif isinstance(item_model, queue_model_objects.XrayCentering):
+            elif isinstance(item_model, queue_model_objects.XrayCentring):
                 acq_parameters = item_model.mesh_dc.acquisitions[
                     0
                 ].acquisition_parameters

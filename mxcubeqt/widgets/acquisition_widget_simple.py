@@ -118,7 +118,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
 
         self.set_tunable_energy(HWR.beamline.config.tunable_wavelength)
 
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode:
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
@@ -146,7 +146,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
 
     def use_kappa(self, state):
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode:
             state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
@@ -267,7 +267,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             self.resolution_validator,
         )
 
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode:
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)

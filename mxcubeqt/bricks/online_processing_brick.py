@@ -75,7 +75,7 @@ class OnlineProcessingBrick(BaseWidget):
         if HWR.beamline.online_processing is None:
             return
         data_collection = item.get_model()
-        if isinstance(item, queue_item.XrayCenteringQueueItem):
+        if isinstance(item, queue_item.XrayCentringQueueItem):
             data_collection = data_collection.mesh_dc
         self.hit_map_widget.set_data_collection(data_collection)
 
