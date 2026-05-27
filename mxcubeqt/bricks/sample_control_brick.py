@@ -202,7 +202,7 @@ class SampleControlBrick(BaseWidget):
         else:
             self.setEnabled(True)
 
-    def centring_started(self):
+    def centring_started(self, mode=None):
         self.setEnabled(True)
         self.centre_button.command_started()
         self.accept_button.setEnabled(False)
