@@ -98,7 +98,7 @@ class AdvancedParametersWidget(qt_import.QWidget):
         self._tree_view_item = tree_view_item
         self._data_collection = data_collection
 
-        # if isinstance(tree_view_item, queue_item.XrayCenteringQueueItem):
+        # if isinstance(tree_view_item, queue_item.XrayCentringQueueItem):
         #    self._data_collection = tree_view_item.get_model().reference_image_collection
         # else:
         #    self._data_collection = tree_view_item.get_model()

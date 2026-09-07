@@ -177,7 +177,7 @@ class KappaPhiBrick(BaseWidget):
         self.kappaphi_dspinbox.blockSignals(False)
 
     def diffractometer_state_changed(self, state):
-        self.setDisabled(HWR.beamline.diffractometer.in_plate_mode())
+        self.setDisabled(HWR.beamline.diffractometer.in_plate_mode)
         self.kappa_dspinbox.setEnabled(HWR.beamline.diffractometer.is_ready())
         self.kappaphi_dspinbox.setEnabled(HWR.beamline.diffractometer.is_ready())
         self.close_button.setEnabled(HWR.beamline.diffractometer.is_ready())

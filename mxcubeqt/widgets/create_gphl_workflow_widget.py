@@ -93,7 +93,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
 
         # set up popup data dialog
-        self.gphl_data_dialog = GphlJsonDialog(self, "GΦL Workflow Data")
+        self.gphl_data_dialog = GphlJsonDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
 
     def initialise_workflows(self):

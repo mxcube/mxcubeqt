@@ -323,7 +323,7 @@ class AcquisitionWidget(qt_import.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode:
             if hasattr(self.parent(), "set_osc_total_range"):
                 self.parent().set_osc_total_range(num_images)
                 self._acquisition_mib.validate_all()
@@ -360,7 +360,7 @@ class AcquisitionWidget(qt_import.QWidget):
 
     def use_kappa(self, state):
         if HWR.beamline.diffractometer is not None:
-            if HWR.beamline.diffractometer.in_plate_mode():
+            if HWR.beamline.diffractometer.in_plate_mode:
                 state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
@@ -459,7 +459,8 @@ class AcquisitionWidget(qt_import.QWidget):
 
         if overlap_ledit:
             self._acquisition_mib.bind_value_update(
-                "overlap",
+                #"overlap",
+                "offset",
                 overlap_ledit,
                 float,
                 qt_import.QDoubleValidator(-1000, 1000, 2, self),
@@ -704,7 +705,7 @@ class AcquisitionWidget(qt_import.QWidget):
         self._acquisition_mib.validate_all()
 
         return
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode:
             if num_images_limits is None:
                 try:
                     osc_start = float(self.acq_widget_layout.osc_start_ledit.text())

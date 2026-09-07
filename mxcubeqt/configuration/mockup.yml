@@ -184,7 +184,7 @@
             - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
               name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
             - {comment: '', default_value: '', hidden: false, name: mnemonicList,
-              old_value: '', type: string, value: /mxcollect /sample_changer}
+              old_value: '', type: string, value: /mxcollect /sample-changer-mockup}
             type: progress_bar_brick
           connections: []
           name: login_vbox
@@ -296,7 +296,7 @@
                     - {comment: '', default_value: '', hidden: false, name: label,
                       old_value: '', type: string, value: Omega}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /udiff_omega}
+                      old_value: '', type: string, value: /diff-omega-mockup}
                     - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
                       old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
@@ -364,7 +364,7 @@
                     - {comment: '', default_value: '', hidden: false, name: label,
                       old_value: '', type: string, value: Phi}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /udiff_kappaphi}
+                      old_value: '', type: string, value: /diff-kappaphi-mockup}
                     - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
                       old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
@@ -511,7 +511,7 @@
                     - {comment: '', default_value: '', hidden: false, name: label,
                       old_value: '', type: string, value: Kappa}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /udiff_kappa}
+                      old_value: '', type: string, value: /diff-kappa-mockup}
                     - {comment: '', default_value: 0, hidden: false, name: oneClickPressButton,
                       old_value: 0, type: boolean, value: 0}
                     - {comment: '', default_value: 1, hidden: false, name: showLabel,
@@ -559,7 +559,7 @@
                     - {comment: '', default_value: '', hidden: false, name: label,
                       old_value: '', type: string, value: Zoom}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /udiff_zoom}
+                      old_value: '', type: string, value: /diff-zoom}
                     - {comment: '', default_value: 1, hidden: false, name: showMoveButtons,
                       old_value: 1, type: boolean, value: 1}
                     type: motor_predef_pos_brick
@@ -677,7 +677,7 @@
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
                       - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
-                        old_value: /graphics, type: string, value: /sample_view}
+                        old_value: /graphics, type: string, value: /sample-view}
                       type: sample_view_brick
                     - children: []
                       connections: []
@@ -944,7 +944,7 @@
                       hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                       value: 0}
                     - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                      old_value: '', type: string, value: /slits}
+                      old_value: '', type: string, value: /slits-mockup}
                     type: slits_brick
                   - brick: {class: ApertureBrick, name: aperture_brick}
                     children: []
@@ -2716,7 +2716,7 @@
         - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
           type: boolean, value: 0}
         - {comment: '', default_value: '', hidden: false, name: hwobj_shutter, old_value: '',
-          type: string, value: /safety_shutter}
+          type: string, value: /safety-shutter-mockup}
         - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,

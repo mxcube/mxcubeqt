@@ -87,7 +87,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         if self.gphl_workflow_page is not None:
-            self.tool_box.addItem(self.gphl_workflow_page, "GΦL Workflows")
+            self.tool_box.addItem(self.gphl_workflow_page, "GPhL Workflows")
         self.tool_box.addItem(self.advanced_page, "Advanced")
         self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
         self.tool_box.addItem(self.ssx_page, "SSX")
@@ -143,7 +143,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             )
 
         # Other ---------------------------------------------------------------
-        in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
+        in_plate_mode = HWR.beamline.diffractometer.in_plate_mode
 
         if (
             HWR.beamline.energy_scan is None
@@ -164,7 +164,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         if HWR.beamline.gphl_connection and HWR.beamline.gphl_workflow:
             self.gphl_workflow_page.initialise_workflows()
         else:
-            logging.getLogger("HWR").info("GΦL workflow task not available")
+            logging.getLogger("HWR").info("GPhL workflow task not available")
 
     def set_available_tasks(self, available_tasks):
         for task_name in available_tasks.split():
@@ -287,7 +287,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             elif isinstance(tree_item, queue_item.GenericWorkflowQueueItem):
                 if self.tool_box.currentWidget() == self.workflow_page:
                     self.create_task_button.setEnabled(True)
-            elif isinstance(tree_item, queue_item.XrayCenteringQueueItem):
+            elif isinstance(tree_item, queue_item.XrayCentringQueueItem):
                 if self.tool_box.currentWidget() == self.advanced_page:
                     self.create_task_button.setEnabled(True)
             elif isinstance(tree_item, queue_item.XrayImagingQueueItem):
@@ -329,7 +329,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
                 self.tool_box.setCurrentWidget(self.gphl_workflow_page)
             elif isinstance(items[0], queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
-            elif isinstance(items[0], queue_item.XrayCenteringQueueItem):
+            elif isinstance(items[0], queue_item.XrayCentringQueueItem):
                 self.tool_box.setCurrentWidget(self.advanced_page)
             elif isinstance(items[0], queue_item.XrayImagingQueueItem):
                 self.tool_box.setCurrentWidget(self.xray_imaging_page)
@@ -473,7 +473,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             if isinstance(item, (
                 queue_item.SampleQueueItem,
                 queue_item.OpticalCentringQueueItem,
-                queue_item.XrayCenteringQueueItem)):
+                queue_item.XrayCentringQueueItem)):
                 if item != mounted_sample_item:
                     will_mount_sample = True
             else:
@@ -500,7 +500,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             if isinstance(item, (
                 queue_item.SampleCentringQueueItem,
                 queue_item.OpticalCentringQueueItem,
-                queue_item.XrayCenteringQueueItem)):
+                queue_item.XrayCentringQueueItem)):
                 item.setOn(False)
                 item.setText(1, "Skipped")
                 item.set_strike_out(True)

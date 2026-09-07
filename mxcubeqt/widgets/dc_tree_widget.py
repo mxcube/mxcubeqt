@@ -292,7 +292,7 @@ class DataCollectTree(qt_import.QWidget):
                 paste_action.setEnabled(self.item_copy is not None)
                 self.item_menu.addSeparator()
                 if not item.get_model().free_pin_mode:
-                    if HWR.beamline.diffractometer.in_plate_mode():
+                    if HWR.beamline.diffractometer.in_plate_mode:
                         self.plate_sample_to_mount = item
                         self.item_menu.addAction("Move", self.mount_sample)
                     else:
@@ -421,7 +421,7 @@ class DataCollectTree(qt_import.QWidget):
                 self.tree_brick.show_workflow_tab(item)
             elif isinstance(item, queue_item.DataCollectionGroupQueueItem):
                 self.tree_brick.show_dcg_tab(item)
-            elif isinstance(item, queue_item.XrayCenteringQueueItem):
+            elif isinstance(item, queue_item.XrayCentringQueueItem):
                 self.tree_brick.show_advanced_tab(item)
         # elif len(items) == 0:
         #    self.tree_brick.show_sample_tab()
@@ -854,7 +854,7 @@ class DataCollectTree(qt_import.QWidget):
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
 
-            if HWR.beamline.diffractometer.in_plate_mode():
+            if HWR.beamline.diffractometer.in_plate_mode:
                 try:
                     loaded_sample = HWR.beamline.plate_manipulator.getLoadedSample()
                     loaded_sample_loc = loaded_sample.getCoords()
@@ -981,7 +981,7 @@ class DataCollectTree(qt_import.QWidget):
         if isinstance(item, queue_item.SampleQueueItem):
             if item.get_model().free_pin_mode == True:
                 result = True
-            elif HWR.beamline.diffractometer.in_plate_mode():
+            elif HWR.beamline.diffractometer.in_plate_mode:
                 if HWR.beamline.plate_manipulator is not None:
                     if not HWR.beamline.plate_manipulator.has_loaded_sample():
                         result = False
@@ -1668,7 +1668,7 @@ class DataCollectTree(qt_import.QWidget):
                 group_name = "Energy scan"
             elif isinstance(self.item_copy[0], queue_model_objects.XRFSpectrum):
                 group_name = "XRF spectrum"
-            elif isinstance(self.item_copy[0], queue_model_objects.XrayCentering):
+            elif isinstance(self.item_copy[0], queue_model_objects.XrayCentring):
                 group_name = "Xray centering"
 
         task_group_node.set_name(group_name)
