@@ -19,7 +19,4 @@ dependencies:
 #      - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.11-cp38-abi3-manylinux_2_17_x86_64.whl
 # For mxlims_data_model
 #      - packaging
-#      - json-schema-for-humans
-#      - datamodel-code-generator==0.37.0
 #      - --editable /home/rhfogh/pycharm/mxlims_data_model
-m
